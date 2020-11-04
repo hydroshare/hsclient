@@ -1,11 +1,15 @@
 import os
 import requests
+import re
+import getpass
 
 from zope.interface import implementer
 
 from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, IFile, IAggregation, IResource
 from hs_rdf.schemas import load_rdf
 
+
+RESOURCE_PATTERN = re.compile('(.*)\/resource\/([A-z0-9\-_]{32})')
 
 def is_aggregation(path):
     return path.endswith('#aggregation')
@@ -17,16 +21,22 @@ class HydroShareSession:
     def __init__(self, username, password):
         self._session = requests.Session()
         if username and password:
-            self.set_auth(username, password)
+            self.set_auth((username, password))
 
     def set_auth(self, auth):
         self._session.auth = auth
 
     def retrieve(self, url, save_path):
-        file = self._session.request('GET', url, allow_redirects=True)
+        file = self._session.get(url, allow_redirects=True)
 
         with open(save_path, "wb") as f:
             f.write(file.content)
+
+    def upload_file(self, url, files):
+        return self._session.post(url, files=files)
+
+    def post(self, url):
+        return self._session.post(url)
 
 
 @implementer(IHydroShare)
@@ -39,7 +49,6 @@ class HydroShare:
         self.host = host
 
     def sign_in(self):
-        import getpass
         username = input("Username: ").strip()
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
@@ -51,13 +60,19 @@ class HydroShare:
         #TODO check resource_id for validity
         return Resource("https://{}/resource/{}/data/resourcemap.xml".format(self.host, resource_id), self._hs_session)
 
+    def create(self):
+        response = self._hs_session.post('https://{}/hsapi/resource/'.format(self.host))
+        resource_id = response.json()['resource_id']
+        return self.resource(resource_id)
+
 
 @implementer(IFile)
 class File:
 
-    def __init__(self, file_url, hs_session):
+    def __init__(self, file_url, hs_session, resource_id):
         self._url = file_url
         self._hs_session = hs_session
+        self._resource_id = resource_id
 
     @property
     def url(self):
@@ -79,11 +94,24 @@ class File:
     def relative_folder(self):
         return self.relative_path.rsplit(self.name, 1)[0]
 
+    @property
+    def checksum(self):
+        pass
+
     def download(self, save_path):
         self._hs_session.retrieve(self.url, save_path)
 
     def delete(self):
         pass
+
+    def overwrite(self, new_file):
+        """Overwrites the file with new_file"""
+
+    def rename(self, file_name):
+        """Updates the name of the file to file_name"""
+
+    def unzip(self):
+        """Unzips the file if it is a zip"""
 
 
 @implementer(IAggregation)
@@ -117,7 +145,7 @@ class Aggregation:
                 if not is_aggregation(str(file_url.path)):
                     if not file_url == self.metadata_url:
                         if not str(file_url.path).endswith('/'): # checking for folders, shouldn't have to do this
-                            self._parsed_files.append(File(file_url, self._hs_session))
+                            self._parsed_files.append(File(file_url, self._hs_session, self.resource_id))
         return self._parsed_files
 
     @property
@@ -143,7 +171,7 @@ class Aggregation:
 
     @property
     def metadata_url(self):
-        return self._map.describes.is_documented_by
+        return str(self._map.describes.is_documented_by)
 
     def download(self, save_path):
         pass
@@ -157,6 +185,14 @@ class Aggregation:
     def __str__(self):
         return self._map_url
 
+    @property
+    def url(self):
+        return str(self.metadata.rdf_subject)
+
+    @property
+    def resource_id(self):
+        RESOURCE_PATTERN.match(self.url).group(1)
+
     def _retrieve_and_parse(self, url):
         filename = 'retrieve_metadata.xml'
         try:
@@ -167,6 +203,21 @@ class Aggregation:
 
         return instance
 
+    def save(self):
+        id = self.metadata.identifier.hydroshare_identifier
+        id = id.replace('http://', 'https://')
+        index = id.find('dev-hs-1.cuahsi.org/') + 20
+        hsapi_url = id[:index] + 'hsapi/' + id[index:] + '/files/'
+        # this is ridiculous
+        self._hs_session.upload_file(hsapi_url,
+                                     files={'file': ('resourcemetadata.xml', self.metadata.rdf_string(rdf_format="xml"))})
+
+    def refresh(self):
+        self._retrieved_map = None
+        self._retrieved_metadata = None
+        self._parsed_files = None
+        self._parsed_aggregations = None
+
 @implementer(IResource)
 class Resource(Aggregation):
 
@@ -175,3 +226,18 @@ class Resource(Aggregation):
 
     def access_rules(self, public):
         pass
+
+    def create_reference(self, file_name, url):
+        """"""
+
+    def update_reference(self, file, url):
+        """"""
+
+    def delete(self):
+        """"""
+
+    def upload(self, *files, dest_folder, auto_aggregate):
+        """Uploads each file to the dest_folder"""
+
+    def delete_folder(self, folder_path):
+        """Deletes each file within folder_path"""

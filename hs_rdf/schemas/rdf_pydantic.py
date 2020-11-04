@@ -20,6 +20,12 @@ class RDFBaseModel(BaseModel):
                 yield f
 
     @classmethod
+    def _rdf_type(cls):
+        for f in cls.__fields__.values():
+            if f.alias == 'rdf_type':
+                return f
+
+    @classmethod
     def class_rdf_type(cls):
         if cls.__fields__['rdf_type']:
             return cls.__fields__['rdf_type'].default
@@ -42,7 +48,7 @@ class RDFBaseModel(BaseModel):
                         # primitive value
                         value = Literal(value)
                         graph.add((self.rdf_subject, predicate, value))
-        if self.rdf_type:
+        if self.rdf_type and self._rdf_type().field_info.extra.get('include', False):
             graph.add((self.rdf_subject, RDF.type, self.rdf_type))
         return graph
 

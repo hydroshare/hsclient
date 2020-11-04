@@ -2,11 +2,10 @@ import uuid
 from typing import List
 
 from pydantic import Field, AnyUrl
-from rdflib.term import Identifier
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
 from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
-    Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage
+    Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier
 from rdflib.term import Identifier as RDFIdentifier
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
@@ -17,12 +16,12 @@ def hs_uid():
 
 class ResourceMetadata(RDFBaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.resource)
+    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.resource, include=True)
 
-    title: str = Field(rdf_predicate=DC.title)
-    description: Description = Field(rdf_predicate=DC.description)
+    title: str = Field(rdf_predicate=DC.title, default=None)
+    description: Description = Field(rdf_predicate=DC.description, default=None)
     language: str = Field(rdf_predicate=DC.language)
-    subjects: List[str] = Field(rdf_predicate=DC.subject)
+    subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     dc_type: DCType = Field(rdf_predicate=DC.type)
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
     creator: List[Creator] = Field(rdf_predicate=DC.creator)

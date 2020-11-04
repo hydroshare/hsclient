@@ -87,7 +87,7 @@ class Creator(RDFBaseModel):
 
 
 class Contributor(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.contributor)
+    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.contributor, include=False)
 
     google_scholar_id: str = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
     research_gate_id: str = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
