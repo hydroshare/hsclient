@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import re
@@ -9,7 +10,7 @@ from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, I
 from hs_rdf.schemas import load_rdf
 
 
-RESOURCE_PATTERN = re.compile('(.*)\/resource\/([A-z0-9\-_]{32})')
+RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
 
 def is_aggregation(path):
     return path.endswith('#aggregation')
@@ -29,14 +30,25 @@ class HydroShareSession:
     def retrieve(self, url, save_path):
         file = self._session.get(url, allow_redirects=True)
 
-        with open(save_path, "wb") as f:
-            f.write(file.content)
+        if file.status_code != 200:
+            if file.status_code == 404:
+                raise Exception("Not Found - {}".format(url))
+            raise Exception("Failed to retrieve {}, status_code {}, message {}".format(url,
+                                                                                       file.status_code,
+                                                                                       file.text))
+        return file.content
 
     def upload_file(self, url, files):
         return self._session.post(url, files=files)
 
     def post(self, url):
         return self._session.post(url)
+
+    def get(self, url):
+        return self._session.get(url)
+
+    def delete(self, url):
+        return self._session.delete(url)
 
 
 @implementer(IHydroShare)
@@ -56,9 +68,11 @@ class HydroShare:
     def search(self):
         pass
 
-    def resource(self, resource_id):
-        #TODO check resource_id for validity
+    def resource(self, resource_id, validate=True):
         return Resource("https://{}/resource/{}/data/resourcemap.xml".format(self.host, resource_id), self._hs_session)
+        if validate:
+            res.metadata
+        return res
 
     def create(self):
         response = self._hs_session.post('https://{}/hsapi/resource/'.format(self.host))
@@ -69,10 +83,9 @@ class HydroShare:
 @implementer(IFile)
 class File:
 
-    def __init__(self, file_url, hs_session, resource_id):
+    def __init__(self, file_url, hs_session):
         self._url = file_url
         self._hs_session = hs_session
-        self._resource_id = resource_id
 
     @property
     def url(self):
@@ -85,10 +98,6 @@ class File:
     @property
     def full_path(self):
         return self._url.path
-
-    @property
-    def relative_path(self):
-        return self._url.path.split('/data/contents/', 1)[1]
 
     @property
     def relative_folder(self):
@@ -112,6 +121,9 @@ class File:
 
     def unzip(self):
         """Unzips the file if it is a zip"""
+
+    def __str__(self):
+        return str(self.url)
 
 
 @implementer(IAggregation)
@@ -145,7 +157,7 @@ class Aggregation:
                 if not is_aggregation(str(file_url.path)):
                     if not file_url == self.metadata_url:
                         if not str(file_url.path).endswith('/'): # checking for folders, shouldn't have to do this
-                            self._parsed_files.append(File(file_url, self._hs_session, self.resource_id))
+                            self._parsed_files.append(File(file_url, self._hs_session))
         return self._parsed_files
 
     @property
@@ -179,9 +191,6 @@ class Aggregation:
     def delete(self):
         pass
 
-    def upload(self, *files, dest_relative_path):
-        pass
-
     def __str__(self):
         return self._map_url
 
@@ -189,28 +198,12 @@ class Aggregation:
     def url(self):
         return str(self.metadata.rdf_subject)
 
-    @property
-    def resource_id(self):
-        RESOURCE_PATTERN.match(self.url).group(1)
-
     def _retrieve_and_parse(self, url):
         filename = 'retrieve_metadata.xml'
-        try:
-            self._hs_session.retrieve(url, filename)
-            instance = load_rdf(filename, file_format='xml')
-        finally:
-            os.remove(filename)
+        file_str = self._hs_session.retrieve(url, filename)
+        instance = load_rdf(file_str, file_format='xml')
 
         return instance
-
-    def save(self):
-        id = self.metadata.identifier.hydroshare_identifier
-        id = id.replace('http://', 'https://')
-        index = id.find('dev-hs-1.cuahsi.org/') + 20
-        hsapi_url = id[:index] + 'hsapi/' + id[index:] + '/files/'
-        # this is ridiculous
-        self._hs_session.upload_file(hsapi_url,
-                                     files={'file': ('resourcemetadata.xml', self.metadata.rdf_string(rdf_format="xml"))})
 
     def refresh(self):
         self._retrieved_map = None
@@ -221,8 +214,26 @@ class Aggregation:
 @implementer(IResource)
 class Resource(Aggregation):
 
+    @property
+    def _hsapi_url(self):
+        id = self.metadata.identifier.hydroshare_identifier
+        id = id.replace('http://', 'https://')
+        index = id.find('dev-hs-1.cuahsi.org/') + 20
+        return id[:index] + 'hsapi/' + id[index:]
+
+    def save(self):
+        hsapi_url = self._hsapi_url + '/files/'
+        # this is ridiculous
+        self._hs_session.upload_file(hsapi_url,
+                                     files={'file': ('resourcemetadata.xml', self.metadata.rdf_string(rdf_format="xml"))})
+
+    @property
+    def resource_id(self):
+        return self._map.identifier
+
     def system_metadata(self):
-        pass
+        hsapi_url = self._hsapi_url + '/sysmeta/'
+        return self._hs_session.get(hsapi_url).json()
 
     def access_rules(self, public):
         pass
@@ -235,9 +246,33 @@ class Resource(Aggregation):
 
     def delete(self):
         """"""
+        hsapi_url = self._hsapi_url
+        response = self._hs_session.delete(hsapi_url)
+        if response.status_code != 204:
+            raise Exception("Failed to delete - status code {} - url {}".format(response.status_code, hsapi_url))
+        self.refresh()
 
-    def upload(self, *files, dest_folder, auto_aggregate):
-        """Uploads each file to the dest_folder"""
+    def upload(self, *files, dest_relative_path=""):
+        zipped_file = 'files.zip'
+        overwrite = True
+        if len(files) == 1:
+            import zipfile
+            if zipfile.is_zipfile(files[0]):
+                zipped_file = files[0]
+        else:
+            dest_relative_path = dest_relative_path.strip("/")
+            from zipfile import ZipFile
+            # TODO should write to tmp directory
+            with ZipFile(zipped_file, 'w') as zipped:
+                for file in files:
+                    zipped.write(file)
+
+        url = self._hsapi_url + "/files/" + dest_relative_path
+        self._hs_session.upload_file(url,
+                                     files={
+                                         'file': open(zipped_file, 'rb')})
+        unzip_url = self._hsapi_url + "/functions/unzip/data/contents/" + dest_relative_path + "{}/".format(os.path.basename(zipped_file))
+        response = self._hs_session.post(unzip_url)
 
     def delete_folder(self, folder_path):
         """Deletes each file within folder_path"""

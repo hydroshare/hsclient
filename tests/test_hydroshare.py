@@ -19,7 +19,7 @@ def test_signin(monkeypatch):
     assert hs._hs_session._session.auth == ("test_username", "test_password")
 
 def test_search():
-    pass
+    raise NotImplementedError("Searching not implemented")
 
 def test_resource():
     hs = HydroShare("user", "pass")

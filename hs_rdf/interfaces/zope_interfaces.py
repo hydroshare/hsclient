@@ -44,11 +44,8 @@ class IFile(Interface):
     url = Attribute("The url of the file")
     name = Attribute("The name of the file")
     full_path = Attribute("The full path of the file")
-    relative_path = Attribute("The relative path of the file")
     relative_folder = Attribute("The relative folder holding the file")
-    # size = Attribute("Size of the file")
     checksum = Attribute("Checksum of the file")
-    # modified = Attribute("Modified date on the file")
 
     def download(save_path):
         """Downloads the file to save_path"""
@@ -75,7 +72,6 @@ class IAggregation(Interface):
     metadata = Attribute("The metadata")
     metadata_url = Attribute("The url of the metadata")
     url = Attribute("The url of the resource")
-    resource_id = Attribute("The resource id of the resource")
 
     def as_blah(self):
         """"""
