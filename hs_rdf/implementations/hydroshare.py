@@ -3,8 +3,12 @@ import os
 import requests
 import re
 import getpass
+import zipfile
+import tempfile
+import time
 
 from zope.interface import implementer
+from zipfile import ZipFile
 
 from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, IFile, IAggregation, IResource
 from hs_rdf.schemas import load_rdf
@@ -27,16 +31,34 @@ class HydroShareSession:
     def set_auth(self, auth):
         self._session.auth = auth
 
-    def retrieve(self, url, save_path):
+    def retrieve_string(self, url):
         file = self._session.get(url, allow_redirects=True)
-
         if file.status_code != 200:
             if file.status_code == 404:
                 raise Exception("Not Found - {}".format(url))
             raise Exception("Failed to retrieve {}, status_code {}, message {}".format(url,
                                                                                        file.status_code,
                                                                                        file.text))
-        return file.content
+        return file.text
+
+    def retrieve_task(self, url, save_path=""):
+        file = self._session.get(url, allow_redirects=True)
+
+        if file.headers['Content-Type'] != "application/zip":
+            response_json = json.loads(file.text)
+            if response_json["name"] == "bag download":
+                if response_json["status"] == "progress":
+                    time.sleep(1)
+                    return self.retrieve_task(url, save_path)
+                if response_json["status"] == "completed":
+                    return self.retrieve_task(url, save_path)
+
+        cd = file.headers['content-disposition']
+        filename = cd.split("filename=")[1].strip('"')
+        downloaded_file = os.path.join(save_path, filename)
+        with open(downloaded_file, 'wb') as f:
+            f.write(file.content)
+        return downloaded_file
 
     def upload_file(self, url, files):
         return self._session.post(url, files=files)
@@ -199,10 +221,8 @@ class Aggregation:
         return str(self.metadata.rdf_subject)
 
     def _retrieve_and_parse(self, url):
-        filename = 'retrieve_metadata.xml'
-        file_str = self._hs_session.retrieve(url, filename)
+        file_str = self._hs_session.retrieve_string(url)
         instance = load_rdf(file_str, file_format='xml')
-
         return instance
 
     def refresh(self):
@@ -235,6 +255,10 @@ class Resource(Aggregation):
         hsapi_url = self._hsapi_url + '/sysmeta/'
         return self._hs_session.get(hsapi_url).json()
 
+    def download(self, save_path):
+        # TODO, can we add download links to maps?
+        return self._hs_session.retrieve_task(self._hsapi_url, save_path=save_path)
+
     def access_rules(self, public):
         pass
 
@@ -253,25 +277,22 @@ class Resource(Aggregation):
         self.refresh()
 
     def upload(self, *files, dest_relative_path=""):
-        zipped_file = 'files.zip'
-        overwrite = True
-        if len(files) == 1:
-            import zipfile
-            if zipfile.is_zipfile(files[0]):
-                zipped_file = files[0]
+        if len(files) and zipfile.is_zipfile(files[0]):
+            self._upload(files[0], dest_relative_path=dest_relative_path)
         else:
-            dest_relative_path = dest_relative_path.strip("/")
-            from zipfile import ZipFile
-            # TODO should write to tmp directory
-            with ZipFile(zipped_file, 'w') as zipped:
-                for file in files:
-                    zipped.write(file)
+            with tempfile.TemporaryDirectory() as tmpdir:
+                zipped_file = os.path.join(tmpdir, 'files.zip')
+                with ZipFile(os.path.join(tmpdir, zipped_file), 'w') as zipped:
+                    for file in files:
+                        zipped.write(file, os.path.basename(file))
+                self._upload(zipped_file, dest_relative_path=dest_relative_path)
 
-        url = self._hsapi_url + "/files/" + dest_relative_path
+    def _upload(self, file, dest_relative_path):
+        url = self._hsapi_url + "/files/" + dest_relative_path.strip("/")
         self._hs_session.upload_file(url,
                                      files={
-                                         'file': open(zipped_file, 'rb')})
-        unzip_url = self._hsapi_url + "/functions/unzip/data/contents/" + dest_relative_path + "{}/".format(os.path.basename(zipped_file))
+                                         'file': open(file, 'rb')})
+        unzip_url = self._hsapi_url + "/functions/unzip/data/contents/" + dest_relative_path + "{}/".format(os.path.basename(file))
         response = self._hs_session.post(unzip_url)
 
     def delete_folder(self, folder_path):

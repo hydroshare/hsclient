@@ -22,7 +22,7 @@ class ResourceMetadata(RDFBaseModel):
     description: Description = Field(rdf_predicate=DC.description, default=None)
     language: str = Field(rdf_predicate=DC.language)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
-    dc_type: DCType = Field(rdf_predicate=DC.type)
+    dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource)
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
     creator: List[Creator] = Field(rdf_predicate=DC.creator)
 
