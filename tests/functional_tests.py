@@ -70,10 +70,13 @@ def test_resource_download(new_resource):
         bag = new_resource.download(tmp)
         assert os.path.exists(bag)
         assert bag.endswith(".zip")
-    pass
 
-def test_file_download():
-    pass
+def test_file_download(resource):
+    with tempfile.TemporaryDirectory() as tmp:
+        file = resource.files[0]
+        downloaded_file = file.download(tmp)
+        assert os.path.exists(downloaded_file)
+        assert os.path.basename(downloaded_file) == file.name
 
 def test_aggregation_download():
     pass
@@ -84,20 +87,30 @@ def test_aggregation_delete():
 def test_aggregation_remove():
     pass
 
-def test_upload():
-    pass
-
-def test_file_overwrite():
-    pass
-
-def test_file_rename():
-    pass
+def test_file_upload_and_rename(new_resource):
+    assert len(new_resource.files) == 0
+    new_resource.upload("data/other.txt")
+    new_resource.refresh()
+    assert len(new_resource.files) == 1
+    file = new_resource.files[0]
+    file.rename("updated.txt")
+    new_resource.refresh()
+    assert new_resource.files[0].name == "updated.txt"
 
 def test_file_aggregate():
     pass
 
 def test_create_update_reference():
     pass
+
+def test_file_unzip(new_resource):
+    new_resource.upload("data/georaster_composite.zip")
+    new_resource.refresh()
+    assert 1 == len(new_resource.files)
+    assert 0 == len(new_resource.aggregations)
+    new_resource.files[0].unzip()
+    new_resource.refresh()
+    assert 1 == len(new_resource.aggregations)
 
 def test_delete_folder():
     pass

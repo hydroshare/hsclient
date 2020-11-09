@@ -41,17 +41,8 @@ class HydroShareSession:
                                                                                        file.text))
         return file.text
 
-    def retrieve_task(self, url, save_path=""):
+    def retrieve_file(self, url, save_path=""):
         file = self._session.get(url, allow_redirects=True)
-
-        if file.headers['Content-Type'] != "application/zip":
-            response_json = json.loads(file.text)
-            if response_json["name"] == "bag download":
-                if response_json["status"] == "progress":
-                    time.sleep(1)
-                    return self.retrieve_task(url, save_path)
-                if response_json["status"] == "completed":
-                    return self.retrieve_task(url, save_path)
 
         cd = file.headers['content-disposition']
         filename = cd.split("filename=")[1].strip('"')
@@ -60,11 +51,19 @@ class HydroShareSession:
             f.write(file.content)
         return downloaded_file
 
+    def retrieve_task(self, url, save_path=""):
+        file = self._session.get(url, allow_redirects=True)
+
+        if file.headers['Content-Type'] != "application/zip":
+            time.sleep(1)
+            return self.retrieve_task(url, save_path)
+        return self.retrieve_file(url, save_path)
+
     def upload_file(self, url, files):
         return self._session.post(url, files=files)
 
-    def post(self, url):
-        return self._session.post(url)
+    def post(self, url, data=None):
+        return self._session.post(url, data=data)
 
     def get(self, url):
         return self._session.get(url)
@@ -114,12 +113,20 @@ class File:
         return str(self._url)
 
     @property
+    def _hsapi_url(self):
+        return self.url.replace(self.relative_path, "").replace("resource", "hsapi/resource").replace('http://', 'https://')
+
+    @property
     def name(self):
         return os.path.basename(self._url.path)
 
     @property
     def full_path(self):
         return self._url.path
+
+    @property
+    def relative_path(self):
+        return "data/contents/" + self._url.path.split('/data/contents/', 1)[1]
 
     @property
     def relative_folder(self):
@@ -130,19 +137,26 @@ class File:
         pass
 
     def download(self, save_path):
-        self._hs_session.retrieve(self.url, save_path)
+        return self._hs_session.retrieve_file(self.url, save_path)
 
     def delete(self):
         pass
 
-    def overwrite(self, new_file):
-        """Overwrites the file with new_file"""
-
     def rename(self, file_name):
         """Updates the name of the file to file_name"""
+        rename_url = self._hsapi_url + "functions/move-or-rename/"
+        source_path = self.relative_path
+        target_path = self.relative_folder + file_name
+        response = self._hs_session.post(rename_url, data={"source_path": source_path, "target_path": target_path})
+        response.status_code
 
     def unzip(self):
-        """Unzips the file if it is a zip"""
+        if not self.name.endswith(".zip"):
+            raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
+        unzip_url = self._hsapi_url + "functions/unzip/data/contents/{}/".format(self.name)
+        response = self._hs_session.post(unzip_url)
+        response.status_code
+
 
     def __str__(self):
         return str(self.url)
@@ -208,6 +222,9 @@ class Aggregation:
         return str(self._map.describes.is_documented_by)
 
     def download(self, save_path):
+        return self._hs_session.retrieve_task(self._hsapi_url, save_path=save_path)
+
+    def remove(self):
         pass
 
     def delete(self):
@@ -277,7 +294,7 @@ class Resource(Aggregation):
         self.refresh()
 
     def upload(self, *files, dest_relative_path=""):
-        if len(files) and zipfile.is_zipfile(files[0]):
+        if len(files) == 1 and zipfile.is_zipfile(files[0]):
             self._upload(files[0], dest_relative_path=dest_relative_path)
         else:
             with tempfile.TemporaryDirectory() as tmpdir:
@@ -286,14 +303,14 @@ class Resource(Aggregation):
                     for file in files:
                         zipped.write(file, os.path.basename(file))
                 self._upload(zipped_file, dest_relative_path=dest_relative_path)
+                unzip_url = self._hsapi_url + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
+                response = self._hs_session.post(unzip_url)
 
     def _upload(self, file, dest_relative_path):
         url = self._hsapi_url + "/files/" + dest_relative_path.strip("/")
         self._hs_session.upload_file(url,
                                      files={
                                          'file': open(file, 'rb')})
-        unzip_url = self._hsapi_url + "/functions/unzip/data/contents/" + dest_relative_path + "{}/".format(os.path.basename(file))
-        response = self._hs_session.post(unzip_url)
 
     def delete_folder(self, folder_path):
         """Deletes each file within folder_path"""
