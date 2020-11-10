@@ -130,6 +130,14 @@ def test_file_unzip(new_resource):
     new_resource.refresh()
     assert 1 == len(new_resource.aggregations)
 
+def test_delete_file(new_resource):
+    new_resource.upload("data/other.txt")
+    new_resource.refresh()
+    assert len(new_resource.files) == 1
+    new_resource.files[0].delete()
+    new_resource.refresh()
+    assert len(new_resource.files) == 0
+
 def test_delete_folder():
     pass
 

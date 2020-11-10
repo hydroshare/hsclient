@@ -140,7 +140,9 @@ class File:
         return self._hs_session.retrieve_file(self.url, save_path)
 
     def delete(self):
-        pass
+        url = self._hsapi_url + "files/" + self.relative_path.rsplit("data/contents/")[1]
+        response = self._hs_session.delete(url)
+        response.status_code
 
     def rename(self, file_name):
         """Updates the name of the file to file_name"""
