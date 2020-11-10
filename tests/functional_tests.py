@@ -25,11 +25,13 @@ def new_resource(hydroshare):
 def resource(new_resource):
     new_resource.upload("data/georaster_composite.zip")
     new_resource.refresh()
+    new_resource.files[0].unzip()
+    new_resource.refresh()
     return new_resource
 
 def test_resource_metadata_updating(new_resource):
 
-    assert 0 == len(new_resource.metadata.subjects)
+    assert len(new_resource.metadata.subjects) == 0
 
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
@@ -38,7 +40,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.refresh()
 
     assert 'resource test' == new_resource.metadata.title
-    assert 2 == len(new_resource.metadata.subjects)
+    assert len(new_resource.metadata.subjects) == 2
 
 def test_system_metadata(new_resource):
 
@@ -124,11 +126,11 @@ def test_create_update_reference(new_resource):
 def test_file_unzip(new_resource):
     new_resource.upload("data/georaster_composite.zip")
     new_resource.refresh()
-    assert 1 == len(new_resource.files)
-    assert 0 == len(new_resource.aggregations)
+    assert len(new_resource.files) == 1
+    assert len(new_resource.aggregations) == 0
     new_resource.files[0].unzip()
     new_resource.refresh()
-    assert 1 == len(new_resource.aggregations)
+    assert len(new_resource.aggregations) == 1
 
 def test_delete_file(new_resource):
     new_resource.upload("data/other.txt")
@@ -149,14 +151,14 @@ def test_refresh(resource):
     resource.files
     resource.aggregations
 
-    assert None is not resource._retrieved_map
-    assert None is not resource._retrieved_metadata
-    assert None is not resource._parsed_files
-    assert None is not resource._parsed_aggregations
+    assert resource._retrieved_map is not None
+    assert resource._retrieved_metadata is not None
+    assert resource._parsed_files is not None
+    assert resource._parsed_aggregations is not None
 
     resource.refresh()
 
-    assert None is resource._retrieved_map
-    assert None is resource._retrieved_metadata
-    assert None is resource._parsed_files
-    assert None is resource._parsed_aggregations
+    assert resource._retrieved_map is None
+    assert resource._retrieved_metadata is None
+    assert resource._parsed_files is None
+    assert resource._parsed_aggregations is None
