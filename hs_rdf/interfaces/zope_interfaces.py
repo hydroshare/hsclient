@@ -104,10 +104,10 @@ class IResource(Interface):
     url = Attribute("The url of the resource")
     resource_id = Attribute("The resource id of the resource")
 
-    def create_reference(file_name, url):
+    def create_reference(file_name, url, path):
         """"""
 
-    def update_reference(file, url):
+    def update_reference(file, url, path):
         """"""
 
     def download(save_path):

@@ -136,7 +136,7 @@ class File:
     def checksum(self):
         pass
 
-    def download(self, save_path):
+    def download(self, save_path=""):
         return self._hs_session.retrieve_file(self.url, save_path)
 
     def delete(self):
@@ -279,11 +279,20 @@ class Resource(Aggregation):
     def access_rules(self, public):
         pass
 
-    def create_reference(self, file_name, url):
-        """"""
+    def create_reference(self, file_name, url, path=''):
+        request_url = self._hsapi_url.replace(self.resource_id, "") + "data-store-add-reference/"
+        response = self._hs_session.post(request_url, data={"res_id": self.resource_id,
+                                                            "curr_path": path,
+                                                            "ref_name": file_name,
+                                                            "ref_url": url})
+        response.status_code
 
-    def update_reference(self, file, url):
-        """"""
+    def update_reference(self, file_name, url, path=''):
+        request_url = self._hsapi_url.replace(self.resource_id, "") + "data_store_edit_reference_url/"
+        response = self._hs_session.post(request_url, data={"res_id": self.resource_id,
+                                                            "curr_path": path,
+                                                            "url_filename": file_name,
+                                                            "new_ref_url": url})
 
     def delete(self):
         """"""

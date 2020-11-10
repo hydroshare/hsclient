@@ -97,11 +97,29 @@ def test_file_upload_and_rename(new_resource):
     new_resource.refresh()
     assert new_resource.files[0].name == "updated.txt"
 
-def test_file_aggregate():
+def test_file_aggregate(new_resource):
     pass
 
-def test_create_update_reference():
-    pass
+def test_create_update_reference(new_resource):
+    assert len(new_resource.aggregations) == 0
+    new_resource.create_reference("reference", "http://studio.bakajo.com")
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 1
+    aggregation = new_resource.aggregations[0]
+    assert len(aggregation.files) == 1
+    file = aggregation.files[0]
+    assert file.name == "reference.url"
+    with tempfile.TemporaryDirectory() as tmp:
+        file.download(tmp)
+        with open(os.path.join(tmp, file.name), "r") as f:
+            assert "http://studio.bakajo.com" in str(f.read())
+
+    new_resource.update_reference(new_resource.aggregations[0].files[0].name, "https://duckduckgo.com")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        new_resource.aggregations[0].files[0].download(tmp)
+        with open(os.path.join(tmp, file.name), "r") as f:
+            assert "https://duckduckgo.com" in str(f.read())
 
 def test_file_unzip(new_resource):
     new_resource.upload("data/georaster_composite.zip")
