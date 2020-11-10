@@ -10,6 +10,8 @@ import time
 from zope.interface import implementer
 from zipfile import ZipFile
 
+from enum import Enum
+
 from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, IFile, IAggregation, IResource
 from hs_rdf.schemas import load_rdf
 
@@ -18,6 +20,16 @@ RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
 
 def is_aggregation(path):
     return path.endswith('#aggregation')
+
+
+class AggregationType(Enum):
+    SingleFile = 1
+    FileSet = 2
+    GeoRaster = 3
+    NetCDF = 4
+    GeoFeature = 5
+    RefTimeseries = 6
+    TimeSeries = 7
 
 
 @implementer(IHydroShareSession)
@@ -64,6 +76,9 @@ class HydroShareSession:
 
     def post(self, url, data=None):
         return self._session.post(url, data=data)
+
+    def put(self, url, data=None):
+        return self._session.put(url, data=data)
 
     def get(self, url):
         return self._session.get(url)
@@ -140,7 +155,7 @@ class File:
         return self._hs_session.retrieve_file(self.url, save_path)
 
     def delete(self):
-        url = self._hsapi_url + "files/" + self.relative_path.rsplit("data/contents/")[1]
+        url = self._hsapi_url + "files/" + self.relative_path.split("data/contents/", 1)[1]
         response = self._hs_session.delete(url)
         response.status_code
 
@@ -159,6 +174,10 @@ class File:
         response = self._hs_session.post(unzip_url)
         response.status_code
 
+    def aggregate(self, type: AggregationType):
+        url = self._hsapi_url + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type.name + "/"
+        response = self._hs_session.post(url)
+        response.status_code
 
     def __str__(self):
         return str(self.url)
@@ -270,6 +289,12 @@ class Resource(Aggregation):
     def resource_id(self):
         return self._map.identifier
 
+    @property
+    def access_permission(self):
+        url = self._hsapi_url + "/access/"
+        response = self._hs_session.get(url)
+        return response.json()
+
     def system_metadata(self):
         hsapi_url = self._hsapi_url + '/sysmeta/'
         return self._hs_session.get(hsapi_url).json()
@@ -279,7 +304,12 @@ class Resource(Aggregation):
         return self._hs_session.retrieve_task(self._hsapi_url, save_path=save_path)
 
     def access_rules(self, public):
-        pass
+        url = self._hsapi_url + "access/"
+
+    def create_folder(self, folder):
+        url = self._hsapi_url + "/folders/" + folder + "/"
+        response = self._hs_session.put(url)
+        response.status_code
 
     def create_reference(self, file_name, url, path=''):
         request_url = self._hsapi_url.replace(self.resource_id, "") + "data-store-add-reference/"
@@ -305,8 +335,9 @@ class Resource(Aggregation):
         self.refresh()
 
     def upload(self, *files, dest_relative_path=""):
-        if len(files) == 1 and zipfile.is_zipfile(files[0]):
-            self._upload(files[0], dest_relative_path=dest_relative_path)
+        if len(files) == 1:
+            response = self._upload(files[0], dest_relative_path=dest_relative_path)
+            response.status_code
         else:
             with tempfile.TemporaryDirectory() as tmpdir:
                 zipped_file = os.path.join(tmpdir, 'files.zip')
@@ -316,12 +347,12 @@ class Resource(Aggregation):
                 self._upload(zipped_file, dest_relative_path=dest_relative_path)
                 unzip_url = self._hsapi_url + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
                 response = self._hs_session.post(unzip_url)
+                response.status_code
 
     def _upload(self, file, dest_relative_path):
-        url = self._hsapi_url + "/files/" + dest_relative_path.strip("/")
-        self._hs_session.upload_file(url,
-                                     files={
-                                         'file': open(file, 'rb')})
+        url = self._hsapi_url + "/files/" + dest_relative_path.strip("/") + "/"
+        response = self._hs_session.upload_file(url, files={'file': open(file, 'rb')})
+        return response
 
     def delete_folder(self, folder_path):
         """Deletes each file within folder_path"""

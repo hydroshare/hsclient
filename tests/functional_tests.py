@@ -2,7 +2,7 @@ import pytest
 import tempfile
 import os
 
-from hs_rdf.implementations.hydroshare import HydroShare, Aggregation
+from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas import ResourceMetadata
 
 
@@ -16,7 +16,7 @@ def new_resource(hydroshare):
     new_resource = hydroshare.create()
     yield new_resource
     try:
-        resource.delete()
+        new_resource.delete()
     except:
         # resource already deleted
         pass
@@ -100,7 +100,16 @@ def test_file_upload_and_rename(new_resource):
     assert new_resource.files[0].name == "updated.txt"
 
 def test_file_aggregate(new_resource):
-    pass
+    assert len(new_resource.files) == 0
+    new_resource.create_folder("folder")
+    new_resource.upload("data/other.txt", dest_relative_path="folder")
+    new_resource.refresh()
+    assert len(new_resource.files) == 1
+    new_resource.files[0].aggregate(AggregationType.SingleFile)
+    new_resource.refresh()
+    assert len(new_resource.files) == 0
+    assert len(new_resource.aggregations) == 1
+    assert len(new_resource.aggregations[0].files) == 1
 
 def test_create_update_reference(new_resource):
     assert len(new_resource.aggregations) == 0
@@ -143,7 +152,8 @@ def test_delete_file(new_resource):
 def test_delete_folder():
     pass
 
-def test_access_rules():
+def test_access_rules(new_resource):
+    ap = new_resource.access_permission
     pass
 
 def test_refresh(resource):
