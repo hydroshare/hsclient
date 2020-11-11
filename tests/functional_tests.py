@@ -80,14 +80,32 @@ def test_file_download(resource):
         assert os.path.exists(downloaded_file)
         assert os.path.basename(downloaded_file) == file.name
 
-def test_aggregation_download():
-    pass
+def test_aggregation_download(resource):
+    assert len(resource.aggregations) == 1
+    agg = resource.aggregations[0]
+    with tempfile.TemporaryDirectory() as tmp:
+        agg.download(tmp)
+        files = os.listdir(tmp)
+        assert len(files) == 1
+        assert files[0] == "logan.vrt.zip"
 
-def test_aggregation_delete():
-    pass
+def test_aggregation_delete(resource):
+    assert len(resource.aggregations) == 1
+    assert len(resource.files) == 1
+    agg = resource.aggregations[0]
+    agg.delete()
+    resource.refresh()
+    assert len(resource.aggregations) == 0
+    assert len(resource.files) == 1
 
-def test_aggregation_remove():
-    pass
+def test_aggregation_remove(resource):
+    assert len(resource.aggregations) == 1
+    assert len(resource.files) == 1
+    agg = resource.aggregations[0]
+    agg.remove()
+    resource.refresh()
+    assert len(resource.aggregations) == 0
+    assert len(resource.files) == 4
 
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files) == 0
@@ -105,7 +123,7 @@ def test_file_aggregate(new_resource):
     new_resource.upload("data/other.txt", dest_relative_path="folder")
     new_resource.refresh()
     assert len(new_resource.files) == 1
-    new_resource.files[0].aggregate(AggregationType.SingleFile)
+    new_resource.files[0].aggregate(AggregationType.SingleFileAggregation)
     new_resource.refresh()
     assert len(new_resource.files) == 0
     assert len(new_resource.aggregations) == 1

@@ -23,13 +23,28 @@ def is_aggregation(path):
 
 
 class AggregationType(Enum):
-    SingleFile = 1
-    FileSet = 2
-    GeoRaster = 3
-    NetCDF = 4
-    GeoFeature = 5
-    RefTimeseries = 6
-    TimeSeries = 7
+
+    SingleFileAggregation = "SingleFile"
+    FileSetAggregation = "FileSet"
+    GeographicRasterAggregation = "GeoRaster"
+    MultidimensionalAggregation = "NetCDF"
+    GeographicFeatureAggregation = "GeoFeature"
+    ReferencedTimeSeriesAggregation = "RefTimeseries"
+    TimeSeriesAggregation = "TimeSeries"
+
+
+def main_file_type(type: AggregationType):
+    if type == AggregationType.GeographicRasterAggregation:
+        return ".vrt"
+    if type == AggregationType.MultidimensionalAggregation:
+        return ".nc"
+    if type == AggregationType.GeographicFeatureAggregation:
+        return ".shp"
+    if type == AggregationType.ReferencedTimeSeriesAggregation:
+        return ".refts.json"
+    if type == AggregationType.TimeSeriesAggregation:
+        return ".sqlite"
+    return None
 
 
 @implementer(IHydroShareSession)
@@ -70,6 +85,26 @@ class HydroShareSession:
             time.sleep(1)
             return self.retrieve_task(url, save_path)
         return self.retrieve_file(url, save_path)
+
+    def check_task(self, task_id):
+        response = self._session.get("https://dev-hs-1.cuahsi.org/hsapi/taskstatus/{}/".format(task_id))
+        return response.json()['status']
+
+    def retrieve_zip(self, url, save_path=""):
+        file = self._session.get(url, allow_redirects=True)
+
+        json_response = file.json()
+        task_id = json_response['task_id']
+        download_path = json_response['download_path']
+        zip_status = json_response['zip_status']
+        if zip_status == "Not ready":
+            # https://www.hydroshare.org/django_irods/check_task_status/ POST task_id=res_id
+            while self.check_task(task_id) != 'true':
+                time.sleep(1)
+        from urllib.parse import urlparse
+        url_parsed = urlparse(url)
+        url = url.split(url_parsed.path, 1)[0]
+        return self.retrieve_file(url + download_path, save_path)
 
     def upload_file(self, url, files):
         return self._session.post(url, files=files)
@@ -175,7 +210,7 @@ class File:
         response.status_code
 
     def aggregate(self, type: AggregationType):
-        url = self._hsapi_url + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type.name + "/"
+        url = self._hsapi_url + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type.value + "/"
         response = self._hs_session.post(url)
         response.status_code
 
@@ -242,13 +277,49 @@ class Aggregation:
     def metadata_url(self):
         return str(self._map.describes.is_documented_by)
 
+    @property
+    def type(self):
+        return self.metadata.rdf_type.split("/terms/")[1]
+
+    @property
+    def main_file_path(self):
+        mft = main_file_type(AggregationType[self.type])
+        for file in self.files:
+            if str(file).endswith(mft):
+                return file.relative_path
+
+    @property
+    def _hsapi_url(self):
+        from urllib.parse import urlparse
+        url = urlparse(self.metadata_url)
+        hsapi_path = "/hsapi" + url.path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
+        hsapi_url = url.geturl().replace("http://", "https://").replace(url.path, hsapi_path)
+        return hsapi_url
+
+    @property
+    def _resource_url(self):
+        from urllib.parse import urlparse
+        url = urlparse(self.metadata_url)
+        resource_path = url.path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
+        resource_url = url.geturl().replace("http://", "https://").replace(url.path, resource_path)
+        return resource_url
+
     def download(self, save_path):
-        return self._hs_session.retrieve_task(self._hsapi_url, save_path=save_path)
+        url = self._resource_url + self.main_file_path + "?zipped=true&aggregation=true"
+        url = url.replace('resource', 'django_irods/rest_download')
+        return self._hs_session.retrieve_zip(url, save_path=save_path)
 
     def remove(self):
+        url = self._hsapi_url + "functions/remove-file-type/" + AggregationType[self.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
+        response = self._hs_session.post(url)
+        response.status_code
         pass
 
     def delete(self):
+        url = self._hsapi_url + "functions/delete-file-type/" + AggregationType[self.type].value + "LogicalFile" + \
+              self.main_file_path.split("data/contents")[1] + "/"
+        response = self._hs_session.delete(url)
+        response.status_code
         pass
 
     def __str__(self):
@@ -350,7 +421,9 @@ class Resource(Aggregation):
                 response.status_code
 
     def _upload(self, file, dest_relative_path):
-        url = self._hsapi_url + "/files/" + dest_relative_path.strip("/") + "/"
+        stripped_path = dest_relative_path.strip("/")
+        stripped_path = stripped_path + "/" if stripped_path else ""
+        url = self._hsapi_url + "/files/" + stripped_path
         response = self._hs_session.upload_file(url, files={'file': open(file, 'rb')})
         return response
 
