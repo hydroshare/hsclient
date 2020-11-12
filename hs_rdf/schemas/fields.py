@@ -112,8 +112,8 @@ class BandInformation(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.BandInformation)
 
     name: str = Field(rdf_predicate=HSTERMS.name)
-    variable_name: str = Field(rdf_predicate=HSTERMS.variableName)
-    variable_unit: str = Field(rdf_predicate=HSTERMS.variableUnit)
+    variable_name: str = Field(rdf_predicate=HSTERMS.variableName, default=None)
+    variable_unit: str = Field(rdf_predicate=HSTERMS.variableUnit, default=None)
 
     no_data_value: str = Field(rdf_predicate=HSTERMS.noDataValue, default=None)
     maximum_value: List[str] = Field(rdf_predicate=HSTERMS.maximumValue, default=None)

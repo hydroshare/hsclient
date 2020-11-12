@@ -4,11 +4,12 @@ import os
 
 from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas import ResourceMetadata
+from hs_rdf.schemas.fields import ExtendedMetadata
 
 
 @pytest.fixture()
 def hydroshare():
-    hs = HydroShare('sblack', 'password')
+    hs = HydroShare('admin', 'default')
     return hs
 
 @pytest.fixture()
@@ -35,12 +36,24 @@ def test_resource_metadata_updating(new_resource):
 
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
+    em = [ExtendedMetadata(key="key1", value="value1"), ExtendedMetadata(key="key2", value="value2"),
+          ExtendedMetadata(key="key3", value="value3")]
+    new_resource.metadata.extended_metadata = em
 
     new_resource.save()
     new_resource.refresh()
 
     assert 'resource test' == new_resource.metadata.title
     assert len(new_resource.metadata.subjects) == 2
+
+    assert len(new_resource.metadata.extended_metadata) == 3
+    keys = ['key1', 'key2', 'key3']
+    values = ['value1', 'value2', 'value3']
+    for i, em in enumerate(new_resource.metadata.extended_metadata):
+        assert em.key in keys
+        keys.remove(em.key)
+        assert em.value in values
+        values.remove(em.value)
 
 def test_system_metadata(new_resource):
 

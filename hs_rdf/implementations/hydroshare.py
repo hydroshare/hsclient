@@ -9,7 +9,7 @@ import time
 
 from zope.interface import implementer
 from zipfile import ZipFile
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 from enum import Enum
 
@@ -51,10 +51,12 @@ def main_file_type(type: AggregationType):
 @implementer(IHydroShareSession)
 class HydroShareSession:
 
-    def __init__(self, username, password, host):
+    def __init__(self, username, password, host, protocol, port):
         self._session = requests.Session()
         self.set_auth((username, password))
         self._host = host
+        self._protocol = protocol
+        self._port = port
 
     def set_auth(self, auth):
         self._session.auth = auth
@@ -65,7 +67,7 @@ class HydroShareSession:
 
     @property
     def base_url(self):
-        return "https://" + self.host
+        return "{}://{}:{}".format(self._protocol, self._host, self._port)
 
     def _build_url(self, path: str):
         if not path.startswith("/"):
@@ -127,8 +129,10 @@ class HydroShareSession:
         url = self._build_url(path)
         return self._session.post(url, files=files)
 
-    def post(self, path, data=None):
+    def post(self, path, data=None, params={}):
         url = self._build_url(path)
+        if params:
+            url = url + "?" + urlencode(params)
         return self._session.post(url, data=data)
 
     def put(self, path, data=None):
@@ -147,10 +151,12 @@ class HydroShareSession:
 @implementer(IHydroShare)
 class HydroShare:
 
-    default_host = 'dev-hs-1.cuahsi.org'
+    default_host = 'localhost'
+    default_protocol = "http"
+    default_port = 8000
 
-    def __init__(self, username=None, password=None, host=default_host):
-        self._hs_session = HydroShareSession(username=username, password=password, host=host)
+    def __init__(self, username=None, password=None, host=default_host, protocol=default_protocol, port=default_port):
+        self._hs_session = HydroShareSession(username=username, password=password, host=host, protocol=protocol, port=port)
 
     def sign_in(self):
         username = input("Username: ").strip()
@@ -223,7 +229,7 @@ class File:
         if not self.name.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
         unzip_path = self._hsapi_path + "functions/unzip/data/contents/{}/".format(self.name)
-        response = self._hs_session.post(unzip_path)
+        response = self._hs_session.post(unzip_path, {"overwrite": "true", "ingest_metadata": "true"})
         response.status_code
 
     def aggregate(self, type: AggregationType):
@@ -360,7 +366,7 @@ class Resource(Aggregation):
         return '/hsapi' + path
 
     def save(self):
-        self._hs_session.upload_file(self._hsapi_path + '/files/',
+        self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
                                      files={'file': ('resourcemetadata.xml', self.metadata.rdf_string(rdf_format="xml"))})
 
     @property
