@@ -24,7 +24,7 @@ simpler, but still difficult to work with
 from rdflib import Graph, Namespace, URIRef, Literal, BNode
 from rdflib.namespace import RDF, DC, DCTERMS
 
-HSTERMS = Namespace("https://www.hydroshare.org/terms/")
+HSTERMS = Namespace("http://www.hydroshare.org/terms/")
 
 # create
 g = Graph()

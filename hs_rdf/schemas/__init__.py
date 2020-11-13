@@ -6,7 +6,7 @@ from hs_rdf.schemas.aggregations import GeographicRasterMetadata, GeographicFeat
 from hs_rdf.schemas.resource import ResourceMap, ResourceMetadata
 
 
-def load_rdf(rdf_str, file_format):
+def load_rdf(rdf_str, file_format='xml'):
     schemas = {ORE.ResourceMap: ResourceMap,
                HSTERMS.resource: ResourceMetadata,
                HSTERMS.GeographicRasterAggregation: GeographicRasterMetadata,
@@ -20,6 +20,4 @@ def load_rdf(rdf_str, file_format):
         subject = g.value(predicate=RDF.type, object=target_class)
         if subject:
             return schema.parse(g)
-    for t in g.triples((None, None, None)):
-        print(t)
-    raise Exception("Could not find schema for file")
+    raise Exception("Could not find schema for \n{}".format(rdf_str))

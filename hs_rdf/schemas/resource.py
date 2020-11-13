@@ -5,7 +5,8 @@ from pydantic import Field, AnyUrl
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
 from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
-    Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier
+    Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier, \
+    Publisher, Format
 from rdflib.term import Identifier as RDFIdentifier
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
@@ -24,16 +25,18 @@ class ResourceMetadata(RDFBaseModel):
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource)
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
-    creator: List[Creator] = Field(rdf_predicate=DC.creator)
+    creators: List[Creator] = Field(rdf_predicate=DC.creator)
 
-    contributor: List[Contributor] = Field(rdf_predicate=DC.contributor, default=None)
-    source: List[Source] = Field(rdf_predicate=DC.source, default=None)
-    relation: List[Relation] = Field(rdf_predicate=DC.relation, default=None)
-    extended_metadata: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=None)
-    rights: List[Rights] = Field(rdf_predicate=DC.rights, default=None)
+    contributors: List[Contributor] = Field(rdf_predicate=DC.contributor, default=None)
+    sources: List[Source] = Field(rdf_predicate=DC.source, default=None)
+    relations: List[Relation] = Field(rdf_predicate=DC.relation, default=None)
+    extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=None)
+    rights: Rights = Field(rdf_predicate=DC.rights, default=None)
     dates: List[Date] = Field(rdf_predicate=DC.date, default=None)
-    award_info: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=None)
-    coverage: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
+    award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=None)
+    coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
+    formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=None)
+    publishers: List[Publisher] = Field(rdf_predicate=HSTERMS.Format, default=None)
 
 
 class FileMap(RDFBaseModel):
