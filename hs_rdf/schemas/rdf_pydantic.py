@@ -14,6 +14,9 @@ class RDFBaseModel(BaseModel):
 
     rdf_subject: RDFIdentifier = Field(default_factory=BNode)
 
+    class Config:
+        validate_assignment = True
+
     @classmethod
     def _rdf_fields(cls):
         for f in cls.__fields__.values():

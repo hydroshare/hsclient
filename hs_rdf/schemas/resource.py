@@ -1,13 +1,15 @@
 import uuid
 from typing import List
 
-from pydantic import Field, AnyUrl
+from pydantic import Field, AnyUrl, validator, root_validator
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
 from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
     Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier, \
     Publisher, Format
 from rdflib.term import Identifier as RDFIdentifier
+
+from hs_rdf.schemas.languages_iso import languages
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
@@ -23,7 +25,7 @@ class ResourceMetadata(RDFBaseModel):
 
     title: str = Field(rdf_predicate=DC.title, default=None)
     description: Description = Field(rdf_predicate=DC.description, default=None)
-    language: str = Field(rdf_predicate=DC.language)
+    language: str = Field(rdf_predicate=DC.language, default='eng')
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource, const=True)
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
@@ -39,6 +41,18 @@ class ResourceMetadata(RDFBaseModel):
     coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
     formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=None)
     publishers: List[Publisher] = Field(rdf_predicate=HSTERMS.Format, default=None)
+
+    @validator('language')
+    def language_constraint(cls, language):
+        if language not in [code for code, verbose in languages]:
+            raise ValueError("language '{}' must be a 3 letter iso language code".format(language))
+        return language
+
+    @root_validator
+    def identifier_constraint(cls, values):
+        identifier, rdf_subject = values.get('identifier'), values.get('rdf_subject')
+        assert identifier.hydroshare_identifier == rdf_subject, "rdf_subject and identifier.hydroshare_identifier must match"
+        return values
 
 
 class FileMap(RDFBaseModel):
