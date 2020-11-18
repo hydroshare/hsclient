@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  xmlns:hsterms="http://hydroshare.org/terms/"
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:dcterms="http://purl.org/dc/terms/"
 >
-  <rdf:Description rdf:about="http://www.hydroshare.org/terms/CompositeResource">
+  <rdf:Description rdf:about="https://www.hydroshare.org/terms/CompositeResource">
     <rdfs:label>Composite Resource</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://hydroshare.org/terms/"/>
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
   </rdf:Description>
-  <hsterms:resource rdf:about="http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20">
+  <hsterms:CompositeResource rdf:about="http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20">
     <dc:subject>Logan River</dc:subject>
     <dc:source>
       <rdf:Description>
@@ -204,6 +204,6 @@
         <hsterms:value>value1</hsterms:value>
       </rdf:Description>
     </hsterms:extendedMetadata>
-    <dc:type rdf:resource="http://hydroshare.org/terms/CompositeResource"/>
-  </hsterms:resource>
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/CompositeResource"/>
+  </hsterms:CompositeResource>
 </rdf:RDF>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
-  xmlns:hsterms="http://hydroshare.org/terms/"
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:dcterms="http://purl.org/dc/terms/"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -78,7 +78,7 @@
     <dc:language>eng</dc:language>
     <dc:subject> Logan River</dc:subject>
     <dc:subject> UEB</dc:subject>
-    <dc:type rdf:resource="http://hydroshare.org/terms/MultidimensionalAggregation"/>
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/MultidimensionalAggregation"/>
     <dc:subject>changed</dc:subject>
     <dc:title>changed UEB modael simulation of snow water equivalent in Logan River watershed from 2008 to 2009</dc:title>
     <dc:coverage>
@@ -98,8 +98,8 @@
       </dcterms:box>
     </hsterms:spatialReference>
   </hsterms:MultidimensionalAggregation>
-  <rdf:Description rdf:about="http://www.hydroshare.org/terms/MultidimensionalAggregation">
+  <rdf:Description rdf:about="https://www.hydroshare.org/terms/MultidimensionalAggregation">
     <rdfs:label>Multidimensional Content: A multidimensional dataset represented by a NetCDF file (.nc) and text file giving its NetCDF header content</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://hydroshare.org/terms/"/>
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
   </rdf:Description>
 </rdf:RDF>

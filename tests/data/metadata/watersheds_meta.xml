@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  xmlns:hsterms="http://hydroshare.org/terms/"
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
   xmlns:dcterms="http://purl.org/dc/terms/"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
@@ -86,7 +86,7 @@
       </hsterms:box>
     </hsterms:spatialReference>
     <dc:language>eng</dc:language>
-    <dc:type rdf:resource="http://hydroshare.org/terms/GeographicFeatureAggregation"/>
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/GeographicFeatureAggregation"/>
     <dc:coverage>
       <dcterms:box>
         <rdf:value>westlimit=-111.79812580632701; northlimit=41.84732649257394; eastlimit=-111.40051926333071; southlimit=41.46101782271056; projection=WGS 84 EPSG:4326; units=Decimal degrees</rdf:value>
@@ -125,8 +125,8 @@
       </rdf:Description>
     </hsterms:extendedMetadata>
   </hsterms:GeographicFeatureAggregation>
-  <rdf:Description rdf:about="http://www.hydroshare.org/terms/GeographicFeatureAggregation">
+  <rdf:Description rdf:about="https://www.hydroshare.org/terms/GeographicFeatureAggregation">
     <rdfs:label>Geographic Feature Content: The multiple files that are part of a geographic shapefile</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://hydroshare.org/terms/"/>
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
   </rdf:Description>
 </rdf:RDF>

@@ -19,7 +19,6 @@ class BaseAggregationMetadata(RDFBaseModel):
 class GeographicRasterMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicRasterAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/GeographicRasterAggregation")
     label: str = Field(const=True, default="Geographic Raster Content: A geographic grid represented by a virtual raster tile (.vrt) file and one or more geotiff (.tif) files")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicRasterAggregation, const=True)
 
@@ -31,7 +30,6 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
 class GeographicFeatureMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicFeatureAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/GeographicFeatureAggregation")
     label: str = Field(const=True, default="Geographic Feature Content: The multiple files that are part of a geographic shapefile")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicFeatureAggregation, const=True)
 
@@ -43,7 +41,6 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
 class MultidimensionalMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.MultidimensionalAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/MultidimensionalAggregation")
     label: str = Field(const=True, default="Multidimensional Content: A multidimensional dataset represented by a NetCDF file (.nc) and text file giving its NetCDF header content")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.MultidimensionalAggregation, const=True)
 
@@ -54,7 +51,6 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
 class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.ReferencedTimeSeriesAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/ReferencedTimeSeriesAggregation")
     label: str = Field(const=True, default="Referenced Time Series Content: A reference to one or more time series served from HydroServers outside of HydroShare in WaterML format")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.ReferencedTimeSeriesAggregation, const=True)
 
@@ -62,7 +58,6 @@ class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
 class FileSetMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.FileSetAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/FileSetAggregation")
     label: str = Field(const=True, default="File Set Content: One or more files with specific metadata")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.FileSetAggregation, const=True)
 
@@ -70,6 +65,5 @@ class FileSetMetadata(BaseAggregationMetadata):
 class SingleFileMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.SingleFileAggregation, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/SingleFileAggregation")
     label: str = Field(const=True, default="Single File Content: A single file with file specific metadata")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.SingleFileAggregation, const=True)

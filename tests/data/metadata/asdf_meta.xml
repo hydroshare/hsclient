@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
   xmlns:dcterms="http://purl.org/dc/terms/"
-  xmlns:hsterms="http://hydroshare.org/terms/"
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
@@ -13,7 +13,7 @@
         <hsterms:value>value</hsterms:value>
       </rdf:Description>
     </hsterms:extendedMetadata>
-    <dc:type rdf:resource="http://hydroshare.org/terms/FileSetAggregation"/>
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/FileSetAggregation"/>
     <dc:coverage>
       <dcterms:point>
         <rdf:value>name=point coverage; projection=WGS 84 EPSG:4326; east=-97.8454; north=36.5415; units=Decimal degrees</rdf:value>
@@ -41,8 +41,8 @@
     <dc:subject>key2</dc:subject>
     <dc:language>eng</dc:language>
   </hsterms:FileSetAggregation>
-  <rdf:Description rdf:about="http://www.hydroshare.org/terms/FileSetAggregation">
+  <rdf:Description rdf:about="https://www.hydroshare.org/terms/FileSetAggregation">
     <rdfs:label>File Set Content: One or more files with specific metadata</rdfs:label>
-    <rdfs:isDefinedBy rdf:resource="http://hydroshare.org/terms/"/>
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
   </rdf:Description>
 </rdf:RDF>

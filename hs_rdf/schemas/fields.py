@@ -9,54 +9,38 @@ from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
 class DCType(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.type)
-
     is_defined_by: AnyUrl = Field(rdf_predicate=RDFS.isDefinedBy)
     label: str = Field(rdf_predicate=RDFS.label)
 
 
 class Source(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.source)
-
     is_derived_from: str = Field(rdf_predicate=HSTERMS.isDerivedFrom, default=None)
 
 
 class Relation(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.relation)
-
     is_copied_from: AnyUrl = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
     is_part_of: AnyUrl = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
 
 
 class Description(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.Description)
-
     abstract: str = Field(rdf_predicate=DCTERMS.abstract)
 
 
 class Coverage(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.coverage)
-
     value: str = Field(rdf_predicate=RDF.value)
     type: AnyUrl = Field(rdf_predicate=RDF.type)
 
 
 class Identifier(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.identifier)
-
     hydroshare_identifier: AnyUrl = Field(rdf_predicate=HSTERMS.hydroShareIdentifier)
 
 
 class ExtendedMetadata(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.extendedMetadata)
-
     value: str = Field(rdf_predicate=HSTERMS.value)
     key: str = Field(rdf_predicate=HSTERMS.key)
 
 
 class CellInformation(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CellInformation)
-
     name: str = Field(rdf_predicate=HSTERMS.name)
     rows: int = Field(rdf_predicate=HSTERMS.rows)
     columns: int = Field(rdf_predicate=HSTERMS.columns)
@@ -71,15 +55,11 @@ class Date(RDFBaseModel):
 
 
 class Rights(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.rights)
-
     rights_statement: str = Field(rdf_predicate=HSTERMS.rightsStatement)
     url: AnyUrl = Field(rdf_predicate=HSTERMS.URL)
 
 
 class Creator(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.creator)
-
     creator_order: int = Field(rdf_predicate=HSTERMS.creatorOrder)
     name: str = Field(rdf_predicate=HSTERMS.name)
 
@@ -88,8 +68,6 @@ class Creator(RDFBaseModel):
 
 
 class Contributor(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.contributor, include=False)
-
     name: str = Field(rdf_predicate=HSTERMS.name, default=None)
     google_scholar_id: AnyUrl = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
     research_gate_id: AnyUrl = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
@@ -102,8 +80,6 @@ class Contributor(RDFBaseModel):
 
 
 class AwardInfo(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.awardInfo)
-
     funding_agency_name: str = Field(rdf_predicate=HSTERMS.fundingAgencyName, default=None)
     award_title: str = Field(rdf_predicate=HSTERMS.awardTitle, default=None)
     award_number: str = Field(rdf_predicate=HSTERMS.awardNumber, default=None)
@@ -111,8 +87,6 @@ class AwardInfo(RDFBaseModel):
 
 
 class BandInformation(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.BandInformation)
-
     name: str = Field(rdf_predicate=HSTERMS.name)
     variable_name: str = Field(rdf_predicate=HSTERMS.variableName, default=None)
     variable_unit: str = Field(rdf_predicate=HSTERMS.variableUnit, default=None)
@@ -125,8 +99,6 @@ class BandInformation(RDFBaseModel):
 
 
 class SpatialReference(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.spatialReference)
-
     northlimit: float = None
     southlimit: float = None
     westlimit: float = None
@@ -188,8 +160,6 @@ class SpatialReference(RDFBaseModel):
 
 
 class FieldInformation(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.FieldInformation)
-
     fieldname: str = Field(rdf_predicate=HSTERMS.fieldName, default=None)
     fieldtype: str = Field(rdf_predicate=HSTERMS.fieldType, default=None)
     fieldTypeCode: str = Field(rdf_predicate=HSTERMS.fieldTypeCode, default=None)
@@ -198,14 +168,10 @@ class FieldInformation(RDFBaseModel):
 
 
 class GeometryInformation(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeometryInformation)
-
     featureCount: int = Field(rdf_predicate=HSTERMS.featureCount, default=None)
     geometryType: str = Field(rdf_predicate=HSTERMS.geometryType, default=None)
 
 class Variable(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.Variable)
-
     name: str = Field(rdf_predicate=HSTERMS.name, default=None)
     unit: str = Field(rdf_predicate=HSTERMS.unit, default=None)
     type: str = Field(rdf_predicate=HSTERMS.type, default=None)
@@ -215,12 +181,8 @@ class Variable(RDFBaseModel):
     missing_value: str = Field(rdf_predicate=HSTERMS.missing_value, default=None)
 
 class Publisher(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.publisher)
-
     name: str = Field(rdf_predicate=HSTERMS.publisherName, default=None)
     url: AnyUrl = Field(rdf_predicate=HSTERMS.publisherURL, default=None)
 
 class Format(RDFBaseModel):
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.Format)
-
     value: str = Field(rdf_predicate=HSTERMS.value, default=None)

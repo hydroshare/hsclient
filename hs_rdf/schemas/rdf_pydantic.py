@@ -7,18 +7,17 @@ from rdflib import Graph, BNode, URIRef, Literal
 from rdflib.term import Identifier as RDFIdentifier
 from pydantic import BaseModel, Field, AnyUrl
 
-from hs_rdf.namespaces import RDF, RDFS1, XSD
+from hs_rdf.namespaces import RDF, RDFS1, XSD, DC
 
 
 class RDFBaseModel(BaseModel):
 
     rdf_subject: RDFIdentifier = Field(default_factory=BNode)
-    rdf_type: URIRef = None
 
     @classmethod
     def _rdf_fields(cls):
         for f in cls.__fields__.values():
-            if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'term']:
+            if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'dc_type']:
                 yield f
 
     @classmethod
@@ -26,6 +25,7 @@ class RDFBaseModel(BaseModel):
         for f in cls.__fields__.values():
             if f.alias == 'rdf_type':
                 return f
+        return None
 
     @classmethod
     def class_rdf_type(cls):
@@ -59,11 +59,13 @@ class RDFBaseModel(BaseModel):
                         else:
                             value = Literal(value)
                         graph.add((self.rdf_subject, predicate, value))
-        if self.rdf_type and self._rdf_type().field_info.extra.get('include', False):
+        if hasattr(self, 'rdf_type'):
             graph.add((self.rdf_subject, RDF.type, self.rdf_type))
-        if hasattr(self, 'term') and hasattr(self, 'label'):
-            graph.add((URIRef(self.term), RDFS1.label, Literal(self.label)))
-            graph.add((URIRef(self.term), RDFS1.isDefinedBy, URIRef("http://hydroshare.org/terms/")))
+        if hasattr(self, 'dc_type'):
+            graph.add((self.rdf_subject, DC.type, self.dc_type))
+        if hasattr(self, 'label'):
+            graph.add((URIRef(str(self.rdf_type)), RDFS1.label, Literal(self.label)))
+            graph.add((URIRef(str(self.rdf_type)), RDFS1.isDefinedBy, URIRef("https://www.hydroshare.org/terms/")))
         return graph
 
     def rdf_string(self, rdf_format='ttl'):

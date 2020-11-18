@@ -17,16 +17,15 @@ def hs_uid():
 
 class ResourceMetadata(RDFBaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.resource, include=True)
+    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource, include=True)
 
-    term: str = Field(const=True, default="http://www.hydroshare.org/terms/CompositeResource")
     label: str = Field(const=True, default="Composite Resource")
 
     title: str = Field(rdf_predicate=DC.title, default=None)
     description: Description = Field(rdf_predicate=DC.description, default=None)
     language: str = Field(rdf_predicate=DC.language)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
-    dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource)
+    dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource, const=True)
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
     creators: List[Creator] = Field(rdf_predicate=DC.creator)
 
@@ -45,7 +44,6 @@ class ResourceMetadata(RDFBaseModel):
 class FileMap(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.Aggregation)
 
-    dc_type: str = Field(rdf_predicate=DCTERMS.type)
     is_documented_by: AnyUrl = Field(rdf_predicate=CITOTERMS.isDocumentedBy)
     files: List[AnyUrl] = Field(rdf_predicate=ORE.aggregates)
     title: str = Field(rdf_predicate=DC.title)

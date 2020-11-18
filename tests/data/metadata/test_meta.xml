@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
   xmlns:dcterms="http://purl.org/dc/terms/"
-  xmlns:hsterms="http://hydroshare.org/terms/"
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
 >
   <hsterms:SingleFileAggregation rdf:about="http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20/data/contents/test_resmap.xml#aggregation">
-    <dc:type rdf:resource="http://hydroshare.org/terms/SingleFileAggregation"/>
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/SingleFileAggregation"/>
     <dc:coverage>
       <dcterms:point>
         <rdf:value>name=point coverage; projection=WGS 84 EPSG:4326; east=-92.3961; north=38.3556; units=Decimal degrees</rdf:value>
@@ -41,8 +41,8 @@
       </dcterms:period>
     </dc:coverage>
   </hsterms:SingleFileAggregation>
-  <rdf:Description rdf:about="http://www.hydroshare.org/terms/SingleFileAggregation">
-    <rdfs:isDefinedBy rdf:resource="http://hydroshare.org/terms/"/>
+  <rdf:Description rdf:about="https://www.hydroshare.org/terms/SingleFileAggregation">
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
     <rdfs:label>Single File Content: A single file with file specific metadata</rdfs:label>
   </rdf:Description>
 </rdf:RDF>

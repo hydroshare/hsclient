@@ -24,7 +24,7 @@ simpler, but still difficult to work with
 from rdflib import Graph, Namespace, URIRef, Literal, BNode
 from rdflib.namespace import RDF, DC, DCTERMS
 
-HSTERMS = Namespace("http://www.hydroshare.org/terms/")
+HSTERMS = Namespace("https://www.hydroshare.org/terms/")
 
 # create
 g = Graph()
@@ -140,7 +140,7 @@ class CoreMetaData(models.Model):
                   'rdfs1': "http://www.w3.org/2000/01/rdf-schema#",
                   'dc': "http://purl.org/dc/elements/1.1/",
                   'dcterms': "http://purl.org/dc/terms/",
-                  'hsterms': "http://hydroshare.org/terms/"}
+                  'hsterms': "https://www.hydroshare.org/terms/"}
 
     id = models.AutoField(primary_key=True)
 

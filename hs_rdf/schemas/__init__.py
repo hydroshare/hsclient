@@ -1,6 +1,6 @@
 from rdflib import Graph
 
-from hs_rdf.namespaces import ORE, HSTERMS, DC
+from hs_rdf.namespaces import ORE, HSTERMS, RDF
 from hs_rdf.schemas.aggregations import GeographicRasterMetadata, GeographicFeatureMetadata, MultidimensionalMetadata, \
     ReferencedTimeSeriesMetadata, FileSetMetadata, SingleFileMetadata
 from hs_rdf.schemas.resource import ResourceMap, ResourceMetadata
@@ -17,7 +17,7 @@ def load_rdf(rdf_str, file_format='xml'):
                HSTERMS.SingleFileAggregation : SingleFileMetadata}
     g = Graph().parse(data=rdf_str, format=file_format)
     for target_class, schema in schemas.items():
-        subject = g.value(predicate=DC.type, object=target_class)
+        subject = g.value(predicate=RDF.type, object=target_class)
         if subject:
             return schema.parse(g)
     raise Exception("Could not find schema for \n{}".format(rdf_str))

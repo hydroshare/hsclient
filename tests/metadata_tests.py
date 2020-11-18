@@ -68,7 +68,7 @@ def test_resource_metadata(res_md):
 
     assert res_md.language == "eng"
 
-    assert res_md.dc_type == "http://www.hydroshare.org/terms/CompositeResource"
+    assert str(res_md.dc_type) == "https://www.hydroshare.org/terms/CompositeResource"
 
     assert res_md.identifier.hydroshare_identifier == "http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"
 
@@ -131,11 +131,3 @@ def test_resource_metadata(res_md):
     period = next(x for x in res_md.coverages if x.type == DCTERMS.period)
     assert period.value == "start=2020-07-10T00:00:00; end=2020-07-29T00:00:00"
 
-
-
-def test_resource_metadata_updating(resource):
-    for agg in resource.aggregations:
-        if agg.metadata.rdf_type == HSTERMS.MultidimensionalAggregation:
-            print(agg.metadata.title)
-
-    pass
