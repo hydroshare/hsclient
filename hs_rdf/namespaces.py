@@ -2,7 +2,7 @@ from rdflib import Namespace
 
 HSRESOURCE = Namespace("http://www.hydroshare.org/resource/")
 DCTERMS = Namespace("http://purl.org/dc/terms/")
-RDFS1 = Namespace("http://www.w3.org/2001/01/rdf-schema#")
+RDFS1 = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 SCHEMA = Namespace("http://schema.org/")
 HSTERMS = Namespace("http://hydroshare.org/terms/")
 XML = Namespace("http://www.w3.org/XML/1998/namespace")

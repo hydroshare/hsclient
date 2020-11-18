@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pydantic import AnyUrl, Field, HttpUrl
-from rdflib import Literal, BNode
+from rdflib import Literal, BNode, URIRef
 
 from hs_rdf.namespaces import RDF, DC, RDFS, HSTERMS, DCTERMS
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
@@ -24,8 +24,8 @@ class Source(RDFBaseModel):
 class Relation(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.relation)
 
-    is_copied_from: str = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
-    is_part_of: str = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
+    is_copied_from: AnyUrl = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
+    is_part_of: AnyUrl = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
 
 
 class Description(RDFBaseModel):
@@ -58,11 +58,11 @@ class CellInformation(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CellInformation)
 
     name: str = Field(rdf_predicate=HSTERMS.name)
-    rows: str = Field(rdf_predicate=HSTERMS.rows)
-    columns: str = Field(rdf_predicate=HSTERMS.columns)
-    cell_size_x_value: str = Field(rdf_predicate=HSTERMS.cellSizeXValue)
+    rows: int = Field(rdf_predicate=HSTERMS.rows)
+    columns: int = Field(rdf_predicate=HSTERMS.columns)
+    cell_size_x_value: float = Field(rdf_predicate=HSTERMS.cellSizeXValue)
     cell_data_type: str = Field(rdf_predicate=HSTERMS.cellDataType)
-    cell_size_y_value: str = Field(rdf_predicate=HSTERMS.cellSizeYValue)
+    cell_size_y_value: float = Field(rdf_predicate=HSTERMS.cellSizeYValue)
 
 
 class Date(RDFBaseModel):
@@ -91,10 +91,10 @@ class Contributor(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=DC.contributor, include=False)
 
     name: str = Field(rdf_predicate=HSTERMS.name, default=None)
-    google_scholar_id: str = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
-    research_gate_id: str = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
+    google_scholar_id: AnyUrl = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
+    research_gate_id: AnyUrl = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
     phone: str = Field(rdf_predicate=HSTERMS.phone, default=None)
-    ORCID: str = Field(rdf_predicate=HSTERMS.ORCID, default=None)
+    ORCID: AnyUrl = Field(rdf_predicate=HSTERMS.ORCID, default=None)
     address: str = Field(rdf_predicate=HSTERMS.address, default=None)
     organization: str = Field(rdf_predicate=HSTERMS.organization, default=None)
     email: str = Field(rdf_predicate=HSTERMS.email, default=None)
@@ -131,11 +131,14 @@ class SpatialReference(RDFBaseModel):
     southlimit: float = None
     westlimit: float = None
     eastlimit: float = None
+    projection: str = None
     projection_string: str = None
     projection_string_type: str = None
     projection_name: str = None
     datum: str = None
     unit: str = None
+
+    type: AnyUrl = Field(rdf_predicate=RDF.type, default=None)
 
     def rdf(self, graph):
         value_dict = {}
@@ -143,10 +146,14 @@ class SpatialReference(RDFBaseModel):
             value_dict['northlimit'] = self.northlimit
         if self.southlimit:
             value_dict['southlimit'] = self.southlimit
-        if self.westlimit:
-            value_dict['westlimit'] = self.westlimit
         if self.eastlimit:
             value_dict['eastlimit'] = self.eastlimit
+        if self.westlimit:
+            value_dict['westlimit'] = self.westlimit
+        if self.projection:
+            value_dict['projection'] = self.projection
+        if self.unit:
+            value_dict['units'] = self.unit
         if self.projection_string:
             value_dict['projection_string'] = self.projection_string
         if self.projection_name:
@@ -155,24 +162,21 @@ class SpatialReference(RDFBaseModel):
             value_dict['projection_string_type'] = self.projection_string_type
         if self.datum:
             value_dict['datum'] = self.datum
-        if self.unit:
-            value_dict['units'] = self.unit
 
         value_string = "; ".join(["=".join([key, str(val)]) for key, val in value_dict.items()])
 
-        coverage = BNode()
-        graph.add((self.rdf_subject, self.rdf_type, coverage))
-        graph.add((coverage, RDF.type, HSTERMS.box))
-        graph.add((coverage, RDF.value, Literal(value_string)))
+        graph.add((self.rdf_subject, RDF.type, URIRef(self.type)))
+        graph.add((self.rdf_subject, RDF.value, Literal(value_string)))
         return graph
 
     @classmethod
     def parse(cls, metadata_graph, subject=None):
         if not subject:
             raise Exception("subject is required for parsing SpatialReference")
-        cov = metadata_graph.value(subject=subject, predicate=HSTERMS.spatialReference)
-        value = metadata_graph.value(subject=cov, predicate=RDF.value)
-        value_dict = {}
+
+        rdf_type = metadata_graph.value(subject=subject, predicate=RDF.type)
+        value = metadata_graph.value(subject=subject, predicate=RDF.value)
+        value_dict = {"type": rdf_type}
         if value:
             for key_value in value.split("; "):
                 k, v = key_value.split("=")
@@ -186,11 +190,11 @@ class SpatialReference(RDFBaseModel):
 class FieldInformation(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.FieldInformation)
 
-    fieldname: str = Field(rdf_predicate=HSTERMS.fieldname, default=None)
-    fieldtype: str = Field(rdf_predicate=HSTERMS.fieldtype, default=None)
+    fieldname: str = Field(rdf_predicate=HSTERMS.fieldName, default=None)
+    fieldtype: str = Field(rdf_predicate=HSTERMS.fieldType, default=None)
     fieldTypeCode: str = Field(rdf_predicate=HSTERMS.fieldTypeCode, default=None)
     fieldWidth: int = Field(rdf_predicate=HSTERMS.fieldWidth, default=None)
-    fieldPrecision: str = Field(rdf_predicate=HSTERMS.fieldPrecision, default=None)
+    fieldPrecision: int = Field(rdf_predicate=HSTERMS.fieldPrecision, default=None)
 
 
 class GeometryInformation(RDFBaseModel):
@@ -198,25 +202,6 @@ class GeometryInformation(RDFBaseModel):
 
     featureCount: int = Field(rdf_predicate=HSTERMS.featureCount, default=None)
     geometryType: str = Field(rdf_predicate=HSTERMS.geometryType, default=None)
-
-
-sr = SpatialReference()
-sr.northlimit = 1
-sr.southlimit = 2
-sr.westlimit = 3
-sr.eastlimit = 4
-sr.projection_string = "proj"
-sr.projection_name = "projname"
-sr.datum = "datum"
-sr.unit = "unit"
-
-print(sr.rdf_string())
-
-from rdflib import Graph
-g = Graph()
-new_sr = SpatialReference.parse(sr.rdf(g), sr.rdf_subject)
-print(new_sr.northlimit)
-
 
 class Variable(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.Variable)

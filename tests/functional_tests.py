@@ -38,7 +38,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.title = "resource test"
     em = [ExtendedMetadata(key="key1", value="value1"), ExtendedMetadata(key="key2", value="value2"),
           ExtendedMetadata(key="key3", value="value3")]
-    new_resource.metadata.extended_metadata = em
+    new_resource.metadata.extended_metadatas = em
 
     new_resource.save()
     new_resource.refresh()
@@ -46,10 +46,10 @@ def test_resource_metadata_updating(new_resource):
     assert 'resource test' == new_resource.metadata.title
     assert len(new_resource.metadata.subjects) == 2
 
-    assert len(new_resource.metadata.extended_metadata) == 3
+    assert len(new_resource.metadata.extended_metadatas) == 3
     keys = ['key1', 'key2', 'key3']
     values = ['value1', 'value2', 'value3']
-    for i, em in enumerate(new_resource.metadata.extended_metadata):
+    for i, em in enumerate(new_resource.metadata.extended_metadatas):
         assert em.key in keys
         keys.remove(em.key)
         assert em.value in values

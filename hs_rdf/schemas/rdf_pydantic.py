@@ -1,11 +1,13 @@
 import inspect
+
 from typing import get_args
+from datetime import datetime
 
 from rdflib import Graph, BNode, URIRef, Literal
 from rdflib.term import Identifier as RDFIdentifier
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AnyUrl
 
-from hs_rdf.namespaces import RDF
+from hs_rdf.namespaces import RDF, RDFS1, XSD
 
 
 class RDFBaseModel(BaseModel):
@@ -16,7 +18,7 @@ class RDFBaseModel(BaseModel):
     @classmethod
     def _rdf_fields(cls):
         for f in cls.__fields__.values():
-            if f.alias not in ['rdf_subject', 'rdf_type']:
+            if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'term']:
                 yield f
 
     @classmethod
@@ -46,10 +48,22 @@ class RDFBaseModel(BaseModel):
                         graph = value.rdf(graph)
                     else:
                         # primitive value
-                        value = Literal(value)
+                        if isinstance(value, AnyUrl):
+                            value = URIRef(value)
+                        elif isinstance(value, datetime):
+                            value = Literal(value.isoformat())
+                        elif isinstance(value, int):
+                            value = Literal(value, datatype=XSD.integer)
+                        elif isinstance(value, float):
+                            value = Literal(value, datatype=XSD.double)
+                        else:
+                            value = Literal(value)
                         graph.add((self.rdf_subject, predicate, value))
         if self.rdf_type and self._rdf_type().field_info.extra.get('include', False):
             graph.add((self.rdf_subject, RDF.type, self.rdf_type))
+        if hasattr(self, 'term') and hasattr(self, 'label'):
+            graph.add((URIRef(self.term), RDFS1.label, Literal(self.label)))
+            graph.add((URIRef(self.term), RDFS1.isDefinedBy, URIRef("http://hydroshare.org/terms/")))
         return graph
 
     def rdf_string(self, rdf_format='ttl'):

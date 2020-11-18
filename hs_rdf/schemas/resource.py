@@ -19,6 +19,9 @@ class ResourceMetadata(RDFBaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.resource, include=True)
 
+    term: str = Field(const=True, default="http://www.hydroshare.org/terms/CompositeResource")
+    label: str = Field(const=True, default="Composite Resource")
+
     title: str = Field(rdf_predicate=DC.title, default=None)
     description: Description = Field(rdf_predicate=DC.description, default=None)
     language: str = Field(rdf_predicate=DC.language)

@@ -58,7 +58,7 @@
     </hsterms:Format>
     <dc:relation>
       <rdf:Description>
-        <hsterms:isPartOf rdf:resource="sadf"/>
+        <hsterms:isPartOf rdf:resource="https://sadf.com"/>
       </rdf:Description>
     </dc:relation>
     <hsterms:awardInfo>
