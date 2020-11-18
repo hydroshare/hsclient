@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pydantic import AnyUrl, Field, HttpUrl
-from rdflib import Literal, BNode, URIRef
+from rdflib import Literal, URIRef
 
 from hs_rdf.namespaces import RDF, DC, RDFS, HSTERMS, DCTERMS
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel

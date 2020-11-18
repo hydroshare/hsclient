@@ -204,6 +204,6 @@
         <hsterms:value>value1</hsterms:value>
       </rdf:Description>
     </hsterms:extendedMetadata>
-    <dc:type rdf:resource="http://www.hydroshare.org/terms/CompositeResource"/>
+    <dc:type rdf:resource="http://hydroshare.org/terms/CompositeResource"/>
   </hsterms:resource>
 </rdf:RDF>
