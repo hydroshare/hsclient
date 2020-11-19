@@ -9,6 +9,7 @@ from rdflib.term import Identifier as RDFIdentifier
 from pydantic import BaseModel, Field, AnyUrl
 
 from hs_rdf.namespaces import RDF, RDFS1, XSD, DC
+from hs_rdf.schemas.enums import AnyUrlEnum
 
 
 class RDFBaseModel(BaseModel):
@@ -60,8 +61,10 @@ class RDFBaseModel(BaseModel):
                             value = Literal(value, datatype=XSD.integer)
                         elif isinstance(value, float):
                             value = Literal(value, datatype=XSD.double)
-                        elif isinstance(value, Enum):
+                        elif isinstance(value, AnyUrlEnum):
                             value = URIRef(value.value)
+                        elif isinstance(value, Enum):
+                            value = Literal(value.value)
                         else:
                             value = Literal(value)
                         graph.add((self.rdf_subject, predicate, value))
@@ -94,7 +97,7 @@ class RDFBaseModel(BaseModel):
             subject = metadata_graph.value(predicate=RDF.type, object=target_class)
             if not subject:
                 raise Exception("Could not find subject for predicate=RDF.type, object={}".format(target_class))
-        kwargs = {'rdf_subject': subject}
+        kwargs = {}
         for f in schema._rdf_fields():
             predicate = f.field_info.extra['rdf_predicate']
             if not predicate:
@@ -108,7 +111,11 @@ class RDFBaseModel(BaseModel):
                     else:
                         # single
                         clazz = f.outer_type_
-                    parsed.append(clazz.parse(metadata_graph, value))
+                    parsed_class = clazz.parse(metadata_graph, value)
+                    if parsed_class:
+                        parsed.append(parsed_class)
+                    elif f.sub_fields:
+                        parsed.append([])
                 else:
                     # primitive value
                     parsed.append(str(value))
@@ -119,7 +126,10 @@ class RDFBaseModel(BaseModel):
                 else:
                     # single
                     kwargs[f.name] = parsed[0]
-        return schema(**kwargs)
+        if kwargs:
+            kwargs['rdf_subject'] = subject
+            return schema(**kwargs)
+        return None
 
 def nested_class(field):
     if field.sub_fields:

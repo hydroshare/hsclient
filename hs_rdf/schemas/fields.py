@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import List
-from enum import Enum
 
 from pydantic import AnyUrl, Field, HttpUrl
 from rdflib import Literal, URIRef
 
-from hs_rdf.namespaces import RDF, DC, RDFS, HSTERMS, DCTERMS
+from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
+from hs_rdf.schemas.enums import CoverageType, DateType, VariableType
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
@@ -25,12 +25,6 @@ class Relation(RDFBaseModel):
 
 class Description(RDFBaseModel):
     abstract: str = Field(rdf_predicate=DCTERMS.abstract)
-
-
-class CoverageType(Enum):
-    period = str(DCTERMS.period)
-    box = str(DCTERMS.box)
-    point = str(DCTERMS.point)
 
 
 class Coverage(RDFBaseModel):
@@ -54,14 +48,6 @@ class CellInformation(RDFBaseModel):
     cell_size_x_value: float = Field(rdf_predicate=HSTERMS.cellSizeXValue)
     cell_data_type: str = Field(rdf_predicate=HSTERMS.cellDataType)
     cell_size_y_value: float = Field(rdf_predicate=HSTERMS.cellSizeYValue)
-
-
-class DateType(Enum):
-    modified = str(DCTERMS.modified)
-    created = str(DCTERMS.created)
-    valid = str(DCTERMS.valid)
-    available = str(DCTERMS.available)
-    published = str(DCTERMS.published)
 
 
 class Date(RDFBaseModel):
@@ -187,17 +173,17 @@ class GeometryInformation(RDFBaseModel):
     geometryType: str = Field(rdf_predicate=HSTERMS.geometryType, default=None)
 
 class Variable(RDFBaseModel):
-    name: str = Field(rdf_predicate=HSTERMS.name, default=None)
-    unit: str = Field(rdf_predicate=HSTERMS.unit, default=None)
-    type: str = Field(rdf_predicate=HSTERMS.type, default=None)
-    shape: str = Field(rdf_predicate=HSTERMS.shape, default=None)
+    name: str = Field(rdf_predicate=HSTERMS.name)
+    unit: str = Field(rdf_predicate=HSTERMS.unit)
+    type: VariableType = Field(rdf_predicate=HSTERMS.type)
+    shape: str = Field(rdf_predicate=HSTERMS.shape)
     descriptive_name: str = Field(rdf_predicate=HSTERMS.descriptive_name, default=None)
     method: str = Field(rdf_predicate=HSTERMS.method, default=None)
     missing_value: str = Field(rdf_predicate=HSTERMS.missing_value, default=None)
 
 class Publisher(RDFBaseModel):
-    name: str = Field(rdf_predicate=HSTERMS.publisherName, default=None)
-    url: AnyUrl = Field(rdf_predicate=HSTERMS.publisherURL, default=None)
+    name: str = Field(rdf_predicate=HSTERMS.publisherName)
+    url: AnyUrl = Field(rdf_predicate=HSTERMS.publisherURL)
 
 class Format(RDFBaseModel):
-    value: str = Field(rdf_predicate=HSTERMS.value, default=None)
+    value: str = Field(rdf_predicate=HSTERMS.value)

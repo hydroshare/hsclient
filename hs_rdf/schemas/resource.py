@@ -3,8 +3,8 @@ from typing import List
 
 from pydantic import Field, AnyUrl, validator, root_validator
 
-from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
-from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
+from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
+from hs_rdf.schemas.fields import Description, Creator, Contributor, Source, \
     Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier, \
     Publisher, Format, DateType, CoverageType
 from rdflib.term import Identifier as RDFIdentifier
@@ -31,7 +31,7 @@ class ResourceMetadata(RDFBaseModel):
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
     creators: List[Creator] = Field(rdf_predicate=DC.creator)
 
-    contributors: List[Contributor] = Field(rdf_predicate=DC.contributor)
+    contributors: List[Contributor] = Field(rdf_predicate=DC.contributor, default=[])
     sources: List[Source] = Field(rdf_predicate=DC.source, default=[])
     relations: List[Relation] = Field(rdf_predicate=DC.relation, default=[])
     extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=[])
@@ -39,8 +39,8 @@ class ResourceMetadata(RDFBaseModel):
     dates: List[Date] = Field(rdf_predicate=DC.date)
     award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
     coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=[])
-    formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=None)
-    publishers: List[Publisher] = Field(rdf_predicate=HSTERMS.Format, default=None)
+    formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=[])
+    publishers: List[Publisher] = Field(rdf_predicate=DC.publisher, default=[])
 
     @validator('language')
     def language_constraint(cls, language):

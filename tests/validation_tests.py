@@ -5,7 +5,8 @@ from pydantic.error_wrappers import ValidationError
 
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
-from hs_rdf.schemas.fields import ExtendedMetadata, Date, DateType
+from hs_rdf.schemas.enums import VariableType
+from hs_rdf.schemas.fields import ExtendedMetadata, Date, DateType, Variable
 
 
 @pytest.fixture()
@@ -49,3 +50,25 @@ def test_dates():
         assert False, "Date type/value are required"
     except ValidationError as ve:
         assert "2 validation errors for Date" in str(ve)
+
+
+def test_variables():
+    variable = Variable(name="name", type=VariableType.Byte, unit="unit", shape="shape",
+                        descriptive_name="descriptive_name", method="method", missing_value="missing_value")
+    assert variable.name == "name"
+    assert variable.type == VariableType.Byte
+    assert variable.unit == "unit"
+    assert variable.shape == "shape"
+    assert variable.descriptive_name == "descriptive_name"
+    assert variable.method == "method"
+    assert variable.missing_value == "missing_value"
+
+    try:
+        Variable()
+        assert False, "Some Variable fields should be required"
+    except ValidationError as ve:
+        assert "4 validation errors for Variable" in str(ve)
+        assert "name" in str(ve)
+        assert "unit" in str(ve)
+        assert "type" in str(ve)
+        assert "shape" in str(ve)
