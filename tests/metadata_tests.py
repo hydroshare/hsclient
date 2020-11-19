@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import pytest
 from rdflib import Graph, URIRef, Literal
@@ -8,7 +9,7 @@ from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
 from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
-from hs_rdf.schemas.fields import DateType, CoverageType
+from hs_rdf.schemas.fields import DateType, CoverageType, BoxCoverage, PeriodCoverage, PointCoverage
 
 
 @pytest.fixture()
@@ -17,14 +18,17 @@ def res_md():
         return load_rdf(f.read())
 
 
+@pytest.fixture()
+def res_md_point():
+    with open("data/metadata/resourcemetadata_with_point_coverage.xml", 'r') as f:
+        return load_rdf(f.read())
+
+
 def to_coverage_dict(value):
     value_dict = {}
     for key_value in value.split("; "):
         k, v = key_value.split("=")
-        if k == 'units':
-            value_dict['unit'] = v
-        else:
-            value_dict[k] = v
+        value_dict[k] = v
     return value_dict
 
 
@@ -110,14 +114,16 @@ def test_resource_metadata(res_md):
     assert res_md.rights.rights_statement == "my statement"
     assert res_md.rights.url == "http://studio.bakajo.com"
 
-    assert len(res_md.dates) == 2
+    assert len(res_md.dates) == 3
     modified = next(x for x in res_md.dates if x.type == DateType.modified)
     assert modified
-    # TODO need to handle timezones in dates
-    assert str(modified.value) == "2020-11-13 19:40:57.276064+00:00"
+    assert modified.value == datetime.fromisoformat("2020-11-13T19:40:57.276064+00:00")
     created = next(x for x in res_md.dates if x.type == DateType.created)
     assert created
-    assert str(created.value) == "2020-07-09 19:12:21.354703+00:00"
+    assert created.value == datetime.fromisoformat("2020-07-09T19:12:21.354703+00:00")
+    published = next(x for x in res_md.dates if x.type == DateType.published)
+    assert published
+    assert published.value == datetime.fromisoformat("2020-11-13T18:53:19.778819+00:00")
 
     assert len(res_md.award_infos) == 2
     award = next(x for x in res_md.award_infos if x.award_title == "t")
@@ -129,7 +135,35 @@ def test_resource_metadata(res_md):
     assert len(res_md.coverages) == 2
     box = next(x for x in res_md.coverages if x.type == CoverageType.box)
     # TODO update coverage to parse values
-    assert box.value == "name=asdfsadf; northlimit=42.1505; eastlimit=-84.5739; southlimit=30.282; westlimit=-104.7887; units=Decimal degrees; projection=WGS 84 EPSG:4326"
+    assert isinstance(box.value, BoxCoverage)
+    assert box.type == CoverageType.box
+    assert box.value.name == 'asdfsadf'
+    assert box.value.northlimit == 42.1505
+    assert box.value.eastlimit == -84.5739
+    assert box.value.southlimit == 30.282
+    assert box.value.westlimit == -104.7887
+    assert box.value.units == "Decimal degrees"
+    assert box.value.projection == "WGS 84 EPSG:4326"
     period = next(x for x in res_md.coverages if x.type == CoverageType.period)
-    assert period.value == "start=2020-07-10T00:00:00; end=2020-07-29T00:00:00"
+    assert period.type == CoverageType.period
+    assert isinstance(period.value, PeriodCoverage)
+    assert period.value.start == datetime.fromisoformat("2020-07-10T00:00:00")
+    assert period.value.end == datetime.fromisoformat("2020-07-29T00:00:00")
+
+    assert res_md.publisher
+    assert res_md.publisher.name == "Consortium of Universities for the Advancement of Hydrologic Science, Inc. (CUAHSI)"
+    assert res_md.publisher.url == "https://www.cuahsi.org"
+
+def test_point_coverage(res_md_point):
+
+    point = next(x for x in res_md_point.coverages if x.type == CoverageType.point)
+    assert point.type == CoverageType.point
+    assert isinstance(point.value, PointCoverage)
+    assert point.value.name == "Logan River Watershed"
+    assert point.value.east == -111.833736
+    assert point.value.north == 41.710961
+    assert point.value.units == "Decimal degrees"
+    assert point.value.projection == "WGS 84 EPSG:4326"
+
+
 

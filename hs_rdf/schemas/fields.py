@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from pydantic import AnyUrl, Field, HttpUrl
+from pydantic import AnyUrl, Field, HttpUrl, BaseModel, validator
 from rdflib import Literal, URIRef
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
@@ -24,12 +24,7 @@ class Relation(RDFBaseModel):
 
 
 class Description(RDFBaseModel):
-    abstract: str = Field(rdf_predicate=DCTERMS.abstract)
-
-
-class Coverage(RDFBaseModel):
-    value: str = Field(rdf_predicate=RDF.value)
-    type: CoverageType = Field(rdf_predicate=RDF.type)
+    abstract: str = Field(rdf_predicate=DCTERMS.abstract, default=None)
 
 
 class Identifier(RDFBaseModel):
@@ -99,65 +94,125 @@ class BandInformation(RDFBaseModel):
     minimum_value: List[str] = Field(rdf_predicate=HSTERMS.minimumValue, default=None)
 
 
-class SpatialReference(RDFBaseModel):
-    northlimit: float = None
-    southlimit: float = None
-    westlimit: float = None
-    eastlimit: float = None
+class BaseCoverage(BaseModel):
+    type: CoverageType
+
+    def __str__(self):
+        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
+                          for key, val in self.__dict__.items()
+                          if key != "type" and val])
+
+
+class BoxCoverage(BaseCoverage):
+    type: CoverageType = Field(default=CoverageType.box, const=True)
+    name: str = None
+    northlimit: float
+    eastlimit: float
+    southlimit: float
+    westlimit: float
+    units: str
+    projection: str
+
+
+class PointCoverage(BaseCoverage):
+    type: CoverageType = Field(default=CoverageType.point, const=True)
+    name: str = None
+    east: float
+    north: float
+    units: str
+    projection: str
+
+
+class PeriodCoverage(BaseCoverage):
+    type: CoverageType = Field(default=CoverageType.period, const=True)
+    start: datetime
+    end: datetime
+    scheme: str = None
+
+
+class Coverage(RDFBaseModel):
+    type: CoverageType = Field(rdf_predicate=RDF.type)
+    value: BaseCoverage = Field(rdf_predicate=RDF.value)
+
+    @validator('value', pre=True)
+    def convert_str_to_coverage(cls, v, values, **kwargs):
+        if isinstance(v, str):
+            if 'type' in values:
+                cov_type = CoverageType(values['type'])
+                cov_kwargs = {}
+                for key_value in v.split("; "):
+                    k, v = key_value.split("=")
+                    cov_kwargs[k] = v
+
+                if cov_type == CoverageType.box:
+                    return BoxCoverage(**cov_kwargs)
+                if cov_type == CoverageType.point:
+                    return PointCoverage(**cov_kwargs)
+                if cov_type == CoverageType.period:
+                    return PeriodCoverage(**cov_kwargs)
+        return v
+
+
+class BaseSpatialReference(BaseModel):
+    type: CoverageType = None
+
+    def __str__(self):
+        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
+                          for key, val in self.__dict__.items()
+                          if key != "type" and val])
+
+
+class PointSpatialReference(BaseSpatialReference):
+    name: str = None
+    east: float
+    north: float
+    units: str
     projection: str = None
-    projection_string: str = None
-    projection_string_type: str = None
     projection_name: str = None
-    datum: str = None
-    unit: str = None
+    projection_string: str
+    datum: str
+    projection_string_type: str = None
 
-    type: AnyUrl = Field(rdf_predicate=RDF.type, default=None)
 
-    def rdf(self, graph):
-        value_dict = {}
-        if self.northlimit:
-            value_dict['northlimit'] = self.northlimit
-        if self.southlimit:
-            value_dict['southlimit'] = self.southlimit
-        if self.eastlimit:
-            value_dict['eastlimit'] = self.eastlimit
-        if self.westlimit:
-            value_dict['westlimit'] = self.westlimit
-        if self.projection:
-            value_dict['projection'] = self.projection
-        if self.unit:
-            value_dict['units'] = self.unit
-        if self.projection_string:
-            value_dict['projection_string'] = self.projection_string
-        if self.projection_name:
-            value_dict['projection_name'] = self.projection_name
-        if self.projection_string_type:
-            value_dict['projection_string_type'] = self.projection_string_type
-        if self.datum:
-            value_dict['datum'] = self.datum
+class BoxSpatialReference(BaseSpatialReference):
+    northlimit: float
+    southlimit: float
+    westlimit: float
+    eastlimit: float
+    projection_name: str = None
+    projection_string: str
+    units: str
+    datum: str
+    name: str = None
+    projection: str = None
+    projection_string_type: str = None
 
-        value_string = "; ".join(["=".join([key, str(val)]) for key, val in value_dict.items()])
 
-        graph.add((self.rdf_subject, RDF.type, URIRef(self.type)))
-        graph.add((self.rdf_subject, RDF.value, Literal(value_string)))
-        return graph
+class SpatialReference(RDFBaseModel):
+    type: CoverageType = Field(rdf_predicate=RDF.type)
+    value: BaseSpatialReference = Field(rdf_predicate=RDF.value)
 
-    @classmethod
-    def parse(cls, metadata_graph, subject=None):
-        if not subject:
-            raise Exception("subject is required for parsing SpatialReference")
+    @validator('value', pre=True)
+    def convert_str_to_spatial_coverage(cls, v, values, **kwargs):
+        if isinstance(v, str):
+            if 'type' in values:
+                cov_type = CoverageType(values['type'])
+                cov_kwargs = {}
+                for key_value in v.split("; "):
+                    k, v = key_value.split("=")
+                    cov_kwargs[k] = v
 
-        rdf_type = metadata_graph.value(subject=subject, predicate=RDF.type)
-        value = metadata_graph.value(subject=subject, predicate=RDF.value)
-        value_dict = {"type": rdf_type}
-        if value:
-            for key_value in value.split("; "):
-                k, v = key_value.split("=")
-                if k == 'units':
-                    value_dict['unit'] = v
-                else:
-                    value_dict[k] = v
-            return SpatialReference(**value_dict)
+                # TODO, hydroshare is inconsistent serving these types
+                if cov_type == CoverageType.box or cov_type == CoverageType.spatial_box:
+                    bsr = BoxSpatialReference(**cov_kwargs)
+                    bsr.type = cov_type
+                    return bsr
+                if cov_type == CoverageType.spatial_point or cov_type == CoverageType.point:
+                    psr = PointSpatialReference(**cov_kwargs)
+                    psr.type = cov_type
+                    return psr
+        return v
+
 
 
 class FieldInformation(RDFBaseModel):

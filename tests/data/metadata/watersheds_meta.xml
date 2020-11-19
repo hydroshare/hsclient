@@ -89,7 +89,7 @@
     <dc:type rdf:resource="https://www.hydroshare.org/terms/GeographicFeatureAggregation"/>
     <dc:coverage>
       <dcterms:box>
-        <rdf:value>westlimit=-111.79812580632701; northlimit=41.84732649257394; eastlimit=-111.40051926333071; southlimit=41.46101782271056; projection=WGS 84 EPSG:4326; units=Decimal degrees</rdf:value>
+        <rdf:value>eastlimit=-111.40051926333071; northlimit=41.84732649257394; projection=WGS 84 EPSG:4326; southlimit=41.46101782271056; units=Decimal degrees; westlimit=-111.79812580632701</rdf:value>
       </dcterms:box>
     </dc:coverage>
     <hsterms:FieldInformation>

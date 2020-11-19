@@ -21,10 +21,10 @@ class ResourceMetadata(RDFBaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource)
 
-    label: str = Field(const=True, default="Composite Resource")
+    label: str = Field(default="Composite Resource", const=True)
 
-    title: str = Field(rdf_predicate=DC.title, default=None)
-    description: Description = Field(rdf_predicate=DC.description, default=None)
+    title: str = Field(rdf_predicate=DC.title)
+    description: Description = Field(rdf_predicate=DC.description, default_factory=Description)
     language: str = Field(rdf_predicate=DC.language, default='eng')
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource, const=True)
@@ -40,7 +40,7 @@ class ResourceMetadata(RDFBaseModel):
     award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
     coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=[])
     formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=[])
-    publishers: List[Publisher] = Field(rdf_predicate=DC.publisher, default=[])
+    publisher: Publisher = Field(rdf_predicate=DC.publisher, default=None)
 
     @validator('language')
     def language_constraint(cls, language):

@@ -104,9 +104,9 @@
       </rdf:Description>
     </hsterms:extendedMetadata>
     <dc:coverage>
-      <dcterms:box>
-        <rdf:value>name=asdfsadf; northlimit=42.1505; eastlimit=-84.5739; southlimit=30.282; westlimit=-104.7887; units=Decimal degrees; projection=WGS 84 EPSG:4326</rdf:value>
-      </dcterms:box>
+      <dcterms:point>
+        <rdf:value>name=Logan River Watershed; east=-111.833736; north=41.710961; units=Decimal degrees; projection=WGS 84 EPSG:4326</rdf:value>
+      </dcterms:point>
     </dc:coverage>
     <dc:contributor>
       <rdf:Description>

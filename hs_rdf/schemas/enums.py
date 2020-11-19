@@ -1,6 +1,6 @@
 from enum import Enum
 
-from hs_rdf.namespaces import DCTERMS
+from hs_rdf.namespaces import DCTERMS, HSTERMS
 
 
 class AnyUrlEnum(str, Enum):
@@ -10,6 +10,8 @@ class CoverageType(AnyUrlEnum):
     period = str(DCTERMS.period)
     box = str(DCTERMS.box)
     point = str(DCTERMS.point)
+    spatial_point = str(HSTERMS.point)
+    spatial_box = str(HSTERMS.box)
 
 
 class DateType(AnyUrlEnum):
