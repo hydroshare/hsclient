@@ -19,7 +19,7 @@ def hs_uid():
 
 class ResourceMetadata(RDFBaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
-    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource, include=True)
+    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource)
 
     label: str = Field(const=True, default="Composite Resource")
 
