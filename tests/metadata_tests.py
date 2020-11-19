@@ -8,6 +8,8 @@ from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
 from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
+from hs_rdf.schemas.fields import DateType
+
 
 @pytest.fixture()
 def res_md():
@@ -109,11 +111,11 @@ def test_resource_metadata(res_md):
     assert res_md.rights.url == "http://studio.bakajo.com"
 
     assert len(res_md.dates) == 2
-    modified = next(x for x in res_md.dates if x.type == DCTERMS.modified)
+    modified = next(x for x in res_md.dates if x.type == DateType.modified)
     assert modified
     # TODO need to handle timezones in dates
     assert str(modified.value) == "2020-11-13 19:40:57.276064+00:00"
-    created = next(x for x in res_md.dates if x.type == DCTERMS.created)
+    created = next(x for x in res_md.dates if x.type == DateType.created)
     assert created
     assert str(created.value) == "2020-07-09 19:12:21.354703+00:00"
 

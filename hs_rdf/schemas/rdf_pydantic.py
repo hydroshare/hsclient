@@ -1,4 +1,5 @@
 import inspect
+from enum import Enum
 
 from typing import get_args
 from datetime import datetime
@@ -59,6 +60,8 @@ class RDFBaseModel(BaseModel):
                             value = Literal(value, datatype=XSD.integer)
                         elif isinstance(value, float):
                             value = Literal(value, datatype=XSD.double)
+                        elif isinstance(value, Enum):
+                            value = URIRef(value.value)
                         else:
                             value = Literal(value)
                         graph.add((self.rdf_subject, predicate, value))

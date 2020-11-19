@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from enum import Enum
 
 from pydantic import AnyUrl, Field, HttpUrl
 from rdflib import Literal, URIRef
@@ -49,8 +50,16 @@ class CellInformation(RDFBaseModel):
     cell_size_y_value: float = Field(rdf_predicate=HSTERMS.cellSizeYValue)
 
 
+class DateType(Enum):
+    modified = str(DCTERMS.modified)
+    created = str(DCTERMS.created)
+    valid = str(DCTERMS.valid)
+    available = str(DCTERMS.available)
+    published = str(DCTERMS.published)
+
+
 class Date(RDFBaseModel):
-    type: AnyUrl = Field(rdf_predicate=RDF.type)
+    type: DateType = Field(rdf_predicate=RDF.type)
     value: datetime = Field(rdf_predicate=RDF.value)
 
 

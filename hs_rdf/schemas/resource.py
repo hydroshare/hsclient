@@ -6,7 +6,7 @@ from pydantic import Field, AnyUrl, validator, root_validator
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
 from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
     Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier, \
-    Publisher, Format
+    Publisher, Format, DateType
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.languages_iso import languages
@@ -34,9 +34,9 @@ class ResourceMetadata(RDFBaseModel):
     contributors: List[Contributor] = Field(rdf_predicate=DC.contributor, default=None)
     sources: List[Source] = Field(rdf_predicate=DC.source, default=None)
     relations: List[Relation] = Field(rdf_predicate=DC.relation, default=None)
-    extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=None)
+    extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=[])
     rights: Rights = Field(rdf_predicate=DC.rights, default=None)
-    dates: List[Date] = Field(rdf_predicate=DC.date, default=None)
+    dates: List[Date] = Field(rdf_predicate=DC.date)
     award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=None)
     coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
     formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=None)
@@ -53,6 +53,20 @@ class ResourceMetadata(RDFBaseModel):
         identifier, rdf_subject = values.get('identifier'), values.get('rdf_subject')
         assert identifier.hydroshare_identifier == rdf_subject, "rdf_subject and identifier.hydroshare_identifier must match"
         return values
+
+    @validator('dates')
+    def dates_constraint(cls, dates):
+        assert len(dates) >= 2
+        created = list(filter(lambda d: d.type == DateType.created, dates))
+        assert len(created) == 1
+        created = created[0]
+        modified = list(filter(lambda d: d.type == DateType.modified, dates))
+        assert len(modified) == 1
+        modified = modified[0]
+
+        assert modified.value >= created.value
+        return dates
+
 
 
 class FileMap(RDFBaseModel):
