@@ -27,9 +27,15 @@ class Description(RDFBaseModel):
     abstract: str = Field(rdf_predicate=DCTERMS.abstract)
 
 
+class CoverageType(Enum):
+    period = str(DCTERMS.period)
+    box = str(DCTERMS.box)
+    point = str(DCTERMS.point)
+
+
 class Coverage(RDFBaseModel):
     value: str = Field(rdf_predicate=RDF.value)
-    type: AnyUrl = Field(rdf_predicate=RDF.type)
+    type: CoverageType = Field(rdf_predicate=RDF.type)
 
 
 class Identifier(RDFBaseModel):

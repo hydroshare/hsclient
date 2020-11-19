@@ -8,7 +8,7 @@ from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
 from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
-from hs_rdf.schemas.fields import DateType
+from hs_rdf.schemas.fields import DateType, CoverageType
 
 
 @pytest.fixture()
@@ -127,9 +127,9 @@ def test_resource_metadata(res_md):
     assert award.funding_agency_url == "https://google.com"
 
     assert len(res_md.coverages) == 2
-    box = next(x for x in res_md.coverages if x.type == DCTERMS.box)
+    box = next(x for x in res_md.coverages if x.type == CoverageType.box)
     # TODO update coverage to parse values
     assert box.value == "name=asdfsadf; northlimit=42.1505; eastlimit=-84.5739; southlimit=30.282; westlimit=-104.7887; units=Decimal degrees; projection=WGS 84 EPSG:4326"
-    period = next(x for x in res_md.coverages if x.type == DCTERMS.period)
+    period = next(x for x in res_md.coverages if x.type == CoverageType.period)
     assert period.value == "start=2020-07-10T00:00:00; end=2020-07-29T00:00:00"
 

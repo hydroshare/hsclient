@@ -6,7 +6,7 @@ from pydantic import Field, AnyUrl, validator, root_validator
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, DCTERMS, CITOTERMS
 from hs_rdf.schemas.fields import Description, DCType, Creator, Contributor, Source, \
     Relation, ExtendedMetadata, Rights, Date, AwardInfo, Coverage, Identifier, \
-    Publisher, Format, DateType
+    Publisher, Format, DateType, CoverageType
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.languages_iso import languages
@@ -31,14 +31,14 @@ class ResourceMetadata(RDFBaseModel):
     identifier: Identifier = Field(rdf_predicate=DC.identifier)
     creators: List[Creator] = Field(rdf_predicate=DC.creator)
 
-    contributors: List[Contributor] = Field(rdf_predicate=DC.contributor, default=None)
-    sources: List[Source] = Field(rdf_predicate=DC.source, default=None)
-    relations: List[Relation] = Field(rdf_predicate=DC.relation, default=None)
+    contributors: List[Contributor] = Field(rdf_predicate=DC.contributor)
+    sources: List[Source] = Field(rdf_predicate=DC.source, default=[])
+    relations: List[Relation] = Field(rdf_predicate=DC.relation, default=[])
     extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=[])
     rights: Rights = Field(rdf_predicate=DC.rights, default=None)
     dates: List[Date] = Field(rdf_predicate=DC.date)
-    award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=None)
-    coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
+    award_infos: List[AwardInfo] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
+    coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=[])
     formats: List[Format] = Field(rdf_predicate=HSTERMS.Format, default=None)
     publishers: List[Publisher] = Field(rdf_predicate=HSTERMS.Format, default=None)
 
@@ -51,6 +51,7 @@ class ResourceMetadata(RDFBaseModel):
     @root_validator
     def identifier_constraint(cls, values):
         identifier, rdf_subject = values.get('identifier'), values.get('rdf_subject')
+        assert rdf_subject, "rdf_subject must be provided"
         assert identifier.hydroshare_identifier == rdf_subject, "rdf_subject and identifier.hydroshare_identifier must match"
         return values
 
@@ -67,6 +68,15 @@ class ResourceMetadata(RDFBaseModel):
         assert modified.value >= created.value
         return dates
 
+    @validator('coverages')
+    def coverages_constraint(cls, coverages):
+        def one_or_none_of_type(type):
+            cov = list(filter(lambda d: d.type == type, coverages))
+            assert len(cov) <= 1
+        one_or_none_of_type(CoverageType.point)
+        one_or_none_of_type(CoverageType.period)
+        one_or_none_of_type(CoverageType.box)
+        return coverages
 
 
 class FileMap(RDFBaseModel):
