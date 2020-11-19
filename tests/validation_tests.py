@@ -6,7 +6,7 @@ from pydantic.error_wrappers import ValidationError
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
 from hs_rdf.schemas.enums import VariableType
-from hs_rdf.schemas.fields import ExtendedMetadata, Date, DateType, Variable
+from hs_rdf.schemas.fields import ExtendedMetadata, Date, DateType, Variable, Coverage, PointCoverage
 
 
 @pytest.fixture()
@@ -72,3 +72,15 @@ def test_variables():
         assert "unit" in str(ve)
         assert "type" in str(ve)
         assert "shape" in str(ve)
+
+
+def test_one_spatial_coverage(res_md):
+    coverages = res_md.coverages
+    point_coverage = PointCoverage(name="Logan River Watershed", east=-111.833736, north=41.710961,
+                                   units="Decimal degrees", projection="WGS 84 EPSG:4326")
+    coverages.append(Coverage(type=point_coverage.type, value=point_coverage))
+    try:
+        res_md.coverages = coverages
+        assert False, "Only one type of spatial coverage should be allowed"
+    except ValueError as ve:
+        assert "Only one type of spatial coverage is allowed, point or box" in str(ve)

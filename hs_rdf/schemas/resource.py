@@ -78,6 +78,14 @@ class ResourceMetadata(RDFBaseModel):
         one_or_none_of_type(CoverageType.box)
         return coverages
 
+    @validator('coverages')
+    def coverages_spatial_constraint(cls, coverages):
+        contains_point = any(c for c in coverages if c.type == CoverageType.point)
+        contains_box = any(c for c in coverages if c.type == CoverageType.box)
+        if contains_point:
+            assert not contains_box, "Only one type of spatial coverage is allowed, point or box"
+        return coverages
+
 
 class FileMap(RDFBaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.Aggregation)
