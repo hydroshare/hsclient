@@ -1,7 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import List
 
-from pydantic import Field, AnyUrl, validator, root_validator
+from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, HttpUrl
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
@@ -17,8 +18,53 @@ def hs_uid():
     return getattr(HSRESOURCE, uuid.uuid4().hex)
 
 
+class ORMBaseModel(BaseModel):
+    class Config:
+        orm_mode = True
+
+class BoxCoverage(BaseModel):
+    name: str = None
+    northlimit: float
+    eastlimit: float
+    southlimit: float
+    westlimit: float
+    units: str
+    projection: str
+
+
+class PointCoverage(BaseModel):
+    name: str = None
+    east: float
+    north: float
+    units: str
+    projection: str
+
+
+class PeriodCoverage(BaseModel):
+    start: datetime
+    end: datetime
+    scheme: str = None
+
+
+class ResourceMetadata(ORMBaseModel):
+    title: str = None
+    description: DescriptionInRDF = None
+    language: str = None
+    subjects: List[str] = []
+    creators: List[CreatorInRDF] = []
+    contributors: List[ContributorInRDF] = []
+    sources: List[SourceInRDF] = Field(rdf_predicate=DC.source, default=[])
+    extended_metadata: List[ExtendedMetadataInRDF] = []
+    rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=None)
+    dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
+    award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
+    coverage_box: BoxCoverage = None
+    #coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=[])
+    formats: List[FormatInRDF] = Field(rdf_predicate=HSTERMS.Format, default=[])
+    publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
+
 class ResourceMetadataInRDF(RDFBaseModel):
-    rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
+    _rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource)
 
     label: str = Field(default="Composite Resource", const=True)
@@ -34,7 +80,7 @@ class ResourceMetadataInRDF(RDFBaseModel):
     contributors: List[ContributorInRDF] = Field(rdf_predicate=DC.contributor, default=[])
     sources: List[SourceInRDF] = Field(rdf_predicate=DC.source, default=[])
     relations: List[RelationInRDF] = Field(rdf_predicate=DC.relation, default=[])
-    extended_metadatas: List[ExtendedMetadataInRDF] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=[])
+    extended_metadata: List[ExtendedMetadataInRDF] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=[])
     rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=None)
     dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
     award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
@@ -47,13 +93,6 @@ class ResourceMetadataInRDF(RDFBaseModel):
         if language not in [code for code, verbose in languages]:
             raise ValueError("language '{}' must be a 3 letter iso language code".format(language))
         return language
-
-    @root_validator
-    def identifier_constraint(cls, values):
-        identifier, rdf_subject = values.get('identifier'), values.get('rdf_subject')
-        assert rdf_subject, "rdf_subject must be provided"
-        assert identifier.hydroshare_identifier == rdf_subject, "rdf_subject and identifier.hydroshare_identifier must match"
-        return values
 
     @validator('dates')
     def dates_constraint(cls, dates):
@@ -85,6 +124,10 @@ class ResourceMetadataInRDF(RDFBaseModel):
         if contains_point:
             assert not contains_box, "Only one type of spatial coverage is allowed, point or box"
         return coverages
+
+
+def to_rdf(rm: ResourceMetadata):
+    pass
 
 
 class FileMap(RDFBaseModel):

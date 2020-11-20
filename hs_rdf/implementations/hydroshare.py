@@ -344,7 +344,7 @@ class Aggregation:
 
     @property
     def path(self):
-        return urlparse(str(self.metadata.rdf_subject)).path
+        return urlparse(str(self.metadata._rdf_subject)).path
 
     def _retrieve_and_parse(self, path):
         file_str = self._hs_session.retrieve_string(path)

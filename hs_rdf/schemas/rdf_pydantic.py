@@ -1,3 +1,4 @@
+import abc
 import inspect
 from enum import Enum
 
@@ -6,23 +7,27 @@ from datetime import datetime
 
 from rdflib import Graph, BNode, URIRef, Literal
 from rdflib.term import Identifier as RDFIdentifier
-from pydantic import BaseModel, Field, AnyUrl
+from pydantic import BaseModel, Field, AnyUrl, PrivateAttr
 
 from hs_rdf.namespaces import RDF, RDFS1, XSD, DC
 from hs_rdf.schemas.enums import AnyUrlEnum
 
 
-class RDFBaseModel(BaseModel):
+class RDFBaseModel(BaseModel):#, abc.ABC):
 
-    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+    _rdf_subject: RDFIdentifier = PrivateAttr(default_factory=BNode)
 
     class Config:
         validate_assignment = True
 
+    #@abc.abstractmethod
+    #def to_simple(self):
+    #    pass
+
     @classmethod
     def _rdf_fields(cls):
         for f in cls.__fields__.values():
-            if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'dc_type']:
+            if f.alias not in ['_rdf_subject', 'rdf_type', 'label', 'dc_type']:
                 yield f
 
     @classmethod
@@ -49,7 +54,7 @@ class RDFBaseModel(BaseModel):
                 for value in values:
                     if isinstance(value, RDFBaseModel):
                         # nested class
-                        graph.add((self.rdf_subject, predicate, value.rdf_subject))
+                        graph.add((self._rdf_subject, predicate, value._rdf_subject))
                         graph = value.rdf(graph)
                     else:
                         # primitive value
@@ -67,11 +72,11 @@ class RDFBaseModel(BaseModel):
                             value = Literal(value.value)
                         else:
                             value = Literal(value)
-                        graph.add((self.rdf_subject, predicate, value))
+                        graph.add((self._rdf_subject, predicate, value))
         if hasattr(self, 'rdf_type'):
-            graph.add((self.rdf_subject, RDF.type, self.rdf_type))
+            graph.add((self._rdf_subject, RDF.type, self.rdf_type))
         if hasattr(self, 'dc_type'):
-            graph.add((self.rdf_subject, DC.type, self.dc_type))
+            graph.add((self._rdf_subject, DC.type, self.dc_type))
         if hasattr(self, 'label'):
             graph.add((URIRef(str(self.rdf_type)), RDFS1.label, Literal(self.label)))
             graph.add((URIRef(str(self.rdf_type)), RDFS1.isDefinedBy, URIRef("https://www.hydroshare.org/terms/")))
@@ -127,7 +132,7 @@ class RDFBaseModel(BaseModel):
                     # single
                     kwargs[f.name] = parsed[0]
         if kwargs:
-            kwargs['rdf_subject'] = subject
+            kwargs['_rdf_subject'] = subject
             return schema(**kwargs)
         return None
 

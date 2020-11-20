@@ -83,7 +83,7 @@ class Description(RDFBaseModel):
     abstract: str = Field(rdf_predicate=DCTERMS.abstract)
 
 class ResourceMetadata(RDFBaseModel):
-    rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
+    _rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.resource)
 
     title: str = Field(rdf_predicate=DC.title, default=None)

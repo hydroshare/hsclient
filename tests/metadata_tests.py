@@ -60,7 +60,7 @@ def test_resource_serialization(metadata_file):
     compare_metadatas(g, metadata_file)
 
 def test_resource_metadata(res_md):
-    assert res_md.rdf_subject == getattr(HSRESOURCE, "84805fd615a04d63b4eada65644a1e20")
+    assert res_md._rdf_subject == getattr(HSRESOURCE, "84805fd615a04d63b4eada65644a1e20")
 
     assert res_md.title == "sadfadsgasdf"
 
@@ -78,8 +78,8 @@ def test_resource_metadata(res_md):
 
     assert res_md.identifier.hydroshare_identifier == "http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"
 
-    assert len(res_md.extended_metadatas) == 2
-    assert next(filter(lambda x: x.key == "key2", res_md.extended_metadatas)).value == "value2"
+    assert len(res_md.extended_metadata) == 2
+    assert next(filter(lambda x: x.key == "key2", res_md.extended_metadata)).value == "value2"
 
     assert len(res_md.sources) == 2
     assert any(x for x in res_md.sources if x.is_derived_from == 'another')
