@@ -9,7 +9,7 @@ from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
 from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
-from hs_rdf.schemas.fields import DateType, CoverageType, BoxCoverage, PeriodCoverage, PointCoverage
+from hs_rdf.schemas.fields import DateType, CoverageType
 
 
 @pytest.fixture()
@@ -133,37 +133,12 @@ def test_resource_metadata(res_md):
     assert award.funding_agency_url == "https://google.com"
 
     assert len(res_md.coverages) == 2
-    box = next(x for x in res_md.coverages if x.type == CoverageType.box)
     # TODO update coverage to parse values
-    assert isinstance(box.value, BoxCoverage)
-    assert box.type == CoverageType.box
-    assert box.value.name == 'asdfsadf'
-    assert box.value.northlimit == 42.1505
-    assert box.value.eastlimit == -84.5739
-    assert box.value.southlimit == 30.282
-    assert box.value.westlimit == -104.7887
-    assert box.value.units == "Decimal degrees"
-    assert box.value.projection == "WGS 84 EPSG:4326"
-    period = next(x for x in res_md.coverages if x.type == CoverageType.period)
-    assert period.type == CoverageType.period
-    assert isinstance(period.value, PeriodCoverage)
-    assert period.value.start == datetime.fromisoformat("2020-07-10T00:00:00")
-    assert period.value.end == datetime.fromisoformat("2020-07-29T00:00:00")
 
     assert res_md.publisher
     assert res_md.publisher.name == "Consortium of Universities for the Advancement of Hydrologic Science, Inc. (CUAHSI)"
     assert res_md.publisher.url == "https://www.cuahsi.org"
 
-def test_point_coverage(res_md_point):
-
-    point = next(x for x in res_md_point.coverages if x.type == CoverageType.point)
-    assert point.type == CoverageType.point
-    assert isinstance(point.value, PointCoverage)
-    assert point.value.name == "Logan River Watershed"
-    assert point.value.east == -111.833736
-    assert point.value.north == 41.710961
-    assert point.value.units == "Decimal degrees"
-    assert point.value.projection == "WGS 84 EPSG:4326"
 
 
 

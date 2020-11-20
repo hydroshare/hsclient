@@ -3,8 +3,8 @@ import tempfile
 import os
 
 from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
-from hs_rdf.schemas import ResourceMetadata
-from hs_rdf.schemas.fields import ExtendedMetadata
+from hs_rdf.schemas import ResourceMetadataInRDF
+from hs_rdf.schemas.fields import ExtendedMetadataInRDF
 
 
 @pytest.fixture()
@@ -36,8 +36,8 @@ def test_resource_metadata_updating(new_resource):
 
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
-    em = [ExtendedMetadata(key="key1", value="value1"), ExtendedMetadata(key="key2", value="value2"),
-          ExtendedMetadata(key="key3", value="value3")]
+    em = [ExtendedMetadataInRDF(key="key1", value="value1"), ExtendedMetadataInRDF(key="key2", value="value2"),
+          ExtendedMetadataInRDF(key="key3", value="value3")]
     new_resource.metadata.extended_metadatas = em
 
     new_resource.save()
@@ -76,7 +76,7 @@ def test_files_aggregations(resource):
 
 
 def test_metadata(resource):
-    assert isinstance(resource.metadata, ResourceMetadata)
+    assert isinstance(resource.metadata, ResourceMetadataInRDF)
     assert resource.metadata.title == "testing from scratch"
     assert resource.aggregations[0].metadata.title == "logan1"
 

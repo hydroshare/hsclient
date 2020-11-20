@@ -3,8 +3,8 @@ from typing import List
 from pydantic import AnyUrl, Field
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
-from hs_rdf.schemas.fields import BandInformation, SpatialReference, CellInformation, ExtendedMetadata, Coverage, \
-    Rights, FieldInformation, GeometryInformation, Variable
+from hs_rdf.schemas.fields import BandInformation, SpatialReference, CellInformation, ExtendedMetadataInRDF, CoverageInRDF, \
+    RightsInRDF, FieldInformation, GeometryInformation, Variable
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
@@ -12,9 +12,9 @@ class BaseAggregationMetadata(RDFBaseModel):
     title: str = Field(rdf_predicate=DC.title)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=None)
     language: str = Field(rdf_predicate=DC.language, default=None)
-    extended_metadatas: List[ExtendedMetadata] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=None)
-    coverages: List[Coverage] = Field(rdf_predicate=DC.coverage, default=None)
-    rights: List[Rights] = Field(rdf_predicate=DC.rights, default=None)
+    extended_metadatas: List[ExtendedMetadataInRDF] = Field(rdf_predicate=HSTERMS.extendedMetadata, default=None)
+    coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=None)
+    rights: List[RightsInRDF] = Field(rdf_predicate=DC.rights, default=None)
 
 class GeographicRasterMetadata(BaseAggregationMetadata):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicRasterAggregation)

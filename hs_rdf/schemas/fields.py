@@ -14,24 +14,24 @@ class DCType(RDFBaseModel):
     label: str = Field(rdf_predicate=RDFS.label)
 
 
-class Source(RDFBaseModel):
+class SourceInRDF(RDFBaseModel):
     is_derived_from: str = Field(rdf_predicate=HSTERMS.isDerivedFrom, default=None)
 
 
-class Relation(RDFBaseModel):
+class RelationInRDF(RDFBaseModel):
     is_copied_from: AnyUrl = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
     is_part_of: AnyUrl = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
 
 
-class Description(RDFBaseModel):
+class DescriptionInRDF(RDFBaseModel):
     abstract: str = Field(rdf_predicate=DCTERMS.abstract, default=None)
 
 
-class Identifier(RDFBaseModel):
+class IdentifierInRDF(RDFBaseModel):
     hydroshare_identifier: AnyUrl = Field(rdf_predicate=HSTERMS.hydroShareIdentifier)
 
 
-class ExtendedMetadata(RDFBaseModel):
+class ExtendedMetadataInRDF(RDFBaseModel):
     value: str = Field(rdf_predicate=HSTERMS.value)
     key: str = Field(rdf_predicate=HSTERMS.key)
 
@@ -45,17 +45,17 @@ class CellInformation(RDFBaseModel):
     cell_size_y_value: float = Field(rdf_predicate=HSTERMS.cellSizeYValue)
 
 
-class Date(RDFBaseModel):
+class DateInRDF(RDFBaseModel):
     type: DateType = Field(rdf_predicate=RDF.type)
     value: datetime = Field(rdf_predicate=RDF.value)
 
 
-class Rights(RDFBaseModel):
+class RightsInRDF(RDFBaseModel):
     rights_statement: str = Field(rdf_predicate=HSTERMS.rightsStatement)
     url: AnyUrl = Field(rdf_predicate=HSTERMS.URL)
 
 
-class Creator(RDFBaseModel):
+class CreatorInRDF(RDFBaseModel):
     creator_order: int = Field(rdf_predicate=HSTERMS.creatorOrder)
     name: str = Field(rdf_predicate=HSTERMS.name)
 
@@ -63,7 +63,7 @@ class Creator(RDFBaseModel):
     organization: str = Field(rdf_predicate=HSTERMS.organization, default=None)
 
 
-class Contributor(RDFBaseModel):
+class ContributorInRDF(RDFBaseModel):
     name: str = Field(rdf_predicate=HSTERMS.name, default=None)
     google_scholar_id: AnyUrl = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
     research_gate_id: AnyUrl = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
@@ -75,7 +75,7 @@ class Contributor(RDFBaseModel):
     homepage: HttpUrl = Field(rdf_predicate=HSTERMS.homepage, default=None)
 
 
-class AwardInfo(RDFBaseModel):
+class AwardInfoInRDF(RDFBaseModel):
     funding_agency_name: str = Field(rdf_predicate=HSTERMS.fundingAgencyName, default=None)
     award_title: str = Field(rdf_predicate=HSTERMS.awardTitle, default=None)
     award_number: str = Field(rdf_predicate=HSTERMS.awardNumber, default=None)
@@ -94,125 +94,14 @@ class BandInformation(RDFBaseModel):
     minimum_value: List[str] = Field(rdf_predicate=HSTERMS.minimumValue, default=None)
 
 
-class BaseCoverage(BaseModel):
-    type: CoverageType
-
-    def __str__(self):
-        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
-                          for key, val in self.__dict__.items()
-                          if key != "type" and val])
-
-
-class BoxCoverage(BaseCoverage):
-    type: CoverageType = Field(default=CoverageType.box, const=True)
-    name: str = None
-    northlimit: float
-    eastlimit: float
-    southlimit: float
-    westlimit: float
-    units: str
-    projection: str
-
-
-class PointCoverage(BaseCoverage):
-    type: CoverageType = Field(default=CoverageType.point, const=True)
-    name: str = None
-    east: float
-    north: float
-    units: str
-    projection: str
-
-
-class PeriodCoverage(BaseCoverage):
-    type: CoverageType = Field(default=CoverageType.period, const=True)
-    start: datetime
-    end: datetime
-    scheme: str = None
-
-
-class Coverage(RDFBaseModel):
+class CoverageInRDF(RDFBaseModel):
     type: CoverageType = Field(rdf_predicate=RDF.type)
-    value: BaseCoverage = Field(rdf_predicate=RDF.value)
-
-    @validator('value', pre=True)
-    def convert_str_to_coverage(cls, v, values, **kwargs):
-        if isinstance(v, str):
-            if 'type' in values:
-                cov_type = CoverageType(values['type'])
-                cov_kwargs = {}
-                for key_value in v.split("; "):
-                    k, v = key_value.split("=")
-                    cov_kwargs[k] = v
-
-                if cov_type == CoverageType.box:
-                    return BoxCoverage(**cov_kwargs)
-                if cov_type == CoverageType.point:
-                    return PointCoverage(**cov_kwargs)
-                if cov_type == CoverageType.period:
-                    return PeriodCoverage(**cov_kwargs)
-        return v
-
-
-class BaseSpatialReference(BaseModel):
-    type: CoverageType = None
-
-    def __str__(self):
-        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
-                          for key, val in self.__dict__.items()
-                          if key != "type" and val])
-
-
-class PointSpatialReference(BaseSpatialReference):
-    name: str = None
-    east: float
-    north: float
-    units: str
-    projection: str = None
-    projection_name: str = None
-    projection_string: str
-    datum: str
-    projection_string_type: str = None
-
-
-class BoxSpatialReference(BaseSpatialReference):
-    northlimit: float
-    southlimit: float
-    westlimit: float
-    eastlimit: float
-    projection_name: str = None
-    projection_string: str
-    units: str
-    datum: str
-    name: str = None
-    projection: str = None
-    projection_string_type: str = None
+    value: str = Field(rdf_predicate=RDF.value)
 
 
 class SpatialReference(RDFBaseModel):
     type: CoverageType = Field(rdf_predicate=RDF.type)
-    value: BaseSpatialReference = Field(rdf_predicate=RDF.value)
-
-    @validator('value', pre=True)
-    def convert_str_to_spatial_coverage(cls, v, values, **kwargs):
-        if isinstance(v, str):
-            if 'type' in values:
-                cov_type = CoverageType(values['type'])
-                cov_kwargs = {}
-                for key_value in v.split("; "):
-                    k, v = key_value.split("=")
-                    cov_kwargs[k] = v
-
-                # TODO, hydroshare is inconsistent serving these types
-                if cov_type == CoverageType.box or cov_type == CoverageType.spatial_box:
-                    bsr = BoxSpatialReference(**cov_kwargs)
-                    bsr.type = cov_type
-                    return bsr
-                if cov_type == CoverageType.spatial_point or cov_type == CoverageType.point:
-                    psr = PointSpatialReference(**cov_kwargs)
-                    psr.type = cov_type
-                    return psr
-        return v
-
+    value: str = Field(rdf_predicate=RDF.value)
 
 
 class FieldInformation(RDFBaseModel):
@@ -236,9 +125,9 @@ class Variable(RDFBaseModel):
     method: str = Field(rdf_predicate=HSTERMS.method, default=None)
     missing_value: str = Field(rdf_predicate=HSTERMS.missing_value, default=None)
 
-class Publisher(RDFBaseModel):
+class PublisherInRDF(RDFBaseModel):
     name: str = Field(rdf_predicate=HSTERMS.publisherName)
     url: AnyUrl = Field(rdf_predicate=HSTERMS.publisherURL)
 
-class Format(RDFBaseModel):
+class FormatInRDF(RDFBaseModel):
     value: str = Field(rdf_predicate=HSTERMS.value)
