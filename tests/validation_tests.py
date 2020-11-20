@@ -6,7 +6,7 @@ from pydantic.error_wrappers import ValidationError
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
 from hs_rdf.schemas.enums import VariableType
-from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, CoverageInRDF
+from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable
 
 
 @pytest.fixture()

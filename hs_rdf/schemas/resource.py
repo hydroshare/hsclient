@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
-from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, HttpUrl
+from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, HttpUrl, PrivateAttr
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
@@ -23,6 +23,7 @@ class ORMBaseModel(BaseModel):
         orm_mode = True
 
 class BoxCoverage(BaseModel):
+    type: str = "box"
     name: str = None
     northlimit: float
     eastlimit: float
@@ -33,6 +34,7 @@ class BoxCoverage(BaseModel):
 
 
 class PointCoverage(BaseModel):
+    type: str = "point"
     name: str = None
     east: float
     north: float
@@ -46,25 +48,8 @@ class PeriodCoverage(BaseModel):
     scheme: str = None
 
 
-class ResourceMetadata(ORMBaseModel):
-    title: str = None
-    description: DescriptionInRDF = None
-    language: str = None
-    subjects: List[str] = []
-    creators: List[CreatorInRDF] = []
-    contributors: List[ContributorInRDF] = []
-    sources: List[SourceInRDF] = Field(rdf_predicate=DC.source, default=[])
-    extended_metadata: List[ExtendedMetadataInRDF] = []
-    rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=None)
-    dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
-    award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
-    coverage_box: BoxCoverage = None
-    #coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=[])
-    formats: List[FormatInRDF] = Field(rdf_predicate=HSTERMS.Format, default=[])
-    publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
-
 class ResourceMetadataInRDF(RDFBaseModel):
-    _rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
+    _rdf_subject: RDFIdentifier = PrivateAttr(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource)
 
     label: str = Field(default="Composite Resource", const=True)
@@ -126,8 +111,42 @@ class ResourceMetadataInRDF(RDFBaseModel):
         return coverages
 
 
-def to_rdf(rm: ResourceMetadata):
-    pass
+class ResourceMetadata(ORMBaseModel):
+    title: str = None
+    description: DescriptionInRDF = None
+    language: str = None
+    subjects: List[str] = []
+    creators: List[CreatorInRDF] = []
+    contributors: List[ContributorInRDF] = []
+    sources: List[SourceInRDF] = Field(rdf_predicate=DC.source, default=[])
+    extended_metadata: List[ExtendedMetadataInRDF] = []
+    rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=None)
+    dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
+    award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
+    spatial_coverage: Union[BoxCoverage, PointCoverage] = None
+    period_coverage: PeriodCoverage = None
+    formats: List[FormatInRDF] = Field(rdf_predicate=HSTERMS.Format, default=[])
+    publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
+
+    @classmethod
+    def parse_rdf_model(self, metadata: ResourceMetadataInRDF):
+        md_out = ResourceMetadata.from_orm(metadata)
+
+        def to_coverage_dict(value):
+            value_dict = {}
+            for key_value in value.split("; "):
+                k, v = key_value.split("=")
+                value_dict[k] = v
+            return value_dict
+
+        for cov in metadata.coverages:
+            if cov.type == CoverageType.point:
+                md_out.spatial_coverage = PointCoverage(**to_coverage_dict(cov.value))
+            elif cov.type == CoverageType.box:
+                md_out.spatial_coverage = BoxCoverage(**to_coverage_dict(cov.value))
+            elif cov.type == CoverageType.period:
+                md_out.period_coverage = PeriodCoverage(**to_coverage_dict(cov.value))
+        return md_out
 
 
 class FileMap(RDFBaseModel):

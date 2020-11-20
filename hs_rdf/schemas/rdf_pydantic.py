@@ -132,8 +132,9 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
                     # single
                     kwargs[f.name] = parsed[0]
         if kwargs:
-            kwargs['_rdf_subject'] = subject
-            return schema(**kwargs)
+            instance = schema(**kwargs)
+            instance._rdf_subject = subject
+            return instance
         return None
 
 def nested_class(field):
