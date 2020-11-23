@@ -5,7 +5,7 @@ from pydantic import AnyUrl, Field, HttpUrl, BaseModel, validator
 from rdflib import Literal, URIRef
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
-from hs_rdf.schemas.enums import CoverageType, DateType, VariableType
+from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
@@ -88,10 +88,10 @@ class BandInformation(RDFBaseModel):
     variable_unit: str = Field(rdf_predicate=HSTERMS.variableUnit, default=None)
 
     no_data_value: str = Field(rdf_predicate=HSTERMS.noDataValue, default=None)
-    maximum_value: List[str] = Field(rdf_predicate=HSTERMS.maximumValue, default=None)
+    maximum_value: str = Field(rdf_predicate=HSTERMS.maximumValue, default=None)
     comment: str = Field(rdf_predicate=HSTERMS.comment, default=None)
     method: str = Field(rdf_predicate=HSTERMS.method, default=None)
-    minimum_value: List[str] = Field(rdf_predicate=HSTERMS.minimumValue, default=None)
+    minimum_value: str = Field(rdf_predicate=HSTERMS.minimumValue, default=None)
 
 
 class CoverageInRDF(RDFBaseModel):
@@ -99,8 +99,8 @@ class CoverageInRDF(RDFBaseModel):
     value: str = Field(rdf_predicate=RDF.value)
 
 
-class SpatialReference(RDFBaseModel):
-    type: CoverageType = Field(rdf_predicate=RDF.type)
+class SpatialReferenceInRDF(RDFBaseModel):
+    type: SpatialReferenceType = Field(rdf_predicate=RDF.type)
     value: str = Field(rdf_predicate=RDF.value)
 
 

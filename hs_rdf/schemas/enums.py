@@ -10,8 +10,11 @@ class CoverageType(AnyUrlEnum):
     period = str(DCTERMS.period)
     box = str(DCTERMS.box)
     point = str(DCTERMS.point)
-    spatial_point = str(HSTERMS.point)
-    spatial_box = str(HSTERMS.box)
+
+
+class SpatialReferenceType(AnyUrlEnum):
+    point = str(HSTERMS.point)
+    box = str(HSTERMS.box)
 
 
 class DateType(AnyUrlEnum):

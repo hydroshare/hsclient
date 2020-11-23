@@ -12,6 +12,7 @@ from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.languages_iso import languages
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
+from hs_rdf.utils import to_coverage_dict
 
 
 def hs_uid():
@@ -29,6 +30,7 @@ class BaseCoverage(BaseModel):
                           for key, val in self.__dict__.items()
                           if key != "type" and val])
 
+
 class BoxCoverage(BaseCoverage):
     type: str = "box"
     name: str = None
@@ -40,6 +42,11 @@ class BoxCoverage(BaseCoverage):
     projection: str
 
 
+class BoxSpatialReference(BoxCoverage):
+    projection_string: str
+    projection_string_type: str = None
+
+
 class PointCoverage(BaseCoverage):
     type: str = "point"
     name: str = None
@@ -47,6 +54,11 @@ class PointCoverage(BaseCoverage):
     north: float
     units: str
     projection: str
+
+
+class PointSpatialReference(PointCoverage):
+    projection_string: str
+    projection_string_type: str = None
 
 
 class PeriodCoverage(BaseCoverage):
@@ -124,14 +136,6 @@ class Creator(RDFBaseModel):
     creator_order: int
     email: str = Field(default=None)
     organization: str = Field(default=None)
-
-
-def to_coverage_dict(value):
-    value_dict = {}
-    for key_value in value.split("; "):
-        k, v = key_value.split("=")
-        value_dict[k] = v
-    return value_dict
 
 class ResourceMetadata(ORMBaseModel):
     _rdf_model: ResourceMetadataInRDF = PrivateAttr()

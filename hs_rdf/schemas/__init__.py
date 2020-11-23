@@ -1,8 +1,9 @@
 from rdflib import Graph
 
 from hs_rdf.namespaces import ORE, HSTERMS, RDF
-from hs_rdf.schemas.aggregations import GeographicRasterMetadata, GeographicFeatureMetadata, MultidimensionalMetadata, \
-    ReferencedTimeSeriesMetadata, FileSetMetadata, SingleFileMetadata
+from hs_rdf.schemas.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadata, \
+    MultidimensionalMetadata, \
+    ReferencedTimeSeriesMetadata, FileSetMetadata, SingleFileMetadata, GeographicRasterMetadata
 from hs_rdf.schemas.resource import ResourceMap, ResourceMetadataInRDF, ResourceMetadata
 
 
@@ -10,6 +11,7 @@ def load_rdf(rdf_str, file_format='xml'):
     schemas = {ORE.ResourceMap: ResourceMap,
                #HSTERMS.CompositeResource: ResourceMetadataInRDF,
                HSTERMS.CompositeResource: ResourceMetadata,
+               #HSTERMS.GeographicRasterAggregation: GeographicRasterMetadataInRDF,
                HSTERMS.GeographicRasterAggregation: GeographicRasterMetadata,
                HSTERMS.GeographicFeatureAggregation : GeographicFeatureMetadata,
                HSTERMS.MultidimensionalAggregation : MultidimensionalMetadata,

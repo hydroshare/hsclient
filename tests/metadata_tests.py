@@ -6,11 +6,12 @@ from rdflib import Graph, URIRef, Literal
 
 from hs_rdf.implementations.hydroshare import Resource, AggregationType
 from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
-from hs_rdf.schemas import load_rdf
+from hs_rdf.schemas import load_rdf, GeographicRasterMetadata
 from rdflib.compare import _squashed_graphs_triples
 
 from hs_rdf.schemas.fields import DateType, CoverageType
 from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage, ResourceMetadata
+from hs_rdf.utils import to_coverage_dict
 
 
 @pytest.fixture()
@@ -23,14 +24,6 @@ def res_md():
 def res_md_point():
     with open("data/metadata/resourcemetadata_with_point_coverage.xml", 'r') as f:
         return load_rdf(f.read())
-
-
-def to_coverage_dict(value):
-    value_dict = {}
-    for key_value in value.split("; "):
-        k, v = key_value.split("=")
-        value_dict[k] = v
-    return value_dict
 
 
 def compare_metadatas(new_graph, original_metadata_file):
@@ -50,14 +43,14 @@ def compare_metadatas(new_graph, original_metadata_file):
 
 metadata_files = ['resourcemetadata.xml', 'asdf_meta.xml', 'logan_meta.xml', 'msf_version.refts_meta.xml',
                   'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml']
-
+metadata_files = ['logan_meta.xml']
 @pytest.mark.parametrize("metadata_file", metadata_files)
 def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
     g = Graph()
-    if isinstance(md, ResourceMetadata):
+    if isinstance(md, ResourceMetadata) or isinstance(md, GeographicRasterMetadata):
         md._sync()
         md._rdf_model.rdf(g)
     else:
