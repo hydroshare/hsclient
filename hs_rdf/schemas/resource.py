@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Any
 
 from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, HttpUrl, PrivateAttr
 
@@ -22,7 +22,14 @@ class ORMBaseModel(BaseModel):
     class Config:
         orm_mode = True
 
-class BoxCoverage(BaseModel):
+class BaseCoverage(BaseModel):
+
+    def __str__(self):
+        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
+                          for key, val in self.__dict__.items()
+                          if key != "type" and val])
+
+class BoxCoverage(BaseCoverage):
     type: str = "box"
     name: str = None
     northlimit: float
@@ -33,7 +40,7 @@ class BoxCoverage(BaseModel):
     projection: str
 
 
-class PointCoverage(BaseModel):
+class PointCoverage(BaseCoverage):
     type: str = "point"
     name: str = None
     east: float
@@ -42,7 +49,7 @@ class PointCoverage(BaseModel):
     projection: str
 
 
-class PeriodCoverage(BaseModel):
+class PeriodCoverage(BaseCoverage):
     start: datetime
     end: datetime
     scheme: str = None
@@ -111,42 +118,196 @@ class ResourceMetadataInRDF(RDFBaseModel):
         return coverages
 
 
+class Creator(RDFBaseModel):
+    name: str = Field()
+
+    creator_order: int
+    email: str = Field(default=None)
+    organization: str = Field(default=None)
+
+
+def to_coverage_dict(value):
+    value_dict = {}
+    for key_value in value.split("; "):
+        k, v = key_value.split("=")
+        value_dict[k] = v
+    return value_dict
+
 class ResourceMetadata(ORMBaseModel):
+    _rdf_model: ResourceMetadataInRDF = PrivateAttr()
+
+    class Config:
+        validate_assignment = True
+
+    type: AnyUrl = Field(alias="dc_type")
+    identifier: AnyUrl
     title: str = None
-    description: DescriptionInRDF = None
+    abstract: str = Field(alias="description", default=None)
     language: str = None
     subjects: List[str] = []
-    creators: List[CreatorInRDF] = []
+    creators: List[Creator] = []
     contributors: List[ContributorInRDF] = []
-    sources: List[SourceInRDF] = Field(rdf_predicate=DC.source, default=[])
-    extended_metadata: List[ExtendedMetadataInRDF] = []
-    rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=None)
-    dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
-    award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
-    spatial_coverage: Union[BoxCoverage, PointCoverage] = None
-    period_coverage: PeriodCoverage = None
-    formats: List[FormatInRDF] = Field(rdf_predicate=HSTERMS.Format, default=[])
-    publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
+    derived_from: List[str] = Field(alias="sources", default=[])
+    relations: List[RelationInRDF] = Field(default=[])
+    additional_metadata = Field(alias="extended_metadata", default={})
+    rights: RightsInRDF = Field(default=None)
+    created: datetime = Field(alias="dates", default_factory=datetime.now)
+    modified: datetime = Field(alias="dates", default_factory=datetime.now)
+    published: datetime = Field(alias="dates", default=None)
+    award_infos: List[AwardInfoInRDF] = Field(default=[])
+    spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(alias='coverages', default=None)
+    period_coverage: PeriodCoverage = Field(alias='coverages', default=None)
+    file_formats: List[str] = Field(alias='formats', default=[])
+    publisher: PublisherInRDF = Field(default=None)
+
+    @validator("identifier", pre=True)
+    def parse_identifier(cls, value):
+        if isinstance(value, dict) and "hydroshare_identifier" in value:
+            return value['hydroshare_identifier']
+        return value
+
+    @validator("abstract", pre=True)
+    def parse_abstract(cls, value):
+        if isinstance(value, dict) and "abstract" in value:
+            return value['abstract']
+        return value
+
+    @validator("created", pre=True)
+    def parse_created(cls, value):
+        if isinstance(value, list):
+            for date in value:
+                if date['type'] == DateType.created:
+                    return date['value']
+            return None
+        return value
+
+    @validator("modified", pre=True)
+    def parse_modified(cls, value):
+        if isinstance(value, list):
+            for date in value:
+                if date['type'] == DateType.modified:
+                    return date['value']
+            return None
+        return value
+
+    @validator("published", pre=True)
+    def parse_published(cls, value):
+        if isinstance(value, list):
+            for date in value:
+                if date['type'] == DateType.published:
+                    return date['value']
+            return None
+        return value
+
+    @validator("spatial_coverage", pre=True)
+    def parse_spatial_coverage(cls, value):
+        if isinstance(value, list):
+            for coverage in value:
+                if coverage['type'] == CoverageType.box:
+                    return BoxCoverage(**to_coverage_dict(coverage['value']))
+                if coverage['type'] == CoverageType.point:
+                    return PointCoverage(**to_coverage_dict(coverage['value']))
+            return None
+        return value
+
+    @validator("period_coverage", pre=True)
+    def parse_period_coverage(cls, value):
+        if isinstance(value, list):
+            for coverage in value:
+                if coverage['type'] == CoverageType.period:
+                    return PeriodCoverage(**to_coverage_dict(coverage['value']))
+            return None
+        return value
+
+    @validator("file_formats", pre=True)
+    def parse_file_formats(cls, value):
+        if len(value) > 0 and isinstance(value[0], dict):
+            return [f['value'] for f in value]
+        return value
+
+    @validator("additional_metadata", pre=True)
+    def parse_additional_metadata(cls, value):
+        if isinstance(value, list):
+            parsed = {}
+            for em in value:
+                parsed[em['key']] = em['value']
+            return parsed
+        return value
+
+    @validator("derived_from", pre=True)
+    def parse_derived_from(cls, value):
+        if len(value) > 0 and isinstance(value[0], dict):
+            return [f['is_derived_from'] for f in value]
+        return value
+
+    @validator('language')
+    def language_constraint(cls, language):
+        if language not in [code for code, verbose in languages]:
+            raise ValueError("language '{}' must be a 3 letter iso language code".format(language))
+        return language
+
+    def rdf_string(self, rdf_format='ttl'):
+        self._sync()
+        return self._rdf_model.rdf_string(rdf_format)
 
     @classmethod
-    def parse_rdf_model(self, metadata: ResourceMetadataInRDF):
-        md_out = ResourceMetadata.from_orm(metadata)
+    def parse(cls, metadata_graph, subject=None):
+        rdf_metadata = ResourceMetadataInRDF.parse(metadata_graph, subject)
+        instance = ResourceMetadata(**rdf_metadata.dict())
+        instance._rdf_model=rdf_metadata
+        return instance
 
-        def to_coverage_dict(value):
-            value_dict = {}
-            for key_value in value.split("; "):
-                k, v = key_value.split("=")
-                value_dict[k] = v
-            return value_dict
+    @classmethod
+    def parse_file(cls, file, file_format='ttl', subject=None):
+        rdf_metadata = ResourceMetadataInRDF.parse_file(file, file_format, subject)
+        instance = ResourceMetadata(**rdf_metadata.dict())
+        instance._rdf_model=rdf_metadata
+        return instance
 
-        for cov in metadata.coverages:
-            if cov.type == CoverageType.point:
-                md_out.spatial_coverage = PointCoverage(**to_coverage_dict(cov.value))
-            elif cov.type == CoverageType.box:
-                md_out.spatial_coverage = BoxCoverage(**to_coverage_dict(cov.value))
-            elif cov.type == CoverageType.period:
-                md_out.period_coverage = PeriodCoverage(**to_coverage_dict(cov.value))
-        return md_out
+    def _sync(self):
+        # we could check for changes here
+        exported = self.dict()
+
+        exported["identifier"] = {"hydroshare_identifier": self.identifier}
+
+        exported["description"] = {"abstract": self.abstract}
+        del exported["abstract"]
+
+        dates = []
+        dates.append({"type": DateType.created, "value": self.created})
+        del exported["created"]
+        dates.append({"type": DateType.modified, "value": self.modified})
+        del exported["modified"]
+        if self.published:
+            dates.append({"type": DateType.published, "value": self.published})
+            del exported["published"]
+        exported["dates"] = dates
+
+        coverages = []
+        if self.spatial_coverage:
+            coverages.append({"type": CoverageType[self.spatial_coverage.type], "value": str(self.spatial_coverage)})
+            del exported['spatial_coverage']
+        if self.period_coverage:
+            coverages.append({"type": CoverageType.period, "value": str(self.period_coverage)})
+            del exported['period_coverage']
+        exported['coverages'] = coverages
+
+        if self.file_formats:
+            exported['formats'] = [{"value": f} for f in self.file_formats]
+            del exported["file_formats"]
+
+        if self.additional_metadata:
+            exported['extended_metadata'] = [{"key": key, "value": value}
+                                             for key, value in self.additional_metadata.items()]
+            del exported['additional_metadata']
+
+        if self.derived_from:
+            exported['sources'] = [{"is_derived_from": s} for s in self.derived_from]
+            del exported['derived_from']
+
+        updated_rdf = ResourceMetadataInRDF(**exported)
+        updated_rdf._rdf_subject = self._rdf_model._rdf_subject
+        self._rdf_model = updated_rdf
 
 
 class FileMap(RDFBaseModel):

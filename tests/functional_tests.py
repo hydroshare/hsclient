@@ -36,9 +36,7 @@ def test_resource_metadata_updating(new_resource):
 
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
-    em = [ExtendedMetadataInRDF(key="key1", value="value1"), ExtendedMetadataInRDF(key="key2", value="value2"),
-          ExtendedMetadataInRDF(key="key3", value="value3")]
-    new_resource.metadata.extended_metadata = em
+    new_resource.metadata.additional_metadata = {"key1": "value1", "key2": "value2", "key3": "value3"}
 
     new_resource.save()
     new_resource.refresh()
@@ -46,14 +44,10 @@ def test_resource_metadata_updating(new_resource):
     assert 'resource test' == new_resource.metadata.title
     assert len(new_resource.metadata.subjects) == 2
 
-    assert len(new_resource.metadata.extended_metadata) == 3
-    keys = ['key1', 'key2', 'key3']
-    values = ['value1', 'value2', 'value3']
-    for i, em in enumerate(new_resource.metadata.extended_metadata):
-        assert em.key in keys
-        keys.remove(em.key)
-        assert em.value in values
-        values.remove(em.value)
+    assert len(new_resource.metadata.additional_metadata) == 3
+    assert new_resource.metadata.additional_metadata["key1"] == "value1"
+    assert new_resource.metadata.additional_metadata["key2"] == "value2"
+    assert new_resource.metadata.additional_metadata["key3"] == "value3"
 
 def test_system_metadata(new_resource):
 
@@ -73,12 +67,6 @@ def test_files_aggregations(resource):
     assert len(resource.aggregations) == 1
     assert len(resource.aggregations[0].files) == 3
     assert len(resource.aggregations[0].aggregations) == 0
-
-
-def test_metadata(resource):
-    assert isinstance(resource.metadata, ResourceMetadataInRDF)
-    assert resource.metadata.title == "testing from scratch"
-    assert resource.aggregations[0].metadata.title == "logan1"
 
 def test_resource_download(new_resource):
     with tempfile.TemporaryDirectory() as tmp:

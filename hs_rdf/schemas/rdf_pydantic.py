@@ -17,9 +17,6 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
 
     _rdf_subject: RDFIdentifier = PrivateAttr(default_factory=BNode)
 
-    class Config:
-        validate_assignment = True
-
     #@abc.abstractmethod
     #def to_simple(self):
     #    pass

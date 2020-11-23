@@ -10,6 +10,7 @@ from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
 from hs_rdf.schemas.fields import DateType, CoverageType
+from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage, ResourceMetadata
 
 
 @pytest.fixture()
@@ -56,11 +57,15 @@ def test_resource_serialization(metadata_file):
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
     g = Graph()
-    md.rdf(g)
+    if isinstance(md, ResourceMetadata):
+        md._sync()
+        md._rdf_model.rdf(g)
+    else:
+        md.rdf(g)
     compare_metadatas(g, metadata_file)
 
 def test_resource_metadata(res_md):
-    assert res_md._rdf_subject == getattr(HSRESOURCE, "84805fd615a04d63b4eada65644a1e20")
+    #assert res_md._rdf_subject == getattr(HSRESOURCE, "84805fd615a04d63b4eada65644a1e20")
 
     assert res_md.title == "sadfadsgasdf"
 
@@ -70,22 +75,24 @@ def test_resource_metadata(res_md):
     assert "asdf" in res_md.subjects
     assert "Snow water equivalent" in res_md.subjects
 
-    assert res_md.description.abstract == "sadfasdfsadfa"
+    assert res_md.abstract == "sadfasdfsadfa"
 
     assert res_md.language == "eng"
 
-    assert str(res_md.dc_type) == "https://www.hydroshare.org/terms/CompositeResource"
+    #assert str(res_md.dc_type) == "https://www.hydroshare.org/terms/CompositeResource"
 
-    assert res_md.identifier.hydroshare_identifier == "http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"
+    assert res_md.identifier == "http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"
 
-    assert len(res_md.extended_metadata) == 2
-    assert next(filter(lambda x: x.key == "key2", res_md.extended_metadata)).value == "value2"
+    assert len(res_md.additional_metadata) == 2
+    assert "key2" in res_md.additional_metadata
+    assert res_md.additional_metadata["key2"] == "value2"
 
-    assert len(res_md.sources) == 2
-    assert any(x for x in res_md.sources if x.is_derived_from == 'another')
+    assert len(res_md.derived_from) == 2
+    assert "another" in res_md.derived_from
+    assert "the source" in res_md.derived_from
 
-    assert len(res_md.formats) == 11
-    assert any(x for x in res_md.formats if x.value == 'application/dbf')
+    assert len(res_md.file_formats) == 11
+    assert 'application/dbf' in res_md.file_formats
 
     assert len(res_md.creators) == 2
     creator = next(x for x in res_md.creators if x.name == "Scott s Black")
@@ -104,9 +111,6 @@ def test_resource_metadata(res_md):
     assert contributor.ORCID == "https://orcid.org/0000-0002-1998-3479"
     assert contributor.name == "David Tarboton"
 
-    assert len(res_md.sources) == 2
-    assert any(x for x in res_md.sources if x.is_derived_from == "the source")
-
     assert len(res_md.relations) == 2
     assert any(x for x in res_md.relations if x.is_part_of == "https://sadf.com")
     assert any(x for x in res_md.relations if x.is_copied_from == "https://www.google.com")
@@ -114,16 +118,9 @@ def test_resource_metadata(res_md):
     assert res_md.rights.rights_statement == "my statement"
     assert res_md.rights.url == "http://studio.bakajo.com"
 
-    assert len(res_md.dates) == 3
-    modified = next(x for x in res_md.dates if x.type == DateType.modified)
-    assert modified
-    assert modified.value == datetime.fromisoformat("2020-11-13T19:40:57.276064+00:00")
-    created = next(x for x in res_md.dates if x.type == DateType.created)
-    assert created
-    assert created.value == datetime.fromisoformat("2020-07-09T19:12:21.354703+00:00")
-    published = next(x for x in res_md.dates if x.type == DateType.published)
-    assert published
-    assert published.value == datetime.fromisoformat("2020-11-13T18:53:19.778819+00:00")
+    assert res_md.modified == datetime.fromisoformat("2020-11-13T19:40:57.276064+00:00")
+    assert res_md.created == datetime.fromisoformat("2020-07-09T19:12:21.354703+00:00")
+    assert res_md.published == datetime.fromisoformat("2020-11-13T18:53:19.778819+00:00")
 
     assert len(res_md.award_infos) == 2
     award = next(x for x in res_md.award_infos if x.award_title == "t")
@@ -132,8 +129,12 @@ def test_resource_metadata(res_md):
     assert award.funding_agency_name == "agency1"
     assert award.funding_agency_url == "https://google.com"
 
-    assert len(res_md.coverages) == 2
-    # TODO update coverage to parse values
+    res_md.period_coverage == PeriodCoverage(start=datetime.fromisoformat("2020-07-10T00:00:00"),
+                                             end=datetime.fromisoformat("2020-07-29T00:00:00"))
+
+    res_md.spatial_coverage == BoxCoverage(name="asdfsadf", northlimit=42.1505, eastlimit=-84.5739,
+                                           projection='WGS 84 EPSG:4326', southlimit=30.282,
+                                           type='box', units='Decimal Degrees', westlimit=-104.7887)
 
     assert res_md.publisher
     assert res_md.publisher.name == "Consortium of Universities for the Advancement of Hydrologic Science, Inc. (CUAHSI)"

@@ -15,7 +15,7 @@ from enum import Enum
 
 from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, IFile, IAggregation, IResource
 from hs_rdf.schemas import load_rdf
-
+from hs_rdf.schemas.resource import ResourceMetadata, ResourceMetadataInRDF
 
 RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
 
@@ -362,12 +362,12 @@ class Resource(Aggregation):
 
     @property
     def _hsapi_path(self):
-        path = urlparse(self.metadata.identifier.hydroshare_identifier).path
+        path = urlparse(self.metadata.identifier).path
         return '/hsapi' + path
 
     def save(self):
         self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
-                                     files={'file': ('resourcemetadata.xml', self.metadata.rdf_string(rdf_format="xml"))})
+                                     files={'file': ('resourcemetadata.xml', self._retrieved_metadata.rdf_string(rdf_format="xml"))})
 
     @property
     def resource_id(self):
