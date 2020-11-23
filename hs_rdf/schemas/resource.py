@@ -7,11 +7,12 @@ from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, HttpUr
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
     RelationInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, AwardInfoInRDF, CoverageInRDF, IdentifierInRDF, \
-    PublisherInRDF, FormatInRDF, DateType, CoverageType
+    PublisherInRDF, FormatInRDF, DateType, CoverageType, BoxCoverage, PeriodCoverage, PointCoverage
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.languages_iso import languages
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
+from hs_rdf.schemas.validators import parse_additional_metadata, parse_period_coverage, parse_spatial_coverage
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -22,49 +23,6 @@ def hs_uid():
 class ORMBaseModel(BaseModel):
     class Config:
         orm_mode = True
-
-class BaseCoverage(BaseModel):
-
-    def __str__(self):
-        return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
-                          for key, val in self.__dict__.items()
-                          if key != "type" and val])
-
-
-class BoxCoverage(BaseCoverage):
-    type: str = "box"
-    name: str = None
-    northlimit: float
-    eastlimit: float
-    southlimit: float
-    westlimit: float
-    units: str
-    projection: str
-
-
-class BoxSpatialReference(BoxCoverage):
-    projection_string: str
-    projection_string_type: str = None
-
-
-class PointCoverage(BaseCoverage):
-    type: str = "point"
-    name: str = None
-    east: float
-    north: float
-    units: str
-    projection: str
-
-
-class PointSpatialReference(PointCoverage):
-    projection_string: str
-    projection_string_type: str = None
-
-
-class PeriodCoverage(BaseCoverage):
-    start: datetime
-    end: datetime
-    scheme: str = None
 
 
 class ResourceMetadataInRDF(RDFBaseModel):
@@ -164,6 +122,10 @@ class ResourceMetadata(ORMBaseModel):
     file_formats: List[str] = Field(alias='formats', default=[])
     publisher: PublisherInRDF = Field(default=None)
 
+    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
+    _parse_spatial_coverage = validator("spatial_coverage", pre=True, allow_reuse=True)(parse_spatial_coverage)
+    _parse_period_coverage = validator("period_coverage", pre=True, allow_reuse=True)(parse_period_coverage)
+
     @validator("identifier", pre=True)
     def parse_identifier(cls, value):
         if isinstance(value, dict) and "hydroshare_identifier" in value:
@@ -203,39 +165,10 @@ class ResourceMetadata(ORMBaseModel):
             return None
         return value
 
-    @validator("spatial_coverage", pre=True)
-    def parse_spatial_coverage(cls, value):
-        if isinstance(value, list):
-            for coverage in value:
-                if coverage['type'] == CoverageType.box:
-                    return BoxCoverage(**to_coverage_dict(coverage['value']))
-                if coverage['type'] == CoverageType.point:
-                    return PointCoverage(**to_coverage_dict(coverage['value']))
-            return None
-        return value
-
-    @validator("period_coverage", pre=True)
-    def parse_period_coverage(cls, value):
-        if isinstance(value, list):
-            for coverage in value:
-                if coverage['type'] == CoverageType.period:
-                    return PeriodCoverage(**to_coverage_dict(coverage['value']))
-            return None
-        return value
-
     @validator("file_formats", pre=True)
     def parse_file_formats(cls, value):
         if len(value) > 0 and isinstance(value[0], dict):
             return [f['value'] for f in value]
-        return value
-
-    @validator("additional_metadata", pre=True)
-    def parse_additional_metadata(cls, value):
-        if isinstance(value, list):
-            parsed = {}
-            for em in value:
-                parsed[em['key']] = em['value']
-            return parsed
         return value
 
     @validator("derived_from", pre=True)

@@ -4,12 +4,13 @@ from pydantic import AnyUrl, Field, BaseModel, validator, PrivateAttr
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
 from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType
-from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, CoverageInRDF, \
-    RightsInRDF, FieldInformation, GeometryInformation, Variable
+from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
+    CoverageInRDF, \
+    RightsInRDF, FieldInformation, GeometryInformation, Variable, BoxSpatialReference, PointSpatialReference
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
-from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage, BoxSpatialReference, \
-    PointSpatialReference
-from hs_rdf.utils import to_coverage_dict
+from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
+from hs_rdf.schemas.validators import parse_spatial_reference, parse_spatial_coverage, parse_period_coverage, \
+    parse_additional_metadata
 
 
 class BaseAggregationMetadata(RDFBaseModel):
@@ -53,42 +54,10 @@ class GeographicRasterMetadata(BaseModel):
         instance._rdf_model=rdf_metadata
         return instance
 
-    @validator("spatial_reference", pre=True)
-    def parse_spatial_reference(cls, value):
-        if value['type'] == SpatialReferenceType.box:
-            return BoxSpatialReference(**to_coverage_dict(value['value']))
-        if value['type'] == SpatialReferenceType.point:
-            return PointSpatialReference(**to_coverage_dict(value['value']))
-        return value
-
-    @validator("additional_metadata", pre=True)
-    def parse_additional_metadata(cls, value):
-        if isinstance(value, list):
-            parsed = {}
-            for em in value:
-                parsed[em['key']] = em['value']
-            return parsed
-        return value
-
-    @validator("spatial_coverage", pre=True)
-    def parse_spatial_coverage(cls, value):
-        if isinstance(value, list):
-            for coverage in value:
-                if coverage['type'] == CoverageType.box:
-                    return BoxCoverage(**to_coverage_dict(coverage['value']))
-                if coverage['type'] == CoverageType.point:
-                    return PointCoverage(**to_coverage_dict(coverage['value']))
-            return None
-        return value
-
-    @validator("period_coverage", pre=True)
-    def parse_period_coverage(cls, value):
-        if isinstance(value, list):
-            for coverage in value:
-                if coverage['type'] == CoverageType.period:
-                    return PeriodCoverage(**to_coverage_dict(coverage['value']))
-            return None
-        return value
+    _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(parse_spatial_reference)
+    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
+    _parse_spatial_coverage = validator("spatial_coverage", pre=True, allow_reuse=True)(parse_spatial_coverage)
+    _parse_period_coverage = validator("period_coverage", pre=True, allow_reuse=True)(parse_period_coverage)
 
     def _sync(self):
 
