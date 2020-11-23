@@ -7,13 +7,11 @@ import zipfile
 import tempfile
 import time
 
-from zope.interface import implementer
 from zipfile import ZipFile
 from urllib.parse import urlparse, urlencode
 
 from enum import Enum
 
-from hs_rdf.interfaces.zope_interfaces import IHydroShareSession, IHydroShare, IFile, IAggregation, IResource
 from hs_rdf.schemas import load_rdf
 from hs_rdf.schemas.resource import ResourceMetadata, ResourceMetadataInRDF
 
@@ -48,7 +46,6 @@ def main_file_type(type: AggregationType):
     return None
 
 
-@implementer(IHydroShareSession)
 class HydroShareSession:
 
     def __init__(self, username, password, host, protocol, port):
@@ -148,7 +145,6 @@ class HydroShareSession:
         return self._session.delete(url)
 
 
-@implementer(IHydroShare)
 class HydroShare:
 
     default_host = 'localhost'
@@ -178,7 +174,6 @@ class HydroShare:
         return self.resource(resource_id)
 
 
-@implementer(IFile)
 class File:
 
     def __init__(self, path, hs_session):
@@ -241,7 +236,6 @@ class File:
         return str(self.path)
 
 
-@implementer(IAggregation)
 class Aggregation:
 
     def __init__(self, map_path, hs_session):
@@ -357,7 +351,6 @@ class Aggregation:
         self._parsed_files = None
         self._parsed_aggregations = None
 
-@implementer(IResource)
 class Resource(Aggregation):
 
     @property
