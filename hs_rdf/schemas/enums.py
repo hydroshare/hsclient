@@ -15,6 +15,9 @@ class CoverageType(AnyUrlEnum):
 class SpatialReferenceType(AnyUrlEnum):
     point = str(HSTERMS.point)
     box = str(HSTERMS.box)
+    # multidimensional uses DCTERMS while aggregations use HSTERMS
+    dc_point = str(DCTERMS.point)
+    dc_box = str(DCTERMS.box)
 
 
 class DateType(AnyUrlEnum):
