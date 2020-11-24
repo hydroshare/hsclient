@@ -1,19 +1,19 @@
 from typing import List, Union
 
-from pydantic import AnyUrl, Field, BaseModel, validator, PrivateAttr
+from pydantic import AnyUrl, Field, BaseModel, validator, PrivateAttr, root_validator
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
-from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
     RightsInRDF, FieldInformation, GeometryInformation, Variable, BoxSpatialReference, PointSpatialReference
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
+from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference
 from hs_rdf.schemas.validators import parse_spatial_reference, parse_spatial_coverage, parse_period_coverage, \
-    parse_additional_metadata
+    parse_additional_metadata, rdf_parse_extended_metadata
 
 
-class BaseAggregationMetadata(RDFBaseModel):
+class BaseAggregationMetadataInRDF(RDFBaseModel):
     title: str = Field(rdf_predicate=DC.title)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     language: str = Field(rdf_predicate=DC.language, default="eng")
@@ -21,15 +21,23 @@ class BaseAggregationMetadata(RDFBaseModel):
     coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=[])
     rights: RightsInRDF = Field(rdf_predicate=DC.rights, default=[])
 
-class GeographicRasterMetadataInRDF(BaseAggregationMetadata):
+    _parse_coverages = root_validator(pre=True, allow_reuse=True)(parse_coverages)
+
+    _rdf_parse_extended_metadata = validator("extended_metadata", pre=True)(rdf_parse_extended_metadata)
+
+class GeographicRasterMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicRasterAggregation)
 
-    label: str = Field(const=True, default="Geographic Raster Content: A geographic grid represented by a virtual raster tile (.vrt) file and one or more geotiff (.tif) files")
+    label: str = Field(const=True, default="Geographic Raster Content: A geographic grid represented by a virtual "
+                                           "raster tile (.vrt) file and one or more geotiff (.tif) files")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicRasterAggregation, const=True)
 
     band_information: BandInformation = Field(rdf_predicate=HSTERMS.BandInformation)
     spatial_reference: SpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
     cell_information: CellInformation = Field(rdf_predicate=HSTERMS.CellInformation)
+
+    _parse_spatial_reference = root_validator(pre=True)(parse_rdf_spatial_reference)
+
 
 class GeographicRasterMetadata(BaseModel):
     _rdf_model: GeographicRasterMetadataInRDF = PrivateAttr()
@@ -63,31 +71,16 @@ class GeographicRasterMetadata(BaseModel):
 
         exported = self.dict()
 
-        coverages = []
-        if self.spatial_coverage:
-            coverages.append({"type": CoverageType[self.spatial_coverage.type], "value": str(self.spatial_coverage)})
-            del exported['spatial_coverage']
-        if self.period_coverage:
-            coverages.append({"type": CoverageType.period, "value": str(self.period_coverage)})
-            del exported['period_coverage']
-        exported['coverages'] = coverages
-
-        if self.spatial_reference:
-            exported['spatial_reference'] ={"type": SpatialReferenceType[self.spatial_reference.type], "value": str(self.spatial_reference)}
-
-        if self.additional_metadata:
-            exported['extended_metadata'] = [{"key": key, "value": value}
-                                              for key, value in self.additional_metadata.items()]
-            del exported['additional_metadata']
-
         updated_rdf = GeographicRasterMetadataInRDF(**exported)
         updated_rdf._rdf_subject = self._rdf_model._rdf_subject
+        return updated_rdf
 
 
-class GeographicFeatureMetadata(BaseAggregationMetadata):
+class GeographicFeatureMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicFeatureAggregation)
 
-    label: str = Field(const=True, default="Geographic Feature Content: The multiple files that are part of a geographic shapefile")
+    label: str = Field(const=True, default="Geographic Feature Content: The multiple files that are part of a "
+                                           "geographic shapefile")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicFeatureAggregation, const=True)
 
     field_informations: List[FieldInformation] = Field(rdf_predicate=HSTERMS.FieldInformation)
@@ -95,31 +88,33 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
     spatial_reference: SpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
 
 
-class MultidimensionalMetadata(BaseAggregationMetadata):
+class MultidimensionalMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.MultidimensionalAggregation)
 
-    label: str = Field(const=True, default="Multidimensional Content: A multidimensional dataset represented by a NetCDF file (.nc) and text file giving its NetCDF header content")
+    label: str = Field(const=True, default="Multidimensional Content: A multidimensional dataset represented by a "
+                                           "NetCDF file (.nc) and text file giving its NetCDF header content")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.MultidimensionalAggregation, const=True)
 
     variables: List[Variable] = Field(rdf_predicate=HSTERMS.Variable)
     spatial_reference: SpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
 
 
-class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
+class ReferencedTimeSeriesMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.ReferencedTimeSeriesAggregation)
 
-    label: str = Field(const=True, default="Referenced Time Series Content: A reference to one or more time series served from HydroServers outside of HydroShare in WaterML format")
+    label: str = Field(const=True, default="Referenced Time Series Content: A reference to one or more time series "
+                                           "served from HydroServers outside of HydroShare in WaterML format")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.ReferencedTimeSeriesAggregation, const=True)
 
 
-class FileSetMetadata(BaseAggregationMetadata):
+class FileSetMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.FileSetAggregation)
 
     label: str = Field(const=True, default="File Set Content: One or more files with specific metadata")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.FileSetAggregation, const=True)
 
 
-class SingleFileMetadata(BaseAggregationMetadata):
+class SingleFileMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.SingleFileAggregation)
 
     label: str = Field(const=True, default="Single File Content: A single file with file specific metadata")

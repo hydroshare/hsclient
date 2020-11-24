@@ -1,6 +1,6 @@
-from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType
+from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType, DateType
 from hs_rdf.schemas.fields import BoxSpatialReference, PointSpatialReference, BoxCoverage, PointCoverage, \
-    PeriodCoverage
+    PeriodCoverage, ExtendedMetadataInRDF, IdentifierInRDF, DescriptionInRDF, FormatInRDF, SourceInRDF
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -43,4 +43,60 @@ def parse_period_coverage(cls, value):
             if coverage['type'] == CoverageType.period:
                 return PeriodCoverage(**to_coverage_dict(coverage['value']))
         return None
+    return value
+
+def parse_identifier(cls, value):
+    if isinstance(value, dict) and "hydroshare_identifier" in value:
+        return value['hydroshare_identifier']
+    return value
+
+def parse_abstract(cls, value):
+    if isinstance(value, dict) and "abstract" in value:
+        return value['abstract']
+    return value
+
+def parse_created(cls, value):
+    if isinstance(value, list):
+        for date in value:
+            if date['type'] == DateType.created:
+                return date['value']
+        return None
+    return value
+
+def parse_published(cls, value):
+    if isinstance(value, list):
+        for date in value:
+            if date['type'] == DateType.published:
+                return date['value']
+        return None
+    return value
+
+def parse_modified(cls, value):
+    if isinstance(value, list):
+        for date in value:
+            if date['type'] == DateType.modified:
+                return date['value']
+        return None
+    return value
+
+def parse_derived_from(cls, value):
+    if len(value) > 0 and isinstance(value[0], dict):
+        return [f['is_derived_from'] for f in value]
+    return value
+
+def parse_file_formats(cls, value):
+    if len(value) > 0 and isinstance(value[0], dict):
+        return [f['value'] for f in value]
+    return value
+
+def rdf_parse_extended_metadata(cls, value):
+    assert isinstance(value, list)
+    if len(value) > 0:
+        if isinstance(value[0], ExtendedMetadataInRDF):
+            return value
+    return [{"key": key, "value": val} for key, val in value.items()]
+
+def rdf_parse_identifier(cls, value):
+    if isinstance(value, str):
+        return {"hydroshare_identifier": value}
     return value
