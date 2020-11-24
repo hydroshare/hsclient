@@ -17,17 +17,7 @@
         <hsterms:isDerivedFrom>another</hsterms:isDerivedFrom>
       </rdf:Description>
     </dc:source>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/dbf</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:subject>CUAHSI</dc:subject>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/xml</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:contributor>
       <rdf:Description>
         <hsterms:phone>tel:4357973172</hsterms:phone>
@@ -45,17 +35,7 @@
         <hsterms:rightsStatement>my statement</hsterms:rightsStatement>
       </rdf:Description>
     </dc:rights>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/cpg</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:subject>fdas</dc:subject>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/x-qgis</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:relation>
       <rdf:Description>
         <hsterms:isPartOf rdf:resource="https://sadf.com"/>
@@ -81,21 +61,6 @@
       </dcterms:modified>
     </dc:date>
     <dc:subject>changed</dc:subject>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/json</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/sbx</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/vrt</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:subject>UEB</dc:subject>
     <hsterms:extendedMetadata>
       <rdf:Description>
@@ -132,11 +97,6 @@
         <hsterms:hydroShareIdentifier rdf:resource="http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"/>
       </rdf:Description>
     </dc:identifier>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/x-netcdf</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:creator>
       <rdf:Description>
         <hsterms:organization>USU</hsterms:organization>
@@ -157,11 +117,6 @@
         <hsterms:isDerivedFrom>the source</hsterms:isDerivedFrom>
       </rdf:Description>
     </dc:source>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/sbn</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <hsterms:awardInfo>
       <rdf:Description>
         <hsterms:fundingAgencyURL rdf:resource="https://google.com"/>
@@ -175,11 +130,6 @@
         <rdf:value>2020-07-09T19:12:21.354703+00:00</rdf:value>
       </dcterms:created>
     </dc:date>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>image/tiff</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <dc:subject>key2</dc:subject>
     <dc:subject>asdf</dc:subject>
     <dc:subject>Snow water equivalent</dc:subject>
@@ -193,11 +143,6 @@
       </dcterms:period>
     </dc:coverage>
     <dc:subject>key</dc:subject>
-    <hsterms:Format>
-      <rdf:Description>
-        <hsterms:value>application/prj</hsterms:value>
-      </rdf:Description>
-    </hsterms:Format>
     <hsterms:extendedMetadata>
       <rdf:Description>
         <hsterms:key>key1</hsterms:key>

@@ -73,12 +73,6 @@ def parse_rdf_extended_metadata(cls, values):
             values["extended_metadata"].append({"key": key, "value": value})
     return values
 
-def rdf_parse_formats(cls, values):
-    if "file_formats" in values:
-        values["formats"] = [{"value": v} for v in values["file_formats"]]
-        del values["file_formats"]
-    return values
-
 def rdf_parse_description(cls, values):
     if "abstract" in values:
         values["description"] = {"abstract": values["abstract"]}

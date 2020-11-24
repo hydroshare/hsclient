@@ -171,6 +171,3 @@ class Variable(RDFBaseModel):
 class PublisherInRDF(RDFBaseModel):
     name: str = Field(rdf_predicate=HSTERMS.publisherName)
     url: AnyUrl = Field(rdf_predicate=HSTERMS.publisherURL)
-
-class FormatInRDF(RDFBaseModel):
-    value: str = Field(rdf_predicate=HSTERMS.value)

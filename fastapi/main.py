@@ -13,10 +13,10 @@ hs = HydroShare('admin', 'default')
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/resource/{resource_id}", response_model=ResourceMetadata, response_model_exclude_none=True)
+@app.get("/resource/{resource_id}", response_model=ResourceMetadata, response_model_by_alias=False, response_model_exclude_none=True)
 def resource_metadata(resource_id: str):
     res = hs.resource(resource_id)
-    return ResourceMetadata.parse_rdf_model(res.metadata)
+    return res.metadata
 
 
 if __name__ == "__main__":

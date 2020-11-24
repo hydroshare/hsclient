@@ -84,9 +84,6 @@ def test_resource_metadata(res_md):
     assert "another" in res_md.derived_from
     assert "the source" in res_md.derived_from
 
-    assert len(res_md.file_formats) == 11
-    assert 'application/dbf' in res_md.file_formats
-
     assert len(res_md.creators) == 2
     creator = next(x for x in res_md.creators if x.name == "Scott s Black")
     assert creator

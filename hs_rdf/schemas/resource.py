@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Dict
 
 from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, PrivateAttr
 
@@ -9,15 +9,15 @@ from hs_rdf.schemas.constraints import language_constraint, dates_constraint, co
     coverages_spatial_constraint
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
     RelationInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, AwardInfoInRDF, CoverageInRDF, IdentifierInRDF, \
-    PublisherInRDF, FormatInRDF, DateType, BoxCoverage, PeriodCoverage, PointCoverage
+    PublisherInRDF, BoxCoverage, PeriodCoverage, PointCoverage
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
-    parse_rdf_sources, rdf_parse_description, rdf_parse_formats
+    parse_rdf_sources, rdf_parse_description
 from hs_rdf.schemas.validators import parse_additional_metadata, parse_period_coverage, parse_spatial_coverage, \
-    parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_file_formats, \
-    parse_derived_from, rdf_parse_identifier
+    parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_derived_from, \
+    rdf_parse_identifier
 
 
 def hs_uid():
@@ -46,7 +46,6 @@ class ResourceMetadataInRDF(RDFBaseModel):
     dates: List[DateInRDF] = Field(rdf_predicate=DC.date)
     award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
     coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=[])
-    formats: List[FormatInRDF] = Field(rdf_predicate=HSTERMS.Format, default=[])
     publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(parse_coverages)
@@ -54,7 +53,6 @@ class ResourceMetadataInRDF(RDFBaseModel):
     _parse_rdf_dates = root_validator(pre=True, allow_reuse=True)(parse_rdf_dates)
     _parse_rdf_sources = root_validator(pre=True, allow_reuse=True)(parse_rdf_sources)
     _parse_description = root_validator(pre=True, allow_reuse=True)(rdf_parse_description)
-    _parse_formats = root_validator(pre=True, allow_reuse=True)(rdf_parse_formats)
 
     _parse_identifier = validator("identifier", pre=True, allow_reuse=True)(rdf_parse_identifier)
 
@@ -65,11 +63,11 @@ class ResourceMetadataInRDF(RDFBaseModel):
 
 
 class Creator(RDFBaseModel):
-    name: str = Field()
+    name: str = Field(description="The name of a creator", default=None)
 
-    creator_order: int
-    email: str = Field(default=None)
-    organization: str = Field(default=None)
+    creator_order: int = Field(description="the order the creator will appear")
+    email: str = Field(default=None, description="the email of a creator")
+    organization: str = Field(default=None, description="the organization of the creator")
 
 class ResourceMetadata(BaseModel):
     _rdf_model: ResourceMetadataInRDF = PrivateAttr()
@@ -79,15 +77,15 @@ class ResourceMetadata(BaseModel):
 
     type: AnyUrl = Field(alias="dc_type")
     identifier: AnyUrl
-    title: str = None
+    title: str = Field(default=None, description="The description of a title")
     abstract: str = Field(alias="description", default=None)
-    language: str = None
+    language: str
     subjects: List[str] = []
-    creators: List[Creator] = []
+    creators: List[Creator] = Field(default=[], description="A list of creators")
     contributors: List[ContributorInRDF] = []
     derived_from: List[str] = Field(alias="sources", default=[])
     relations: List[RelationInRDF] = Field(default=[])
-    additional_metadata = Field(alias="extended_metadata", default={})
+    additional_metadata: Dict[str, str] = Field(alias="extended_metadata", default={})
     rights: RightsInRDF = Field(default=None)
     created: datetime = Field(alias="dates", default_factory=datetime.now)
     modified: datetime = Field(alias="dates", default_factory=datetime.now)
@@ -95,7 +93,6 @@ class ResourceMetadata(BaseModel):
     award_infos: List[AwardInfoInRDF] = Field(default=[])
     spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(alias='coverages', default=None)
     period_coverage: PeriodCoverage = Field(alias='coverages', default=None)
-    file_formats: List[str] = Field(alias='formats', default=[])
     publisher: PublisherInRDF = Field(default=None)
 
     _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
@@ -107,7 +104,6 @@ class ResourceMetadata(BaseModel):
     _parse_created = validator("created", pre=True)(parse_created)
     _parse_modified = validator("modified", pre=True)(parse_modified)
     _parse_published = validator("published", pre=True)(parse_published)
-    _parse_file_formats = validator("file_formats", pre=True)(parse_file_formats)
     _parse_derived_from = validator("derived_from", pre=True)(parse_derived_from)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)

@@ -1,6 +1,6 @@
 from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType, DateType
 from hs_rdf.schemas.fields import BoxSpatialReference, PointSpatialReference, BoxCoverage, PointCoverage, \
-    PeriodCoverage, ExtendedMetadataInRDF, IdentifierInRDF, DescriptionInRDF, FormatInRDF, SourceInRDF
+    PeriodCoverage, ExtendedMetadataInRDF
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -82,11 +82,6 @@ def parse_modified(cls, value):
 def parse_derived_from(cls, value):
     if len(value) > 0 and isinstance(value[0], dict):
         return [f['is_derived_from'] for f in value]
-    return value
-
-def parse_file_formats(cls, value):
-    if len(value) > 0 and isinstance(value[0], dict):
-        return [f['value'] for f in value]
     return value
 
 def rdf_parse_extended_metadata(cls, value):
