@@ -41,19 +41,18 @@ def compare_metadatas(new_graph, original_metadata_file):
             else:
                 assert new_triple == original_triple
 
-metadata_files = ['resourcemetadata.xml', 'asdf_meta.xml', 'logan_meta.xml', 'msf_version.refts_meta.xml',
+metadata_files = ['resourcemetadata.xml', 'logan_meta.xml', 'asdf_meta.xml', 'msf_version.refts_meta.xml',
                   'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml']
-#metadata_files = ['resourcemetadata.xml']
+#metadata_files = ['logan_meta.xml']
 @pytest.mark.parametrize("metadata_file", metadata_files)
 def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
-    g = Graph()
-    if isinstance(md, ResourceMetadata) or isinstance(md, GeographicRasterMetadata):
-        rdfmd = md._sync()
-        md._rdf_model.rdf(g)
+    if hasattr(md, "rdf_graph"):
+        g = md.rdf_graph()
     else:
+        g = Graph()
         md.rdf(g)
     compare_metadatas(g, metadata_file)
 

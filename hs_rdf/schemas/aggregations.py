@@ -1,19 +1,25 @@
 from typing import List, Union
 
-from pydantic import AnyUrl, Field, BaseModel, validator, PrivateAttr, root_validator
+from pydantic import AnyUrl, Field, validator, root_validator
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
+from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
     RightsInRDF, FieldInformation, GeometryInformation, Variable, BoxSpatialReference, PointSpatialReference
-from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
-from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference
+from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
+    parse_rdf_extended_metadata
 from hs_rdf.schemas.validators import parse_spatial_reference, parse_spatial_coverage, parse_period_coverage, \
     parse_additional_metadata, rdf_parse_extended_metadata
 
+from rdflib import BNode
+from rdflib.term import Identifier as RDFIdentifier
+
 
 class BaseAggregationMetadataInRDF(RDFBaseModel):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+    _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
     title: str = Field(rdf_predicate=DC.title)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     language: str = Field(rdf_predicate=DC.language, default="eng")
@@ -23,7 +29,7 @@ class BaseAggregationMetadataInRDF(RDFBaseModel):
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(parse_coverages)
 
-    _rdf_parse_extended_metadata = validator("extended_metadata", pre=True)(rdf_parse_extended_metadata)
+    _parse_extended_metadata = root_validator(pre=True, allow_reuse=True)(parse_rdf_extended_metadata)
 
 class GeographicRasterMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicRasterAggregation)
@@ -39,9 +45,10 @@ class GeographicRasterMetadataInRDF(BaseAggregationMetadataInRDF):
     _parse_spatial_reference = root_validator(pre=True)(parse_rdf_spatial_reference)
 
 
-class GeographicRasterMetadata(BaseModel):
-    _rdf_model: GeographicRasterMetadataInRDF = PrivateAttr()
+class GeographicRasterMetadata(BaseMetadata):
+    _rdf_model_class = GeographicRasterMetadataInRDF
 
+    url: AnyUrl = Field(alias="rdf_subject")
     title: str = Field()
     subjects: List[str] = Field(default=[])
     language: str = Field(default="eng")
@@ -54,26 +61,10 @@ class GeographicRasterMetadata(BaseModel):
     spatial_reference: Union[BoxSpatialReference, PointSpatialReference] = Field(default=None)
     cell_information: CellInformation = Field()
 
-    @classmethod
-    def parse(cls, metadata_graph, subject=None):
-        rdf_metadata = GeographicRasterMetadataInRDF.parse(metadata_graph, subject)
-        d = rdf_metadata.dict()
-        instance = GeographicRasterMetadata(**d)
-        instance._rdf_model=rdf_metadata
-        return instance
-
     _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(parse_spatial_reference)
     _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_spatial_coverage = validator("spatial_coverage", pre=True, allow_reuse=True)(parse_spatial_coverage)
     _parse_period_coverage = validator("period_coverage", pre=True, allow_reuse=True)(parse_period_coverage)
-
-    def _sync(self):
-
-        exported = self.dict()
-
-        updated_rdf = GeographicRasterMetadataInRDF(**exported)
-        updated_rdf._rdf_subject = self._rdf_model._rdf_subject
-        return updated_rdf
 
 
 class GeographicFeatureMetadataInRDF(BaseAggregationMetadataInRDF):

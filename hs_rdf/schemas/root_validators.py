@@ -1,5 +1,6 @@
+from rdflib import URIRef
+
 from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType
-from hs_rdf.schemas.fields import SpatialReferenceInRDF
 from hs_rdf.utils import to_coverage_value_string
 
 
@@ -27,7 +28,7 @@ def parse_coverages(cls, values):
 
 def parse_rdf_spatial_reference(cls, values):
     assert "spatial_reference" in values
-    if isinstance(values["spatial_reference"], SpatialReferenceInRDF):
+    if not isinstance(values["spatial_reference"], dict):
         return values
     sr = values["spatial_reference"]
     value = to_coverage_value_string(sr)
@@ -71,4 +72,10 @@ def rdf_parse_description(cls, values):
     if "abstract" in values:
         values["description"] = {"abstract": values["abstract"]}
         del values["abstract"]
+    return values
+
+def rdf_parse_rdf_subject(cls, values):
+    if "url" in values:
+        values["rdf_subject"] = URIRef(values["url"])
+        del values["url"]
     return values

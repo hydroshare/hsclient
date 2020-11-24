@@ -4,8 +4,8 @@ from pydantic import AnyUrl, Field, HttpUrl, BaseModel
 
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
+from hs_rdf.schemas.base_models import RDFBaseModel
 from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType
-from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 
 
 class BaseCoverage(BaseModel):
@@ -30,6 +30,7 @@ class BoxCoverage(BaseCoverage):
 class BoxSpatialReference(BoxCoverage):
     projection_string: str
     projection_string_type: str = None
+    datum: str = None
 
 
 class PointCoverage(BaseCoverage):

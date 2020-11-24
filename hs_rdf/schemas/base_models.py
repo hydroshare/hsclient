@@ -1,4 +1,3 @@
-import abc
 import inspect
 from enum import Enum
 
@@ -7,24 +6,21 @@ from datetime import datetime
 
 from rdflib import Graph, BNode, URIRef, Literal
 from rdflib.term import Identifier as RDFIdentifier
-from pydantic import BaseModel, Field, AnyUrl, PrivateAttr
+from pydantic import BaseModel, Field, AnyUrl, root_validator
 
 from hs_rdf.namespaces import RDF, RDFS1, XSD, DC
 from hs_rdf.schemas.enums import AnyUrlEnum
+from hs_rdf.schemas.root_validators import rdf_parse_rdf_subject
 
 
-class RDFBaseModel(BaseModel):#, abc.ABC):
+class RDFBaseModel(BaseModel):
 
-    _rdf_subject: RDFIdentifier = PrivateAttr(default_factory=BNode)
-
-    #@abc.abstractmethod
-    #def to_simple(self):
-    #    pass
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
 
     @classmethod
     def _rdf_fields(cls):
         for f in cls.__fields__.values():
-            if f.alias not in ['_rdf_subject', 'rdf_type', 'label', 'dc_type']:
+            if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'dc_type']:
                 yield f
 
     @classmethod
@@ -40,7 +36,9 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
             return cls.__fields__['rdf_type'].default
         return None
 
-    def rdf(self, graph):
+    def rdf(self, graph=None):
+        if not graph:
+            graph = Graph()
         for f in self._rdf_fields():
             predicate = f.field_info.extra['rdf_predicate']
             values = getattr(self, f.name, None)
@@ -51,7 +49,7 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
                 for value in values:
                     if isinstance(value, RDFBaseModel):
                         # nested class
-                        graph.add((self._rdf_subject, predicate, value._rdf_subject))
+                        graph.add((self.rdf_subject, predicate, value.rdf_subject))
                         graph = value.rdf(graph)
                     else:
                         # primitive value
@@ -69,22 +67,22 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
                             value = Literal(value.value)
                         else:
                             value = Literal(value)
-                        graph.add((self._rdf_subject, predicate, value))
+                        graph.add((self.rdf_subject, predicate, value))
         if hasattr(self, 'rdf_type'):
-            graph.add((self._rdf_subject, RDF.type, self.rdf_type))
+            graph.add((self.rdf_subject, RDF.type, self.rdf_type))
         if hasattr(self, 'dc_type'):
-            graph.add((self._rdf_subject, DC.type, self.dc_type))
+            graph.add((self.rdf_subject, DC.type, self.dc_type))
         if hasattr(self, 'label'):
             graph.add((URIRef(str(self.rdf_type)), RDFS1.label, Literal(self.label)))
             graph.add((URIRef(str(self.rdf_type)), RDFS1.isDefinedBy, URIRef("https://www.hydroshare.org/terms/")))
         return graph
 
-    def rdf_string(self, rdf_format='ttl'):
+    def rdf_string(self, rdf_format='pretty-xml'):
         g = Graph()
         return self.rdf(g).serialize(format=rdf_format).decode()
 
     @classmethod
-    def parse_file(cls, file, file_format='ttl', subject=None):
+    def parse_file(cls, file, file_format='xml', subject=None):
         metadata_graph = Graph().parse(file, format=file_format)
         return cls.parse(metadata_graph, subject)
 
@@ -130,7 +128,7 @@ class RDFBaseModel(BaseModel):#, abc.ABC):
                     kwargs[f.name] = parsed[0]
         if kwargs:
             instance = schema(**kwargs)
-            instance._rdf_subject = subject
+            instance.rdf_subject = subject
             return instance
         return None
 
@@ -142,6 +140,36 @@ def nested_class(field):
     if inspect.isclass(clazz):
         return issubclass(clazz, RDFBaseModel)
     return False
+
+class BaseMetadata(BaseModel):
+
+    class Config:
+        validate_assignment = True
+
+    _rdf_model_class: RDFBaseModel
+
+
+    def _rdf_model_instance(self):
+        d = self.dict()
+        rdf_model = self._rdf_model_class(**d)
+        return rdf_model
+
+    def rdf_string(self, rdf_format='pretty-xml'):
+        return self._rdf_model_instance().rdf_string(rdf_format)
+
+    def rdf_graph(self):
+        return self._rdf_model_instance().rdf()
+
+    @classmethod
+    def parse_file(cls, file, file_format='xml', subject=None):
+        return cls._rdf_model_class.parse_file(file, file_format, subject)
+
+    @classmethod
+    def parse(cls, metadata_graph, subject=None):
+        rdf_metadata = cls._rdf_model_class.parse(metadata_graph, subject)
+        instance = cls(**rdf_metadata.dict())
+        return instance
+
 
 
 

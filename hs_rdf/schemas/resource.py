@@ -2,9 +2,10 @@ import uuid
 from datetime import datetime
 from typing import List, Union, Dict
 
-from pydantic import Field, AnyUrl, validator, root_validator, BaseModel, PrivateAttr
+from pydantic import Field, AnyUrl, validator, root_validator
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
+from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
 from hs_rdf.schemas.constraints import language_constraint, dates_constraint, coverages_constraint, \
     coverages_spatial_constraint
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
@@ -12,9 +13,8 @@ from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInR
     PublisherInRDF, BoxCoverage, PeriodCoverage, PointCoverage
 from rdflib.term import Identifier as RDFIdentifier
 
-from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
-    rdf_parse_description
+    rdf_parse_description, rdf_parse_rdf_subject
 from hs_rdf.schemas.validators import parse_additional_metadata, parse_period_coverage, parse_spatial_coverage, \
     parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_sources, \
     rdf_parse_identifier, parse_rdf_sources
@@ -25,7 +25,9 @@ def hs_uid():
 
 
 class ResourceMetadataInRDF(RDFBaseModel):
-    _rdf_subject: RDFIdentifier = PrivateAttr(default_factory=hs_uid)
+    rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
+    _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
+
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.CompositeResource)
 
     label: str = Field(default="Composite Resource", const=True)
@@ -69,13 +71,12 @@ class Creator(RDFBaseModel):
     email: str = Field(default=None, description="the email of a creator")
     organization: str = Field(default=None, description="the organization of the creator")
 
-class ResourceMetadata(BaseModel):
-    _rdf_model: ResourceMetadataInRDF = PrivateAttr()
 
-    class Config:
-        validate_assignment = True
+class ResourceMetadata(BaseMetadata):
+    _rdf_model_class = ResourceMetadataInRDF
 
-    type: AnyUrl = Field(alias="dc_type")
+    url: AnyUrl = Field(alias="rdf_subject")
+
     identifier: AnyUrl
     title: str = Field(default=None, description="The description of a title")
     abstract: str = Field(alias="description", default=None)
@@ -107,33 +108,6 @@ class ResourceMetadata(BaseModel):
     _parse_sources = validator("sources", pre=True)(parse_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
-
-    def rdf_string(self, rdf_format='ttl'):
-        self._sync()
-        return self._rdf_model.rdf_string(rdf_format)
-
-    @classmethod
-    def parse(cls, metadata_graph, subject=None):
-        rdf_metadata = ResourceMetadataInRDF.parse(metadata_graph, subject)
-        instance = ResourceMetadata(**rdf_metadata.dict())
-        instance._rdf_model=rdf_metadata
-        return instance
-
-    @classmethod
-    def parse_file(cls, file, file_format='ttl', subject=None):
-        rdf_metadata = ResourceMetadataInRDF.parse_file(file, file_format, subject)
-        instance = ResourceMetadata(**rdf_metadata.dict())
-        instance._rdf_model=rdf_metadata
-        return instance
-
-    def _sync(self):
-        # we could check for changes here
-        exported = self.dict()
-
-        updated_rdf = ResourceMetadataInRDF(**exported)
-        updated_rdf._rdf_subject = self._rdf_model._rdf_subject
-        self._rdf_model = updated_rdf
-        return updated_rdf
 
 
 class FileMap(RDFBaseModel):
