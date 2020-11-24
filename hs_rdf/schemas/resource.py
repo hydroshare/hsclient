@@ -14,10 +14,10 @@ from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.rdf_pydantic import RDFBaseModel
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
-    parse_rdf_sources, rdf_parse_description
+    rdf_parse_description
 from hs_rdf.schemas.validators import parse_additional_metadata, parse_period_coverage, parse_spatial_coverage, \
-    parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_derived_from, \
-    rdf_parse_identifier
+    parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_sources, \
+    rdf_parse_identifier, parse_rdf_sources
 
 
 def hs_uid():
@@ -51,10 +51,10 @@ class ResourceMetadataInRDF(RDFBaseModel):
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(parse_coverages)
     _parse_extended_metadata = root_validator(pre=True, allow_reuse=True)(parse_rdf_extended_metadata)
     _parse_rdf_dates = root_validator(pre=True, allow_reuse=True)(parse_rdf_dates)
-    _parse_rdf_sources = root_validator(pre=True, allow_reuse=True)(parse_rdf_sources)
     _parse_description = root_validator(pre=True, allow_reuse=True)(rdf_parse_description)
 
     _parse_identifier = validator("identifier", pre=True, allow_reuse=True)(rdf_parse_identifier)
+    _parse_rdf_sources = validator("sources", pre=True, allow_reuse=True)(parse_rdf_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
     _dates_constraint = validator('dates', allow_reuse=True)(dates_constraint)
@@ -83,7 +83,7 @@ class ResourceMetadata(BaseModel):
     subjects: List[str] = []
     creators: List[Creator] = Field(default=[], description="A list of creators")
     contributors: List[ContributorInRDF] = []
-    derived_from: List[str] = Field(alias="sources", default=[])
+    sources: List[str] = Field(default=[])
     relations: List[RelationInRDF] = Field(default=[])
     additional_metadata: Dict[str, str] = Field(alias="extended_metadata", default={})
     rights: RightsInRDF = Field(default=None)
@@ -104,7 +104,7 @@ class ResourceMetadata(BaseModel):
     _parse_created = validator("created", pre=True)(parse_created)
     _parse_modified = validator("modified", pre=True)(parse_modified)
     _parse_published = validator("published", pre=True)(parse_published)
-    _parse_derived_from = validator("derived_from", pre=True)(parse_derived_from)
+    _parse_sources = validator("sources", pre=True)(parse_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
 

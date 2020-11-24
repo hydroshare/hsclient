@@ -79,9 +79,14 @@ def parse_modified(cls, value):
         return None
     return value
 
-def parse_derived_from(cls, value):
+def parse_sources(cls, value):
     if len(value) > 0 and isinstance(value[0], dict):
         return [f['is_derived_from'] for f in value]
+    return value
+
+def parse_rdf_sources(cls, value):
+    if len(value) > 0 and isinstance(value[0], str):
+        return [{"is_derived_from": v} for v in value]
     return value
 
 def rdf_parse_extended_metadata(cls, value):

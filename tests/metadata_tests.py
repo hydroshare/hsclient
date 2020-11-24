@@ -80,9 +80,9 @@ def test_resource_metadata(res_md):
     assert "key2" in res_md.additional_metadata
     assert res_md.additional_metadata["key2"] == "value2"
 
-    assert len(res_md.derived_from) == 2
-    assert "another" in res_md.derived_from
-    assert "the source" in res_md.derived_from
+    assert len(res_md.sources) == 2
+    assert "another" in res_md.sources
+    assert "the source" in res_md.sources
 
     assert len(res_md.creators) == 2
     creator = next(x for x in res_md.creators if x.name == "Scott s Black")

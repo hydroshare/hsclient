@@ -57,12 +57,6 @@ def parse_rdf_dates(cls, values):
     values["dates"] = dates
     return values
 
-def parse_rdf_sources(cls, values):
-    if "derived_from" in values:
-        values["sources"] = [{"is_derived_from": v} for v in values["derived_from"]]
-        del values["derived_from"]
-    return values
-
 def parse_rdf_extended_metadata(cls, values):
     if "additional_metadata" in values:
         em = values["additional_metadata"]
