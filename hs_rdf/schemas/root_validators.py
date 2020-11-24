@@ -12,15 +12,17 @@ def parse_coverages(cls, values):
     if "spatial_coverage" in values:
         sc = values["spatial_coverage"]
         del values["spatial_coverage"]
-        value = to_coverage_value_string(sc)
-        cov_type = CoverageType[sc["type"]]
-        values["coverages"].append({"type": cov_type, "value": value})
+        if sc:
+            value = to_coverage_value_string(sc)
+            cov_type = CoverageType[sc["type"]]
+            values["coverages"].append({"type": cov_type, "value": value})
     if "period_coverage" in values:
         pc = values["period_coverage"]
         del values["period_coverage"]
-        value = to_coverage_value_string(pc)
-        cov_type = CoverageType.period
-        values["coverages"].append({"type": cov_type, "value": value})
+        if pc:
+            value = to_coverage_value_string(pc)
+            cov_type = CoverageType.period
+            values["coverages"].append({"type": cov_type, "value": value})
     return values
 
 def parse_rdf_spatial_reference(cls, values):
@@ -39,14 +41,16 @@ def parse_rdf_dates(cls, values):
 
     dates = []
     assert "created" in values
+    assert values["created"]
     dates.append({"type": DateType.created, "value": values["created"]})
     del values["created"]
 
     assert "modified" in values
+    assert values["modified"]
     dates.append({"type": DateType.modified, "value": values["modified"]})
     del values["modified"]
 
-    if "published" in values:
+    if "published" in values and values["published"]:
         dates.append({"type": DateType.published, "value": values["published"]})
         del values["published"]
 
