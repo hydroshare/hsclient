@@ -5,7 +5,8 @@ from pydantic import AnyUrl, Field, HttpUrl, BaseModel
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
 from hs_rdf.schemas.base_models import RDFBaseModel
-from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType
+from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType, \
+    MultidimensionalSpatialReferenceType
 
 
 class BaseCoverage(BaseModel):
@@ -24,13 +25,18 @@ class BoxCoverage(BaseCoverage):
     southlimit: float
     westlimit: float
     units: str
-    projection: str
+    projection: str = None
 
 
 class BoxSpatialReference(BoxCoverage):
     projection_string: str
     projection_string_type: str = None
     datum: str = None
+    projection_name: str = None
+
+
+class MultidimensionalBoxSpatialReference(BoxSpatialReference):
+    pass
 
 
 class PointCoverage(BaseCoverage):
@@ -45,6 +51,11 @@ class PointCoverage(BaseCoverage):
 class PointSpatialReference(PointCoverage):
     projection_string: str
     projection_string_type: str = None
+    projection_name: str = None
+
+
+class MultidimensionalPointSpatialReference(PointSpatialReference):
+    pass
 
 
 class PeriodCoverage(BaseCoverage):
@@ -145,6 +156,11 @@ class CoverageInRDF(RDFBaseModel):
 
 class SpatialReferenceInRDF(RDFBaseModel):
     type: SpatialReferenceType = Field(rdf_predicate=RDF.type)
+    value: str = Field(rdf_predicate=RDF.value)
+
+
+class MultidimensionalSpatialReferenceInRDF(RDFBaseModel):
+    type: MultidimensionalSpatialReferenceType = Field(rdf_predicate=RDF.type)
     value: str = Field(rdf_predicate=RDF.value)
 
 

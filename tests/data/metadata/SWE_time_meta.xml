@@ -83,7 +83,7 @@
     <dc:title>changed UEB modael simulation of snow water equivalent in Logan River watershed from 2008 to 2009</dc:title>
     <dc:coverage>
       <dcterms:box>
-        <rdf:value>northlimit=39.4499; eastlimit=-90.4626; southlimit=30.5397; westlimit=-107.6891; units=Decimal degrees; projection=WGS 84 EPSG:4326; name=named</rdf:value>
+        <rdf:value>name=named; northlimit=39.4499; eastlimit=-90.4626; southlimit=30.5397; westlimit=-107.6891; units=Decimal degrees; projection=WGS 84 EPSG:4326</rdf:value>
       </dcterms:box>
     </dc:coverage>
     <dc:rights>
@@ -94,7 +94,7 @@
     </dc:rights>
     <hsterms:spatialReference>
       <dcterms:box>
-        <rdf:value>northlimit=47.1121; eastlimit=-95.736; southlimit=25.2607; westlimit=-120.8727; units=Meter; projection_name=NAD83 / UTM zone 12N; datum=North_American_Datum_1983; projection_string=PROJCS["NAD83 / UTM zone 12N",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.2572221010002,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4269"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-111],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","26912"]]; projection_string_type=box</rdf:value>
+        <rdf:value>northlimit=47.1121; eastlimit=-95.736; southlimit=25.2607; westlimit=-120.8727; units=Meter; projection_string=PROJCS["NAD83 / UTM zone 12N",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.2572221010002,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4269"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-111],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","26912"]]; projection_string_type=box; datum=North_American_Datum_1983; projection_name=NAD83 / UTM zone 12N</rdf:value>
       </dcterms:box>
     </hsterms:spatialReference>
   </hsterms:MultidimensionalAggregation>

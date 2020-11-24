@@ -1,6 +1,6 @@
-from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType, DateType
+from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType, DateType, MultidimensionalSpatialReferenceType
 from hs_rdf.schemas.fields import BoxSpatialReference, PointSpatialReference, BoxCoverage, PointCoverage, \
-    PeriodCoverage, ExtendedMetadataInRDF
+    PeriodCoverage, ExtendedMetadataInRDF, MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -9,6 +9,15 @@ def parse_spatial_reference(cls, value):
         return BoxSpatialReference(**to_coverage_dict(value['value']))
     if value['type'] == SpatialReferenceType.point:
         return PointSpatialReference(**to_coverage_dict(value['value']))
+    return value
+
+def parse_multidimensional_spatial_reference(cls, value):
+    if value['type'] == MultidimensionalSpatialReferenceType.box:
+        d = to_coverage_dict(value['value'])
+        return MultidimensionalBoxSpatialReference(**d)
+    if value['type'] == MultidimensionalSpatialReferenceType.point:
+        d = to_coverage_dict(value['value'])
+        return MultidimensionalPointSpatialReference(**d)
     return value
 
 def parse_additional_metadata(cls, value):

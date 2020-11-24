@@ -2,15 +2,13 @@ import os
 from datetime import datetime
 
 import pytest
-from rdflib import Graph, URIRef, Literal
+from rdflib import Graph
 
-from hs_rdf.implementations.hydroshare import Resource, AggregationType
-from hs_rdf.namespaces import HSTERMS, HSRESOURCE, DCTERMS, RDFS1, RDF
-from hs_rdf.schemas import load_rdf, GeographicRasterMetadata
+from hs_rdf.namespaces import RDF
+from hs_rdf.schemas import load_rdf
 from rdflib.compare import _squashed_graphs_triples
 
-from hs_rdf.schemas.fields import DateType, CoverageType
-from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage, ResourceMetadata
+from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -43,21 +41,17 @@ def compare_metadatas(new_graph, original_metadata_file):
 
 metadata_files = ['resourcemetadata.xml', 'logan_meta.xml', 'asdf_meta.xml', 'msf_version.refts_meta.xml',
                   'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml']
-#metadata_files = ['logan_meta.xml']
 @pytest.mark.parametrize("metadata_file", metadata_files)
 def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
-    if hasattr(md, "rdf_graph"):
-        g = md.rdf_graph()
-    else:
-        g = Graph()
-        md.rdf(g)
+    g = md.rdf_graph()
+    instance = md._rdf_model_instance()
+    print(md.rdf_string())
     compare_metadatas(g, metadata_file)
 
 def test_resource_metadata(res_md):
-    #assert res_md._rdf_subject == getattr(HSRESOURCE, "84805fd615a04d63b4eada65644a1e20")
 
     assert res_md.title == "sadfadsgasdf"
 
@@ -70,8 +64,6 @@ def test_resource_metadata(res_md):
     assert res_md.abstract == "sadfasdfsadfa"
 
     assert res_md.language == "eng"
-
-    #assert str(res_md.dc_type) == "https://www.hydroshare.org/terms/CompositeResource"
 
     assert res_md.identifier == "http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20"
 

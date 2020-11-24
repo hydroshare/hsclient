@@ -1,6 +1,6 @@
 from rdflib import URIRef
 
-from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType
+from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType, MultidimensionalSpatialReferenceType
 from hs_rdf.utils import to_coverage_value_string
 
 
@@ -33,6 +33,16 @@ def parse_rdf_spatial_reference(cls, values):
     sr = values["spatial_reference"]
     value = to_coverage_value_string(sr)
     cov_type = SpatialReferenceType[sr["type"]]
+    values["spatial_reference"] = {"type": cov_type, "value": value}
+    return values
+
+def parse_rdf_multidimensional_spatial_reference(cls, values):
+    assert "spatial_reference" in values
+    if not isinstance(values["spatial_reference"], dict):
+        return values
+    sr = values["spatial_reference"]
+    value = to_coverage_value_string(sr)
+    cov_type = MultidimensionalSpatialReferenceType[sr["type"]]
     values["spatial_reference"] = {"type": cov_type, "value": value}
     return values
 
