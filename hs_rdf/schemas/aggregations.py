@@ -4,15 +4,16 @@ from pydantic import AnyUrl, Field, validator, root_validator
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
 from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
+from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialReference, \
+    MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
-    RightsInRDF, FieldInformation, GeometryInformation, Variable, BoxSpatialReference, PointSpatialReference, \
-    MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference, MultidimensionalSpatialReferenceInRDF
+    RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
-    parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference
-from hs_rdf.schemas.validators import parse_spatial_reference, parse_spatial_coverage, parse_period_coverage, \
-    parse_additional_metadata, parse_multidimensional_spatial_reference
+    parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages
+from hs_rdf.schemas.validators import parse_spatial_reference, parse_additional_metadata, \
+    parse_multidimensional_spatial_reference
 
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
@@ -101,13 +102,12 @@ class BaseAggregationMetadata(BaseMetadata):
     subjects: List[str] = Field(default=[])
     language: str = Field(default="eng")
     additional_metadata: dict = Field(alias="extended_metadata", default={})
-    spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(alias="coverages", default=None)
-    period_coverage: PeriodCoverage = Field(alias="coverages", default=None)
+    spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(default=None)
+    period_coverage: PeriodCoverage = Field(default=None)
     rights: RightsInRDF = Field(default=None)
 
     _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
-    _parse_spatial_coverage = validator("spatial_coverage", pre=True, allow_reuse=True)(parse_spatial_coverage)
-    _parse_period_coverage = validator("period_coverage", pre=True, allow_reuse=True)(parse_period_coverage)
+    _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):

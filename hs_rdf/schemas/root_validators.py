@@ -1,7 +1,8 @@
 from rdflib import URIRef
 
+from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage, PointCoverage
 from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType, MultidimensionalSpatialReferenceType
-from hs_rdf.utils import to_coverage_value_string
+from hs_rdf.utils import to_coverage_value_string, to_coverage_dict
 
 
 def parse_coverages(cls, values):
@@ -44,6 +45,38 @@ def parse_rdf_multidimensional_spatial_reference(cls, values):
     value = to_coverage_value_string(sr)
     cov_type = MultidimensionalSpatialReferenceType[sr["type"]]
     values["spatial_reference"] = {"type": cov_type, "value": value}
+    return values
+
+def split_dates(cls, values):
+    if "created" in values:
+        return values
+
+    assert "dates" in values
+
+    for date in values['dates']:
+        if date['type'] == DateType.created:
+            values["created"] = date['value']
+        elif date['type'] == DateType.modified:
+            values["modified"] = date['value']
+        elif date['type'] == DateType.published:
+            values["published"] = date['value']
+    del values["dates"]
+    return values
+
+def split_coverages(cls, values):
+    if "spatial_coverage" in values or "period_coverage" in values:
+        return values
+
+    assert "coverages" in values
+
+    for coverage in values['coverages']:
+        if coverage['type'] == CoverageType.period:
+            values["period_coverage"] = PeriodCoverage(**to_coverage_dict(coverage['value']))
+        elif coverage['type'] == CoverageType.box:
+            values["spatial_coverage"] = BoxCoverage(**to_coverage_dict(coverage['value']))
+        elif coverage['type'] == CoverageType.point:
+            values["spatial_coverage"] = PointCoverage(**to_coverage_dict(coverage['value']))
+    del values["coverages"]
     return values
 
 def parse_rdf_dates(cls, values):

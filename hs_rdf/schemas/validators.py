@@ -1,6 +1,8 @@
+from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialReference, \
+    MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference, BoxCoverage, PointCoverage, \
+    PeriodCoverage
 from hs_rdf.schemas.enums import SpatialReferenceType, CoverageType, DateType, MultidimensionalSpatialReferenceType
-from hs_rdf.schemas.fields import BoxSpatialReference, PointSpatialReference, BoxCoverage, PointCoverage, \
-    PeriodCoverage, ExtendedMetadataInRDF, MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
+from hs_rdf.schemas.fields import ExtendedMetadataInRDF
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -28,32 +30,6 @@ def parse_additional_metadata(cls, value):
         return parsed
     return value
 
-def parse_spatial_coverage(cls, value):
-    if isinstance(value, list):
-        for coverage in value:
-            if coverage['type'] == CoverageType.box:
-                return BoxCoverage(**to_coverage_dict(coverage['value']))
-            if coverage['type'] == CoverageType.point:
-                return PointCoverage(**to_coverage_dict(coverage['value']))
-        return None
-    return value
-
-def parse_period_coverage(cls, value):
-    if isinstance(value, list):
-        for coverage in value:
-            if coverage['type'] == CoverageType.period:
-                return PeriodCoverage(**to_coverage_dict(coverage['value']))
-        return None
-    return value
-
-def parse_period_coverage(cls, value):
-    if isinstance(value, list):
-        for coverage in value:
-            if coverage['type'] == CoverageType.period:
-                return PeriodCoverage(**to_coverage_dict(coverage['value']))
-        return None
-    return value
-
 def parse_identifier(cls, value):
     if isinstance(value, dict) and "hydroshare_identifier" in value:
         return value['hydroshare_identifier']
@@ -62,30 +38,6 @@ def parse_identifier(cls, value):
 def parse_abstract(cls, value):
     if isinstance(value, dict) and "abstract" in value:
         return value['abstract']
-    return value
-
-def parse_created(cls, value):
-    if isinstance(value, list):
-        for date in value:
-            if date['type'] == DateType.created:
-                return date['value']
-        return None
-    return value
-
-def parse_published(cls, value):
-    if isinstance(value, list):
-        for date in value:
-            if date['type'] == DateType.published:
-                return date['value']
-        return None
-    return value
-
-def parse_modified(cls, value):
-    if isinstance(value, list):
-        for date in value:
-            if date['type'] == DateType.modified:
-                return date['value']
-        return None
     return value
 
 def parse_sources(cls, value):

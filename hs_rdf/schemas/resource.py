@@ -8,15 +8,15 @@ from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
 from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
 from hs_rdf.schemas.constraints import language_constraint, dates_constraint, coverages_constraint, \
     coverages_spatial_constraint
+from hs_rdf.schemas.data_structures import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
     RelationInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, AwardInfoInRDF, CoverageInRDF, IdentifierInRDF, \
-    PublisherInRDF, BoxCoverage, PeriodCoverage, PointCoverage
+    PublisherInRDF
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
-    rdf_parse_description, rdf_parse_rdf_subject
-from hs_rdf.schemas.validators import parse_additional_metadata, parse_period_coverage, parse_spatial_coverage, \
-    parse_identifier, parse_abstract, parse_created, parse_modified, parse_published, parse_sources, \
+    rdf_parse_description, rdf_parse_rdf_subject, split_dates, split_coverages
+from hs_rdf.schemas.validators import parse_additional_metadata, parse_identifier, parse_abstract, parse_sources, \
     rdf_parse_identifier, parse_rdf_sources
 
 
@@ -25,6 +25,7 @@ def hs_uid():
 
 
 class ResourceMetadataInRDF(RDFBaseModel):
+
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
 
@@ -37,7 +38,7 @@ class ResourceMetadataInRDF(RDFBaseModel):
     language: str = Field(rdf_predicate=DC.language, default='eng')
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.CompositeResource, const=True)
-    identifier: IdentifierInRDF = Field(rdf_predicate=DC.identifier)
+    identifier: IdentifierInRDF = Field(rdf_predicate=DC.identifier, cont=True)
     creators: List[CreatorInRDF] = Field(rdf_predicate=DC.creator)
 
     contributors: List[ContributorInRDF] = Field(rdf_predicate=DC.contributor, default=[])
@@ -88,23 +89,20 @@ class ResourceMetadata(BaseMetadata):
     relations: List[RelationInRDF] = Field(default=[])
     additional_metadata: Dict[str, str] = Field(alias="extended_metadata", default={})
     rights: RightsInRDF = Field(default=None)
-    created: datetime = Field(alias="dates", default_factory=datetime.now)
-    modified: datetime = Field(alias="dates", default_factory=datetime.now)
-    published: datetime = Field(alias="dates", default=None)
+    created: datetime = Field(default_factory=datetime.now)
+    modified: datetime = Field(default_factory=datetime.now)
+    published: datetime = Field(default=None)
     award_infos: List[AwardInfoInRDF] = Field(default=[])
-    spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(alias='coverages', default=None)
-    period_coverage: PeriodCoverage = Field(alias='coverages', default=None)
+    spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(default=None)
+    period_coverage: PeriodCoverage = Field(default=None)
     publisher: PublisherInRDF = Field(default=None)
 
-    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
-    _parse_spatial_coverage = validator("spatial_coverage", pre=True, allow_reuse=True)(parse_spatial_coverage)
-    _parse_period_coverage = validator("period_coverage", pre=True, allow_reuse=True)(parse_period_coverage)
+    _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
+    _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)
 
+    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_identifier = validator("identifier", pre=True)(parse_identifier)
     _parse_abstract = validator("abstract", pre=True)(parse_abstract)
-    _parse_created = validator("created", pre=True)(parse_created)
-    _parse_modified = validator("modified", pre=True)(parse_modified)
-    _parse_published = validator("published", pre=True)(parse_published)
     _parse_sources = validator("sources", pre=True)(parse_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
