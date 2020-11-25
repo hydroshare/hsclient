@@ -1,14 +1,15 @@
 from typing import List, Union
 
-from pydantic import AnyUrl, Field, validator, root_validator
+from pydantic import AnyUrl, Field, validator, root_validator, BaseModel
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
-from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
+from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialReference, \
     MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
-    RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF
+    RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF, \
+    BandInformationInRDF, CellInformationInRDF, FieldInformationInRDF, GeometryInformationInRDF, VariableInRDF, Rights
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
     parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages
@@ -19,7 +20,7 @@ from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
 
-class BaseAggregationMetadataInRDF(RDFBaseModel):
+class BaseAggregationMetadataInRDF(BaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=BNode)
     _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
     title: str = Field(rdf_predicate=DC.title)
@@ -33,6 +34,7 @@ class BaseAggregationMetadataInRDF(RDFBaseModel):
 
     _parse_extended_metadata = root_validator(pre=True, allow_reuse=True)(parse_rdf_extended_metadata)
 
+
 class GeographicRasterMetadataInRDF(BaseAggregationMetadataInRDF):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.GeographicRasterAggregation)
 
@@ -40,9 +42,9 @@ class GeographicRasterMetadataInRDF(BaseAggregationMetadataInRDF):
                                            "raster tile (.vrt) file and one or more geotiff (.tif) files")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicRasterAggregation, const=True)
 
-    band_information: BandInformation = Field(rdf_predicate=HSTERMS.BandInformation)
+    band_information: BandInformationInRDF = Field(rdf_predicate=HSTERMS.BandInformation)
     spatial_reference: SpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
-    cell_information: CellInformation = Field(rdf_predicate=HSTERMS.CellInformation)
+    cell_information: CellInformationInRDF = Field(rdf_predicate=HSTERMS.CellInformation)
 
     _parse_spatial_reference = root_validator(pre=True, allow_reuse=True)(parse_rdf_spatial_reference)
 
@@ -54,8 +56,8 @@ class GeographicFeatureMetadataInRDF(BaseAggregationMetadataInRDF):
                                            "geographic shapefile")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.GeographicFeatureAggregation, const=True)
 
-    field_information: List[FieldInformation] = Field(rdf_predicate=HSTERMS.FieldInformation)
-    geometry_information: GeometryInformation = Field(rdf_predicate=HSTERMS.GeometryInformation)
+    field_information: List[FieldInformationInRDF] = Field(rdf_predicate=HSTERMS.FieldInformation)
+    geometry_information: GeometryInformationInRDF = Field(rdf_predicate=HSTERMS.GeometryInformation)
     spatial_reference: SpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
 
     _parse_spatial_reference = root_validator(pre=True, allow_reuse=True)(parse_rdf_spatial_reference)
@@ -68,7 +70,7 @@ class MultidimensionalMetadataInRDF(BaseAggregationMetadataInRDF):
                                            "NetCDF file (.nc) and text file giving its NetCDF header content")
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.MultidimensionalAggregation, const=True)
 
-    variables: List[Variable] = Field(rdf_predicate=HSTERMS.Variable)
+    variables: List[VariableInRDF] = Field(rdf_predicate=HSTERMS.Variable)
     spatial_reference: MultidimensionalSpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
 
     _parse_spatial_reference = root_validator(pre=True, allow_reuse=True)(parse_rdf_multidimensional_spatial_reference)
@@ -104,7 +106,7 @@ class BaseAggregationMetadata(BaseMetadata):
     additional_metadata: dict = Field(alias="extended_metadata", default={})
     spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(default=None)
     period_coverage: PeriodCoverage = Field(default=None)
-    rights: RightsInRDF = Field(default=None)
+    rights: Rights = Field(default=None)
 
     _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)

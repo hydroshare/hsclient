@@ -2,18 +2,18 @@ import uuid
 from datetime import datetime
 from typing import List, Union, Dict
 
-from pydantic import Field, AnyUrl, validator, root_validator
+from pydantic import Field, AnyUrl, validator, root_validator, BaseModel
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
-from hs_rdf.schemas.base_models import BaseMetadata, RDFBaseModel
+from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.constraints import language_constraint, dates_constraint, coverages_constraint, \
     coverages_spatial_constraint
 from hs_rdf.schemas.data_structures import BoxCoverage, PointCoverage, PeriodCoverage
-from hs_rdf.schemas.fields import DescriptionInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
-    RelationInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, AwardInfoInRDF, CoverageInRDF, IdentifierInRDF, \
-    PublisherInRDF
 from rdflib.term import Identifier as RDFIdentifier
 
+from hs_rdf.schemas.fields import Creator, Contributor, Relation, Rights, AwardInfo, Publisher, DescriptionInRDF, \
+    IdentifierInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, \
+    AwardInfoInRDF, CoverageInRDF, PublisherInRDF, RelationInRDF
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
     rdf_parse_description, rdf_parse_rdf_subject, split_dates, split_coverages
 from hs_rdf.schemas.validators import parse_additional_metadata, parse_identifier, parse_abstract, parse_sources, \
@@ -24,7 +24,7 @@ def hs_uid():
     return getattr(HSRESOURCE, uuid.uuid4().hex)
 
 
-class ResourceMetadataInRDF(RDFBaseModel):
+class ResourceMetadataInRDF(BaseModel):
 
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
@@ -65,14 +65,6 @@ class ResourceMetadataInRDF(RDFBaseModel):
     _coverages_spatial_constraint = validator('coverages', allow_reuse=True)(coverages_spatial_constraint)
 
 
-class Creator(RDFBaseModel):
-    name: str = Field(description="The name of a creator", default=None)
-
-    creator_order: int = Field(description="the order the creator will appear")
-    email: str = Field(default=None, description="the email of a creator")
-    organization: str = Field(default=None, description="the organization of the creator")
-
-
 class ResourceMetadata(BaseMetadata):
     _rdf_model_class = ResourceMetadataInRDF
 
@@ -84,18 +76,18 @@ class ResourceMetadata(BaseMetadata):
     language: str
     subjects: List[str] = []
     creators: List[Creator] = Field(default=[], description="A list of creators")
-    contributors: List[ContributorInRDF] = []
+    contributors: List[Contributor] = []
     sources: List[str] = Field(default=[])
-    relations: List[RelationInRDF] = Field(default=[])
+    relations: List[Relation] = Field(default=[])
     additional_metadata: Dict[str, str] = Field(alias="extended_metadata", default={})
-    rights: RightsInRDF = Field(default=None)
+    rights: Rights = Field(default=None)
     created: datetime = Field(default_factory=datetime.now)
     modified: datetime = Field(default_factory=datetime.now)
     published: datetime = Field(default=None)
-    award_infos: List[AwardInfoInRDF] = Field(default=[])
+    award_infos: List[AwardInfo] = Field(default=[])
     spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(default=None)
     period_coverage: PeriodCoverage = Field(default=None)
-    publisher: PublisherInRDF = Field(default=None)
+    publisher: Publisher = Field(default=None)
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)
@@ -108,7 +100,7 @@ class ResourceMetadata(BaseMetadata):
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
 
 
-class FileMap(RDFBaseModel):
+class FileMap(BaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.Aggregation)
 
     is_documented_by: AnyUrl = Field(rdf_predicate=CITOTERMS.isDocumentedBy)
@@ -117,7 +109,7 @@ class FileMap(RDFBaseModel):
     is_described_by: AnyUrl = Field(rdf_predicate=ORE.isDescribedBy)
 
 
-class ResourceMap(RDFBaseModel):
+class ResourceMap(BaseModel):
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.ResourceMap)
 
     describes: FileMap = Field(rdf_predicate=ORE.describes)
