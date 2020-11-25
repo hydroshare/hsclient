@@ -5,7 +5,7 @@ import pytest
 from rdflib import Graph
 
 from hs_rdf.namespaces import RDF
-from hs_rdf.schemas import load_rdf
+from hs_rdf.schemas import load_rdf, rdf_graph
 from rdflib.compare import _squashed_graphs_triples
 
 from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage
@@ -47,7 +47,7 @@ def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
-    g = md.rdf_graph()
+    g = rdf_graph(md)
     compare_metadatas(g, metadata_file)
 
 def test_resource_metadata(res_md):

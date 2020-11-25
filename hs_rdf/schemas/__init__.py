@@ -16,38 +16,63 @@ from hs_rdf.schemas.enums import AnyUrlEnum
 from hs_rdf.schemas.resource import ResourceMap, ResourceMetadataInRDF, ResourceMetadata
 
 
-def nested_class(field):
-    if field.sub_fields:
-        clazz = get_args(field.outer_type_)[0]
-    else:
-        clazz = field.outer_type_
-    if inspect.isclass(clazz):
-        return issubclass(clazz, BaseModel)
-    return False
+rdf_schemas = {ORE.ResourceMap: ResourceMap,
+               HSTERMS.CompositeResource: ResourceMetadataInRDF,
+               HSTERMS.GeographicRasterAggregation: GeographicRasterMetadataInRDF,
+               HSTERMS.GeographicFeatureAggregation: GeographicFeatureMetadataInRDF,
+               HSTERMS.MultidimensionalAggregation: MultidimensionalMetadataInRDF,
+               HSTERMS.ReferencedTimeSeriesAggregation: ReferencedTimeSeriesMetadataInRDF,
+               HSTERMS.FileSetAggregation: FileSetMetadataInRDF,
+               HSTERMS.SingleFileAggregation: SingleFileMetadataInRDF}
+
+user_schemas = {ResourceMetadataInRDF: ResourceMetadata,
+                GeographicRasterMetadataInRDF: GeographicRasterMetadata,
+                GeographicFeatureMetadataInRDF: GeographicFeatureMetadata,
+                MultidimensionalMetadataInRDF: MultidimensionalMetadata,
+                ReferencedTimeSeriesMetadataInRDF: ReferencedTimeSeriesMetadata,
+                FileSetMetadataInRDF: FileSetMetadata,
+                SingleFileMetadataInRDF: SingleFileMetadata}
 
 
-def rdf_fields(schema):
+def load_rdf(rdf_str, file_format='xml'):
+
+    g = Graph().parse(data=rdf_str, format=file_format)
+    for target_class, schema in rdf_schemas.items():
+        subject = g.value(predicate=RDF.type, object=target_class)
+        if subject:
+            if target_class == ORE.ResourceMap:
+                return _parse(schema, g)
+            else:
+                rdf_metadata = _parse(schema, g)
+                if schema in user_schemas.keys():
+                    return user_schemas[schema](**rdf_metadata.dict())
+                return rdf_metadata
+    raise Exception("Could not find schema for \n{}".format(rdf_str))
+
+
+def parse_file(schema, file, file_format='xml', subject=None):
+    metadata_graph = Graph().parse(file, format=file_format)
+    return _parse(schema, metadata_graph, subject)
+
+
+def rdf_graph(schema):
+    for rdf_schema, user_schema in user_schemas.items():
+        if isinstance(schema, user_schema):
+            return _rdf_graph(rdf_schema(**schema.dict()), Graph())
+    return _rdf_graph(schema, Graph())
+
+
+def rdf_string(schema, rdf_format='pretty-xml'):
+    return rdf_graph(schema).serialize(format=rdf_format).decode()
+
+
+def _rdf_fields(schema):
     for f in schema.__fields__.values():
         if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'dc_type']:
             yield f
 
-
-def rdf_type(schema):
-    for f in schema.__fields__.values():
-        if f.alias == 'rdf_type':
-            return f
-    return None
-
-
-def class_rdf_type(schema):
-    if schema.__fields__['rdf_type']:
-        return schema.__fields__['rdf_type'].default
-    return None
-
-def rdf(schema, graph=None):
-    if not graph:
-        graph = Graph()
-    for f in rdf_fields(schema):
+def _rdf_graph(schema, graph=None):
+    for f in _rdf_fields(schema):
         predicate = f.field_info.extra['rdf_predicate']
         values = getattr(schema, f.name, None)
         if values:
@@ -59,7 +84,7 @@ def rdf(schema, graph=None):
                     assert hasattr(value, "rdf_subject")
                     # nested class
                     graph.add((schema.rdf_subject, predicate, value.rdf_subject))
-                    graph = rdf(value, graph)
+                    graph = _rdf_graph(value, graph)
                 else:
                     # primitive value
                     if isinstance(value, AnyUrl):
@@ -87,17 +112,21 @@ def rdf(schema, graph=None):
     return graph
 
 
-def rdf_string(schema, rdf_format='pretty-xml'):
-    g = Graph()
-    return rdf(schema, g).serialize(format=rdf_format).decode()
+def _parse(schema, metadata_graph, subject=None):
+    def nested_class(field):
+        if field.sub_fields:
+            clazz = get_args(field.outer_type_)[0]
+        else:
+            clazz = field.outer_type_
+        if inspect.isclass(clazz):
+            return issubclass(clazz, BaseModel)
+        return False
 
+    def class_rdf_type(schema):
+        if schema.__fields__['rdf_type']:
+            return schema.__fields__['rdf_type'].default
+        return None
 
-def parse_file(schema, file, file_format='xml', subject=None):
-    metadata_graph = Graph().parse(file, format=file_format)
-    return parse(schema, metadata_graph, subject)
-
-
-def parse(schema, metadata_graph, subject=None):
     if not subject:
         # lookup subject using RDF.type specified in the schema
         target_class = class_rdf_type(schema)
@@ -107,7 +136,7 @@ def parse(schema, metadata_graph, subject=None):
         if not subject:
             raise Exception("Could not find subject for predicate=RDF.type, object={}".format(target_class))
     kwargs = {}
-    for f in rdf_fields(schema):
+    for f in _rdf_fields(schema):
         predicate = f.field_info.extra['rdf_predicate']
         if not predicate:
             raise Exception("Schema configuration error for {}, all fields must specify a rdf_predicate".format(schema))
@@ -120,7 +149,7 @@ def parse(schema, metadata_graph, subject=None):
                 else:
                     # single
                     clazz = f.outer_type_
-                parsed_class = parse(clazz, metadata_graph, value)
+                parsed_class = _parse(clazz, metadata_graph, value)
                 if parsed_class:
                     parsed.append(parsed_class)
                 elif f.sub_fields:
@@ -140,23 +169,3 @@ def parse(schema, metadata_graph, subject=None):
         instance.rdf_subject = subject
         return instance
     return None
-
-
-def load_rdf(rdf_str, file_format='xml'):
-    schemas = {ORE.ResourceMap: ResourceMap,
-               HSTERMS.CompositeResource: ResourceMetadata,
-               HSTERMS.GeographicRasterAggregation: GeographicRasterMetadata,
-               HSTERMS.GeographicFeatureAggregation : GeographicFeatureMetadata,
-               HSTERMS.MultidimensionalAggregation : MultidimensionalMetadata,
-               HSTERMS.ReferencedTimeSeriesAggregation : ReferencedTimeSeriesMetadata,
-               HSTERMS.FileSetAggregation : FileSetMetadata,
-               HSTERMS.SingleFileAggregation : SingleFileMetadata}
-
-    g = Graph().parse(data=rdf_str, format=file_format)
-    for target_class, schema in schemas.items():
-        subject = g.value(predicate=RDF.type, object=target_class)
-        if subject:
-            rdf_metadata = parse(schema._rdf_model_class, g)
-            instance = schema(**rdf_metadata.dict())
-            return instance
-    raise Exception("Could not find schema for \n{}".format(rdf_str))

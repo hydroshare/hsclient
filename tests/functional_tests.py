@@ -3,8 +3,6 @@ import tempfile
 import os
 
 from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
-from hs_rdf.schemas import ResourceMetadataInRDF
-from hs_rdf.schemas.fields import ExtendedMetadataInRDF
 
 
 @pytest.fixture()

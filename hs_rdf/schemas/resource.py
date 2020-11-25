@@ -101,6 +101,7 @@ class ResourceMetadata(BaseMetadata):
 
 
 class FileMap(BaseModel):
+    rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.Aggregation)
 
     is_documented_by: AnyUrl = Field(rdf_predicate=CITOTERMS.isDocumentedBy)
@@ -110,6 +111,7 @@ class FileMap(BaseModel):
 
 
 class ResourceMap(BaseModel):
+    rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
     rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=ORE.ResourceMap)
 
     describes: FileMap = Field(rdf_predicate=ORE.describes)

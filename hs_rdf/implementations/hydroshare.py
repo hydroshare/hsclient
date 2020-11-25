@@ -12,7 +12,7 @@ from urllib.parse import urlparse, urlencode
 
 from enum import Enum
 
-from hs_rdf.schemas import load_rdf
+from hs_rdf.schemas import load_rdf, rdf_string
 from hs_rdf.schemas.resource import ResourceMetadata, ResourceMetadataInRDF
 
 RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
@@ -360,7 +360,7 @@ class Resource(Aggregation):
 
     def save(self):
         self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
-                                     files={'file': ('resourcemetadata.xml', self._retrieved_metadata.rdf_string(rdf_format="xml"))})
+                                     files={'file': ('resourcemetadata.xml', rdf_string(self._retrieved_metadata, rdf_format="xml"))})
 
     @property
     def resource_id(self):
