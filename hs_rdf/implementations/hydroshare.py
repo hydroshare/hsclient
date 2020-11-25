@@ -295,12 +295,8 @@ class Aggregation:
         return urlparse(str(self._map.describes.is_documented_by)).path
 
     @property
-    def type(self):
-        return self.metadata.rdf_type.split("/terms/")[1]
-
-    @property
     def main_file_path(self):
-        mft = main_file_type(AggregationType[self.type])
+        mft = main_file_type(AggregationType[self.metadata.type])
         for file in self.files:
             if str(file).endswith(mft):
                 return file.relative_path
@@ -321,13 +317,13 @@ class Aggregation:
         return self._hs_session.retrieve_zip(path, save_path=save_path)
 
     def remove(self):
-        path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
+        path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
         response = self._hs_session.post(path)
         response.status_code
         pass
 
     def delete(self):
-        path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.type].value + "LogicalFile" + \
+        path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + \
                self.main_file_path.split("data/contents")[1] + "/"
         response = self._hs_session.delete(path)
         response.status_code
@@ -342,7 +338,7 @@ class Aggregation:
 
     def _retrieve_and_parse(self, path):
         file_str = self._hs_session.retrieve_string(path)
-        instance = load_rdf(file_str, file_format='xml')
+        instance = load_rdf(file_str)
         return instance
 
     def refresh(self):

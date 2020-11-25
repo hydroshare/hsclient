@@ -7,6 +7,8 @@ from hs_rdf.utils import to_coverage_dict
 
 
 def parse_spatial_reference(cls, value):
+    if not value:
+        return value
     if value['type'] == SpatialReferenceType.box:
         return BoxSpatialReference(**to_coverage_dict(value['value']))
     if value['type'] == SpatialReferenceType.point:

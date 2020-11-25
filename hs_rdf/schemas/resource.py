@@ -66,7 +66,7 @@ class ResourceMetadataInRDF(BaseModel):
 
 
 class ResourceMetadata(BaseMetadata):
-    _rdf_model_class = ResourceMetadataInRDF
+    type: AnyUrl = Field(const=True, default="CompositeResource")
 
     url: AnyUrl = Field(alias="rdf_subject")
 

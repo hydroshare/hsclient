@@ -165,7 +165,6 @@ def _parse(schema, metadata_graph, subject=None):
                 # single
                 kwargs[f.name] = parsed[0]
     if kwargs:
-        instance = schema(**kwargs)
-        instance.rdf_subject = subject
+        instance = schema(**kwargs, rdf_subject=subject)
         return instance
     return None

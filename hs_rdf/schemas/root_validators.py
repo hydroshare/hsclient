@@ -28,7 +28,8 @@ def parse_coverages(cls, values):
     return values
 
 def parse_rdf_spatial_reference(cls, values):
-    assert "spatial_reference" in values
+    if "spatial_reference" not in values:
+        return values
     if not isinstance(values["spatial_reference"], dict):
         return values
     sr = values["spatial_reference"]

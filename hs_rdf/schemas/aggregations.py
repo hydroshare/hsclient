@@ -113,7 +113,7 @@ class BaseAggregationMetadata(BaseMetadata):
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):
-    _rdf_model_class = GeographicRasterMetadataInRDF
+    type: AnyUrl = Field(const=True, default="GeographicRasterAggregation")
 
     band_information: BandInformation = Field()
     spatial_reference: Union[BoxSpatialReference, PointSpatialReference] = Field(default=None)
@@ -123,7 +123,7 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
 
 
 class GeographicFeatureMetadata(BaseAggregationMetadata):
-    _rdf_model_class = GeographicFeatureMetadataInRDF
+    type: AnyUrl = Field(const=True, default="GeographicFeatureAggregation")
 
     field_information: List[FieldInformation] = Field()
     geometry_information: GeometryInformation = Field()
@@ -133,7 +133,7 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
 
 
 class MultidimensionalMetadata(BaseAggregationMetadata):
-    _rdf_model_class = MultidimensionalMetadataInRDF
+    type: AnyUrl = Field(const=True, default="MultidimensionalAggregation")
 
     variables: List[Variable] = Field()
     spatial_reference: Union[MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference] = Field(default=None)
@@ -142,12 +142,12 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
 
 
 class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
-    _rdf_model_class = ReferencedTimeSeriesMetadataInRDF
+    type: AnyUrl = Field(const=True, default="ReferencedTimeSeriesAggregation")
 
 
 class FileSetMetadata(BaseAggregationMetadata):
-    _rdf_model_class = FileSetMetadataInRDF
+    type: AnyUrl = Field(const=True, default="FileSetAggregation")
 
 
 class SingleFileMetadata(BaseAggregationMetadata):
-    _rdf_model_class = SingleFileMetadataInRDF
+    type: AnyUrl = Field(const=True, default="SingleFileAggregation")
