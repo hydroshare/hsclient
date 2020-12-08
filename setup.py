@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='hs_rdf',
     version='0.1',
-    packages=['hs_rdf'],
+    packages=find_packages(include=['hs_rdf', 'hs_rdf.*']),
     url='https://github.com/sblack-usu/hs_rdf',
     license='',
     author='Scott Black',
