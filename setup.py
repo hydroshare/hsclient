@@ -5,9 +5,9 @@ setup(
     version='0.1',
     packages=find_packages(include=['hs_rdf', 'hs_rdf.*']),
     install_requires=[
-        'rdflib == 5.0.0',
-        'requests == 2.24.0',
-        'pydantic == 1.7.2'
+        'rdflib',
+        'requests',
+        'pydantic'
     ],
     url='https://github.com/sblack-usu/hs_rdf',
     license='',
