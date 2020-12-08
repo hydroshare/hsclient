@@ -282,7 +282,7 @@ class Aggregation:
         metadat_file = self.metadata_path.split("/data/contents/", 1)[1]
         self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
                                      files={'file': (metadat_file,
-                                                     rdf_string(self.metadata, rdf_format="xml"))})
+                                                     rdf_string(self._retrieved_metadata, rdf_format="xml"))})
 
     @property
     def files(self):
