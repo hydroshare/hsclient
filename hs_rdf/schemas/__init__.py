@@ -4,7 +4,7 @@ from enum import Enum
 
 from pydantic import AnyUrl, BaseModel
 from rdflib import Graph, URIRef, Literal
-from typing import get_args
+#from typing import get_args
 
 from hs_rdf.namespaces import ORE, HSTERMS, RDF, XSD, DC, RDFS1
 from hs_rdf.schemas.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadataInRDF, \
@@ -111,6 +111,8 @@ def _rdf_graph(schema, graph=None):
         graph.add((URIRef(str(schema.rdf_type)), RDFS1.isDefinedBy, URIRef("https://www.hydroshare.org/terms/")))
     return graph
 
+def get_args(t):
+    return getattr(t, "__args__", None)
 
 def _parse(schema, metadata_graph, subject=None):
     def nested_class(field):
