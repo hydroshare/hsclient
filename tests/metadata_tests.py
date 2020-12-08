@@ -24,11 +24,7 @@ def res_md_point():
         return load_rdf(f.read())
 
 
-def compare_metadatas(new_graph, original_metadata_file):
-        original_graph = Graph()
-        with open(original_metadata_file, "r") as f:
-            original_graph = original_graph.parse(data=f.read())
-
+def compare_graphs(new_graph, original_graph):
         for (new_triple, original_triple) in _squashed_graphs_triples(new_graph, original_graph):
             if new_triple[1] == RDF.value:
                 # for coverage and spatial reference, the value string needs to be parsed into a dictionary for comparison
@@ -38,6 +34,13 @@ def compare_metadatas(new_graph, original_metadata_file):
                     assert to_coverage_dict(new_triple[2]) == to_coverage_dict(original_triple[2])
             else:
                 assert new_triple == original_triple
+
+
+def compare_metadatas(new_graph, original_metadata_file):
+        original_graph = Graph()
+        with open(original_metadata_file, "r") as f:
+            original_graph = original_graph.parse(data=f.read())
+        compare_graphs(new_graph, original_graph)
 
 metadata_files = ['resourcemetadata.xml', 'logan_meta.xml', 'asdf_meta.xml', 'msf_version.refts_meta.xml',
                   'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml']

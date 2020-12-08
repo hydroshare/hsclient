@@ -35,6 +35,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
     new_resource.metadata.additional_metadata = {"key1": "value1", "key2": "value2", "key3": "value3"}
+    new_resource.metadata.abstract = "world’s"
 
     new_resource.save()
     new_resource.refresh()
@@ -46,6 +47,7 @@ def test_resource_metadata_updating(new_resource):
     assert new_resource.metadata.additional_metadata["key1"] == "value1"
     assert new_resource.metadata.additional_metadata["key2"] == "value2"
     assert new_resource.metadata.additional_metadata["key3"] == "value3"
+    assert new_resource.metadata.abstract == "world’s"
 
 def test_system_metadata(new_resource):
 

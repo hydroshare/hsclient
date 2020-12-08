@@ -69,7 +69,7 @@ class HydroShareSession:
     def _build_url(self, path: str):
         if not path.startswith("/"):
             path = "/" + path
-        if not path.endswith("/"):
+        if "?" not in path and not path.endswith("/"):
             path = path + "/"
         return self.base_url + path
 
@@ -81,8 +81,8 @@ class HydroShareSession:
                 raise Exception("Not Found - {}".format(url))
             raise Exception("Failed to retrieve {}, status_code {}, message {}".format(url,
                                                                                        file.status_code,
-                                                                                       file.text))
-        return file.text
+                                                                                       file.content))
+        return file.content
 
     def retrieve_file(self, path, save_path=""):
         url = self._build_url(path)
@@ -277,6 +277,12 @@ class Aggregation:
                 if is_aggregation(str(file.path)):
                     self._parsed_aggregations.append(Aggregation(file.path, self._hs_session))
         return self._parsed_aggregations
+
+    def save(self):
+        metadat_file = self.metadata_path.split("/data/contents/", 1)[1]
+        self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
+                                     files={'file': (metadat_file,
+                                                     rdf_string(self._retrieved_metadata, rdf_format="xml"))})
 
     @property
     def files(self):
