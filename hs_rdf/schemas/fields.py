@@ -23,6 +23,7 @@ class SourceInRDF(BaseModel):
 class Relation(BaseModel):
     is_copied_from: AnyUrl = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
     is_part_of: AnyUrl = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
+    is_described_by: AnyUrl = Field(rdf_predicate=HSTERMS.isDescribedBy, default=None)
 
 
 class RelationInRDF(Relation):
