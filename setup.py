@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='hs_rdf',
     version='0.1',
-    packages=[''],
+    packages=['hs_rdf'],
     url='https://github.com/sblack-usu/hs_rdf',
     license='',
     author='Scott Black',
