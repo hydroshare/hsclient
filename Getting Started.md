@@ -49,7 +49,7 @@ file.download("downloads")
 file.delete()
 
 # upload one or more files
-hs.upload("downloads/readme.txt")
+res.upload("downloads/readme.txt")
 ```
 ### Aggregations
 create/remove aggregations and update metadata (not complete)
