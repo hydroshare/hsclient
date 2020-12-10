@@ -82,7 +82,7 @@ class HydroShareSession:
             raise Exception("Failed to retrieve {}, status_code {}, message {}".format(url,
                                                                                        file.status_code,
                                                                                        file.content))
-        return file.content
+        return file.content.decode()
 
     def retrieve_file(self, path, save_path=""):
         url = self._build_url(path)
@@ -279,10 +279,10 @@ class Aggregation:
         return self._parsed_aggregations
 
     def save(self):
-        metadat_file = self.metadata_path.split("/data/contents/", 1)[1]
-        self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
-                                     files={'file': (metadat_file,
-                                                     rdf_string(self._retrieved_metadata, rdf_format="xml"))})
+        metadata_file = self.metadata_path.split("/data/contents/", 1)[1]
+        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        url = self._hsapi_path + "ingest_metadata/"
+        self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
 
     @property
     def files(self):
@@ -361,8 +361,9 @@ class Resource(Aggregation):
         return '/hsapi' + path
 
     def save(self):
-        self._hs_session.upload_file(self._hsapi_path + '/ingest_metadata/',
-                                     files={'file': ('resourcemetadata.xml', rdf_string(self._retrieved_metadata, rdf_format="xml"))})
+        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        path = self._hsapi_path + "/ingest_metadata/"
+        self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
 
     @property
     def resource_id(self):
@@ -378,7 +379,7 @@ class Resource(Aggregation):
         hsapi_path = self._hsapi_path + '/sysmeta/'
         return self._hs_session.get(hsapi_path).json()
 
-    def download(self, save_path):
+    def download(self, save_path=""):
         # TODO, can we add download links to maps?
         return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
 
