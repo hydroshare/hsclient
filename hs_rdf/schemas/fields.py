@@ -78,8 +78,14 @@ class Creator(BaseModel):
     name: str = Field(rdf_predicate=HSTERMS.name, description="The name of a creator", default=None)
 
     creator_order: int = Field(rdf_predicate=HSTERMS.creatorOrder, description="the order the creator will appear")
-    email: str = Field(rdf_predicate=HSTERMS.email, default=None, description="the email of a creator")
-    organization: str = Field(rdf_predicate=HSTERMS.organization, default=None, description="the organization of the creator")
+    google_scholar_id: AnyUrl = Field(rdf_predicate=HSTERMS.GoogleScholarID, default=None)
+    research_gate_id: AnyUrl = Field(rdf_predicate=HSTERMS.ResearchGateID, default=None)
+    phone: str = Field(rdf_predicate=HSTERMS.phone, default=None)
+    ORCID: AnyUrl = Field(rdf_predicate=HSTERMS.ORCID, default=None)
+    address: str = Field(rdf_predicate=HSTERMS.address, default=None)
+    organization: str = Field(rdf_predicate=HSTERMS.organization, default=None)
+    email: str = Field(rdf_predicate=HSTERMS.email, default=None)
+    homepage: HttpUrl = Field(rdf_predicate=HSTERMS.homepage, default=None)
 
 
 class CreatorInRDF(Creator):
