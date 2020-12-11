@@ -86,6 +86,7 @@ class Creator(BaseModel):
     organization: str = Field(rdf_predicate=HSTERMS.organization, default=None)
     email: str = Field(rdf_predicate=HSTERMS.email, default=None)
     homepage: HttpUrl = Field(rdf_predicate=HSTERMS.homepage, default=None)
+    description: str = Field(rdf_predicate=HSTERMS.description, default=None)
 
 
 class CreatorInRDF(Creator):

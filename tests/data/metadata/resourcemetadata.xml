@@ -99,10 +99,23 @@
     </dc:identifier>
     <dc:creator>
       <rdf:Description>
+        <hsterms:GoogleScholarID rdf:resource="https://scholar.google.com/citations?user=mu4k534AAAAJ&amp;hl=en"/>
+        <hsterms:email>jeff.horsburgh@usu.edu</hsterms:email>
+        <hsterms:ResearchGateID rdf:resource="https://www.researchgate.net/profile/Jeffery_Horsburgh"/>
+        <hsterms:creatorOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</hsterms:creatorOrder>
+        <hsterms:organization>Utah State University</hsterms:organization>
+        <hsterms:description>/user/10/</hsterms:description>
+        <hsterms:phone>(435) 797-2946</hsterms:phone>
+        <hsterms:ORCID rdf:resource="https://orcid.org/0000-0002-0768-3196"/>
+        <hsterms:name>Horsburgh, Jeffery S.</hsterms:name>
+      </rdf:Description>
+    </dc:creator>
+    <dc:creator>
+      <rdf:Description>
         <hsterms:organization>USU</hsterms:organization>
         <hsterms:email>scott.black@usu.edu</hsterms:email>
         <hsterms:name>Scott s Black</hsterms:name>
-        <hsterms:creatorOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</hsterms:creatorOrder>
+        <hsterms:creatorOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</hsterms:creatorOrder>
       </rdf:Description>
     </dc:creator>
     <dc:creator>
