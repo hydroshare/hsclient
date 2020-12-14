@@ -64,7 +64,7 @@ res.refresh()
 
 agg = next(agg for agg in res.aggregations if any(file for file in agg.files if file.name == "readme.txt"))
 agg.metadata.title = "Adding an aggregation title to an aggregation"
-agg.metadata.subject = ['aggregation', 'keywords']
+agg.metadata.subjects = ['aggregation', 'keywords']
 agg.save()
 
 agg.remove() # remove metadata from files
