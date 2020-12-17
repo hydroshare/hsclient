@@ -11,7 +11,7 @@ from hs_rdf.schemas.aggregations import GeographicRasterMetadataInRDF, Geographi
     MultidimensionalMetadataInRDF, \
     ReferencedTimeSeriesMetadataInRDF, FileSetMetadataInRDF, SingleFileMetadataInRDF, GeographicRasterMetadata, \
     GeographicFeatureMetadata, MultidimensionalMetadata, ReferencedTimeSeriesMetadata, FileSetMetadata, \
-    SingleFileMetadata
+    SingleFileMetadata, TimeSeriesMetadataInRDF, TimeSeriesMetadata
 from hs_rdf.schemas.enums import AnyUrlEnum
 from hs_rdf.schemas.resource import ResourceMap, ResourceMetadataInRDF, ResourceMetadata
 
@@ -23,7 +23,8 @@ rdf_schemas = {ORE.ResourceMap: ResourceMap,
                HSTERMS.MultidimensionalAggregation: MultidimensionalMetadataInRDF,
                HSTERMS.ReferencedTimeSeriesAggregation: ReferencedTimeSeriesMetadataInRDF,
                HSTERMS.FileSetAggregation: FileSetMetadataInRDF,
-               HSTERMS.SingleFileAggregation: SingleFileMetadataInRDF}
+               HSTERMS.SingleFileAggregation: SingleFileMetadataInRDF,
+               HSTERMS.TimeSeriesAggregation: TimeSeriesMetadataInRDF}
 
 user_schemas = {ResourceMetadataInRDF: ResourceMetadata,
                 GeographicRasterMetadataInRDF: GeographicRasterMetadata,
@@ -31,7 +32,8 @@ user_schemas = {ResourceMetadataInRDF: ResourceMetadata,
                 MultidimensionalMetadataInRDF: MultidimensionalMetadata,
                 ReferencedTimeSeriesMetadataInRDF: ReferencedTimeSeriesMetadata,
                 FileSetMetadataInRDF: FileSetMetadata,
-                SingleFileMetadataInRDF: SingleFileMetadata}
+                SingleFileMetadataInRDF: SingleFileMetadata,
+                TimeSeriesMetadataInRDF: TimeSeriesMetadata}
 
 
 def load_rdf(rdf_str, file_format='xml'):

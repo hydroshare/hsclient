@@ -9,7 +9,8 @@ from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialRefe
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
     RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF, \
-    BandInformationInRDF, CellInformationInRDF, FieldInformationInRDF, GeometryInformationInRDF, VariableInRDF, Rights
+    BandInformationInRDF, CellInformationInRDF, FieldInformationInRDF, GeometryInformationInRDF, VariableInRDF, Rights, \
+    TimeSeriesResultInRDF, TimeSeriesResult
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
     parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages
@@ -74,6 +75,16 @@ class MultidimensionalMetadataInRDF(BaseAggregationMetadataInRDF):
     spatial_reference: MultidimensionalSpatialReferenceInRDF = Field(rdf_predicate=HSTERMS.spatialReference, default=None)
 
     _parse_spatial_reference = root_validator(pre=True, allow_reuse=True)(parse_rdf_multidimensional_spatial_reference)
+
+
+class TimeSeriesMetadataInRDF(BaseAggregationMetadataInRDF):
+    rdf_type: AnyUrl = Field(rdf_predicate=RDF.type, const=True, default=HSTERMS.TimeSeriesAggregation)
+
+    label: str = Field(const=True, default="Time Series Content: One or more time series held in an ODM2 format "
+                                           "SQLite file and optional source comma separated (.csv) files")
+    dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.TimeSeriesAggregation, const=True)
+
+    time_series_results: List[TimeSeriesResultInRDF] = Field(rdf_predicate=HSTERMS.timeSeriesResult)
 
 
 class ReferencedTimeSeriesMetadataInRDF(BaseAggregationMetadataInRDF):
@@ -151,3 +162,9 @@ class FileSetMetadata(BaseAggregationMetadata):
 
 class SingleFileMetadata(BaseAggregationMetadata):
     type: AnyUrl = Field(const=True, default="SingleFileAggregation")
+
+
+class TimeSeriesMetadata(BaseAggregationMetadata):
+    type: AnyUrl = Field(const=True, default="TimeSeriesAggregation")
+
+    time_series_results: List[TimeSeriesResult] = Field()

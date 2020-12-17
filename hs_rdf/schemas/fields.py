@@ -196,3 +196,96 @@ class Publisher(BaseModel):
 
 class PublisherInRDF(Publisher):
     rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class TimeSeriesVariable(BaseModel):
+    variable_code: str = Field(rdf_predicate=HSTERMS.VariableCode)
+    variable_name: str = Field(rdf_predicate=HSTERMS.VariableName)
+    variable_type: str = Field(rdf_predicate=HSTERMS.VariableType)
+    no_data_value: int = Field(rdf_predicate=HSTERMS.NoDataValue)
+    variable_definition: str = Field(rdf_predicate=HSTERMS.VariableDefinition, default=None)
+    speciation: str = Field(rdf_predicate=HSTERMS.Speciation, default=None)
+
+
+class TimeSeriesVariableInRDF(TimeSeriesVariable):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class TimeSeriesSite(BaseModel):
+    site_code: str = Field(rdf_predicate=HSTERMS.SiteCode)
+    site_name: str = Field(rdf_predicate=HSTERMS.SiteName, default=None)
+    elevation_m: float = Field(rdf_predicate=HSTERMS.Elevation_m, default=None)
+    elevation_datum: str = Field(rdf_predicate=HSTERMS.ElevationDatum, default=None)
+    site_type: str = Field(rdf_predicate=HSTERMS.SiteType, default=None)
+    latitude: float = Field(rdf_predicate=HSTERMS.Latitude, default=None)
+    longitude: float = Field(rdf_predicate=HSTERMS.Longitude, default=None)
+
+
+class TimeSeriesSiteInRDF(TimeSeriesSite):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class TimeSeriesMethod(BaseModel):
+    method_code: str = Field(rdf_predicate=HSTERMS.MethodCode)
+    method_name: str = Field(rdf_predicate=HSTERMS.MethodName)
+    method_type: str = Field(rdf_predicate=HSTERMS.MethodType)
+    method_description: str = Field(rdf_predicate=HSTERMS.MethodDescription, default=None)
+    method_link: AnyUrl = Field(rdf_predicate=HSTERMS.MethodLink, default=None)
+
+
+class TimeSeriesMethodInRDF(TimeSeriesMethod):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class ProcessingLevel(BaseModel):
+    processing_level_code: str = Field(rdf_predicate=HSTERMS.ProcessingLevelCode)
+    definition: str = Field(rdf_predicate=HSTERMS.Definition, default=None)
+    explanation: str = Field(rdf_predicate=HSTERMS.Explanation, default=None)
+
+
+class ProcessingLevelInRDF(ProcessingLevel):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class Unit(BaseModel):
+    type: str = Field(rdf_predicate=HSTERMS.UnitsType)
+    name: str = Field(rdf_predicate=HSTERMS.UnitsName)
+    abbreviation: str = Field(rdf_predicate=HSTERMS.UnitsAbbreviation)
+
+
+class UnitInRDF(Unit):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class UTCOffSet(BaseModel):
+    value: str = Field(rdf_predicate=HSTERMS.value)
+
+
+class UTCOffSetInRDF(UTCOffSet):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+
+class TimeSeriesResult(BaseModel):
+    series_id: str = Field(rdf_predicate=HSTERMS.timeSeriesResultUUID)
+    unit: Unit = Field(rdf_predicate=HSTERMS.unit, default=None)
+    status: str = Field(rdf_predicate=HSTERMS.Status, default=None)
+    sample_medium: str = Field(rdf_predicate=HSTERMS.SampleMedium)
+    value_count: int = Field(rdf_predicate=HSTERMS.ValueCount)
+    aggregation_statistics: str = Field(rdf_predicate=HSTERMS.AggregationStatistic)
+    series_label: str = Field(rdf_predicate=HSTERMS.SeriesLabel, default=None)
+    site: TimeSeriesSite = Field(rdf_predicate=HSTERMS.site)
+    variable: TimeSeriesVariable = Field(rdf_predicate=HSTERMS.variable)
+    method: TimeSeriesMethod = Field(rdf_predicate=HSTERMS.method)
+    processing_level: ProcessingLevel = Field(rdf_predicate=HSTERMS.processingLevel)
+    utc_offset: UTCOffSet = Field(rdf_predicate=HSTERMS.UTCOffSet, default=None)
+
+
+class TimeSeriesResultInRDF(TimeSeriesResult):
+    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+
+    unit: UnitInRDF = Field(rdf_predicate=HSTERMS.unit, default=None)
+    site: TimeSeriesSiteInRDF = Field(rdf_predicate=HSTERMS.site)
+    variable: TimeSeriesVariableInRDF = Field(rdf_predicate=HSTERMS.variable)
+    method: TimeSeriesMethodInRDF = Field(rdf_predicate=HSTERMS.method)
+    processing_level: ProcessingLevelInRDF = Field(rdf_predicate=HSTERMS.processingLevel)
+    utc_offset: UTCOffSetInRDF = Field(rdf_predicate=HSTERMS.UTCOffSet, default=None)

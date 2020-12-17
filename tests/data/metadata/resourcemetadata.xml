@@ -12,6 +12,7 @@
   </rdf:Description>
   <hsterms:CompositeResource rdf:about="http://www.hydroshare.org/resource/84805fd615a04d63b4eada65644a1e20">
     <dc:subject>Logan River</dc:subject>
+    <dcterms:bibliographicCitation>a custom citation</dcterms:bibliographicCitation>
     <dc:source>
       <rdf:Description>
         <hsterms:isDerivedFrom>another</hsterms:isDerivedFrom>

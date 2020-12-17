@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Union, Dict
 
 from pydantic import Field, AnyUrl, validator, root_validator, BaseModel
+from rdflib import DCTERMS
 
 from hs_rdf.namespaces import HSRESOURCE, HSTERMS, RDF, DC, ORE, CITOTERMS
 from hs_rdf.schemas.base_models import BaseMetadata
@@ -50,6 +51,7 @@ class ResourceMetadataInRDF(BaseModel):
     award_infos: List[AwardInfoInRDF] = Field(rdf_predicate=HSTERMS.awardInfo, default=[])
     coverages: List[CoverageInRDF] = Field(rdf_predicate=DC.coverage, default=[])
     publisher: PublisherInRDF = Field(rdf_predicate=DC.publisher, default=None)
+    citation: str = Field(rdf_predicate=DCTERMS.bibliographicCitation)
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(parse_coverages)
     _parse_extended_metadata = root_validator(pre=True, allow_reuse=True)(parse_rdf_extended_metadata)
@@ -88,6 +90,7 @@ class ResourceMetadata(BaseMetadata):
     spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(default=None)
     period_coverage: PeriodCoverage = Field(default=None)
     publisher: Publisher = Field(default=None)
+    citation: str = Field(default=None, description="blah")
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)

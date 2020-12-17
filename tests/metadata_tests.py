@@ -43,14 +43,15 @@ def compare_metadatas(new_graph, original_metadata_file):
         compare_graphs(new_graph, original_graph)
 
 metadata_files = ['resourcemetadata.xml', 'logan_meta.xml', 'asdf_meta.xml', 'msf_version.refts_meta.xml',
-                  'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml']
-#metadata_files = ['resourcemetadata.xml']
+                  'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml', 'ODM2_Multi_Site_One_Variable_meta.xml']
+#metadata_files = ['ODM2_Multi_Site_One_Variable_meta.xml']
 @pytest.mark.parametrize("metadata_file", metadata_files)
 def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
     with open(metadata_file, 'r') as f:
         md = load_rdf(f.read())
     g = rdf_graph(md)
+    rdf_string = g.serialize(format="pretty-xml").decode()
     compare_metadatas(g, metadata_file)
 
 def test_resource_metadata(res_md):
