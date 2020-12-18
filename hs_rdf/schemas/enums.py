@@ -45,3 +45,17 @@ class VariableType(Enum):
     String = 'String'  # variable length character string
     User_Defined_Type = 'User Defined Type'  # compound, vlen, opaque, enum
     Unknown = 'Unknown'
+
+
+class RelationType(Enum):
+    isHostedBy = 'The content of this resource is hosted by'
+    isCopiedFrom = 'The content of this resource was copied from'
+    isPartOf = 'The content of this resource is part of'
+    hasPart = 'Has Part'
+    isExecutedBy = 'The content of this resource can be executed by'
+    isCreatedBy = 'The content of this resource was created by'
+    isVersionOf = 'Version Of'
+    isReplacedBy = 'Replaced By'
+    isDataFor = 'The content of this resource serves as the data for'
+    cites = 'This resource cites'
+    isDescribedBy = 'This resource is described by'

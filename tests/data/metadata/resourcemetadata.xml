@@ -39,7 +39,7 @@
     <dc:subject>fdas</dc:subject>
     <dc:relation>
       <rdf:Description>
-        <hsterms:isPartOf rdf:resource="https://sadf.com"/>
+        <hsterms:isPartOf>https://sadf.com</hsterms:isPartOf>
       </rdf:Description>
     </dc:relation>
     <hsterms:awardInfo>
@@ -53,7 +53,12 @@
     <dc:subject>Time Series</dc:subject>
     <dc:relation>
       <rdf:Description>
-        <hsterms:isCopiedFrom rdf:resource="https://www.google.com"/>
+        <hsterms:isDataFor>Bastidas Pacheco, C. J., Horsburgh, J. S., Tracy, R. J. (2020). A low-cost, open source monitoring system for collecting high-resolution water use data on magnetically-driven residential water meters, Sensors, 20(13), 3655, https://doi.org/10.3390/s20133655.</hsterms:isDataFor>
+      </rdf:Description>
+    </dc:relation>
+    <dc:relation>
+      <rdf:Description>
+        <hsterms:isCopiedFrom>https://www.google.com</hsterms:isCopiedFrom>
       </rdf:Description>
     </dc:relation>
     <dc:date>

@@ -1,7 +1,8 @@
 from rdflib import URIRef
 
 from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage, PointCoverage
-from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType, MultidimensionalSpatialReferenceType
+from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType, MultidimensionalSpatialReferenceType, \
+    RelationType
 from hs_rdf.utils import to_coverage_value_string, to_coverage_dict
 
 
@@ -149,4 +150,18 @@ def parse_url(cls, values):
         if value:
             values["url"] = values["rdf_subject"]
             del values["rdf_subject"]
+    return values
+
+def parse_relation(cls, values):
+    if "type" in values or "value" in values:
+        return values
+    for relation_type in RelationType:
+        if relation_type.name in values and values[relation_type.name]:
+            values["type"] = relation_type
+            values["value"] = values[relation_type.name]
+            return values
+
+def parse_relation_rdf(cls, values):
+    if "type" in values and "value" in values:
+        values[values["type"].name] = values["value"]
     return values

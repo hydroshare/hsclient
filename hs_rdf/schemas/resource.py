@@ -73,8 +73,8 @@ class ResourceMetadata(BaseMetadata):
 
     url: AnyUrl = Field()
 
-    identifier: AnyUrl
-    title: str = Field(default=None, description="The description of a title")
+    identifier: AnyUrl = Field()
+    title: str = Field(max_length=300, default=None, description="The description of a title")
     abstract: str = Field(default=None)
     language: str
     subjects: List[str] = []

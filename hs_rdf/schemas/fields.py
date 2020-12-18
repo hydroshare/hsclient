@@ -1,12 +1,14 @@
 from datetime import datetime
 
-from pydantic import AnyUrl, Field, HttpUrl, BaseModel
+from pydantic import AnyUrl, Field, HttpUrl, BaseModel, PositiveInt, validator, root_validator
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
 from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType, \
-    MultidimensionalSpatialReferenceType
+    MultidimensionalSpatialReferenceType, RelationType
+from hs_rdf.schemas.root_validators import parse_relation, parse_relation_rdf
+from hs_rdf.schemas.validators import validate_user_url
 
 
 class RDFBaseModel(BaseModel):
@@ -23,17 +25,26 @@ class SourceInRDF(RDFBaseModel):
 
 
 class Relation(BaseModel):
-    is_copied_from: AnyUrl = Field(default=None)
-    is_part_of: AnyUrl = Field(default=None)
-    is_described_by: AnyUrl = Field(default=None)
+    type: RelationType
+    value: str
+
+    _parse_relation = root_validator(pre=True)(parse_relation)
 
 
-class RelationInRDF(Relation, RDFBaseModel):
+class RelationInRDF(RDFBaseModel):
+    isHostedBy: str = Field(rdf_predicate=HSTERMS.isHostedBy, default=None)
+    isCopiedFrom: str = Field(rdf_predicate=HSTERMS.isCopiedFrom, default=None)
+    isPartOf: str = Field(rdf_predicate=HSTERMS.isPartOf, default=None)
+    hasPart: str = Field(rdf_predicate=HSTERMS.hasPart, default=None)
+    isExecutedBy: str = Field(rdf_predicate=HSTERMS.isExecutedBy, default=None)
+    isCreatedBy: str = Field(rdf_predicate=HSTERMS.isCreatedBy, default=None)
+    isVersionOf: str = Field(rdf_predicate=HSTERMS.isVersionOf, default=None)
+    isReplacedBy: str = Field(rdf_predicate=HSTERMS.isReplacedBy, default=None)
+    isDataFor: str = Field(rdf_predicate=HSTERMS.isDataFor, default=None)
+    cites: str = Field(rdf_predicate=HSTERMS.cites, default=None)
+    isDescribedBy: str = Field(rdf_predicate=HSTERMS.isDescribedBy, default=None)
 
-    class Config:
-        fields = {'is_copied_from': {"rdf_predicate": HSTERMS.isCopiedFrom},
-                  'is_part_of': {"rdf_predicate": HSTERMS.isPartOf},
-                  'is_described_by': {"rdf_predicate": HSTERMS.isDescribedBy}}
+    _parse_relation = root_validator(pre=True)(parse_relation_rdf)
 
 
 class DescriptionInRDF(RDFBaseModel):
@@ -89,7 +100,7 @@ class RightsInRDF(Rights, RDFBaseModel):
 class Creator(BaseModel):
     name: str = Field(description="The name of a creator", default=None)
 
-    creator_order: int = Field(description="the order the creator will appear")
+    creator_order: PositiveInt = Field(description="the order the creator will appear")
     google_scholar_id: AnyUrl = Field(default=None)
     research_gate_id: AnyUrl = Field(default=None)
     phone: str = Field(default=None)
@@ -98,7 +109,9 @@ class Creator(BaseModel):
     organization: str = Field(default=None)
     email: str = Field(default=None)
     homepage: HttpUrl = Field(default=None)
-    description: str = Field(default=None)
+    description: str = Field(max_length=50, default=None)
+
+    _description_validator = validator("description", pre=True)(validate_user_url)
 
 
 class CreatorInRDF(Creator, RDFBaseModel):
