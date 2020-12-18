@@ -74,19 +74,11 @@ class HydroShareSession:
         return self.base_url + path
 
     def retrieve_string(self, path):
-        url = self._build_url(path)
-        file = self._session.get(url, allow_redirects=True)
-        if file.status_code != 200:
-            if file.status_code == 404:
-                raise Exception("Not Found - {}".format(url))
-            raise Exception("Failed to retrieve {}, status_code {}, message {}".format(url,
-                                                                                       file.status_code,
-                                                                                       file.content))
+        file = self.get(path, status_code=200, allow_redirects=True)
         return file.content.decode()
 
     def retrieve_file(self, path, save_path=""):
-        url = self._build_url(path)
-        file = self._session.get(url, allow_redirects=True)
+        file = self.get(path, status_code=200, allow_redirects=True)
 
         cd = file.headers['content-disposition']
         filename = cd.split("filename=")[1].strip('"')
@@ -96,8 +88,7 @@ class HydroShareSession:
         return downloaded_file
 
     def retrieve_bag(self, path, save_path=""):
-        url = self._build_url(path)
-        file = self._session.get(url, allow_redirects=True)
+        file = self.get(path, status_code=200, allow_redirects=True)
 
         if file.headers['Content-Type'] != "application/zip":
             time.sleep(1)
@@ -105,13 +96,11 @@ class HydroShareSession:
         return self.retrieve_file(path, save_path)
 
     def check_task(self, task_id):
-        url = self._build_url("/hsapi/taskstatus/")
-        response = self._session.get(url + task_id + "/")
+        response = self.get(f"/hsapi/taskstatus/{task_id}/", status_code=200)
         return response.json()['status']
 
     def retrieve_zip(self, path, save_path=""):
-        url = self._build_url(path)
-        file = self._session.get(url, allow_redirects=True)
+        file = self.get(path, status_code=200, allow_redirects=True)
 
         json_response = file.json()
         task_id = json_response['task_id']
@@ -122,27 +111,42 @@ class HydroShareSession:
                 time.sleep(1)
         return self.retrieve_file(download_path, save_path)
 
-    def upload_file(self, path, files):
-        url = self._build_url(path)
-        return self._session.post(url, files=files)
+    def upload_file(self, path, files, status_code=204):
+        return self.post(path, files=files, status_code=status_code)
 
-    def post(self, path, data=None, params={}):
+    def post(self, path, status_code, data=None, params={}, **kwargs):
         url = self._build_url(path)
         if params:
             url = url + "?" + urlencode(params)
-        return self._session.post(url, data=data)
+        response = self._session.post(url, data=data, **kwargs)
+        if response.status_code != status_code:
+            raise Exception("Failed POST {}, status_code {}, message {}".format(url, response.status_code,
+                                                                                response.content))
+        return response
 
-    def put(self, path, data=None):
+    def put(self, path, status_code, data=None, **kwargs):
         url = self._build_url(path)
-        return self._session.put(url, data=data)
+        response = self._session.put(url, data=data, **kwargs)
+        if response.status_code != status_code:
+            raise Exception("Failed PUT {}, status_code {}, message {}".format(url, response.status_code,
+                                                                               response.content))
+        return response
 
-    def get(self, path):
+    def get(self, path, status_code, **kwargs):
         url = self._build_url(path)
-        return self._session.get(url)
+        response = self._session.get(url, **kwargs)
+        if response.status_code != status_code:
+            raise Exception("Failed GET {}, status_code {}, message {}".format(url, response.status_code,
+                                                                               response.content))
+        return response
 
-    def delete(self, path):
+    def delete(self, path, status_code, **kwargs):
         url = self._build_url(path)
-        return self._session.delete(url)
+        response = self._session.delete(url, **kwargs)
+        if response.status_code != status_code:
+            raise Exception("Failed DELETE {}, status_code {}, message {}".format(url, response.status_code,
+                                                                                  response.content))
+        return response
 
 
 class HydroShare:
@@ -169,7 +173,7 @@ class HydroShare:
         return res
 
     def create(self):
-        response = self._hs_session.post('/hsapi/resource/')
+        response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
         return self.resource(resource_id)
 
@@ -209,28 +213,24 @@ class File:
 
     def delete(self):
         path = self._hsapi_path + "files/" + self.relative_path.split("data/contents/", 1)[1]
-        response = self._hs_session.delete(path)
-        response.status_code
+        self._hs_session.delete(path, status_code=200)
 
     def rename(self, file_name):
         """Updates the name of the file to file_name"""
         rename_path = self._hsapi_path + "functions/move-or-rename/"
         source_path = self.relative_path
         target_path = self.relative_folder + file_name
-        response = self._hs_session.post(rename_path, data={"source_path": source_path, "target_path": target_path})
-        response.status_code
+        self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
 
     def unzip(self):
         if not self.name.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
         unzip_path = self._hsapi_path + "functions/unzip/data/contents/{}/".format(self.name)
-        response = self._hs_session.post(unzip_path, {"overwrite": "true", "ingest_metadata": "true"})
-        response.status_code
+        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
 
     def aggregate(self, type: AggregationType):
         path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type.value + "/"
-        response = self._hs_session.post(path)
-        response.status_code
+        self._hs_session.post(path, status_code=201)
 
     def __str__(self):
         return str(self.path)
@@ -324,16 +324,12 @@ class Aggregation:
 
     def remove(self):
         path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
-        response = self._hs_session.post(path)
-        response.status_code
-        pass
+        self._hs_session.post(path, status_code=200)
 
     def delete(self):
         path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + \
                self.main_file_path.split("data/contents")[1] + "/"
-        response = self._hs_session.delete(path)
-        response.status_code
-        pass
+        self._hs_session.delete(path, status_code=200)
 
     def __str__(self):
         return self._map_path
@@ -372,12 +368,12 @@ class Resource(Aggregation):
     @property
     def access_permission(self):
         path = self._hsapi_path + "/access/"
-        response = self._hs_session.get(path)
+        response = self._hs_session.get(path, status_code=200)
         return response.json()
 
     def system_metadata(self):
         hsapi_path = self._hsapi_path + '/sysmeta/'
-        return self._hs_session.get(hsapi_path).json()
+        return self._hs_session.get(hsapi_path, status_code=200).json()
 
     def download(self, save_path=""):
         # TODO, can we add download links to maps?
@@ -388,37 +384,29 @@ class Resource(Aggregation):
 
     def create_folder(self, folder):
         path = self._hsapi_path + "/folders/" + folder + "/"
-        response = self._hs_session.put(path)
-        response.status_code
+        self._hs_session.put(path, status_code=201)
 
     def create_reference(self, file_name, url, path=''):
         request_path = self._hsapi_path.replace(self.resource_id, "") + "data-store-add-reference/"
-        response = self._hs_session.post(request_path, data={"res_id": self.resource_id,
-                                                             "curr_path": path,
-                                                             "ref_name": file_name,
-                                                             "ref_url": url})
-        response.status_code
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
+                                                  "ref_url": url},
+                              status_code=200)
 
     def update_reference(self, file_name, url, path=''):
         request_path = self._hsapi_path.replace(self.resource_id, "") + "data_store_edit_reference_url/"
-        response = self._hs_session.post(request_path, data={"res_id": self.resource_id,
-                                                             "curr_path": path,
-                                                             "url_filename": file_name,
-                                                             "new_ref_url": url})
-        response.status_code
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
+                                                  "url_filename": file_name, "new_ref_url": url},
+                              status_code=200)
 
     def delete(self):
         """"""
         hsapi_path = self._hsapi_path
-        response = self._hs_session.delete(hsapi_path)
-        if response.status_code != 204:
-            raise Exception("Failed to delete - status code {} - path {}".format(response.status_code, hsapi_path))
+        self._hs_session.delete(hsapi_path, status_code=204)
         self.refresh()
 
     def upload(self, *files, dest_relative_path=""):
         if len(files) == 1:
-            response = self._upload(files[0], dest_relative_path=dest_relative_path)
-            response.status_code
+            self._upload(files[0], dest_relative_path=dest_relative_path)
         else:
             with tempfile.TemporaryDirectory() as tmpdir:
                 zipped_file = os.path.join(tmpdir, 'files.zip')
@@ -427,14 +415,13 @@ class Resource(Aggregation):
                         zipped.write(file, os.path.basename(file))
                 self._upload(zipped_file, dest_relative_path=dest_relative_path)
                 unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
-                response = self._hs_session.post(unzip_path)
-                response.status_code
+                self._hs_session.post(unzip_path)
 
     def _upload(self, file, dest_relative_path):
         stripped_path = dest_relative_path.strip("/")
         stripped_path = stripped_path + "/" if stripped_path else ""
         path = self._hsapi_path + "/files/" + stripped_path
-        response = self._hs_session.upload_file(path, files={'file': open(file, 'rb')})
+        response = self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
         return response
 
     def delete_folder(self, folder_path):
