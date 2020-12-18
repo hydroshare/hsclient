@@ -71,11 +71,18 @@ def rdf_string(schema, rdf_format='pretty-xml'):
 def _rdf_fields(schema):
     for f in schema.__fields__.values():
         if f.alias not in ['rdf_subject', 'rdf_type', 'label', 'dc_type']:
-            yield f
+            predicate = f.field_info.extra.get('rdf_predicate', None)
+            if not predicate:
+                config_field_info = schema.Config.fields.get(f.name, None)
+                if isinstance(config_field_info, dict):
+                    predicate = config_field_info.get('rdf_predicate', None)
+            if not predicate:
+                raise Exception(
+                    "Schema configuration error for {}, all fields must specify a rdf_predicate".format(schema))
+            yield f, predicate
 
 def _rdf_graph(schema, graph=None):
-    for f in _rdf_fields(schema):
-        predicate = f.field_info.extra['rdf_predicate']
+    for f, predicate in _rdf_fields(schema):
         values = getattr(schema, f.name, None)
         if values:
             if not isinstance(values, list):
@@ -140,10 +147,7 @@ def _parse(schema, metadata_graph, subject=None):
         if not subject:
             raise Exception("Could not find subject for predicate=RDF.type, object={}".format(target_class))
     kwargs = {}
-    for f in _rdf_fields(schema):
-        predicate = f.field_info.extra['rdf_predicate']
-        if not predicate:
-            raise Exception("Schema configuration error for {}, all fields must specify a rdf_predicate".format(schema))
+    for f, predicate in _rdf_fields(schema):
         parsed = []
         for value in metadata_graph.objects(subject=subject, predicate=predicate):
             if nested_class(f):
