@@ -123,3 +123,30 @@ def rdf_parse_rdf_subject(cls, values):
         values["rdf_subject"] = URIRef(values["url"])
         del values["url"]
     return values
+
+def parse_additional_metadata(cls, values):
+    if "extended_metadata" in values:
+        value = values["extended_metadata"]
+        if isinstance(value, list):
+            parsed = {}
+            for em in value:
+                parsed[em['key']] = em['value']
+            values["additional_metadata"] = parsed
+            del values["extended_metadata"]
+    return values
+
+def parse_abstract(cls, values):
+    if "description" in values:
+        value = values["description"]
+        if isinstance(value, dict) and "abstract" in value:
+            values['abstract'] = value['abstract']
+            del values['description']
+    return values
+
+def parse_url(cls, values):
+    if "rdf_subject" in values:
+        value = values["rdf_subject"]
+        if value:
+            values["url"] = values["rdf_subject"]
+            del values["rdf_subject"]
+    return values

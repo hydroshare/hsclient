@@ -17,8 +17,9 @@ from hs_rdf.schemas.fields import Creator, Contributor, Relation, Rights, AwardI
     AwardInfoInRDF, CoverageInRDF, PublisherInRDF, RelationInRDF
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
     rdf_parse_description, rdf_parse_rdf_subject, split_dates, split_coverages
-from hs_rdf.schemas.validators import parse_additional_metadata, parse_identifier, parse_abstract, parse_sources, \
-    rdf_parse_identifier, parse_rdf_sources
+from hs_rdf.schemas.validators import parse_identifier, parse_sources, rdf_parse_identifier, \
+    parse_rdf_sources
+from hs_rdf.schemas.root_validators import parse_additional_metadata, parse_abstract, parse_url
 
 
 def hs_uid():
@@ -70,18 +71,18 @@ class ResourceMetadataInRDF(BaseModel):
 class ResourceMetadata(BaseMetadata):
     type: AnyUrl = Field(const=True, default="CompositeResource")
 
-    url: AnyUrl = Field(alias="rdf_subject")
+    url: AnyUrl = Field()
 
     identifier: AnyUrl
     title: str = Field(default=None, description="The description of a title")
-    abstract: str = Field(alias="description", default=None)
+    abstract: str = Field(default=None)
     language: str
     subjects: List[str] = []
     creators: List[Creator] = Field(default=[], description="A list of creators")
     contributors: List[Contributor] = []
     sources: List[str] = Field(default=[])
     relations: List[Relation] = Field(default=[])
-    additional_metadata: Dict[str, str] = Field(alias="extended_metadata", default={})
+    additional_metadata: Dict[str, str] = Field(default={})
     rights: Rights = Field(default=None)
     created: datetime = Field(default_factory=datetime.now)
     modified: datetime = Field(default_factory=datetime.now)
@@ -94,10 +95,11 @@ class ResourceMetadata(BaseMetadata):
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)
+    _parse_additional_metadata = root_validator(pre=True, allow_reuse=True)(parse_additional_metadata)
+    _parse_abstract = root_validator(pre=True)(parse_abstract)
+    _parse_url = root_validator(pre=True, allow_reuse=True)(parse_url)
 
-    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_identifier = validator("identifier", pre=True)(parse_identifier)
-    _parse_abstract = validator("abstract", pre=True)(parse_abstract)
     _parse_sources = validator("sources", pre=True)(parse_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)

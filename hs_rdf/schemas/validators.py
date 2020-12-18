@@ -24,22 +24,9 @@ def parse_multidimensional_spatial_reference(cls, value):
         return MultidimensionalPointSpatialReference(**d)
     return value
 
-def parse_additional_metadata(cls, value):
-    if isinstance(value, list):
-        parsed = {}
-        for em in value:
-            parsed[em['key']] = em['value']
-        return parsed
-    return value
-
 def parse_identifier(cls, value):
     if isinstance(value, dict) and "hydroshare_identifier" in value:
         return value['hydroshare_identifier']
-    return value
-
-def parse_abstract(cls, value):
-    if isinstance(value, dict) and "abstract" in value:
-        return value['abstract']
     return value
 
 def parse_sources(cls, value):

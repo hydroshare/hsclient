@@ -10,20 +10,20 @@ from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellIn
     CoverageInRDF, \
     RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF, \
     BandInformationInRDF, CellInformationInRDF, FieldInformationInRDF, GeometryInformationInRDF, VariableInRDF, Rights, \
-    TimeSeriesResultInRDF, TimeSeriesResult
+    TimeSeriesResultInRDF, TimeSeriesResult, RDFBaseModel
 from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
-    parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages
-from hs_rdf.schemas.validators import parse_spatial_reference, parse_additional_metadata, \
-    parse_multidimensional_spatial_reference
+    parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages, parse_url
+from hs_rdf.schemas.validators import parse_spatial_reference, parse_multidimensional_spatial_reference
+from hs_rdf.schemas.root_validators import parse_additional_metadata
 
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
 
-class BaseAggregationMetadataInRDF(BaseModel):
-    rdf_subject: RDFIdentifier = Field(default_factory=BNode)
+class BaseAggregationMetadataInRDF(RDFBaseModel):
     _parse_rdf_subject = root_validator(pre=True, allow_reuse=True)(rdf_parse_rdf_subject)
+
     title: str = Field(rdf_predicate=DC.title)
     subjects: List[str] = Field(rdf_predicate=DC.subject, default=[])
     language: str = Field(rdf_predicate=DC.language, default="eng")
@@ -110,17 +110,18 @@ class SingleFileMetadataInRDF(BaseAggregationMetadataInRDF):
 
 
 class BaseAggregationMetadata(BaseMetadata):
-    url: AnyUrl = Field(alias="rdf_subject")
+    url: AnyUrl = Field()
     title: str = Field()
     subjects: List[str] = Field(default=[])
     language: str = Field(default="eng")
-    additional_metadata: dict = Field(alias="extended_metadata", default={})
+    additional_metadata: dict = Field(default={})
     spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(default=None)
     period_coverage: PeriodCoverage = Field(default=None)
     rights: Rights = Field(default=None)
 
-    _parse_additional_metadata = validator("additional_metadata", pre=True, allow_reuse=True)(parse_additional_metadata)
+    _parse_additional_metadata = root_validator(pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
+    _parse_url = root_validator(pre=True, allow_reuse=True)(parse_url)
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):
