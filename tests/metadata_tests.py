@@ -95,7 +95,7 @@ def test_resource_metadata(res_md):
         res_md.creators = []
         assert False, "should have thrown exception"
     except ValueError as e:
-        assert "Creator list must contain at least one creator" in str(e)
+        assert "list must contain at least one entry" in str(e)
 
     assert len(res_md.contributors) == 2
     contributor = next(x for x in res_md.contributors if x.email == "dtarb@usu.edu")
@@ -111,7 +111,7 @@ def test_resource_metadata(res_md):
     assert any(x for x in res_md.relations if x.value == "https://sadf.com" and x.type == RelationType.isPartOf)
     assert any(x for x in res_md.relations if x.value == "https://www.google.com" and x.type== RelationType.isCopiedFrom)
 
-    assert res_md.rights.rights_statement == "my statement"
+    assert res_md.rights.statement == "my statement"
     assert res_md.rights.url == "http://studio.bakajo.com"
 
     assert res_md.modified == datetime.fromisoformat("2020-11-13T19:40:57.276064+00:00")

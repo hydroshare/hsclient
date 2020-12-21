@@ -6,7 +6,7 @@ from pydantic.error_wrappers import ValidationError
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
 from hs_rdf.schemas.enums import VariableType
-from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable
+from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, Rights
 
 
 @pytest.fixture()
@@ -43,7 +43,6 @@ def test_dates():
     except ValidationError as ve:
         assert "2 validation errors for Date" in str(ve)
 
-
 def test_variables():
     variable = Variable(name="name", type=VariableType.Byte, unit="unit", shape="shape",
                         descriptive_name="descriptive_name", method="method", missing_value="missing_value")
@@ -64,3 +63,33 @@ def test_variables():
         assert "unit" in str(ve)
         assert "type" in str(ve)
         assert "shape" in str(ve)
+
+def test_rights():
+    assert Rights.Creative_Commons_Attribution_CC_BY() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution CC BY.",
+                  url="http://creativecommons.org/licenses/by/4.0/")
+
+    assert Rights.Creative_Commons_Attribution_ShareAlike_CC_BY() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
+                  url="http://creativecommons.org/licenses/by-sa/4.0/")
+
+    assert Rights.Creative_Commons_Attribution_NoDerivs_CC_BY_ND() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
+                  url="http://creativecommons.org/licenses/by-nd/4.0/")
+
+    assert Rights.Creative_Commons_Attribution_NoCommercial_ShareAlike_CC_BY_NC_SA() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-ShareAlike"
+                            " CC BY-NC-SA.",
+                  url="http://creativecommons.org/licenses/by-nc-sa/4.0/")
+
+    assert Rights.Creative_Commons_Attribution_NoCommercial_CC_BY_NC() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial CC BY-NC.",
+                  url="http://creativecommons.org/licenses/by-nc/4.0/")
+
+    assert Rights.Creative_Commons_Attribution_NoCommercial_NoDerivs_CC_BY_NC_ND() == \
+           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-NoDerivs "
+                            "CC BY-NC-ND.",
+                  url="http://creativecommons.org/licenses/by-nc-nd/4.0/")
+
+    assert Rights.Other("a statement", "https://www.hydroshare.org") == \
+           Rights(statement="a statement", url="https://www.hydroshare.org")

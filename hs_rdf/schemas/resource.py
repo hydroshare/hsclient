@@ -18,7 +18,7 @@ from hs_rdf.schemas.fields import Creator, Contributor, Relation, Rights, AwardI
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_extended_metadata, parse_rdf_dates, \
     rdf_parse_description, rdf_parse_rdf_subject, split_dates, split_coverages
 from hs_rdf.schemas.validators import parse_identifier, parse_sources, rdf_parse_identifier, \
-    parse_rdf_sources, sort_creators, creators_not_empty
+    parse_rdf_sources, sort_creators, list_not_empty
 from hs_rdf.schemas.root_validators import parse_additional_metadata, parse_abstract, parse_url
 
 
@@ -84,7 +84,7 @@ class ResourceMetadata(BaseMetadata):
     sources: List[str] = Field(default=[])
     relations: List[Relation] = Field(default=[])
     additional_metadata: Dict[str, str] = Field(default={})
-    rights: Rights = Field(default=None)
+    rights: Rights = Field()
     created: datetime = Field(default_factory=datetime.now)
     modified: datetime = Field(default_factory=datetime.now)
     published: datetime = Field(default=None)
@@ -104,7 +104,7 @@ class ResourceMetadata(BaseMetadata):
     _parse_sources = validator("sources", pre=True)(parse_sources)
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
-    _creators_constraint = validator('creators')(creators_not_empty)
+    _creators_constraint = validator('creators')(list_not_empty)
 
 
 class FileMap(BaseModel):

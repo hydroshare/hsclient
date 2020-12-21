@@ -59,10 +59,10 @@ def sort_creators(cls, creators):
         return creators
     return sorted(creators, key=lambda creator: creator.creator_order)
 
-def creators_not_empty(cls, creators):
-    if len(creators) == 0:
-        raise ValueError("Creator list must contain at least one creator")
-    return creators
+def list_not_empty(cls, l):
+    if len(l) == 0:
+        raise ValueError("list must contain at least one entry")
+    return l
 
 def validate_user_url(value):
     """Validate that a URL is a valid URL for a hydroshare user."""

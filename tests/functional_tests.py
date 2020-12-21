@@ -214,7 +214,7 @@ def test_empty_creator(new_resource):
         new_resource.save()
         assert False, "should have thrown error"
     except ValueError as e:
-        assert "creators list must have at least one creator" in str(e)
+        assert "list must contain at least one entry" in str(e)
 
 def test_user_info(hydroshare):
     user = hydroshare.user(11)
