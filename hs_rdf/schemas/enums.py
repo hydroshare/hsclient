@@ -47,6 +47,12 @@ class VariableType(Enum):
     Unknown = 'Unknown'
 
 
+class UserIdentifierType(Enum):
+    google_scholar_id = "GoogleScholarID"
+    research_gate_id = "ResearchGateID"
+    ORCID = "ORCID"
+
+
 class RelationType(Enum):
     isCopiedFrom = 'The content of this resource was copied from'
     isPartOf = 'The content of this resource is part of'

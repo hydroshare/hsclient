@@ -4,7 +4,7 @@ import os
 
 from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas.enums import RelationType
-from hs_rdf.schemas.fields import Relation, Creator
+from hs_rdf.schemas.fields import Relation, Creator, Contributor
 
 
 @pytest.fixture()
@@ -43,7 +43,6 @@ def test_creator_order(new_resource):
     res.refresh()
     assert res.metadata.creators[1].name == "Administrator, HydroShare"
     assert res.metadata.creators[0].name == "Testing"
-
 
 def test_resource_metadata_updating(new_resource):
 
@@ -216,3 +215,24 @@ def test_empty_creator(new_resource):
         assert False, "should have thrown error"
     except ValueError as e:
         assert "creators list must have at least one creator" in str(e)
+
+def test_user_info(hydroshare):
+    user = hydroshare.user(11)
+    creator = Creator.from_user(user)
+    assert creator.name == user.name
+    assert creator.phone == user.phone
+    assert creator.address == user.address
+    assert creator.organization == user.organization
+    assert creator.email == user.email
+    assert creator.homepage == user.website
+    assert creator.identifiers == user.identifiers
+    assert creator.description == user.url.path
+
+    contributor = Contributor.from_user(user)
+    assert contributor.name == user.name
+    assert contributor.phone == user.phone
+    assert contributor.address == user.address
+    assert contributor.organization == user.organization
+    assert contributor.email == user.email
+    assert contributor.homepage == user.website
+    assert contributor.identifiers == user.identifiers

@@ -13,6 +13,7 @@ from urllib.parse import urlparse, urlencode
 from enum import Enum
 
 from hs_rdf.schemas import load_rdf, rdf_string
+from hs_rdf.schemas.fields import User
 from hs_rdf.schemas.resource import ResourceMetadata, ResourceMetadataInRDF
 
 RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
@@ -176,6 +177,11 @@ class HydroShare:
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
         return self.resource(resource_id)
+
+    def user(self, user_id):
+        response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
+        return User(**response.json())
+
 
 
 class File:

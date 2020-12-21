@@ -1,13 +1,16 @@
 from datetime import datetime
+from typing import Dict
 
 from pydantic import AnyUrl, Field, HttpUrl, BaseModel, PositiveInt, validator, root_validator
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
 from hs_rdf.namespaces import RDF, RDFS, HSTERMS, DCTERMS
+from hs_rdf.schemas.data_structures import User
 from hs_rdf.schemas.enums import CoverageType, DateType, VariableType, SpatialReferenceType, \
-    MultidimensionalSpatialReferenceType, RelationType
-from hs_rdf.schemas.root_validators import parse_relation, parse_relation_rdf
+    MultidimensionalSpatialReferenceType, RelationType, UserIdentifierType
+from hs_rdf.schemas.root_validators import parse_relation, parse_relation_rdf, group_user_identifiers, \
+    split_user_identifiers
 from hs_rdf.schemas.validators import validate_user_url
 
 
@@ -98,23 +101,44 @@ class RightsInRDF(Rights, RDFBaseModel):
 
 
 class Creator(BaseModel):
-    name: str = Field(description="The name of a creator", default=None)
+    name: str = Field(default=None)
 
-    google_scholar_id: AnyUrl = Field(default=None)
-    research_gate_id: AnyUrl = Field(default=None)
     phone: str = Field(default=None)
-    ORCID: AnyUrl = Field(default=None)
     address: str = Field(default=None)
     organization: str = Field(default=None)
     email: str = Field(default=None)
     homepage: HttpUrl = Field(default=None)
     description: str = Field(max_length=50, default=None)
+    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={})
 
     _description_validator = validator("description", pre=True)(validate_user_url)
 
+    _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
 
-class CreatorInRDF(Creator, RDFBaseModel):
+    @classmethod
+    def from_user(cls, user: User):
+        user_dict = user.dict()
+        user_dict["description"] = user.url.path
+        if user.website:
+            user_dict["homepage"] = user.website
+
+        return Creator(**user_dict)
+
+
+class CreatorInRDF(RDFBaseModel):
     creator_order: PositiveInt
+    name: str = Field(default=None)
+    phone: str = Field(default=None)
+    address: str = Field(default=None)
+    organization: str = Field(default=None)
+    email: str = Field(default=None)
+    homepage: HttpUrl = Field(default=None)
+    description: str = Field(max_length=50, default=None)
+    ORCID: AnyUrl = Field(default=None)
+    google_scholar_id: AnyUrl = Field(default=None)
+    research_gate_id: AnyUrl = Field(default=None)
+
+    _group_identifiers = root_validator(pre=True, allow_reuse=True)(split_user_identifiers)
 
     class Config:
         fields = {'name': {"rdf_predicate": HSTERMS.name},
@@ -132,28 +156,48 @@ class CreatorInRDF(Creator, RDFBaseModel):
 
 class Contributor(BaseModel):
     name: str = Field(default=None)
-    google_scholar_id: AnyUrl = Field(default=None)
-    research_gate_id: AnyUrl = Field(default=None)
     phone: str = Field(default=None)
-    ORCID: AnyUrl = Field(default=None)
     address: str = Field(default=None)
     organization: str = Field(default=None)
     email: str = Field(default=None)
     homepage: HttpUrl = Field(default=None)
+    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={})
+
+    _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
+
+    @classmethod
+    def from_user(cls, user: User):
+        user_dict = user.dict()
+        user_dict["description"] = user.url.path
+        if user.website:
+            user_dict["homepage"] = user.website
+
+        return Contributor(**user_dict)
 
 
-class ContributorInRDF(Contributor, RDFBaseModel):
+class ContributorInRDF(RDFBaseModel):
+    name: str = Field(default=None)
+    phone: str = Field(default=None)
+    address: str = Field(default=None)
+    organization: str = Field(default=None)
+    email: str = Field(default=None)
+    homepage: HttpUrl = Field(default=None)
+    ORCID: AnyUrl = Field(default=None)
+    google_scholar_id: AnyUrl = Field(default=None)
+    research_gate_id: AnyUrl = Field(default=None)
+
+    _group_identifiers = root_validator(pre=True, allow_reuse=True)(split_user_identifiers)
 
     class Config:
         fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
-                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
                   'phone': {"rdf_predicate": HSTERMS.phone},
-                  'ORCID': {"rdf_predicate": HSTERMS.ORCID},
                   'address': {"rdf_predicate": HSTERMS.address},
                   'organization': {"rdf_predicate": HSTERMS.organization},
                   'email': {"rdf_predicate": HSTERMS.email},
-                  'homepage': {"rdf_predicate": HSTERMS.homepage}}
+                  'homepage': {"rdf_predicate": HSTERMS.homepage},
+                  'ORCID': {"rdf_predicate": HSTERMS.ORCID},
+                  'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
+                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID}}
 
 
 class AwardInfo(BaseModel):

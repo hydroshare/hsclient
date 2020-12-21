@@ -2,7 +2,7 @@ from rdflib import URIRef
 
 from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage, PointCoverage
 from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, DateType, MultidimensionalSpatialReferenceType, \
-    RelationType
+    RelationType, UserIdentifierType
 from hs_rdf.utils import to_coverage_value_string, to_coverage_dict
 
 
@@ -164,4 +164,20 @@ def parse_relation(cls, values):
 def parse_relation_rdf(cls, values):
     if "type" in values and "value" in values:
         values[values["type"].name] = values["value"]
+    return values
+
+def group_user_identifiers(cls, values):
+    if "identifiers" not in values:
+        identifiers = {}
+        for identifier in UserIdentifierType:
+            if identifier.name in values and values[identifier.name]:
+                identifiers[identifier] = values[identifier.name]
+        values["identifiers"] = identifiers
+    return values
+
+def split_user_identifiers(cls, values):
+    if "identifiers" in values:
+        identifiers = values["identifiers"]
+        for id_type, id_value in identifiers.items():
+            values[id_type.name] = id_value
     return values

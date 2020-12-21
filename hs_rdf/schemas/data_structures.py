@@ -1,6 +1,9 @@
 from datetime import datetime
+from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, AnyUrl
+
+from hs_rdf.schemas.enums import UserIdentifierType
 
 
 class BaseCoverage(BaseModel):
@@ -56,3 +59,14 @@ class PeriodCoverage(BaseCoverage):
     start: datetime
     end: datetime
     scheme: str = None
+
+
+class User(BaseModel):
+    name: str = None
+    email: str = None
+    url: AnyUrl = None
+    phone: str = None
+    address: str = None
+    organization: str = None
+    website: AnyUrl = None
+    identifiers: Dict[UserIdentifierType, str] = {}
