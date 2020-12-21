@@ -5,7 +5,7 @@ from pydantic.error_wrappers import ValidationError
 
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
-from hs_rdf.schemas.data_structures import PeriodCoverage
+from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage
 from hs_rdf.schemas.enums import VariableType
 from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, Rights
 
@@ -111,3 +111,15 @@ def test_period_constraint_happy_path():
     assert pc.start == start
     assert pc.end == end
     assert pc.name == "hello"
+
+def test_box_constraints_north_south():
+    box_coverage = BoxCoverage(name="asdfsadf", northlimit=42.1505, eastlimit=-84.5739,
+                               projection='WGS 84 EPSG:4326', southlimit=30.282,
+                               units='Decimal Degrees', westlimit=-104.7887)
+
+    try:
+        box_coverage.northlimit = 29
+        assert False, "Should have thrown error"
+    except ValueError as e:
+        assert "North latitude [29.0] must be greater than or equal to South latitude [30.282]" in str(e)
+

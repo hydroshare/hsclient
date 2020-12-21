@@ -3,10 +3,11 @@ from typing import Dict
 
 from pydantic import BaseModel, AnyUrl, Field, root_validator
 
+from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.enums import UserIdentifierType
 
 
-class BaseCoverage(BaseModel):
+class BaseCoverage(BaseMetadata):
 
     def __str__(self):
         return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
@@ -17,15 +18,30 @@ class BaseCoverage(BaseModel):
 class BoxCoverage(BaseCoverage):
     type: str = Field(default="box", const=True)
     name: str = None
+    northlimit: float = Field(gt=-90, lt=90)
+    eastlimit: float = Field(gt=-180, lt=180)
+    southlimit: float = Field(gt=-90, lt=90)
+    westlimit: float = Field(gt=-180, lt=180)
+    units: str
+    projection: str = None
+
+    @root_validator
+    def compare_north_south(cls, values):
+        north, south = values["northlimit"], values["southlimit"]
+        if north < south:
+            raise ValueError(f"North latitude [{north}] must be greater than or equal to South latitude [{south}]")
+        return values
+
+
+class BoxSpatialReference(BoxCoverage):
+    type: str = Field(default="box", const=True)
+    name: str = None
     northlimit: float
     eastlimit: float
     southlimit: float
     westlimit: float
     units: str
     projection: str = None
-
-
-class BoxSpatialReference(BoxCoverage):
     projection_string: str
     projection_string_type: str = None
     datum: str = None
@@ -39,13 +55,19 @@ class MultidimensionalBoxSpatialReference(BoxSpatialReference):
 class PointCoverage(BaseCoverage):
     type: str = Field(default="point", const=True)
     name: str = None
-    east: float
-    north: float
+    east: float = Field(gt=-180, lt=180)
+    north: float = Field(gt=-90, lt=90)
     units: str
     projection: str
 
 
-class PointSpatialReference(PointCoverage):
+class PointSpatialReference(BaseCoverage):
+    type: str = Field(default="point", const=True)
+    name: str = None
+    east: float
+    north: float
+    units: str
+    projection: str
     projection_string: str
     projection_string_type: str = None
     projection_name: str = None
