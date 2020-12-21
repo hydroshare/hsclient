@@ -317,7 +317,7 @@ class Aggregation:
         resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
         return resource_path
 
-    def download(self, save_path):
+    def download(self, save_path=""):
         path = self._resource_path + self.main_file_path + "?zipped=true&aggregation=true"
         path = path.replace('resource', 'django_irods/rest_download')
         return self._hs_session.retrieve_zip(path, save_path=save_path)
