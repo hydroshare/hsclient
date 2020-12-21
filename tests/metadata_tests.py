@@ -8,6 +8,7 @@ from hs_rdf.namespaces import RDF
 from hs_rdf.schemas import load_rdf, rdf_graph
 from rdflib.compare import _squashed_graphs_triples
 
+from hs_rdf.schemas.enums import RelationType
 from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage
 from hs_rdf.utils import to_coverage_dict
 
@@ -44,7 +45,7 @@ def compare_metadatas(new_graph, original_metadata_file):
 
 metadata_files = ['resourcemetadata.xml', 'logan_meta.xml', 'asdf_meta.xml', 'msf_version.refts_meta.xml',
                   'SWE_time_meta.xml', 'test_meta.xml', 'watersheds_meta.xml', 'ODM2_Multi_Site_One_Variable_meta.xml']
-#metadata_files = ['ODM2_Multi_Site_One_Variable_meta.xml']
+#metadata_files = ['resourcemetadata.xml']
 @pytest.mark.parametrize("metadata_file", metadata_files)
 def test_resource_serialization(metadata_file):
     metadata_file = os.path.join('data', 'metadata', metadata_file)
@@ -78,12 +79,23 @@ def test_resource_metadata(res_md):
     assert "another" in res_md.sources
     assert "the source" in res_md.sources
 
-    assert len(res_md.creators) == 2
-    creator = next(x for x in res_md.creators if x.name == "Scott s Black")
-    assert creator
+    assert len(res_md.creators) == 3
+    creator = res_md.creators[0]
+    assert creator.organization == 'Utah State University'
+    assert creator.email == 'jeff.horsburgh@usu.edu'
+    creator = res_md.creators[1]
+    assert not creator.organization
+    assert not creator.email
+    assert creator.name == 'Tseganeh Z. Gichamo'
+    creator = res_md.creators[2]
     assert creator.organization == 'USU'
     assert creator.email == 'scott.black@usu.edu'
-    assert creator.creator_order == 1
+
+    try:
+        res_md.creators = []
+        assert False, "should have thrown exception"
+    except ValueError as e:
+        assert "Creator list must contain at least one creator" in str(e)
 
     assert len(res_md.contributors) == 2
     contributor = next(x for x in res_md.contributors if x.email == "dtarb@usu.edu")
@@ -95,9 +107,9 @@ def test_resource_metadata(res_md):
     assert contributor.ORCID == "https://orcid.org/0000-0002-1998-3479"
     assert contributor.name == "David Tarboton"
 
-    assert len(res_md.relations) == 2
-    assert any(x for x in res_md.relations if x.is_part_of == "https://sadf.com")
-    assert any(x for x in res_md.relations if x.is_copied_from == "https://www.google.com")
+    assert len(res_md.relations) == 3
+    assert any(x for x in res_md.relations if x.value == "https://sadf.com" and x.type == RelationType.isPartOf)
+    assert any(x for x in res_md.relations if x.value == "https://www.google.com" and x.type== RelationType.isCopiedFrom)
 
     assert res_md.rights.rights_statement == "my statement"
     assert res_md.rights.url == "http://studio.bakajo.com"
@@ -123,6 +135,7 @@ def test_resource_metadata(res_md):
     assert res_md.publisher
     assert res_md.publisher.name == "Consortium of Universities for the Advancement of Hydrologic Science, Inc. (CUAHSI)"
     assert res_md.publisher.url == "https://www.cuahsi.org"
+
 
 
 

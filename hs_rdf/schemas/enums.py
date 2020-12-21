@@ -48,7 +48,6 @@ class VariableType(Enum):
 
 
 class RelationType(Enum):
-    isHostedBy = 'The content of this resource is hosted by'
     isCopiedFrom = 'The content of this resource was copied from'
     isPartOf = 'The content of this resource is part of'
     hasPart = 'Has Part'

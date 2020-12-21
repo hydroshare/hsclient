@@ -100,7 +100,6 @@ class RightsInRDF(Rights, RDFBaseModel):
 class Creator(BaseModel):
     name: str = Field(description="The name of a creator", default=None)
 
-    creator_order: PositiveInt = Field(description="the order the creator will appear")
     google_scholar_id: AnyUrl = Field(default=None)
     research_gate_id: AnyUrl = Field(default=None)
     phone: str = Field(default=None)
@@ -115,6 +114,7 @@ class Creator(BaseModel):
 
 
 class CreatorInRDF(Creator, RDFBaseModel):
+    creator_order: PositiveInt
 
     class Config:
         fields = {'name': {"rdf_predicate": HSTERMS.name},

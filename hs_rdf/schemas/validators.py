@@ -50,6 +50,20 @@ def rdf_parse_identifier(cls, value):
         return {"hydroshare_identifier": value}
     return value
 
+def sort_creators(cls, creators):
+    if not creators:
+        raise ValueError("creators list must have at least one creator")
+    if isinstance(next(iter(creators)), dict):
+        for index, creator in enumerate(creators):
+            creator["creator_order"] = index + 1
+        return creators
+    return sorted(creators, key=lambda creator: creator.creator_order)
+
+def creators_not_empty(cls, creators):
+    if len(creators) == 0:
+        raise ValueError("Creator list must contain at least one creator")
+    return creators
+
 def validate_user_url(value):
     """Validate that a URL is a valid URL for a hydroshare user."""
     err_message = '%s is not a valid url for hydroshare user' % value

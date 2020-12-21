@@ -3,6 +3,8 @@ import tempfile
 import os
 
 from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
+from hs_rdf.schemas.enums import RelationType
+from hs_rdf.schemas.fields import Relation, Creator
 
 
 @pytest.fixture()
@@ -28,6 +30,21 @@ def resource(new_resource):
     new_resource.refresh()
     return new_resource
 
+def test_creator_order(new_resource):
+    res = new_resource#hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
+    res.metadata.creators.append(Creator(name="Testing"))
+    res.save()
+    res.refresh()
+    assert res.metadata.creators[0].name == "Administrator, HydroShare"
+    assert res.metadata.creators[1].name == "Testing"
+    reversed = [res.metadata.creators[1], res.metadata.creators[0]]
+    res.metadata.creators = reversed
+    res.save()
+    res.refresh()
+    assert res.metadata.creators[1].name == "Administrator, HydroShare"
+    assert res.metadata.creators[0].name == "Testing"
+
+
 def test_resource_metadata_updating(new_resource):
 
     assert len(new_resource.metadata.subjects) == 0
@@ -36,6 +53,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.title = "resource test"
     new_resource.metadata.additional_metadata = {"key1": "value1", "key2": "value2", "key3": "value3"}
     new_resource.metadata.abstract = "world’s"
+    new_resource.metadata.relations = [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
     new_resource.save()
     new_resource.refresh()
@@ -48,6 +66,8 @@ def test_resource_metadata_updating(new_resource):
     assert new_resource.metadata.additional_metadata["key2"] == "value2"
     assert new_resource.metadata.additional_metadata["key3"] == "value3"
     assert new_resource.metadata.abstract == "world’s"
+
+    assert new_resource.metadata.relations == [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
 def test_system_metadata(new_resource):
 
@@ -168,9 +188,6 @@ def test_delete_file(new_resource):
     new_resource.refresh()
     assert len(new_resource.files) == 0
 
-def test_delete_folder():
-    pass
-
 def test_access_rules(new_resource):
     ap = new_resource.access_permission
     pass
@@ -191,3 +208,11 @@ def test_refresh(resource):
     assert resource._retrieved_metadata is None
     assert resource._parsed_files is None
     assert resource._parsed_aggregations is None
+
+def test_empty_creator(new_resource):
+    new_resource.metadata.creators.clear()
+    try:
+        new_resource.save()
+        assert False, "should have thrown error"
+    except ValueError as e:
+        assert "creators list must have at least one creator" in str(e)
