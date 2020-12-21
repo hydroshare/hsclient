@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from pydantic import BaseModel, AnyUrl
+from pydantic import BaseModel, AnyUrl, Field, root_validator
 
 from hs_rdf.schemas.enums import UserIdentifierType
 
@@ -15,7 +15,7 @@ class BaseCoverage(BaseModel):
 
 
 class BoxCoverage(BaseCoverage):
-    type: str = "box"
+    type: str = Field(default="box", const=True)
     name: str = None
     northlimit: float
     eastlimit: float
@@ -37,7 +37,7 @@ class MultidimensionalBoxSpatialReference(BoxSpatialReference):
 
 
 class PointCoverage(BaseCoverage):
-    type: str = "point"
+    type: str = Field(default="point", const=True)
     name: str = None
     east: float
     north: float
@@ -56,9 +56,16 @@ class MultidimensionalPointSpatialReference(PointSpatialReference):
 
 
 class PeriodCoverage(BaseCoverage):
+    name: str = None
     start: datetime
     end: datetime
-    scheme: str = None
+
+    @root_validator
+    def start_before_end(cls, values):
+        start, end = values["start"], values["end"]
+        if start > end:
+            raise ValueError(f"start date [{start}] is after end date [{end}]")
+        return values
 
 
 class User(BaseModel):

@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from pydantic.error_wrappers import ValidationError
 
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
+from hs_rdf.schemas.data_structures import PeriodCoverage
 from hs_rdf.schemas.enums import VariableType
 from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, Rights
 
@@ -93,3 +94,20 @@ def test_rights():
 
     assert Rights.Other("a statement", "https://www.hydroshare.org") == \
            Rights(statement="a statement", url="https://www.hydroshare.org")
+
+def test_period_constraints_error():
+    start = datetime.now()
+    end = datetime.now() - timedelta(seconds=1)
+    try:
+        PeriodCoverage(start=start, end=end)
+        assert False, "Should have raised error"
+    except ValueError as e:
+        assert f"start date [{start}] is after end date [{end}]" in str(e)
+
+def test_period_constraint_happy_path():
+    start = datetime.now()
+    end = datetime.now() + timedelta(seconds=1)
+    pc = PeriodCoverage(name="hello", start=start, end=end)
+    assert pc.start == start
+    assert pc.end == end
+    assert pc.name == "hello"

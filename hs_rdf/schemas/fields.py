@@ -237,7 +237,7 @@ class ContributorInRDF(RDFBaseModel):
 
 
 class AwardInfo(BaseModel):
-    funding_agency_name: str = Field(default=None)
+    funding_agency_name: str = Field()
     award_title: str = Field(default=None)
     award_number: str = Field(default=None)
     funding_agency_url: HttpUrl = Field(default=None)
