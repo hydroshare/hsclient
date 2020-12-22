@@ -1,4 +1,6 @@
 import os
+from typing import List
+
 import requests
 import getpass
 import tempfile
@@ -8,10 +10,268 @@ from zipfile import ZipFile
 from urllib.parse import urlparse, urlencode
 
 from hs_rdf.schemas import load_rdf, rdf_string
+from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.enums import AggregationType
 from hs_rdf.schemas.fields import User
 from hs_rdf.utils import is_aggregation, main_file_type
 
+
+class File:
+
+    def __init__(self, path, hs_session):
+        self._path = path
+        self._hs_session = hs_session
+
+    @property
+    def path(self) -> str:
+        return str(self._path)
+
+    @property
+    def _hsapi_path(self):
+        return self.path.replace(self.relative_path, "").replace("resource", "hsapi/resource")
+
+    @property
+    def name(self) -> str:
+        return os.path.basename(self.path)
+
+    @property
+    def relative_path(self) -> str:
+        return "data/contents/" + self.path.split('/data/contents/', 1)[1]
+
+    @property
+    def relative_folder(self) -> str:
+        return self.relative_path.rsplit(self.name, 1)[0]
+
+    @property
+    def checksum(self):
+        raise NotImplementedError("TODO")
+
+    def download(self, save_path="") -> str:
+        return self._hs_session.retrieve_file(self.path, save_path)
+
+    def delete(self) -> None:
+        path = self._hsapi_path + "files/" + self.relative_path.split("data/contents/", 1)[1]
+        self._hs_session.delete(path, status_code=200)
+
+    def rename(self, file_name) -> None:
+        """Updates the name of the file to file_name"""
+        rename_path = self._hsapi_path + "functions/move-or-rename/"
+        source_path = self.relative_path
+        target_path = self.relative_folder + file_name
+        self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
+
+    def unzip(self) -> None:
+        if not self.name.endswith(".zip"):
+            raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
+        unzip_path = self._hsapi_path + "functions/unzip/data/contents/{}/".format(self.name)
+        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+
+    def aggregate(self, type: AggregationType) -> None:
+        type_value = type.value
+        if type == AggregationType.SingleFileAggregation:
+            type_value = 'SingleFile'
+        path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type_value + "/"
+        self._hs_session.post(path, status_code=201)
+
+    def __str__(self):
+        return str(self.path)
+
+
+class Aggregation:
+
+    def __init__(self, map_path, hs_session):
+        self._map_path = map_path
+        self._hs_session = hs_session
+        self._retrieved_map = None
+        self._retrieved_metadata = None
+        self._parsed_files = None
+        self._parsed_aggregations = None
+
+    @property
+    def _map(self):
+        if not self._retrieved_map:
+            self._retrieved_map = self._retrieve_and_parse(self._map_path)
+        return self._retrieved_map
+
+    @property
+    def _metadata(self):
+        if not self._retrieved_metadata:
+            self._retrieved_metadata = self._retrieve_and_parse(self.metadata_path)
+        return self._retrieved_metadata
+
+    @property
+    def _files(self):
+        if not self._parsed_files:
+            self._parsed_files = []
+            for file in self._map.describes.files:
+                if not is_aggregation(str(file.path)):
+                    if not file.path == self.metadata_path:
+                        if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
+                            self._parsed_files.append(File(file.path, self._hs_session))
+        return self._parsed_files
+
+    @property
+    def _aggregations(self):
+        if not self._parsed_aggregations:
+            self._parsed_aggregations = []
+            for file in self._map.describes.files:
+                if is_aggregation(str(file.path)):
+                    self._parsed_aggregations.append(Aggregation(file.path, self._hs_session))
+        return self._parsed_aggregations
+
+    def save(self) -> None:
+        metadata_file = self.metadata_path.split("/data/contents/", 1)[1]
+        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        url = self._hsapi_path + "ingest_metadata/"
+        self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
+
+    @property
+    def files(self) -> List[File]:
+        return self._files
+
+    @property
+    def aggregations(self) -> List[BaseMetadata]:
+        return self._aggregations
+
+    @property
+    def metadata(self) -> BaseMetadata:
+        return self._metadata
+
+    @property
+    def metadata_path(self) -> str:
+        return urlparse(str(self._map.describes.is_documented_by)).path
+
+    @property
+    def main_file_path(self) -> str:
+        mft = main_file_type(AggregationType[self.metadata.type])
+        if mft:
+            for file in self.files:
+                if str(file).endswith(mft):
+                    return file.relative_path
+        return self.files[0].relative_path
+
+
+    @property
+    def _hsapi_path(self):
+        hsapi_path = "/hsapi" + self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
+        return hsapi_path
+
+    @property
+    def _resource_path(self):
+        resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
+        return resource_path
+
+    def download(self, save_path: str = "") -> str:
+        path = self._resource_path + self.main_file_path + "?zipped=true&aggregation=true"
+        path = path.replace('resource', 'django_irods/rest_download')
+        return self._hs_session.retrieve_zip(path, save_path=save_path)
+
+    def remove(self) -> None:
+        path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
+        self._hs_session.post(path, status_code=200)
+
+    def delete(self) -> None:
+        path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + \
+               self.main_file_path.split("data/contents")[1] + "/"
+        self._hs_session.delete(path, status_code=200)
+
+    def __str__(self):
+        return self._map_path
+
+    @property
+    def path(self) -> str:
+        return urlparse(str(self.metadata.rdf_subject)).path
+
+    def _retrieve_and_parse(self, path):
+        file_str = self._hs_session.retrieve_string(path)
+        instance = load_rdf(file_str)
+        return instance
+
+    def refresh(self) -> None:
+        self._retrieved_map = None
+        self._retrieved_metadata = None
+        self._parsed_files = None
+        self._parsed_aggregations = None
+
+class Resource(Aggregation):
+
+    @property
+    def _hsapi_path(self):
+        path = urlparse(self.metadata.identifier).path
+        return '/hsapi' + path
+
+    def save(self) -> None:
+        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        path = self._hsapi_path + "/ingest_metadata/"
+        self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
+
+    @property
+    def resource_id(self) -> str:
+        return self._map.identifier
+
+    @property
+    def access_permission(self):
+        path = self._hsapi_path + "/access/"
+        response = self._hs_session.get(path, status_code=200)
+        return response.json()
+
+    def system_metadata(self):
+        hsapi_path = self._hsapi_path + '/sysmeta/'
+        return self._hs_session.get(hsapi_path, status_code=200).json()
+
+    def download(self, save_path: str = "") -> str:
+        # TODO, can we add download links to maps?
+        return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
+
+    def access_rules(self, public: bool):
+        url = self._hsapi_path + "access/"
+        raise NotImplementedError("TODO")
+
+    def create_folder(self, folder: str) -> None:
+        path = self._hsapi_path + "/folders/" + folder + "/"
+        self._hs_session.put(path, status_code=201)
+
+    def create_reference(self, file_name: str, url: str, path: str = '') -> None:
+        request_path = self._hsapi_path.replace(self.resource_id, "") + "data-store-add-reference/"
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
+                                                  "ref_url": url},
+                              status_code=200)
+
+    def update_reference(self, file_name: str, url: str, path: str = '') -> None:
+        request_path = self._hsapi_path.replace(self.resource_id, "") + "data_store_edit_reference_url/"
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
+                                                  "url_filename": file_name, "new_ref_url": url},
+                              status_code=200)
+
+    def delete(self) -> None:
+        """"""
+        hsapi_path = self._hsapi_path
+        self._hs_session.delete(hsapi_path, status_code=204)
+        self.refresh()
+
+    def upload(self, *files: str, dest_relative_path: str ="") -> None:
+        if len(files) == 1:
+            self._upload(files[0], dest_relative_path=dest_relative_path)
+        else:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                zipped_file = os.path.join(tmpdir, 'files.zip')
+                with ZipFile(os.path.join(tmpdir, zipped_file), 'w') as zipped:
+                    for file in files:
+                        zipped.write(file, os.path.basename(file))
+                self._upload(zipped_file, dest_relative_path=dest_relative_path)
+                unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
+                self._hs_session.post(unzip_path)
+
+    def _upload(self, file, dest_relative_path):
+        stripped_path = dest_relative_path.strip("/")
+        stripped_path = stripped_path + "/" if stripped_path else ""
+        path = self._hsapi_path + "/files/" + stripped_path
+        response = self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
+        return response
+
+    def delete_folder(self, folder_path: str) -> None:
+        """Deletes each file within folder_path"""
+        raise NotImplementedError('TODO')
 
 class HydroShareSession:
 
@@ -122,286 +382,29 @@ class HydroShare:
     default_protocol = "http"
     default_port = 8000
 
-    def __init__(self, username=None, password=None, host=default_host, protocol=default_protocol, port=default_port):
+    def __init__(self, username: str = None, password: str = None, host: str = default_host,
+                 protocol: str = default_protocol, port: int = default_port):
         self._hs_session = HydroShareSession(username=username, password=password, host=host, protocol=protocol, port=port)
 
-    def sign_in(self):
+    def sign_in(self) -> None:
         username = input("Username: ").strip()
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
 
     def search(self):
-        pass
+        raise NotImplementedError("TODO")
 
-    def resource(self, resource_id, validate=True):
+    def resource(self, resource_id: str, validate: bool = True) -> Resource:
         return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
             res.metadata
         return res
 
-    def create(self):
+    def create(self) -> Resource:
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
         return self.resource(resource_id)
 
-    def user(self, user_id: int):
+    def user(self, user_id: int) -> User:
         response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
         return User(**response.json())
-
-
-
-class File:
-
-    def __init__(self, path, hs_session):
-        self._path = path
-        self._hs_session = hs_session
-
-    @property
-    def path(self):
-        return str(self._path)
-
-    @property
-    def _hsapi_path(self):
-        return self.path.replace(self.relative_path, "").replace("resource", "hsapi/resource")
-
-    @property
-    def name(self):
-        return os.path.basename(self.path)
-
-    @property
-    def relative_path(self):
-        return "data/contents/" + self.path.split('/data/contents/', 1)[1]
-
-    @property
-    def relative_folder(self):
-        return self.relative_path.rsplit(self.name, 1)[0]
-
-    @property
-    def checksum(self):
-        pass
-
-    def download(self, save_path=""):
-        return self._hs_session.retrieve_file(self.path, save_path)
-
-    def delete(self):
-        path = self._hsapi_path + "files/" + self.relative_path.split("data/contents/", 1)[1]
-        self._hs_session.delete(path, status_code=200)
-
-    def rename(self, file_name):
-        """Updates the name of the file to file_name"""
-        rename_path = self._hsapi_path + "functions/move-or-rename/"
-        source_path = self.relative_path
-        target_path = self.relative_folder + file_name
-        self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
-
-    def unzip(self):
-        if not self.name.endswith(".zip"):
-            raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
-        unzip_path = self._hsapi_path + "functions/unzip/data/contents/{}/".format(self.name)
-        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
-
-    def aggregate(self, type: AggregationType):
-        type_value = type.value
-        if type == AggregationType.SingleFileAggregation:
-            type_value = 'SingleFile'
-        path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type_value + "/"
-        self._hs_session.post(path, status_code=201)
-
-    def __str__(self):
-        return str(self.path)
-
-
-class Aggregation:
-
-    def __init__(self, map_path, hs_session):
-        self._map_path = map_path
-        self._hs_session = hs_session
-        self._retrieved_map = None
-        self._retrieved_metadata = None
-        self._parsed_files = None
-        self._parsed_aggregations = None
-
-    @property
-    def _map(self):
-        if not self._retrieved_map:
-            self._retrieved_map = self._retrieve_and_parse(self._map_path)
-        return self._retrieved_map
-
-    @property
-    def _metadata(self):
-        if not self._retrieved_metadata:
-            self._retrieved_metadata = self._retrieve_and_parse(self.metadata_path)
-        return self._retrieved_metadata
-
-    @property
-    def _files(self):
-        if not self._parsed_files:
-            self._parsed_files = []
-            for file in self._map.describes.files:
-                if not is_aggregation(str(file.path)):
-                    if not file.path == self.metadata_path:
-                        if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
-                            self._parsed_files.append(File(file.path, self._hs_session))
-        return self._parsed_files
-
-    @property
-    def _aggregations(self):
-        if not self._parsed_aggregations:
-            self._parsed_aggregations = []
-            for file in self._map.describes.files:
-                if is_aggregation(str(file.path)):
-                    self._parsed_aggregations.append(Aggregation(file.path, self._hs_session))
-        return self._parsed_aggregations
-
-    def save(self):
-        metadata_file = self.metadata_path.split("/data/contents/", 1)[1]
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
-        url = self._hsapi_path + "ingest_metadata/"
-        self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
-
-    @property
-    def files(self):
-        return self._files
-
-    @property
-    def aggregations(self):
-        return self._aggregations
-
-    @property
-    def metadata(self):
-        return self._metadata
-
-    @property
-    def metadata_path(self):
-        return urlparse(str(self._map.describes.is_documented_by)).path
-
-    @property
-    def main_file_path(self):
-        mft = main_file_type(AggregationType[self.metadata.type])
-        if mft:
-            for file in self.files:
-                if str(file).endswith(mft):
-                    return file.relative_path
-        return self.files[0].relative_path
-
-
-    @property
-    def _hsapi_path(self):
-        hsapi_path = "/hsapi" + self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
-        return hsapi_path
-
-    @property
-    def _resource_path(self):
-        resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
-        return resource_path
-
-    def download(self, save_path=""):
-        path = self._resource_path + self.main_file_path + "?zipped=true&aggregation=true"
-        path = path.replace('resource', 'django_irods/rest_download')
-        return self._hs_session.retrieve_zip(path, save_path=save_path)
-
-    def remove(self):
-        path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
-        self._hs_session.post(path, status_code=200)
-
-    def delete(self):
-        path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + \
-               self.main_file_path.split("data/contents")[1] + "/"
-        self._hs_session.delete(path, status_code=200)
-
-    def __str__(self):
-        return self._map_path
-
-    @property
-    def path(self):
-        return urlparse(str(self.metadata.rdf_subject)).path
-
-    def _retrieve_and_parse(self, path):
-        file_str = self._hs_session.retrieve_string(path)
-        instance = load_rdf(file_str)
-        return instance
-
-    def refresh(self):
-        self._retrieved_map = None
-        self._retrieved_metadata = None
-        self._parsed_files = None
-        self._parsed_aggregations = None
-
-class Resource(Aggregation):
-
-    @property
-    def _hsapi_path(self):
-        path = urlparse(self.metadata.identifier).path
-        return '/hsapi' + path
-
-    def save(self):
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
-        path = self._hsapi_path + "/ingest_metadata/"
-        self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
-
-    @property
-    def resource_id(self):
-        return self._map.identifier
-
-    @property
-    def access_permission(self):
-        path = self._hsapi_path + "/access/"
-        response = self._hs_session.get(path, status_code=200)
-        return response.json()
-
-    def system_metadata(self):
-        hsapi_path = self._hsapi_path + '/sysmeta/'
-        return self._hs_session.get(hsapi_path, status_code=200).json()
-
-    def download(self, save_path=""):
-        # TODO, can we add download links to maps?
-        return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
-
-    def access_rules(self, public):
-        url = self._hsapi_path + "access/"
-
-    def create_folder(self, folder):
-        path = self._hsapi_path + "/folders/" + folder + "/"
-        self._hs_session.put(path, status_code=201)
-
-    def create_reference(self, file_name, url, path=''):
-        request_path = self._hsapi_path.replace(self.resource_id, "") + "data-store-add-reference/"
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
-                                                  "ref_url": url},
-                              status_code=200)
-
-    def update_reference(self, file_name, url, path=''):
-        request_path = self._hsapi_path.replace(self.resource_id, "") + "data_store_edit_reference_url/"
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
-                                                  "url_filename": file_name, "new_ref_url": url},
-                              status_code=200)
-
-    def delete(self):
-        """"""
-        hsapi_path = self._hsapi_path
-        self._hs_session.delete(hsapi_path, status_code=204)
-        self.refresh()
-
-    def upload(self, *files, dest_relative_path=""):
-        if len(files) == 1:
-            self._upload(files[0], dest_relative_path=dest_relative_path)
-        else:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zipped_file = os.path.join(tmpdir, 'files.zip')
-                with ZipFile(os.path.join(tmpdir, zipped_file), 'w') as zipped:
-                    for file in files:
-                        zipped.write(file, os.path.basename(file))
-                self._upload(zipped_file, dest_relative_path=dest_relative_path)
-                unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
-                self._hs_session.post(unzip_path)
-
-    def _upload(self, file, dest_relative_path):
-        stripped_path = dest_relative_path.strip("/")
-        stripped_path = stripped_path + "/" if stripped_path else ""
-        path = self._hsapi_path + "/files/" + stripped_path
-        response = self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
-        return response
-
-    def delete_folder(self, folder_path):
-        """Deletes each file within folder_path"""
-        raise NotImplementedError('TODO')
