@@ -60,7 +60,7 @@ class RelationType(Enum):
 
 class AggregationType(Enum):
 
-    SingleFileAggregation = "SingleFile"
+    SingleFileAggregation = "Generic"
     FileSetAggregation = "FileSet"
     GeographicRasterAggregation = "GeoRaster"
     MultidimensionalAggregation = "NetCDF"
