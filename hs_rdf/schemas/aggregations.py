@@ -3,6 +3,7 @@ from typing import List, Union
 from pydantic import AnyUrl, Field, validator, root_validator
 
 from hs_rdf.schemas.base_models import BaseMetadata
+from hs_rdf.schemas.enums import AggregationType
 from hs_rdf.schemas.fields import BandInformation, CellInformation, FieldInformation, GeometryInformation, Variable, \
     TimeSeriesResult, BoxSpatialReference, MultidimensionalBoxSpatialReference, PointSpatialReference, \
     MultidimensionalPointSpatialReference, PointCoverage, BoxCoverage, PeriodCoverage, Rights
@@ -28,7 +29,7 @@ class BaseAggregationMetadata(BaseMetadata):
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="GeographicRasterAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.GeographicRasterAggregation)
 
     band_information: BandInformation = Field()
     spatial_reference: Union[BoxSpatialReference, PointSpatialReference] = Field(default=None)
@@ -38,7 +39,7 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
 
 
 class GeographicFeatureMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="GeographicFeatureAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.GeographicFeatureAggregation)
 
     field_information: List[FieldInformation] = Field()
     geometry_information: GeometryInformation = Field()
@@ -48,7 +49,7 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
 
 
 class MultidimensionalMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="MultidimensionalAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.MultidimensionalAggregation)
 
     variables: List[Variable] = Field()
     spatial_reference: Union[MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference] = Field(default=None)
@@ -57,18 +58,18 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
 
 
 class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="ReferencedTimeSeriesAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.ReferencedTimeSeriesAggregation)
 
 
 class FileSetMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="FileSetAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.FileSetAggregation)
 
 
 class SingleFileMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="SingleFileAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.SingleFileAggregation)
 
 
 class TimeSeriesMetadata(BaseAggregationMetadata):
-    type: AnyUrl = Field(const=True, default="TimeSeriesAggregation")
+    type: AggregationType = Field(const=True, default=AggregationType.TimeSeriesAggregation)
 
     time_series_results: List[TimeSeriesResult] = Field()

@@ -143,7 +143,7 @@ class Aggregation:
 
     @property
     def main_file_path(self) -> str:
-        mft = main_file_type(AggregationType[self.metadata.type])
+        mft = main_file_type(self.metadata.type)
         if mft:
             for file in self.files:
                 if str(file).endswith(mft):
@@ -167,11 +167,11 @@ class Aggregation:
         return self._hs_session.retrieve_zip(path, save_path=save_path)
 
     def remove(self) -> None:
-        path = self._hsapi_path + "functions/remove-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
+        path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
         self._hs_session.post(path, status_code=200)
 
     def delete(self) -> None:
-        path = self._hsapi_path + "functions/delete-file-type/" + AggregationType[self.metadata.type].value + "LogicalFile" + \
+        path = self._hsapi_path + "functions/delete-file-type/" + self.metadata.type.value + "LogicalFile" + \
                self.main_file_path.split("data/contents")[1] + "/"
         self._hs_session.delete(path, status_code=200)
 
@@ -259,8 +259,8 @@ class Resource(Aggregation):
                     for file in files:
                         zipped.write(file, os.path.basename(file))
                 self._upload(zipped_file, dest_relative_path=dest_relative_path)
-                unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename(file)))
-                self._hs_session.post(unzip_path)
+                unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(os.path.join(dest_relative_path, os.path.basename('files.zip')))
+                self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
 
     def _upload(self, file, dest_relative_path):
         stripped_path = dest_relative_path.strip("/")

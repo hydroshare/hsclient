@@ -236,3 +236,35 @@ def test_user_info(hydroshare):
     assert contributor.email == user.email
     assert contributor.homepage == user.website
     assert contributor.identifiers == user.identifiers
+
+@pytest.mark.parametrize("files",
+                         [["logan1.tif", "logan2.tif", "logan.vrt", "logan_meta.xml"]])
+def test_aggregation_raster(new_resource, files):
+    root_path = "data/test_resource_metadata_files/"
+    new_resource.upload(*[root_path + file for file in files])
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 1
+    assert len(new_resource.files) == 0
+    agg = new_resource.aggregations[0]
+    agg_type = agg.metadata.type
+    assert len(agg.files) == 3
+    agg.remove()
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 0
+    assert len(new_resource.files) == 3
+    main_file = next(f for f in new_resource.files if f.relative_path.endswith(files[0]))
+    assert main_file
+    main_file.aggregate(agg_type)
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 1
+    assert len(new_resource.files) == 0
+    agg = new_resource.aggregations[0]
+    assert len(agg.files) == 3
+    with tempfile.TemporaryDirectory() as tmp:
+        agg.download(tmp)
+        files = os.listdir(tmp)
+        assert len(files) == 1
+    agg.delete()
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 0
+    assert len(new_resource.files) == 0
