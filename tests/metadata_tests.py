@@ -9,7 +9,7 @@ from hs_rdf.schemas import load_rdf, rdf_graph
 from rdflib.compare import _squashed_graphs_triples
 
 from hs_rdf.schemas.enums import RelationType, UserIdentifierType
-from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage, PointCoverage
+from hs_rdf.schemas.fields import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.utils import to_coverage_dict
 
 

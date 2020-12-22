@@ -1,50 +1,16 @@
-import json
 import os
 import requests
-import re
 import getpass
-import zipfile
 import tempfile
 import time
 
 from zipfile import ZipFile
 from urllib.parse import urlparse, urlencode
 
-from enum import Enum
-
 from hs_rdf.schemas import load_rdf, rdf_string
+from hs_rdf.schemas.enums import AggregationType
 from hs_rdf.schemas.fields import User
-from hs_rdf.schemas.resource import ResourceMetadata, ResourceMetadataInRDF
-
-RESOURCE_PATTERN = re.compile('(.*)/resource/([A-z0-9\-_]{32})')
-
-def is_aggregation(path):
-    return path.endswith('#aggregation')
-
-
-class AggregationType(Enum):
-
-    SingleFileAggregation = "SingleFile"
-    FileSetAggregation = "FileSet"
-    GeographicRasterAggregation = "GeoRaster"
-    MultidimensionalAggregation = "NetCDF"
-    GeographicFeatureAggregation = "GeoFeature"
-    ReferencedTimeSeriesAggregation = "RefTimeseries"
-    TimeSeriesAggregation = "TimeSeries"
-
-
-def main_file_type(type: AggregationType):
-    if type == AggregationType.GeographicRasterAggregation:
-        return ".vrt"
-    if type == AggregationType.MultidimensionalAggregation:
-        return ".nc"
-    if type == AggregationType.GeographicFeatureAggregation:
-        return ".shp"
-    if type == AggregationType.ReferencedTimeSeriesAggregation:
-        return ".refts.json"
-    if type == AggregationType.TimeSeriesAggregation:
-        return ".sqlite"
-    return None
+from hs_rdf.utils import is_aggregation, main_file_type
 
 
 class HydroShareSession:
@@ -432,3 +398,4 @@ class Resource(Aggregation):
 
     def delete_folder(self, folder_path):
         """Deletes each file within folder_path"""
+        raise NotImplementedError('TODO')

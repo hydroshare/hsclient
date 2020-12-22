@@ -3,31 +3,23 @@ from enum import Enum
 from hs_rdf.namespaces import DCTERMS, HSTERMS
 
 
-class AnyUrlEnum(str, Enum):
+class StringEnum(str, Enum):
     pass
 
-class CoverageType(AnyUrlEnum):
+class CoverageType(StringEnum):
     period = str(DCTERMS.period)
     box = str(DCTERMS.box)
     point = str(DCTERMS.point)
 
 
-class SpatialReferenceType(AnyUrlEnum):
+class SpatialReferenceType(StringEnum):
     point = str(HSTERMS.point)
     box = str(HSTERMS.box)
 
 
-class MultidimensionalSpatialReferenceType(AnyUrlEnum):
+class MultidimensionalSpatialReferenceType(StringEnum):
     point = str(DCTERMS.point)
     box = str(DCTERMS.box)
-
-
-class DateType(AnyUrlEnum):
-    modified = str(DCTERMS.modified)
-    created = str(DCTERMS.created)
-    valid = str(DCTERMS.valid)
-    available = str(DCTERMS.available)
-    published = str(DCTERMS.published)
 
 
 class VariableType(Enum):
@@ -64,3 +56,22 @@ class RelationType(Enum):
     isDataFor = 'The content of this resource serves as the data for'
     cites = 'This resource cites'
     isDescribedBy = 'This resource is described by'
+
+
+class AggregationType(Enum):
+
+    SingleFileAggregation = "SingleFile"
+    FileSetAggregation = "FileSet"
+    GeographicRasterAggregation = "GeoRaster"
+    MultidimensionalAggregation = "NetCDF"
+    GeographicFeatureAggregation = "GeoFeature"
+    ReferencedTimeSeriesAggregation = "RefTimeseries"
+    TimeSeriesAggregation = "TimeSeries"
+
+
+class DateType(StringEnum):
+    modified = str(DCTERMS.modified)
+    created = str(DCTERMS.created)
+    valid = str(DCTERMS.valid)
+    available = str(DCTERMS.available)
+    published = str(DCTERMS.published)

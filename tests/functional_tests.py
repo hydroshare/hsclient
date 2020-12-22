@@ -2,7 +2,7 @@ import pytest
 import tempfile
 import os
 
-from hs_rdf.implementations.hydroshare import HydroShare, AggregationType
+from hs_rdf.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas.enums import RelationType
 from hs_rdf.schemas.fields import Relation, Creator, Contributor
 

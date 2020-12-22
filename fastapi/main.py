@@ -3,7 +3,9 @@ from fastapi import FastAPI
 
 from hs_rdf.implementations.hydroshare import HydroShare
 from hs_rdf.schemas.enums import CoverageType
-from hs_rdf.schemas.resource import ResourceMetadataInRDF, ResourceMetadata, PointCoverage, BoxCoverage, PeriodCoverage
+from hs_rdf.schemas.resource import ResourceMetadata
+from hs_rdf.schemas.rdf.resource import ResourceMetadataInRDF
+from hs_rdf.schemas.fields import BoxCoverage, PointCoverage, PeriodCoverage
 
 app = FastAPI()
 hs = HydroShare('admin', 'default')

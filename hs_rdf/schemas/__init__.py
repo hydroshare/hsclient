@@ -4,17 +4,16 @@ from enum import Enum
 
 from pydantic import AnyUrl, BaseModel
 from rdflib import Graph, URIRef, Literal
-#from typing import get_args
-
-from hs_rdf.namespaces import ORE, HSTERMS, RDF, XSD, DC, RDFS1
-from hs_rdf.schemas.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadataInRDF, \
-    MultidimensionalMetadataInRDF, \
-    ReferencedTimeSeriesMetadataInRDF, FileSetMetadataInRDF, SingleFileMetadataInRDF, GeographicRasterMetadata, \
+from hs_rdf.namespaces import HSTERMS, RDF, XSD, DC, RDFS1, ORE
+from hs_rdf.schemas.aggregations import GeographicRasterMetadata, \
     GeographicFeatureMetadata, MultidimensionalMetadata, ReferencedTimeSeriesMetadata, FileSetMetadata, \
-    SingleFileMetadata, TimeSeriesMetadataInRDF, TimeSeriesMetadata
-from hs_rdf.schemas.enums import AnyUrlEnum
-from hs_rdf.schemas.resource import ResourceMap, ResourceMetadataInRDF, ResourceMetadata
-
+    SingleFileMetadata, TimeSeriesMetadata
+from hs_rdf.schemas.enums import StringEnum
+from hs_rdf.schemas.rdf.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadataInRDF, \
+    MultidimensionalMetadataInRDF, ReferencedTimeSeriesMetadataInRDF, FileSetMetadataInRDF, SingleFileMetadataInRDF, \
+    TimeSeriesMetadataInRDF
+from hs_rdf.schemas.resource import ResourceMetadata
+from hs_rdf.schemas.rdf.resource import ResourceMap, ResourceMetadataInRDF
 
 rdf_schemas = {ORE.ResourceMap: ResourceMap,
                HSTERMS.CompositeResource: ResourceMetadataInRDF,
@@ -42,7 +41,7 @@ def load_rdf(rdf_str, file_format='xml'):
     for target_class, schema in rdf_schemas.items():
         subject = g.value(predicate=RDF.type, object=target_class)
         if subject:
-            if target_class == ORE.ResourceMap:
+            if target_class == ResourceMap:
                 return _parse(schema, g)
             else:
                 rdf_metadata = _parse(schema, g)
@@ -104,7 +103,7 @@ def _rdf_graph(schema, graph=None):
                         value = Literal(value, datatype=XSD.integer)
                     elif isinstance(value, float):
                         value = Literal(value, datatype=XSD.double)
-                    elif isinstance(value, AnyUrlEnum):
+                    elif isinstance(value, StringEnum):
                         value = URIRef(value.value)
                     elif isinstance(value, Enum):
                         value = Literal(value.value)
