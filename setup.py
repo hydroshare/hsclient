@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='hs_rdf',
     version='0.1',
-    packages=find_packages(include=['hs_rdf', 'hs_rdf.*', 'hs_rdf.rdf.*']),
+    packages=find_packages(include=['hs_rdf', 'hs_rdf.*', 'hs_rdf.schemas.*', 'hs_rdf.schemas.rdf.*']),
     install_requires=[
         'rdflib',
         'requests',
