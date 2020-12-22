@@ -178,7 +178,7 @@ class HydroShare:
         resource_id = response.json()['resource_id']
         return self.resource(resource_id)
 
-    def user(self, user_id):
+    def user(self, user_id: int):
         response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
         return User(**response.json())
 
