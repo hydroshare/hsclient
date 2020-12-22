@@ -33,7 +33,7 @@ class BoxCoverage(BaseCoverage):
         return values
 
 
-class BoxSpatialReference(BoxCoverage):
+class BoxSpatialReference(BaseCoverage):
     type: str = Field(default="box", const=True)
     name: str = None
     northlimit: float

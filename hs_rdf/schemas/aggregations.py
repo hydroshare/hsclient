@@ -6,13 +6,13 @@ from hs_rdf.namespaces import RDF, HSTERMS, DC
 from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.constraints import language_constraint
 from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialReference, \
-    MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
+    MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference, PeriodCoverage, \
+    PointCoverage, BoxCoverage
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
     CoverageInRDF, \
     RightsInRDF, FieldInformation, GeometryInformation, Variable, MultidimensionalSpatialReferenceInRDF, \
     BandInformationInRDF, CellInformationInRDF, FieldInformationInRDF, GeometryInformationInRDF, VariableInRDF, Rights, \
     TimeSeriesResultInRDF, TimeSeriesResult, RDFBaseModel
-from hs_rdf.schemas.resource import BoxCoverage, PointCoverage, PeriodCoverage
 from hs_rdf.schemas.root_validators import parse_coverages, parse_rdf_spatial_reference, rdf_parse_rdf_subject, \
     parse_rdf_extended_metadata, parse_rdf_multidimensional_spatial_reference, split_coverages, parse_url
 from hs_rdf.schemas.validators import parse_spatial_reference, parse_multidimensional_spatial_reference

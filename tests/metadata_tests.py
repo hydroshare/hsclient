@@ -9,7 +9,7 @@ from hs_rdf.schemas import load_rdf, rdf_graph
 from rdflib.compare import _squashed_graphs_triples
 
 from hs_rdf.schemas.enums import RelationType, UserIdentifierType
-from hs_rdf.schemas.resource import PeriodCoverage, BoxCoverage
+from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage, PointCoverage
 from hs_rdf.utils import to_coverage_dict
 
 
@@ -118,8 +118,8 @@ def test_resource_metadata(res_md):
     assert res_md.created == datetime.fromisoformat("2020-07-09T19:12:21.354703+00:00")
     assert res_md.published == datetime.fromisoformat("2020-11-13T18:53:19.778819+00:00")
 
-    assert len(res_md.award_infos) == 2
-    award = next(x for x in res_md.award_infos if x.award_title == "t")
+    assert len(res_md.awards) == 2
+    award = next(x for x in res_md.awards if x.award_title == "t")
     assert award
     assert award.award_number == "n"
     assert award.funding_agency_name == "agency1"
@@ -131,6 +131,12 @@ def test_resource_metadata(res_md):
     res_md.spatial_coverage == BoxCoverage(name="asdfsadf", northlimit=42.1505, eastlimit=-84.5739,
                                            projection='WGS 84 EPSG:4326', southlimit=30.282,
                                            type='box', units='Decimal Degrees', westlimit=-104.7887)
+
+    pc = PointCoverage(name='Logan, Utah', north=41.7371, east=-111.8351,
+                                            projection='WGS 84 EPSG:4326', type='point',
+                                            units='Decimal degrees')
+
+    res_md.spatial_coverage = pc
 
     assert res_md.publisher
     assert res_md.publisher.name == "Consortium of Universities for the Advancement of Hydrologic Science, Inc. (CUAHSI)"

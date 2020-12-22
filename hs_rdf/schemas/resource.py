@@ -89,7 +89,7 @@ class ResourceMetadata(BaseMetadata):
     modified: datetime = Field(default_factory=datetime.now)
     published: datetime = Field(default=None)
     awards: List[AwardInfo] = Field(default=[])
-    spatial_coverage: Union[BoxCoverage, PointCoverage] = Field(default=None)
+    spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(default=None)
     period_coverage: PeriodCoverage = Field(default=None)
     publisher: Publisher = Field(default=None)
     citation: str = Field(default=None, description="blah")
