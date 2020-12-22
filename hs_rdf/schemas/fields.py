@@ -238,8 +238,8 @@ class ContributorInRDF(RDFBaseModel):
 
 class AwardInfo(BaseModel):
     funding_agency_name: str = Field()
-    award_title: str = Field(default=None)
-    award_number: str = Field(default=None)
+    title: str = Field(default=None)
+    number: str = Field(default=None)
     funding_agency_url: AnyUrl = Field(default=None)
 
 
@@ -247,8 +247,8 @@ class AwardInfoInRDF(AwardInfo, RDFBaseModel):
 
     class Config:
         fields = {'funding_agency_name': {"rdf_predicate": HSTERMS.fundingAgencyName},
-                  'award_title': {"rdf_predicate": HSTERMS.awardTitle},
-                  'award_number': {"rdf_predicate": HSTERMS.awardNumber},
+                  'title': {"rdf_predicate": HSTERMS.awardTitle},
+                  'number': {"rdf_predicate": HSTERMS.awardNumber},
                   'funding_agency_url': {"rdf_predicate": HSTERMS.fundingAgencyURL}}
 
 

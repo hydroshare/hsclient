@@ -119,9 +119,9 @@ def test_resource_metadata(res_md):
     assert res_md.published == datetime.fromisoformat("2020-11-13T18:53:19.778819+00:00")
 
     assert len(res_md.awards) == 2
-    award = next(x for x in res_md.awards if x.award_title == "t")
+    award = next(x for x in res_md.awards if x.title == "t")
     assert award
-    assert award.award_number == "n"
+    assert award.number == "n"
     assert award.funding_agency_name == "agency1"
     assert award.funding_agency_url == "https://google.com"
 
