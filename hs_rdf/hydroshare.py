@@ -279,7 +279,7 @@ class Aggregation:
             for file in self.files:
                 if str(file).endswith(mft):
                     return file.relative_path
-        return self.files[0]
+        return self.files[0].relative_path
 
 
     @property
