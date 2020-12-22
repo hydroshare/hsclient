@@ -7,7 +7,8 @@ setup(
     install_requires=[
         'rdflib',
         'requests',
-        'pydantic'
+        'pydantic',
+        'email-validator'
     ],
     url='https://github.com/sblack-usu/hs_rdf',
     license='',

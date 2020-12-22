@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from pydantic import AnyUrl, Field, HttpUrl, BaseModel, PositiveInt, validator, root_validator
+from pydantic import AnyUrl, Field, HttpUrl, BaseModel, PositiveInt, validator, root_validator, EmailStr
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
@@ -29,7 +29,7 @@ class SourceInRDF(RDFBaseModel):
 
 class Relation(BaseModel):
     type: RelationType
-    value: str
+    value: str = Field(max_length=500)
 
     _parse_relation = root_validator(pre=True)(parse_relation)
 
@@ -64,12 +64,12 @@ class ExtendedMetadataInRDF(RDFBaseModel):
 
 
 class CellInformation(BaseModel):
-    name: str = Field()
-    rows: int = Field()
-    columns: int = Field()
-    cell_size_x_value: float = Field()
-    cell_data_type: str = Field()
-    cell_size_y_value: float = Field()
+    name: str = Field(default=None, max_length=500)
+    rows: int = Field(default=None)
+    columns: int = Field(default=None)
+    cell_size_x_value: float = Field(default=None)
+    cell_data_type: str = Field(default=None, max_length=50)
+    cell_size_y_value: float = Field(default=None)
 
 
 class CellInformationInRDF(CellInformation, RDFBaseModel):
@@ -137,12 +137,12 @@ class RightsInRDF(Rights, RDFBaseModel):
 
 
 class Creator(BaseModel):
-    name: str = Field(default=None)
+    name: str = Field(default=None, max_length=100)
 
-    phone: str = Field(default=None)
-    address: str = Field(default=None)
-    organization: str = Field(default=None)
-    email: str = Field(default=None)
+    phone: str = Field(default=None, max_length=25)
+    address: str = Field(default=None, max_length=250)
+    organization: str = Field(default=None, max_length=200)
+    email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
     description: str = Field(max_length=50, default=None)
     identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={})
@@ -167,7 +167,7 @@ class CreatorInRDF(RDFBaseModel):
     phone: str = Field(default=None)
     address: str = Field(default=None)
     organization: str = Field(default=None)
-    email: str = Field(default=None)
+    email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
     description: str = Field(max_length=50, default=None)
     ORCID: AnyUrl = Field(default=None)
@@ -195,7 +195,7 @@ class Contributor(BaseModel):
     phone: str = Field(default=None)
     address: str = Field(default=None)
     organization: str = Field(default=None)
-    email: str = Field(default=None)
+    email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
     identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={})
 
@@ -216,7 +216,7 @@ class ContributorInRDF(RDFBaseModel):
     phone: str = Field(default=None)
     address: str = Field(default=None)
     organization: str = Field(default=None)
-    email: str = Field(default=None)
+    email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
     ORCID: AnyUrl = Field(default=None)
     google_scholar_id: AnyUrl = Field(default=None)
@@ -240,7 +240,7 @@ class AwardInfo(BaseModel):
     funding_agency_name: str = Field()
     award_title: str = Field(default=None)
     award_number: str = Field(default=None)
-    funding_agency_url: HttpUrl = Field(default=None)
+    funding_agency_url: AnyUrl = Field(default=None)
 
 
 class AwardInfoInRDF(AwardInfo, RDFBaseModel):
@@ -253,9 +253,9 @@ class AwardInfoInRDF(AwardInfo, RDFBaseModel):
 
 
 class BandInformation(BaseModel):
-    name: str = Field()
-    variable_name: str = Field(default=None)
-    variable_unit: str = Field(default=None)
+    name: str = Field(max_length=500)
+    variable_name: str = Field(default=None, max_length=100)
+    variable_unit: str = Field(default=None, max_length=50)
 
     no_data_value: str = Field(default=None)
     maximum_value: str = Field(default=None)
@@ -293,9 +293,9 @@ class MultidimensionalSpatialReferenceInRDF(RDFBaseModel):
 
 
 class FieldInformation(BaseModel):
-    field_name: str = Field(default=None)
-    field_type: str = Field(default=None)
-    field_type_code: str = Field(default=None)
+    field_name: str = Field(max_length=128)
+    field_type: str = Field(max_length=128)
+    field_type_code: str = Field(default=None, max_length=50)
     field_width: int = Field(default=None)
     field_precision: int = Field(default=None)
 
@@ -311,8 +311,8 @@ class FieldInformationInRDF(FieldInformation, RDFBaseModel):
 
 
 class GeometryInformation(BaseModel):
-    feature_count: int = Field(default=None)
-    geometry_type: str = Field(default=None)
+    feature_count: int = Field(default=0)
+    geometry_type: str = Field(max_length=128)
 
 
 class GeometryInformationInRDF(GeometryInformation, RDFBaseModel):
@@ -323,13 +323,13 @@ class GeometryInformationInRDF(GeometryInformation, RDFBaseModel):
 
 
 class Variable(BaseModel):
-    name: str = Field()
-    unit: str = Field()
+    name: str = Field(max_length=1000)
+    unit: str = Field(max_length=1000)
     type: VariableType = Field()
-    shape: str = Field()
-    descriptive_name: str = Field(default=None)
+    shape: str = Field(max_length=1000)
+    descriptive_name: str = Field(default=None, max_length=1000)
     method: str = Field(default=None)
-    missing_value: str = Field(default=None)
+    missing_value: str = Field(default=None, max_length=1000)
 
 
 class VariableInRDF(Variable, RDFBaseModel):
@@ -345,7 +345,7 @@ class VariableInRDF(Variable, RDFBaseModel):
 
 
 class Publisher(BaseModel):
-    name: str = Field()
+    name: str = Field(max_length=200)
     url: AnyUrl = Field()
 
 
@@ -357,12 +357,12 @@ class PublisherInRDF(Publisher, RDFBaseModel):
 
 
 class TimeSeriesVariable(BaseModel):
-    variable_code: str = Field()
-    variable_name: str = Field()
-    variable_type: str = Field()
+    variable_code: str = Field(max_length=50)
+    variable_name: str = Field(max_length=100)
+    variable_type: str = Field(max_length=100)
     no_data_value: int = Field()
-    variable_definition: str = Field(default=None)
-    speciation: str = Field(default=None)
+    variable_definition: str = Field(default=None, max_length=255)
+    speciation: str = Field(default=None, max_length=255)
 
 
 class TimeSeriesVariableInRDF(TimeSeriesVariable, RDFBaseModel):
@@ -377,11 +377,11 @@ class TimeSeriesVariableInRDF(TimeSeriesVariable, RDFBaseModel):
 
 
 class TimeSeriesSite(BaseModel):
-    site_code: str = Field()
-    site_name: str = Field(default=None)
+    site_code: str = Field(max_length=200)
+    site_name: str = Field(default=None, max_length=255)
     elevation_m: float = Field(default=None)
-    elevation_datum: str = Field(default=None)
-    site_type: str = Field(default=None)
+    elevation_datum: str = Field(default=None, max_length=50)
+    site_type: str = Field(default=None, max_length=100)
     latitude: float = Field(default=None)
     longitude: float = Field(default=None)
 
@@ -399,9 +399,9 @@ class TimeSeriesSiteInRDF(TimeSeriesSite, RDFBaseModel):
 
 
 class TimeSeriesMethod(BaseModel):
-    method_code: str = Field()
-    method_name: str = Field()
-    method_type: str = Field()
+    method_code: str = Field(max_length=50)
+    method_name: str = Field(max_length=200)
+    method_type: str = Field(max_length=200)
     method_description: str = Field(default=None)
     method_link: AnyUrl = Field(default=None)
 
@@ -417,8 +417,8 @@ class TimeSeriesMethodInRDF(TimeSeriesMethod, RDFBaseModel):
 
 
 class ProcessingLevel(BaseModel):
-    processing_level_code: str = Field()
-    definition: str = Field(default=None)
+    processing_level_code: str = Field(max_length=50)
+    definition: str = Field(default=None, max_length=200)
     explanation: str = Field(default=None)
 
 
@@ -431,9 +431,9 @@ class ProcessingLevelInRDF(ProcessingLevel, RDFBaseModel):
 
 
 class Unit(BaseModel):
-    type: str = Field()
-    name: str = Field()
-    abbreviation: str = Field()
+    type: str = Field(max_length=255)
+    name: str = Field(max_length=255)
+    abbreviation: str = Field(max_length=20)
 
 
 class UnitInRDF(Unit, RDFBaseModel):
@@ -445,7 +445,7 @@ class UnitInRDF(Unit, RDFBaseModel):
 
 
 class UTCOffSet(BaseModel):
-    value: str = Field(rdf_predicate=HSTERMS.value)
+    value: float = Field(default=0)
 
 
 class UTCOffSetInRDF(UTCOffSet, RDFBaseModel):
@@ -455,13 +455,13 @@ class UTCOffSetInRDF(UTCOffSet, RDFBaseModel):
 
 
 class TimeSeriesResult(BaseModel):
-    series_id: str = Field()
+    series_id: str = Field(max_length=36)
     unit: Unit = Field(default=None)
-    status: str = Field(default=None)
-    sample_medium: str = Field()
+    status: str = Field(default=None, max_length=255)
+    sample_medium: str = Field(max_length=255)
     value_count: int = Field()
-    aggregation_statistics: str = Field()
-    series_label: str = Field(default=None)
+    aggregation_statistics: str = Field(max_length=255)
+    series_label: str = Field(default=None, max_length=255)
     site: TimeSeriesSite = Field()
     variable: TimeSeriesVariable = Field()
     method: TimeSeriesMethod = Field()

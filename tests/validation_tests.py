@@ -7,7 +7,7 @@ from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
 from hs_rdf.schemas.data_structures import PeriodCoverage, BoxCoverage
 from hs_rdf.schemas.enums import VariableType
-from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, Rights
+from hs_rdf.schemas.fields import ExtendedMetadataInRDF, DateInRDF, DateType, Variable, Rights, Creator
 
 
 @pytest.fixture()
@@ -122,4 +122,11 @@ def test_box_constraints_north_south():
         assert False, "Should have thrown error"
     except ValueError as e:
         assert "North latitude [29.0] must be greater than or equal to South latitude [30.282]" in str(e)
+
+def test_invalid_email():
+    try:
+        creator = Creator(email="bad")
+        assert False, "Should have thrown error"
+    except ValueError as e:
+        assert "value is not a valid email address" in str(e)
 

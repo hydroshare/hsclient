@@ -4,6 +4,7 @@ from pydantic import AnyUrl, Field, validator, root_validator, BaseModel
 
 from hs_rdf.namespaces import RDF, HSTERMS, DC
 from hs_rdf.schemas.base_models import BaseMetadata
+from hs_rdf.schemas.constraints import language_constraint
 from hs_rdf.schemas.data_structures import BoxSpatialReference, PointSpatialReference, \
     MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference
 from hs_rdf.schemas.fields import BandInformation, SpatialReferenceInRDF, CellInformation, ExtendedMetadataInRDF, \
@@ -122,6 +123,7 @@ class BaseAggregationMetadata(BaseMetadata):
     _parse_additional_metadata = root_validator(pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_url = root_validator(pre=True, allow_reuse=True)(parse_url)
+    _language_constraint = validator('language', allow_reuse=True)(language_constraint)
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):

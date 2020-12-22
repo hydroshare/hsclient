@@ -2,3 +2,4 @@ pytest == 6.0.2
 rdflib == 5.0.0
 requests == 2.24.0
 pydantic == 1.7.2
+email-validator
