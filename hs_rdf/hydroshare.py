@@ -204,7 +204,7 @@ class File:
         type_value = type.value
         if type == AggregationType.SingleFileAggregation:
             type_value = 'SingleFile'
-        path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type.value + "/"
+        path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type_value + "/"
         self._hs_session.post(path, status_code=201)
 
     def __str__(self):
