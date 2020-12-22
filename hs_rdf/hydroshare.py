@@ -275,9 +275,12 @@ class Aggregation:
     @property
     def main_file_path(self):
         mft = main_file_type(AggregationType[self.metadata.type])
-        for file in self.files:
-            if str(file).endswith(mft):
-                return file.relative_path
+        if mft:
+            for file in self.files:
+                if str(file).endswith(mft):
+                    return file.relative_path
+        return self.files[0]
+
 
     @property
     def _hsapi_path(self):
