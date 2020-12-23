@@ -67,11 +67,17 @@ class File:
         self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
 
     def aggregate(self, type: AggregationType) -> None:
+        relative_path = self.relative_path.rsplit("data/contents/", 1)[1]
         type_value = type.value
+        data = {}
         if type == AggregationType.SingleFileAggregation:
             type_value = 'SingleFile'
-        path = self._hsapi_path + "functions/set-file-type/" + self.relative_path.rsplit("data/contents/")[1] + "/" + type_value + "/"
-        self._hs_session.post(path, status_code=201)
+        if type == AggregationType.FileSetAggregation:
+            relative_path = os.path.dirname(relative_path)
+            data = {"folder_path": relative_path}
+
+        path = self._hsapi_path + "functions/set-file-type/" + relative_path + "/" + type_value + "/"
+        self._hs_session.post(path, status_code=201, data=data)
 
     def __str__(self):
         return str(self.path)
@@ -148,8 +154,9 @@ class Aggregation:
             for file in self.files:
                 if str(file).endswith(mft):
                     return file.relative_path
+        if self.metadata.type == AggregationType.FileSetAggregation:
+            return self.files[0].relative_folder.rstrip("/")
         return self.files[0].relative_path
-
 
     @property
     def _hsapi_path(self):
@@ -162,7 +169,8 @@ class Aggregation:
         return resource_path
 
     def download(self, save_path: str = "") -> str:
-        path = self._resource_path + self.main_file_path + "?zipped=true&aggregation=true"
+        main_file_path = self.main_file_path
+        path = self._resource_path + main_file_path + "?zipped=true&aggregation=true"
         path = path.replace('resource', 'django_irods/rest_download')
         return self._hs_session.retrieve_zip(path, save_path=save_path)
 

@@ -237,21 +237,29 @@ def test_user_info(hydroshare):
     assert contributor.homepage == user.website
     assert contributor.identifiers == user.identifiers
 
-@pytest.mark.parametrize("files",
-                         [["logan1.tif", "logan2.tif", "logan.vrt", "logan_meta.xml"]])
-def test_aggregation_raster(new_resource, files):
+@pytest.mark.parametrize("files", [
+    ["logan1.tif", "logan2.tif", "logan.vrt", "logan_resmap.xml", "logan_meta.xml"],
+    ["msf_version.refts.json", "msf_version.refts_resmap.xml", "msf_version.refts_meta.xml"],
+    ["ODM2_Multi_Site_One_Variable.sqlite", "ODM2_Multi_Site_One_Variable_resmap.xml", "ODM2_Multi_Site_One_Variable_meta.xml"],
+    ["SWE_time.nc", "SWE_time_header_info.txt", "SWE_time_resmap.xml", "SWE_time_meta.xml"],
+    ["test.xml", "test_resmap.xml", "test_meta.xml"],
+    ["watersheds.shp", "watersheds.cpg", "watersheds.dbf", "watersheds.prj", "watersheds.sbn", "watersheds.sbx",
+     "watersheds.shx", "watersheds_resmap.xml", "watersheds_meta.xml"]
+])
+def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
+    file_count = len(files) - 2 # exclude rdf/xml file
     new_resource.upload(*[root_path + file for file in files])
     new_resource.refresh()
     assert len(new_resource.aggregations) == 1
     assert len(new_resource.files) == 0
     agg = new_resource.aggregations[0]
     agg_type = agg.metadata.type
-    assert len(agg.files) == 3
+    assert len(agg.files) == file_count
     agg.remove()
     new_resource.refresh()
     assert len(new_resource.aggregations) == 0
-    assert len(new_resource.files) == 3
+    assert len(new_resource.files) == file_count
     main_file = next(f for f in new_resource.files if f.relative_path.endswith(files[0]))
     assert main_file
     main_file.aggregate(agg_type)
@@ -259,7 +267,43 @@ def test_aggregation_raster(new_resource, files):
     assert len(new_resource.aggregations) == 1
     assert len(new_resource.files) == 0
     agg = new_resource.aggregations[0]
-    assert len(agg.files) == 3
+    assert len(agg.files) == file_count
+    with tempfile.TemporaryDirectory() as tmp:
+        agg.download(tmp)
+        files = os.listdir(tmp)
+        assert len(files) == 1
+    agg.delete()
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 0
+    assert len(new_resource.files) == 0
+
+
+@pytest.mark.parametrize("files", [
+    ["asdf/testing.xml", "asdf/asdf_resmap.xml", "asdf/asdf_meta.xml"], # requires hydrosare updates in bag_ingestion_patches
+])
+def test_aggregation_fileset(new_resource, files):
+    root_path = "data/test_resource_metadata_files/"
+    file_count = len(files) - 2 # exclude rdf/xml file
+    new_resource.create_folder("asdf")
+    new_resource.upload(*[root_path + file for file in files], dest_relative_path="asdf")
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 1
+    assert len(new_resource.files) == 0
+    agg = new_resource.aggregations[0]
+    agg_type = agg.metadata.type
+    assert len(agg.files) == file_count
+    agg.remove()
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 0
+    assert len(new_resource.files) == file_count
+    main_file = next(f for f in new_resource.files if f.relative_path.endswith(files[0]))
+    assert main_file
+    main_file.aggregate(agg_type)
+    new_resource.refresh()
+    assert len(new_resource.aggregations) == 1
+    assert len(new_resource.files) == 0
+    agg = new_resource.aggregations[0]
+    assert len(agg.files) == file_count
     with tempfile.TemporaryDirectory() as tmp:
         agg.download(tmp)
         files = os.listdir(tmp)
