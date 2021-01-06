@@ -109,6 +109,7 @@ class Contributor(BaseModel):
     organization: str = Field(default=None)
     email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
+    description: str = Field(max_length=50, default=None)
     identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={})
 
     _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
