@@ -8,7 +8,7 @@ from hs_rdf.namespaces import HSTERMS, RDF, XSD, DC, RDFS1, ORE
 from hs_rdf.schemas.aggregations import GeographicRasterMetadata, \
     GeographicFeatureMetadata, MultidimensionalMetadata, ReferencedTimeSeriesMetadata, FileSetMetadata, \
     SingleFileMetadata, TimeSeriesMetadata
-from hs_rdf.schemas.enums import StringEnum
+from hs_rdf.schemas.enums import TermEnum
 from hs_rdf.schemas.rdf.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadataInRDF, \
     MultidimensionalMetadataInRDF, ReferencedTimeSeriesMetadataInRDF, FileSetMetadataInRDF, SingleFileMetadataInRDF, \
     TimeSeriesMetadataInRDF
@@ -103,7 +103,7 @@ def _rdf_graph(schema, graph=None):
                         value = Literal(value, datatype=XSD.integer)
                     elif isinstance(value, float):
                         value = Literal(value, datatype=XSD.double)
-                    elif isinstance(value, StringEnum):
+                    elif isinstance(value, TermEnum):
                         value = URIRef(value.value)
                     elif isinstance(value, Enum):
                         value = Literal(value.value)

@@ -28,6 +28,7 @@
         <hsterms:organization>Utah State University</hsterms:organization>
         <hsterms:ORCID rdf:resource="https://orcid.org/0000-0002-1998-3479"/>
         <hsterms:name>David Tarboton</hsterms:name>
+        <hsterms:description>/user/2/</hsterms:description>
       </rdf:Description>
     </dc:contributor>
     <dc:rights>
@@ -90,6 +91,7 @@
         <hsterms:email>castronova.anthony@gmail.com</hsterms:email>
         <hsterms:homepage rdf:resource="http://anthonycastronova.com"/>
         <hsterms:ResearchGateID rdf:resource="https://www.researchgate.net/profile/Anthony_Castronova"/>
+        <hsterms:description>/user/11/</hsterms:description>
       </rdf:Description>
     </dc:contributor>
     <dc:description>
@@ -114,6 +116,7 @@
         <hsterms:phone>(435) 797-2946</hsterms:phone>
         <hsterms:ORCID rdf:resource="https://orcid.org/0000-0002-0768-3196"/>
         <hsterms:name>Horsburgh, Jeffery S.</hsterms:name>
+        <hsterms:description>/user/10/</hsterms:description>
       </rdf:Description>
     </dc:creator>
     <dc:creator>
@@ -122,6 +125,7 @@
         <hsterms:email>scott.black@usu.edu</hsterms:email>
         <hsterms:name>Scott s Black</hsterms:name>
         <hsterms:creatorOrder rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</hsterms:creatorOrder>
+        <hsterms:description>/user/2351/</hsterms:description>
       </rdf:Description>
     </dc:creator>
     <dc:creator>

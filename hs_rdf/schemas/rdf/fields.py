@@ -113,6 +113,7 @@ class ContributorInRDF(RDFBaseModel):
     organization: str = Field(default=None)
     email: EmailStr = Field(default=None)
     homepage: HttpUrl = Field(default=None)
+    description: str = Field(max_length=50, default=None)
     ORCID: AnyUrl = Field(default=None)
     google_scholar_id: AnyUrl = Field(default=None)
     research_gate_id: AnyUrl = Field(default=None)
@@ -128,7 +129,8 @@ class ContributorInRDF(RDFBaseModel):
                   'homepage': {"rdf_predicate": HSTERMS.homepage},
                   'ORCID': {"rdf_predicate": HSTERMS.ORCID},
                   'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
-                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID}}
+                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
+                  'description': {"rdf_predicate": HSTERMS.description}}
 
 
 class AwardInfoInRDF(AwardInfo, RDFBaseModel):

@@ -6,18 +6,21 @@ from hs_rdf.namespaces import DCTERMS, HSTERMS
 class StringEnum(str, Enum):
     pass
 
-class CoverageType(StringEnum):
+class TermEnum(StringEnum):
+    pass
+
+class CoverageType(TermEnum):
     period = str(DCTERMS.period)
     box = str(DCTERMS.box)
     point = str(DCTERMS.point)
 
 
-class SpatialReferenceType(StringEnum):
+class SpatialReferenceType(TermEnum):
     point = str(HSTERMS.point)
     box = str(HSTERMS.box)
 
 
-class MultidimensionalSpatialReferenceType(StringEnum):
+class MultidimensionalSpatialReferenceType(TermEnum):
     point = str(DCTERMS.point)
     box = str(DCTERMS.box)
 
@@ -69,7 +72,7 @@ class AggregationType(StringEnum):
     TimeSeriesAggregation = "TimeSeries"
 
 
-class DateType(StringEnum):
+class DateType(TermEnum):
     modified = str(DCTERMS.modified)
     created = str(DCTERMS.created)
     valid = str(DCTERMS.valid)
