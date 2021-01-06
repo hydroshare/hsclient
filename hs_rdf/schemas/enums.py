@@ -22,7 +22,7 @@ class MultidimensionalSpatialReferenceType(StringEnum):
     box = str(DCTERMS.box)
 
 
-class VariableType(Enum):
+class VariableType(StringEnum):
     Char = 'Char'  # 8-bit byte that contains uninterpreted character data
     Byte = 'Byte'  # integer(8bit)
     Short = 'Short'  # signed integer (16bit)
@@ -39,13 +39,13 @@ class VariableType(Enum):
     Unknown = 'Unknown'
 
 
-class UserIdentifierType(Enum):
+class UserIdentifierType(StringEnum):
     google_scholar_id = "GoogleScholarID"
     research_gate_id = "ResearchGateID"
     ORCID = "ORCID"
 
 
-class RelationType(Enum):
+class RelationType(StringEnum):
     isCopiedFrom = 'The content of this resource was copied from'
     isPartOf = 'The content of this resource is part of'
     hasPart = 'Has Part'
@@ -58,7 +58,7 @@ class RelationType(Enum):
     isDescribedBy = 'This resource is described by'
 
 
-class AggregationType(Enum):
+class AggregationType(StringEnum):
 
     SingleFileAggregation = "Generic"
     FileSetAggregation = "FileSet"

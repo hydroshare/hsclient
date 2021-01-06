@@ -1,4 +1,3 @@
-from __future__ import annotations
 from datetime import datetime
 from typing import Dict
 
@@ -94,7 +93,7 @@ class Creator(BaseModel):
     _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
 
     @classmethod
-    def from_user(cls, user: User) -> Creator:
+    def from_user(cls, user: User):
         user_dict = user.dict()
         user_dict["description"] = user.url.path
         if user.website:
@@ -115,7 +114,7 @@ class Contributor(BaseModel):
     _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
 
     @classmethod
-    def from_user(cls, user: User) -> Contributor:
+    def from_user(cls, user: User):
         user_dict = user.dict()
         user_dict["description"] = user.url.path
         if user.website:
