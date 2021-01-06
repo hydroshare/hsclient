@@ -41,39 +41,39 @@ class Rights(BaseModel):
     url: AnyUrl = Field()
 
     @classmethod
-    def Creative_Commons_Attribution_CC_BY(cls) -> Rights:
+    def Creative_Commons_Attribution_CC_BY(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution CC BY.",
                       url="http://creativecommons.org/licenses/by/4.0/")
 
     @classmethod
-    def Creative_Commons_Attribution_ShareAlike_CC_BY(cls) -> Rights:
+    def Creative_Commons_Attribution_ShareAlike_CC_BY(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
                       url="http://creativecommons.org/licenses/by-sa/4.0/")
 
     @classmethod
-    def Creative_Commons_Attribution_NoDerivs_CC_BY_ND(cls) -> Rights:
+    def Creative_Commons_Attribution_NoDerivs_CC_BY_ND(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
                       url="http://creativecommons.org/licenses/by-nd/4.0/")
 
     @classmethod
-    def Creative_Commons_Attribution_NoCommercial_ShareAlike_CC_BY_NC_SA(cls) -> Rights:
+    def Creative_Commons_Attribution_NoCommercial_ShareAlike_CC_BY_NC_SA(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-ShareAlike"
                                 " CC BY-NC-SA.",
                       url="http://creativecommons.org/licenses/by-nc-sa/4.0/")
 
     @classmethod
-    def Creative_Commons_Attribution_NoCommercial_CC_BY_NC(cls) -> Rights:
+    def Creative_Commons_Attribution_NoCommercial_CC_BY_NC(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial CC BY-NC.",
                       url="http://creativecommons.org/licenses/by-nc/4.0/")
 
     @classmethod
-    def Creative_Commons_Attribution_NoCommercial_NoDerivs_CC_BY_NC_ND(cls) -> Rights:
+    def Creative_Commons_Attribution_NoCommercial_NoDerivs_CC_BY_NC_ND(cls):
         return Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-NoDerivs "
                                 "CC BY-NC-ND.",
                       url="http://creativecommons.org/licenses/by-nc-nd/4.0/")
 
     @classmethod
-    def Other(cls, statement: str, url: EmailStr) -> Rights:
+    def Other(cls, statement: str, url: EmailStr):
         return Rights(statement=statement, url=url)
 
 
