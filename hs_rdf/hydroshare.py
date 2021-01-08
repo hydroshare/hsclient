@@ -13,41 +13,49 @@ from hs_rdf.schemas import load_rdf, rdf_string
 from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.enums import AggregationType
 from hs_rdf.schemas.fields import User
-from hs_rdf.utils import is_aggregation, main_file_type
+from hs_rdf.utils import is_aggregation, main_file_type, attribute_filter
 
 
 class File:
 
-    def __init__(self, path, hs_session):
-        self._path = path
+    def __init__(self, url_path, hs_session):
+        self._url_path = url_path
         self._hs_session = hs_session
 
     @property
-    def path(self) -> str:
-        return str(self._path)
+    def url_path(self) -> str:
+        return str(self._url_path)
 
     @property
     def _hsapi_path(self):
-        return self.path.replace(self.relative_path, "").replace("resource", "hsapi/resource")
+        return self.url_path.replace(self.relative_path, "").replace("resource", "hsapi/resource")
 
     @property
     def name(self) -> str:
-        return os.path.basename(self.path)
+        return os.path.basename(self.url_path)
+
+    @property
+    def extension(self) -> str:
+        return os.path.splitext(self.name)[1]
 
     @property
     def relative_path(self) -> str:
-        return "data/contents/" + self.path.split('/data/contents/', 1)[1]
+        return "data/contents/" + self.url_path.split('/data/contents/', 1)[1]
 
     @property
-    def relative_folder(self) -> str:
-        return self.relative_path.rsplit(self.name, 1)[0]
+    def path(self) -> str:
+        return self.url_path.split('/data/contents/', 1)[1]
+
+    @property
+    def folder(self) -> str:
+        return os.path.dirname(self.url_path.split('/data/contents/', 1)[1])
 
     @property
     def checksum(self):
         raise NotImplementedError("TODO")
 
     def download(self, save_path="") -> str:
-        return self._hs_session.retrieve_file(self.path, save_path)
+        return self._hs_session.retrieve_file(self.url_path, save_path)
 
     def delete(self) -> None:
         path = self._hsapi_path + "files/" + self.relative_path.split("data/contents/", 1)[1]
@@ -57,7 +65,7 @@ class File:
         """Updates the name of the file to file_name"""
         rename_path = self._hsapi_path + "functions/move-or-rename/"
         source_path = self.relative_path
-        target_path = self.relative_folder + file_name
+        target_path = self.folder + file_name
         self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
 
     def unzip(self) -> None:
@@ -80,7 +88,7 @@ class File:
         self._hs_session.post(path, status_code=201, data=data)
 
     def __str__(self):
-        return str(self.path)
+        return str(self.url_path)
 
 
 class Aggregation:
@@ -131,13 +139,32 @@ class Aggregation:
         url = self._hsapi_path + "ingest_metadata/"
         self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
 
-    @property
-    def files(self) -> List[File]:
-        return self._files
+    def files(self, search_aggregations=False, **kwargs) -> List[File]:
+        files = self._files
+        for key, value in kwargs.items():
+            files = list(filter(lambda file: attribute_filter(file, key, value), files))
+        if search_aggregations:
+            for aggregation in self.aggregations():
+                files = files + list(aggregation.files(search_aggregations=search_aggregations, **kwargs))
+        return files
 
-    @property
-    def aggregations(self) -> List[BaseMetadata]:
-        return self._aggregations
+    def file(self, search_aggregations=False, **kwargs) -> File:
+        files = self.files(search_aggregations=search_aggregations, **kwargs)
+        if files:
+            return files[0]
+        return None
+
+    def aggregations(self, **kwargs) -> List[BaseMetadata]:
+        aggregations = self._aggregations
+        for key, value in kwargs.items():
+            aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
+        return list(aggregations)
+
+    def aggregation(self, **kwargs) -> File:
+        aggregations = self.aggregations(**kwargs)
+        if aggregations:
+            return aggregations[0]
+        return None
 
     @property
     def metadata(self) -> BaseMetadata:
@@ -151,12 +178,12 @@ class Aggregation:
     def main_file_path(self) -> str:
         mft = main_file_type(self.metadata.type)
         if mft:
-            for file in self.files:
+            for file in self.files():
                 if str(file).endswith(mft):
-                    return file.relative_path
+                    return file.path
         if self.metadata.type == AggregationType.FileSetAggregation:
-            return self.files[0].relative_folder.rstrip("/")
-        return self.files[0].relative_path
+            return self.files()[0].folder#.rstrip("/")
+        return self.files()[0].path
 
     @property
     def _hsapi_path(self):
@@ -170,17 +197,16 @@ class Aggregation:
 
     def download(self, save_path: str = "") -> str:
         main_file_path = self.main_file_path
-        path = self._resource_path + main_file_path + "?zipped=true&aggregation=true"
+        path = self._resource_path + "data/contents/" + main_file_path + "?zipped=true&aggregation=true"
         path = path.replace('resource', 'django_irods/rest_download')
         return self._hs_session.retrieve_zip(path, save_path=save_path)
 
     def remove(self) -> None:
-        path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + self.main_file_path.split("data/contents")[1] + "/"
+        path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + "/" + self.main_file_path + "/"
         self._hs_session.post(path, status_code=200)
 
     def delete(self) -> None:
-        path = self._hsapi_path + "functions/delete-file-type/" + self.metadata.type.value + "LogicalFile" + \
-               self.main_file_path.split("data/contents")[1] + "/"
+        path = self._hsapi_path + "functions/delete-file-type/" + self.metadata.type.value + "LogicalFile" + "/" + self.main_file_path + "/"
         self._hs_session.delete(path, status_code=200)
 
     def __str__(self):
@@ -306,6 +332,8 @@ class HydroShareSession:
             path = "/" + path
         if "?" not in path and not path.endswith("/"):
             path = path + "/"
+        if "?" in path and "/?" not in path:
+            path = path.replace("?", "/?")
         return self.base_url + path
 
     def retrieve_string(self, path):

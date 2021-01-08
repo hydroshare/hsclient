@@ -7,13 +7,13 @@ print(resource.metadata.title)
 
 from pathlib import Path
 for f in resource.files:
-    Path("temp/" + f.relative_folder).mkdir(parents=True, exist_ok=True)
+    Path("temp/" + f.folder).mkdir(parents=True, exist_ok=True)
     f.download("temp/" + f.relative_path)
 
 for agg in resource.aggregations:
     print(agg.metadata.title)
     for f in agg.files:
-        Path("temp/" + f.relative_folder).mkdir(parents=True, exist_ok=True)
+        Path("temp/" + f.folder).mkdir(parents=True, exist_ok=True)
         f.download("temp/" + f.relative_path)
 
 
