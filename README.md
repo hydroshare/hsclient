@@ -2,6 +2,7 @@
 a python client for interacting with HydroShare in an object oriented way.
 
 ## Example:
+
 ```python
 from hs_rdf.implementations.hydroshare import HydroShare
 
@@ -17,9 +18,10 @@ resource = hs.resource('09041bbe8015485db414a4d41b3575db')
 print(resource.metadata.title)
 
 from pathlib import Path
+
 # loop through files not associated with an aggregation
 for f in resource.files:
-    Path("temp/" + f.relative_folder).mkdir(parents=True, exist_ok=True)
+    Path("temp/" + f.folder).mkdir(parents=True, exist_ok=True)
     # download each file to temp and the relative path within the resource
     f.download("temp/" + f.relative_path)
 
@@ -29,7 +31,7 @@ for agg in resource.aggregations:
     print(agg.metadata.title)
     # loop through files in the aggregation
     for f in agg.files:
-        Path("temp/" + f.relative_folder).mkdir(parents=True, exist_ok=True)
+        Path("temp/" + f.folder).mkdir(parents=True, exist_ok=True)
         # download each file to temp and the relative path within the aggregation
         f.download("temp/" + f.relative_path)
 ```

@@ -32,3 +32,25 @@ def main_file_type(type: AggregationType):
     if type == AggregationType.TimeSeriesAggregation:
         return ".sqlite"
     return None
+
+def attribute_filter(o, key, value) -> bool:
+    if isinstance(o, list):
+        if key == "contains":
+            return value in o
+    if isinstance(o, dict):
+        if key == "key":
+            return value in o
+        if key == "value":
+            return value in o.values()
+    if "__" in key:
+        keys = key.split("__", 1)
+        if not hasattr(o, keys[0]):
+            return None
+            # raise AttributeError(f"{o} has no attribute {keys[0]}")
+        o = getattr(o, keys[0])
+        return attribute_filter(o, keys[1], value)
+    if not hasattr(o, key):
+        return None
+        # raise AttributeError(f"{o} has no attribute {key}")
+    attr = getattr(o, key)
+    return attr == value
