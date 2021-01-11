@@ -45,10 +45,12 @@ def attribute_filter(o, key, value) -> bool:
     if "__" in key:
         keys = key.split("__", 1)
         if not hasattr(o, keys[0]):
-            raise AttributeError(f"{o} has no attribute {keys[0]}")
+            return None
+            # raise AttributeError(f"{o} has no attribute {keys[0]}")
         o = getattr(o, keys[0])
         return attribute_filter(o, keys[1], value)
     if not hasattr(o, key):
-        raise AttributeError(f"{o} has no attribute {key}")
+        return None
+        # raise AttributeError(f"{o} has no attribute {key}")
     attr = getattr(o, key)
     return attr == value

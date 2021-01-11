@@ -64,10 +64,19 @@ def test_filtering_aggregations(timeseries_resource):
     assert not timeseries_resource.aggregation(title="bad")
     assert timeseries_resource.aggregation(title="changed from the Little Bear River, UT").metadata.title == "changed from the Little Bear River, UT"
 
-    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name")) == 1
-    assert timeseries_resource.aggregation(period_coverage__name="period_coverage name").metadata.period_coverage.name == "period_coverage name"
+    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name",
+                                                title="changed from the Little Bear River, UT")) == 1
+    assert timeseries_resource.aggregation(period_coverage__name="period_coverage name",
+                                           title="changed from the Little Bear River, UT").metadata.period_coverage.name == "period_coverage name"
+
+    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name",
+                                                title="bad")) == 0
+
     assert not timeseries_resource.aggregation(period_coverage__name="bad")
     assert len(timeseries_resource.aggregations(period_coverage__name="bad")) == 0
+
+    assert len(timeseries_resource.aggregations(bad="does not matter")) == 0
+    assert not timeseries_resource.aggregation(bad="does not matter")
 
 def test_filtering_files(resource):
     resource.create_folder("asdf")
@@ -96,18 +105,21 @@ def test_filtering_files(resource):
     assert len(resource.files(name="testing.xml")) == 1
     assert resource.file(name="testing.xml")
 
+    assert len(resource.files(bad="testing.xml")) == 0
+    assert not resource.file(bad="testing.xml")
+
 def test_creator_order(new_resource):
     res = new_resource#hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
     res.refresh()
-    assert res.metadata.creators[0].name == "Administrator, HydroShare"
+    assert res.metadata.creators[0].name == "Black, Scott s"
     assert res.metadata.creators[1].name == "Testing"
     reversed = [res.metadata.creators[1], res.metadata.creators[0]]
     res.metadata.creators = reversed
     res.save()
     res.refresh()
-    assert res.metadata.creators[1].name == "Administrator, HydroShare"
+    assert res.metadata.creators[1].name == "Black, Scott s"
     assert res.metadata.creators[0].name == "Testing"
 
 def test_resource_metadata_updating(new_resource):
