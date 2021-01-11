@@ -1,10 +1,12 @@
 import os
-from typing import List
+from typing import List, Dict
 
 import requests
 import getpass
 import tempfile
 import time
+import pandas
+import sqlite3
 
 from zipfile import ZipFile
 from urllib.parse import urlparse, urlencode
@@ -195,11 +197,18 @@ class Aggregation:
         resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
         return resource_path
 
-    def download(self, save_path: str = "") -> str:
+    def download(self, save_path: str = "", unzip_to: str = None) -> str:
         main_file_path = self.main_file_path
         path = self._resource_path + "data/contents/" + main_file_path + "?zipped=true&aggregation=true"
         path = path.replace('resource', 'django_irods/rest_download')
-        return self._hs_session.retrieve_zip(path, save_path=save_path)
+        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path)
+        if unzip_to:
+            import zipfile
+            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
+                zip_ref.extractall(unzip_to)
+            os.remove(downloaded_zip)
+            return unzip_to
+        return downloaded_zip
 
     def remove(self) -> None:
         path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + "/" + self.main_file_path + "/"
@@ -226,6 +235,27 @@ class Aggregation:
         self._retrieved_metadata = None
         self._parsed_files = None
         self._parsed_aggregations = None
+
+    def as_series(self, agg_path=None) -> Dict[int, pandas.Series]:
+        def to_series(timeseries_file: str):
+            con = sqlite3.connect(timeseries_file)
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            cur.execute("select ResultID from Results")
+            results = cur.fetchall()
+            series_by_id = {}
+            for result in results:
+                series_by_id[result["ResultID"]] = pandas.read_sql("select * from TimeSeriesResultValues", con).squeeze()
+            return series_by_id
+
+        if agg_path is None:
+            with tempfile.TemporaryDirectory() as td:
+                self.download(unzip_to=td)
+                # zip extracted to folder with main file name
+                file_name = self.file(extension=".sqlite").name
+                return to_series(os.path.join(td, file_name, file_name))
+        return to_series(os.path.join(agg_path, self.file(extension=".sqlite").name))
+
 
 class Resource(Aggregation):
 

@@ -1,6 +1,7 @@
 import pytest
 import tempfile
 import os
+import pandas
 
 from hs_rdf.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas.enums import RelationType
@@ -390,3 +391,13 @@ def test_aggregation_fileset(new_resource, files):
     new_resource.refresh()
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == 0
+
+def test_pandas_series_local(timeseries_resource):
+    timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
+    series_map = timeseries.as_series("data/test_resource_metadata_files")
+    assert len(series_map) == 7
+
+def test_pandas_series_remote(timeseries_resource):
+    timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
+    series_map = timeseries.as_series()
+    assert len(series_map) == 7
