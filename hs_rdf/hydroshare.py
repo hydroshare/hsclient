@@ -160,7 +160,7 @@ class Aggregation:
             aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
         return list(aggregations)
 
-    def aggregation(self, **kwargs) -> File:
+    def aggregation(self, **kwargs) -> BaseMetadata:
         aggregations = self.aggregations(**kwargs)
         if aggregations:
             return aggregations[0]
