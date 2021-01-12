@@ -1,7 +1,6 @@
 import pytest
 import tempfile
 import os
-import pandas
 
 from hs_rdf.hydroshare import HydroShare, AggregationType
 from hs_rdf.schemas.enums import RelationType
@@ -79,6 +78,17 @@ def test_filtering_aggregations(timeseries_resource):
     assert len(timeseries_resource.aggregations(bad="does not matter")) == 0
     assert not timeseries_resource.aggregation(bad="does not matter")
 
+def test_filtering_aggregations_by_files(timeseries_resource):
+    assert len(timeseries_resource.aggregations(file__path="ODM2_Multi_Site_One_Variable.sqlite")) == 1
+    assert timeseries_resource.aggregation(file__path="ODM2_Multi_Site_One_Variable.sqlite")
+    assert len(timeseries_resource.aggregations(files__path="ODM2_Multi_Site_One_Variable.sqlite")) == 1
+    assert timeseries_resource.aggregation(files__path="ODM2_Multi_Site_One_Variable.sqlite")
+
+    assert len(timeseries_resource.aggregations(file__path="No_match.sqlite")) == 0
+    assert not timeseries_resource.aggregation(file__path="No_match.sqlite")
+    assert len(timeseries_resource.aggregations(files__path="No_match.sqlite")) == 0
+    assert not timeseries_resource.aggregation(files__path="No_match.sqlite")
+
 def test_filtering_files(resource):
     resource.create_folder("asdf")
     resource.upload("data/test_resource_metadata_files/asdf/testing.xml", dest_relative_path="asdf")
@@ -114,13 +124,13 @@ def test_creator_order(new_resource):
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
     res.refresh()
-    assert res.metadata.creators[0].name == "Black, Scott s"
+    assert res.metadata.creators[0].name == "Black, Scott S"
     assert res.metadata.creators[1].name == "Testing"
     reversed = [res.metadata.creators[1], res.metadata.creators[0]]
     res.metadata.creators = reversed
     res.save()
     res.refresh()
-    assert res.metadata.creators[1].name == "Black, Scott s"
+    assert res.metadata.creators[1].name == "Black, Scott S"
     assert res.metadata.creators[0].name == "Testing"
 
 def test_resource_metadata_updating(new_resource):

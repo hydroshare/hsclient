@@ -159,7 +159,14 @@ class Aggregation:
     def aggregations(self, **kwargs) -> List[BaseMetadata]:
         aggregations = self._aggregations
         for key, value in kwargs.items():
-            aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
+            if key.startswith('file__'):
+                file_args = {key[len('file__'):]: value}
+                aggregations = [agg for agg in aggregations if agg.files(**file_args)]
+            elif key.startswith('files__'):
+                file_args = {key[len('files__'):]: value}
+                aggregations = [agg for agg in aggregations if agg.files(**file_args)]
+            else:
+                aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
         return list(aggregations)
 
     def aggregation(self, **kwargs) -> BaseMetadata:
@@ -337,6 +344,17 @@ class Resource(Aggregation):
     def delete_folder(self, folder_path: str) -> None:
         """Deletes each file within folder_path"""
         raise NotImplementedError('TODO')
+
+    def move_folder(self, folder_path: str, new_folder_path: str) -> None:
+        raise NotImplementedError('TODO')
+
+    def download_folder(self, folder_path: str) -> None:
+        raise NotImplementedError('TODO')
+
+    def zip(self, path: str) -> None:
+        raise NotImplementedError('TODO')
+
+
 
 class HydroShareSession:
 
