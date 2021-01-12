@@ -449,5 +449,5 @@ def test_folder_download(new_resource):
     new_resource.upload("data/other.txt", dest_relative_path="test_folder")
     new_resource.refresh()
     assert len(new_resource.files()) == 1
-    downloaded_folder = new_resource.download("test_folder")
+    downloaded_folder = new_resource.download(path="test_folder")
     assert downloaded_folder == "test_folder.zip"

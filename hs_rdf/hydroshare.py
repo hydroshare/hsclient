@@ -330,7 +330,7 @@ class Resource(Aggregation):
         path = self._hsapi_path + "/files/" + stripped_path
         self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
 
-    def download(self, path: str = None, save_path: str = "") -> str:
+    def download(self, save_path: str = "", path: str = None) -> str:
         if path is None:
             return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
         else:
