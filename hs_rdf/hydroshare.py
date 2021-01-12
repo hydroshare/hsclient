@@ -291,10 +291,6 @@ class Resource(Aggregation):
         hsapi_path = self._hsapi_path + '/sysmeta/'
         return self._hs_session.get(hsapi_path, status_code=200).json()
 
-    def download(self, save_path: str = "") -> str:
-        # TODO, can we add download links to maps?
-        return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
-
     def access_rules(self, public: bool):
         url = self._hsapi_path + "access/"
         raise NotImplementedError("TODO")
@@ -315,12 +311,6 @@ class Resource(Aggregation):
                                                   "url_filename": file_name, "new_ref_url": url},
                               status_code=200)
 
-    def delete(self) -> None:
-        """"""
-        hsapi_path = self._hsapi_path
-        self._hs_session.delete(hsapi_path, status_code=204)
-        self.refresh()
-
     def upload(self, *files: str, dest_relative_path: str ="") -> None:
         if len(files) == 1:
             self._upload(files[0], dest_relative_path=dest_relative_path)
@@ -338,21 +328,39 @@ class Resource(Aggregation):
         stripped_path = dest_relative_path.strip("/")
         stripped_path = stripped_path + "/" if stripped_path else ""
         path = self._hsapi_path + "/files/" + stripped_path
-        response = self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
-        return response
+        self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
 
-    def delete_folder(self, folder_path: str) -> None:
-        """Deletes each file within folder_path"""
-        raise NotImplementedError('TODO')
+    def download(self, path: str = None, save_path: str = "") -> str:
+        if path is None:
+            return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
+        else:
+            return self._download_file_folder(self._hsapi_path.replace("/hsapi", "") + "/data/contents/" + path, save_path)
 
-    def move_folder(self, folder_path: str, new_folder_path: str) -> None:
-        raise NotImplementedError('TODO')
+    def delete(self, path: str = None) -> None:
+        """"""
+        if path is None:
+            hsapi_path = self._hsapi_path
+            self._hs_session.delete(hsapi_path, status_code=204)
+            self.refresh()
+        else:
+            self._delete_file_folder(path)
 
-    def download_folder(self, folder_path: str) -> None:
-        raise NotImplementedError('TODO')
+    def _download_file_folder(self, path: str, save_path: str) -> None:
+        return self._hs_session.retrieve_zip(path, save_path)
 
-    def zip(self, path: str) -> None:
-        raise NotImplementedError('TODO')
+    def _delete_file_folder(self, path: str) -> None:
+        path = self._hsapi_path + "/folders/" + path
+        self._hs_session.delete(path, status_code=200)
+
+    def rename(self, path: str, new_path: str) -> None:
+        rename_path = self._hsapi_path + "/functions/move-or-rename/"
+        self._hs_session.post(rename_path, status_code=200,
+                              data={"source_path": path, "target_path": new_path})
+
+    def zip(self, path: str, zip_name: str = None, remove_files: bool = True) -> None:
+        zip_name = os.path.basename(path) + ".zip" if not zip_name else zip_name
+        data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_files}
+        self._hs_session.post(self._hsapi_path + "/functions/zip/", status_code=200, data=data)
 
 
 

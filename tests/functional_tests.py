@@ -411,3 +411,43 @@ def test_pandas_series_remote(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
     series_map = timeseries.as_series()
     assert len(series_map) == 7
+
+def test_folder_zip(new_resource):
+    new_resource.create_folder("test_folder")
+    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
+    new_resource.zip("test_folder")
+    new_resource.refresh()
+    assert new_resource.file().path == "test_folder.zip"
+    assert not new_resource.file(path="data/other.txt")
+
+def test_folder_zip_specify_name(new_resource):
+    new_resource.create_folder("test_folder")
+    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
+    new_resource.zip("test_folder", "test.zip", False)
+    new_resource.refresh()
+    assert new_resource.file(path="test.zip").path == "test.zip"
+    assert new_resource.file(path="test_folder/other.txt").path == "test_folder/other.txt"
+
+def test_folder_rename(new_resource):
+    new_resource.create_folder("test_folder")
+    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
+    new_resource.rename("test_folder", "renamed_folder")
+    new_resource.refresh()
+    assert new_resource.file(path="renamed_folder/other.txt")
+
+def test_folder_delete(new_resource):
+    new_resource.create_folder("test_folder")
+    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
+    new_resource.refresh()
+    assert len(new_resource.files()) == 1
+    new_resource.delete("test_folder")
+    new_resource.refresh()
+    assert not new_resource.file()
+
+def test_folder_download(new_resource):
+    new_resource.create_folder("test_folder")
+    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
+    new_resource.refresh()
+    assert len(new_resource.files()) == 1
+    downloaded_folder = new_resource.download("test_folder")
+    assert downloaded_folder == "test_folder.zip"
