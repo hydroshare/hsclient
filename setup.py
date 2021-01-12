@@ -8,7 +8,8 @@ setup(
         'rdflib',
         'requests',
         'pydantic',
-        'email-validator'
+        'email-validator',
+        'pandas'
     ],
     url='https://github.com/sblack-usu/hs_rdf',
     license='',
