@@ -445,9 +445,9 @@ class HydroShareSession:
 
 class HydroShare:
 
-    default_host = 'localhost'
-    default_protocol = "http"
-    default_port = 8000
+    default_host = 'www.hydroshare.org'
+    default_protocol = "https"
+    default_port = 443
 
     def __init__(self, username: str = None, password: str = None, host: str = default_host,
                  protocol: str = default_protocol, port: int = default_port):
