@@ -245,7 +245,8 @@ class Aggregation:
             results = cur.fetchall()
             series_by_id = {}
             for result in results:
-                series_by_id[result["ResultID"]] = pandas.read_sql("select * from TimeSeriesResultValues", con).squeeze()
+                result_id = result["ResultID"]
+                series_by_id[result_id] = pandas.read_sql(f"select * from TimeSeriesResultValues where ResultID={result_id}", con).squeeze()
             return series_by_id
 
         if agg_path is None:
