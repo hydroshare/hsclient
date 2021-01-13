@@ -404,13 +404,13 @@ def test_aggregation_fileset(new_resource, files):
 
 def test_pandas_series_local(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_map = timeseries.as_series("data/test_resource_metadata_files")
-    assert len(series_map) == 7
+    series = timeseries.as_series(timeseries.metadata.time_series_results[0].series_id, "data/test_resource_metadata_files")
+    assert len(series) == 1440
 
 def test_pandas_series_remote(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_map = timeseries.as_series()
-    assert len(series_map) == 7
+    series_map = timeseries.as_series(timeseries.metadata.time_series_results[1].series_id)
+    assert len(series_map) == 1440
 
 def test_folder_zip(new_resource):
     new_resource.create_folder("test_folder")

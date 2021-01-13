@@ -243,18 +243,11 @@ class Aggregation:
         self._parsed_files = None
         self._parsed_aggregations = None
 
-    def as_series(self, agg_path=None) -> Dict[int, pandas.Series]:
+    def as_series(self, series_id: str, agg_path: str = None) -> Dict[int, pandas.Series]:
         def to_series(timeseries_file: str):
             con = sqlite3.connect(timeseries_file)
-            con.row_factory = sqlite3.Row
-            cur = con.cursor()
-            cur.execute("select ResultID from Results")
-            results = cur.fetchall()
-            series_by_id = {}
-            for result in results:
-                result_id = result["ResultID"]
-                series_by_id[result_id] = pandas.read_sql(f"select * from TimeSeriesResultValues where ResultID={result_id}", con).squeeze()
-            return series_by_id
+            return pandas.read_sql(f'SELECT * FROM TimeSeriesResultValues WHERE ResultID IN '
+                                   f'(SELECT ResultID FROM Results WHERE ResultUUID = "{series_id}");', con).squeeze()
 
         if agg_path is None:
             with tempfile.TemporaryDirectory() as td:
