@@ -22,9 +22,8 @@ from hs_rdf.utils import is_aggregation, main_file_type, attribute_filter
 
 class File:
 
-    def __init__(self, url_path, hs_session):
+    def __init__(self, url_path):
         self._url_path = url_path
-        self._hs_session = hs_session
 
     @property
     def url_path(self) -> str:
@@ -57,41 +56,6 @@ class File:
     @property
     def checksum(self):
         raise NotImplementedError("TODO")
-
-    def download(self, save_path: str = "", zipped: bool = False) -> str:
-        if zipped:
-            return self._hs_session.retrieve_zip(self.url_path + "?zipped=True", save_path)
-        return self._hs_session.retrieve_file(self.url_path, save_path)
-
-    def delete(self) -> None:
-        path = self._hsapi_path + "files/" + self.relative_path.split("data/contents/", 1)[1]
-        self._hs_session.delete(path, status_code=200)
-
-    def rename(self, file_name) -> None:
-        """Updates the name of the file to file_name"""
-        rename_path = self._hsapi_path + "functions/move-or-rename/"
-        source_path = self.relative_path
-        target_path = urljoin(self.folder, file_name)
-        self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
-
-    def unzip(self) -> None:
-        if not self.name.endswith(".zip"):
-            raise Exception("File {} is not a zip, and cannot be unzipped".format(self.name))
-        unzip_path = self._hsapi_path + "functions/unzip/data/contents/{}/".format(self.name)
-        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
-
-    def aggregate(self, type: AggregationType) -> None:
-        relative_path = self.relative_path.rsplit("data/contents/", 1)[1]
-        type_value = type.value
-        data = {}
-        if type == AggregationType.SingleFileAggregation:
-            type_value = 'SingleFile'
-        if type == AggregationType.FileSetAggregation:
-            relative_path = os.path.dirname(relative_path)
-            data = {"folder_path": relative_path}
-
-        path = self._hsapi_path + "functions/set-file-type/" + relative_path + "/" + type_value + "/"
-        self._hs_session.post(path, status_code=201, data=data)
 
     def __str__(self):
         return str(self.url_path)
@@ -127,7 +91,7 @@ class Aggregation:
                 if not is_aggregation(str(file.path)):
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
-                            self._parsed_files.append(File(file.path, self._hs_session))
+                            self._parsed_files.append(File(file.path))
         return self._parsed_files
 
     @property
@@ -208,19 +172,6 @@ class Aggregation:
         resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
         return resource_path
 
-    def download(self, save_path: str = "", unzip_to: str = None) -> str:
-        main_file_path = self.main_file_path
-        path = self._resource_path + "data/contents/" + main_file_path + "?zipped=true&aggregation=true"
-        path = path.replace('resource', 'django_irods/rest_download')
-        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path)
-        if unzip_to:
-            import zipfile
-            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
-                zip_ref.extractall(unzip_to)
-            os.remove(downloaded_zip)
-            return unzip_to
-        return downloaded_zip
-
     def remove(self) -> None:
         path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + "/" + self.main_file_path + "/"
         self._hs_session.post(path, status_code=200)
@@ -231,10 +182,6 @@ class Aggregation:
 
     def __str__(self):
         return self._map_path
-
-    @property
-    def path(self) -> str:
-        return urlparse(str(self.metadata.rdf_subject)).path
 
     def _retrieve_and_parse(self, path):
         file_str = self._hs_session.retrieve_string(path)
@@ -327,11 +274,31 @@ class Resource(Aggregation):
         path = self._hsapi_path + "/files/" + stripped_path
         self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
 
-    def download(self, save_path: str = "", path: str = None) -> str:
-        if path is None:
+    def download(self, *files: str, save_path: str = "", aggregation: Aggregation = None, zipped: bool = False, unzip_to: str = None) -> str:
+        if aggregation:
+            return self._download_aggregation(aggregation, save_path=save_path, unzip_to=unzip_to)
+        if len(files) == 0:
             return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
+        if len(files) > 1:
+            raise NotImplementedError("Currently may only download one file at a time, hydroshare needs to be updated to allow for more")
+        file = files[0]
+        if zipped or is_folder(file):
+            return self._hs_session.retrieve_zip(self._resource_path + "data/contents/" + file + "?zipped=True", save_path)
         else:
-            return self._download_file_folder(self._hsapi_path.replace("/hsapi", "") + "/data/contents/" + path, save_path)
+            return self._hs_session.retrieve_file(self._resource_path + "data/contents/" + file, save_path)
+
+    def _download_aggregation(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
+        main_file_path = aggregation.main_file_path
+        path = aggregation._resource_path + "data/contents/" + main_file_path + "?zipped=true&aggregation=true"
+        path = path.replace('resource', 'django_irods/rest_download')
+        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path)
+        if unzip_to:
+            import zipfile
+            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
+                zip_ref.extractall(unzip_to)
+            os.remove(downloaded_zip)
+            return unzip_to
+        return downloaded_zip
 
     def delete(self, path: str = None) -> None:
         """"""
@@ -359,6 +326,28 @@ class Resource(Aggregation):
         data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_files}
         self._hs_session.post(self._hsapi_path + "/functions/zip/", status_code=200, data=data)
 
+    def unzip(self, path: str) -> None:
+        if not path.endswith(".zip"):
+            raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
+        unzip_path = self._hsapi_path + "/functions/unzip/data/contents/{}/".format(path)
+        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+
+    def aggregate(self, path, agg_type: AggregationType) -> None:
+        type_value = agg_type.value
+        data = {}
+        if agg_type == AggregationType.SingleFileAggregation:
+            type_value = 'SingleFile'
+        if agg_type == AggregationType.FileSetAggregation:
+            relative_path = os.path.dirname(path)
+            data = {"folder_path": relative_path}
+
+        path = self._hsapi_path + "/functions/set-file-type/" + path + "/" + type_value + "/"
+        self._hs_session.post(path, status_code=201, data=data)
+
+
+def is_folder(path):
+    """Checks for an extension to determine if the path is to a folder"""
+    return os.path.splitext(path)[1] == ''
 
 
 class HydroShareSession:
@@ -388,7 +377,7 @@ class HydroShareSession:
             path = path + "/"
         if "?" in path and "/?" not in path:
             path = path.replace("?", "/?")
-        return self.base_url + path
+        return encode_resource_url(self.base_url + path)
 
     def retrieve_string(self, path):
         file = self.get(path, status_code=200, allow_redirects=True)
@@ -465,6 +454,18 @@ class HydroShareSession:
                                                                                   response.content))
         return response
 
+def encode_resource_url(url):
+    """
+    URL encodes a full resource file/folder url.
+    :param url: a string url
+    :return: url encoded string
+    """
+    import urllib
+    from urllib.request import pathname2url, url2pathname
+    parsed_url = urllib.parse.urlparse(url)
+    url_encoded_path = pathname2url(parsed_url.path)
+    encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
+    return encoded_url
 
 class HydroShare:
 
