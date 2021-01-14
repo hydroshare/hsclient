@@ -56,7 +56,9 @@ class File:
     def checksum(self):
         raise NotImplementedError("TODO")
 
-    def download(self, save_path="") -> str:
+    def download(self, save_path: str = "", zipped: bool = False) -> str:
+        if zipped:
+            return self._hs_session.retrieve_zip(self.url_path + "?zipped=True", save_path)
         return self._hs_session.retrieve_file(self.url_path, save_path)
 
     def delete(self) -> None:

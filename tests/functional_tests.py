@@ -444,6 +444,12 @@ def test_folder_delete(new_resource):
     new_resource.refresh()
     assert not new_resource.file()
 
+def test_zipped_file_download(resource):
+    with tempfile.TemporaryDirectory() as tmp:
+        bag = resource.file(path="other.txt").download(zipped=True, save_path=tmp)
+        assert os.path.exists(bag)
+        assert bag.endswith(".zip")
+
 def test_folder_download(new_resource):
     new_resource.create_folder("test_folder")
     new_resource.upload("data/other.txt", dest_relative_path="test_folder")
