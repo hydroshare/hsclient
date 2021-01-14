@@ -1,5 +1,6 @@
 import os
 from typing import List, Dict
+from urllib.request import url2pathname
 
 import requests
 import getpass
@@ -10,6 +11,7 @@ import sqlite3
 
 from zipfile import ZipFile
 from urllib.parse import urlparse, urlencode
+from posixpath import join as urljoin
 
 from hs_rdf.schemas import load_rdf, rdf_string
 from hs_rdf.schemas.base_models import BaseMetadata
@@ -26,7 +28,7 @@ class File:
 
     @property
     def url_path(self) -> str:
-        return str(self._url_path)
+        return url2pathname(str(self._url_path))
 
     @property
     def _hsapi_path(self):
@@ -69,7 +71,7 @@ class File:
         """Updates the name of the file to file_name"""
         rename_path = self._hsapi_path + "functions/move-or-rename/"
         source_path = self.relative_path
-        target_path = self.folder + file_name
+        target_path = urljoin(self.folder, file_name)
         self._hs_session.post(rename_path, status_code=200, data={"source_path": source_path, "target_path": target_path})
 
     def unzip(self) -> None:
