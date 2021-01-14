@@ -172,6 +172,21 @@ class Aggregation:
         resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")]
         return resource_path
 
+    def download(self, save_path: str = "", unzip_to: str = None) -> str:
+        main_file_path = self.main_file_path
+
+        path = self._resource_path + "data/contents/" + main_file_path + "?zipped=true&aggregation=true"
+        path = path.replace('resource', 'django_irods/rest_download')
+        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path)
+
+        if unzip_to:
+            import zipfile
+            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
+                zip_ref.extractall(unzip_to)
+                os.remove(downloaded_zip)
+            return unzip_to
+        return downloaded_zip
+
     def remove(self) -> None:
         path = self._hsapi_path + "functions/remove-file-type/" + self.metadata.type.value + "LogicalFile" + "/" + self.main_file_path + "/"
         self._hs_session.post(path, status_code=200)
@@ -307,7 +322,14 @@ class Resource(Aggregation):
             self._hs_session.delete(hsapi_path, status_code=204)
             self.refresh()
         else:
-            self._delete_file_folder(path)
+            if is_folder(path):
+                self._delete_file_folder(path)
+            else:
+                self._delete_file(path)
+
+    def _delete_file(self, path) -> None:
+        path = self._hsapi_path + "/files/" + path
+        self._hs_session.delete(path, status_code=200)
 
     def _download_file_folder(self, path: str, save_path: str) -> None:
         return self._hs_session.retrieve_zip(path, save_path)
