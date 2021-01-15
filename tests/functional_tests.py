@@ -26,7 +26,7 @@ def new_resource(hydroshare):
 def resource(new_resource):
     new_resource.upload("data/georaster_composite.zip")
     new_resource.refresh()
-    new_resource.unzip(new_resource.files()[0].path)
+    new_resource.unzip(new_resource.files()[0])
     new_resource.refresh()
     return new_resource
 
@@ -185,7 +185,7 @@ def test_resource_download(new_resource):
 def test_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
         file = resource.files()[0]
-        downloaded_file = resource.download(file.path, save_path=tmp)
+        downloaded_file = resource.download(file, save_path=tmp)
         assert os.path.exists(downloaded_file)
         assert os.path.basename(downloaded_file) == file.name
 
@@ -222,7 +222,7 @@ def test_file_upload_and_rename(new_resource):
     new_resource.refresh()
     assert len(new_resource.files()) == 1
     file = new_resource.files()[0]
-    new_resource.rename(file.path, "updated.txt")
+    new_resource.rename(file, "updated.txt")
     new_resource.refresh()
     assert new_resource.files()[0].name == "updated.txt"
 
@@ -232,7 +232,7 @@ def test_file_aggregate(new_resource):
     new_resource.upload("data/other.txt", dest_relative_path="folder")
     new_resource.refresh()
     assert len(new_resource.files()) == 1
-    new_resource.aggregate(new_resource.files()[0].path, agg_type=AggregationType.SingleFileAggregation)
+    new_resource.aggregate(new_resource.files()[0], agg_type=AggregationType.SingleFileAggregation)
     new_resource.refresh()
     assert len(new_resource.files()) == 0
     assert len(new_resource.aggregations()) == 1
@@ -248,14 +248,14 @@ def test_create_update_reference(new_resource):
     file = aggregation.files()[0]
     assert file.name == "reference.url"
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(file.path, save_path=tmp)
+        new_resource.download(file, save_path=tmp)
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "http://studio.bakajo.com" in str(f.read())
 
     new_resource.update_reference(new_resource.aggregations()[0].files()[0].name, "https://duckduckgo.com")
 
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(new_resource.aggregations()[0].files()[0].path, save_path=tmp)
+        new_resource.download(new_resource.aggregations()[0].files()[0], save_path=tmp)
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "https://duckduckgo.com" in str(f.read())
 
@@ -264,7 +264,7 @@ def test_file_unzip(new_resource):
     new_resource.refresh()
     assert len(new_resource.files()) == 1
     assert len(new_resource.aggregations()) == 0
-    new_resource.unzip(new_resource.files()[0].path)
+    new_resource.unzip(new_resource.files()[0])
     new_resource.refresh()
     assert len(new_resource.aggregations()) == 1
 
@@ -272,7 +272,7 @@ def test_delete_file(new_resource):
     new_resource.upload("data/other.txt")
     new_resource.refresh()
     assert len(new_resource.files()) == 1
-    new_resource.delete(new_resource.files()[0].path)
+    new_resource.delete(new_resource.files()[0])
     new_resource.refresh()
     assert len(new_resource.files()) == 0
 
@@ -351,11 +351,9 @@ def test_aggregations(new_resource, files):
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
-    new_resource.aggregate(main_file.path, agg_type)
-    new_resource.refresh()
+    agg = new_resource.aggregate(main_file, agg_type)
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
-    agg = new_resource.aggregations()[0]
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
         agg.download(tmp)
@@ -387,11 +385,10 @@ def test_aggregation_fileset(new_resource, files):
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
-    new_resource.aggregate(main_file.path, agg_type=agg_type)
+    agg = new_resource.aggregate(main_file, agg_type=agg_type)
     new_resource.refresh()
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
-    agg = new_resource.aggregations()[0]
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
         agg.download(tmp)
@@ -459,8 +456,9 @@ def test_folder_download(new_resource):
     new_resource.upload("data/other.txt", dest_relative_path="test_folder")
     new_resource.refresh()
     assert len(new_resource.files()) == 1
-    downloaded_folder = new_resource.download("test_folder")
-    assert downloaded_folder == "test_folder.zip"
+    with tempfile.TemporaryDirectory() as td:
+        downloaded_folder = new_resource.download("test_folder", save_path=td)
+        assert os.path.basename(downloaded_folder) == "test_folder.zip"
 
 #@pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
 def test_filename_spaces(hydroshare):
@@ -470,8 +468,9 @@ def test_filename_spaces(hydroshare):
     res.refresh()
     file = res.file(path="with spaces/other.txt")
     assert file
-    res.rename(file.path, "with spaces/with spaces file.txt")
+    res.rename(file, "with spaces/with spaces file.txt")
     res.refresh()
     file = res.file(path="with spaces/with spaces file.txt")
-    filename = res.download(file.path)
-    assert filename == "with spaces file.txt"
+    with tempfile.TemporaryDirectory() as td:
+        filename = res.download(file, save_path=td)
+        assert os.path.basename(filename) == "with spaces file.txt"

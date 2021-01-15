@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict
-from urllib.request import url2pathname
+from urllib.request import url2pathname, pathname2url
 
 import requests
 import getpass
@@ -20,48 +20,50 @@ from hs_rdf.schemas.fields import User
 from hs_rdf.utils import is_aggregation, main_file_type, attribute_filter
 
 
-class File:
+class File(str):
 
-    def __init__(self, url_path):
-        self._url_path = url_path
+    def __new__(cls, value, file_url, checksum):
+        return super(File, cls).__new__(cls, value)
+
+    def __init__(self, value, file_url, checksum):
+        self._file_url = file_url
+        self._checksum = checksum
 
     @property
-    def url_path(self) -> str:
-        return url2pathname(str(self._url_path))
+    def path(self) -> str:
+        return self
 
     @property
     def name(self) -> str:
-        return basename(self.url_path)
+        return basename(self)
 
     @property
     def extension(self) -> str:
         return splitext(self.name)[1]
 
     @property
-    def path(self) -> str:
-        return self.url_path.split('/data/contents/', 1)[1]
-
-    @property
     def folder(self) -> str:
-        return dirname(self.path)
+        return dirname(self)
 
     @property
     def checksum(self):
-        raise NotImplementedError("TODO")
+        return self._checksum
 
-    def __str__(self):
-        return str(self.url_path)
+    @property
+    def url(self):
+        return self._file_url
 
 
 class Aggregation:
 
-    def __init__(self, map_path, hs_session):
+    def __init__(self, map_path, hs_session, checksums=None):
         self._map_path = map_path
         self._hs_session = hs_session
         self._retrieved_map = None
         self._retrieved_metadata = None
         self._parsed_files = None
         self._parsed_aggregations = None
+        self._parsed_checksums = checksums
 
     @property
     def _map(self):
@@ -76,6 +78,12 @@ class Aggregation:
         return self._retrieved_metadata
 
     @property
+    def _checksums(self):
+        if not self._parsed_checksums:
+            self._parsed_checksums = self._retrieve_checksums(self._checksums_path)
+        return self._parsed_checksums
+
+    @property
     def _files(self):
         if not self._parsed_files:
             self._parsed_files = []
@@ -83,7 +91,10 @@ class Aggregation:
                 if not is_aggregation(str(file.path)):
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
-                            self._parsed_files.append(File(file.path))
+                            file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
+                            file_path = url2pathname(file_checksum_path.split("data/contents/",)[1])
+                            f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
+                            self._parsed_files.append(f)
         return self._parsed_files
 
     @property
@@ -92,7 +103,7 @@ class Aggregation:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file.path)):
-                    self._parsed_aggregations.append(Aggregation(file.path, self._hs_session))
+                    self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, self._checksums))
         return self._parsed_aggregations
 
     @property
@@ -148,6 +159,12 @@ class Aggregation:
         return urlparse(str(self._map.describes.is_documented_by)).path
 
     @property
+    def _checksums_path(self):
+        path = self.metadata_path.split("/data/", 1)[0]
+        path = urljoin(path, "manifest-md5.txt")
+        return path
+
+    @property
     def main_file_path(self) -> str:
         mft = main_file_type(self.metadata.type)
         if mft:
@@ -201,11 +218,17 @@ class Aggregation:
         instance = load_rdf(file_str)
         return instance
 
+    def _retrieve_checksums(self, path):
+        file_str = self._hs_session.retrieve_string(path)
+        data = {pathname2url(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)}
+        return data
+
     def refresh(self) -> None:
         self._retrieved_map = None
         self._retrieved_metadata = None
         self._parsed_files = None
         self._parsed_aggregations = None
+        self._parsed_checksums = None
 
     def as_series(self, series_id: str, agg_path: str = None) -> Dict[int, pandas.Series]:
         def to_series(timeseries_file: str):
@@ -345,8 +368,10 @@ class Resource(Aggregation):
             relative_path = dirname(path)
             data = {"folder_path": relative_path}
 
-        path = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
-        self._hs_session.post(path, status_code=201, data=data)
+        url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
+        self._hs_session.post(url, status_code=201, data=data)
+        self.refresh()
+        return self.aggregation(file__path=path)
 
 
 def is_folder(path):
@@ -376,7 +401,7 @@ class HydroShareSession:
 
     def _build_url(self, path: str):
         path = "/" + path.strip("/") + "/"
-        return encode_resource_url(self.base_url + path)
+        return self.base_url + path
 
     def retrieve_string(self, path):
         file = self.get(path, status_code=200, allow_redirects=True)
@@ -420,7 +445,7 @@ class HydroShareSession:
         return self.post(path, files=files, status_code=status_code)
 
     def post(self, path, status_code, data=None, params={}, **kwargs):
-        url = self._build_url(path)
+        url = encode_resource_url(self._build_url(path))
         response = self._session.post(url, params=params, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception("Failed POST {}, status_code {}, message {}".format(url, response.status_code,
@@ -428,7 +453,7 @@ class HydroShareSession:
         return response
 
     def put(self, path, status_code, data=None, **kwargs):
-        url = self._build_url(path)
+        url = encode_resource_url(self._build_url(path))
         response = self._session.put(url, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception("Failed PUT {}, status_code {}, message {}".format(url, response.status_code,
@@ -436,7 +461,7 @@ class HydroShareSession:
         return response
 
     def get(self, path, status_code, **kwargs):
-        url = self._build_url(path)
+        url = encode_resource_url(self._build_url(path))
         response = self._session.get(url, **kwargs)
         if response.status_code != status_code:
             raise Exception("Failed GET {}, status_code {}, message {}".format(url, response.status_code,
@@ -444,7 +469,7 @@ class HydroShareSession:
         return response
 
     def delete(self, path, status_code, **kwargs):
-        url = self._build_url(path)
+        url = encode_resource_url(self._build_url(path))
         response = self._session.delete(url, **kwargs)
         if response.status_code != status_code:
             raise Exception("Failed DELETE {}, status_code {}, message {}".format(url, response.status_code,
@@ -458,7 +483,6 @@ def encode_resource_url(url):
     :return: url encoded string
     """
     import urllib
-    from urllib.request import pathname2url, url2pathname
     parsed_url = urllib.parse.urlparse(url)
     url_encoded_path = pathname2url(parsed_url.path)
     encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
