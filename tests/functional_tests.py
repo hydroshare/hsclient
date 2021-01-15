@@ -193,7 +193,7 @@ def test_aggregation_download(resource):
     assert len(resource.aggregations()) == 1
     agg = resource.aggregations()[0]
     with tempfile.TemporaryDirectory() as tmp:
-        resource.download(aggregation=agg, save_path=tmp)
+        agg.download(tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
         assert files[0] == "logan.vrt.zip"
@@ -272,7 +272,7 @@ def test_delete_file(new_resource):
     new_resource.upload("data/other.txt")
     new_resource.refresh()
     assert len(new_resource.files()) == 1
-    new_resource.delete(new_resource.files()[0])
+    new_resource.delete(new_resource.files()[0].path)
     new_resource.refresh()
     assert len(new_resource.files()) == 0
 
@@ -349,7 +349,7 @@ def test_aggregations(new_resource, files):
     new_resource.refresh()
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == file_count
-    main_file = next(f for f in new_resource.files() if f.relative_path.endswith(files[0]))
+    main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     new_resource.aggregate(main_file.path, agg_type)
     new_resource.refresh()
@@ -358,7 +358,7 @@ def test_aggregations(new_resource, files):
     agg = new_resource.aggregations()[0]
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(aggregation=agg, save_path=tmp)
+        agg.download(tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
     agg.delete()
@@ -385,7 +385,7 @@ def test_aggregation_fileset(new_resource, files):
     new_resource.refresh()
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == file_count
-    main_file = next(f for f in new_resource.files() if f.relative_path.endswith(files[0]))
+    main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     new_resource.aggregate(main_file.path, agg_type=agg_type)
     new_resource.refresh()
@@ -394,7 +394,7 @@ def test_aggregation_fileset(new_resource, files):
     agg = new_resource.aggregations()[0]
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(aggregation=agg, save_path=tmp)
+        agg.download(tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
     agg.delete()
@@ -404,12 +404,16 @@ def test_aggregation_fileset(new_resource, files):
 
 def test_pandas_series_local(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series = timeseries.as_series(timeseries.metadata.time_series_results[0].series_id, "data/test_resource_metadata_files")
-    assert len(series) == 1440
+    series_result = next(
+        r for r in timeseries.metadata.time_series_results if r.series_id == "2837b7d9-1ebc-11e6-a16e-f45c8999816f")
+    series = timeseries.as_series(series_result.series_id, "data/test_resource_metadata_files")
+    assert len(series) == 1333
 
 def test_pandas_series_remote(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_map = timeseries.as_series(timeseries.metadata.time_series_results[1].series_id)
+    series_result = next(
+        r for r in timeseries.metadata.time_series_results if r.series_id == "3b9037f8-1ebc-11e6-a304-f45c8999816f")
+    series_map = timeseries.as_series(series_result.series_id)
     assert len(series_map) == 1440
 
 def test_folder_zip(new_resource):
