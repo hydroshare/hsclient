@@ -93,7 +93,8 @@ class Aggregation:
                         if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
                             file_path = url2pathname(file_checksum_path.split("data/contents/",)[1])
-                            f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
+                            #f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
+                            f = File(file_path, url2pathname(file.path), None)
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -103,7 +104,8 @@ class Aggregation:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file.path)):
-                    self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, self._checksums))
+                    #self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, self._checksums))
+                    self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, None))
         return self._parsed_aggregations
 
     @property
