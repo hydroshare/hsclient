@@ -1,16 +1,18 @@
-import pytest
-import tempfile
 import os
+import tempfile
 
-from hs_rdf.hydroshare import HydroShare, AggregationType
+import pytest
+
+from hs_rdf.hydroshare import AggregationType, HydroShare
 from hs_rdf.schemas.enums import RelationType
-from hs_rdf.schemas.fields import Relation, Creator, Contributor
+from hs_rdf.schemas.fields import Contributor, Creator, Relation
 
 
 @pytest.fixture()
 def hydroshare():
-    hs = HydroShare('admin', 'default')
+    hs = HydroShare('admin', 'default', port=8000, protocol='http', host='localhost')
     return hs
+
 
 @pytest.fixture()
 def new_resource(hydroshare):
@@ -22,18 +24,25 @@ def new_resource(hydroshare):
         # resource already deleted
         pass
 
+
 @pytest.fixture()
 def resource(new_resource):
     new_resource.file_upload("data/georaster_composite.zip")
     new_resource.file_unzip(new_resource.files()[0])
     return new_resource
 
+
 @pytest.fixture()
 def timeseries_resource(new_resource):
-    files = ["ODM2_Multi_Site_One_Variable.sqlite", "ODM2_Multi_Site_One_Variable_resmap.xml", "ODM2_Multi_Site_One_Variable_meta.xml"]
+    files = [
+        "ODM2_Multi_Site_One_Variable.sqlite",
+        "ODM2_Multi_Site_One_Variable_resmap.xml",
+        "ODM2_Multi_Site_One_Variable_meta.xml",
+    ]
     root_path = "data/test_resource_metadata_files/"
     new_resource.file_upload(*[root_path + file for file in files])
     return new_resource
+
 
 def test_filtering_aggregations(timeseries_resource):
     assert len(timeseries_resource.aggregations(type=AggregationType.TimeSeriesAggregation)) == 1
@@ -59,21 +68,34 @@ def test_filtering_aggregations(timeseries_resource):
     assert len(timeseries_resource.aggregations(title="changed from the Little Bear River, UT")) == 1
     assert len(timeseries_resource.aggregations(title="bad")) == 0
     assert not timeseries_resource.aggregation(title="bad")
-    assert timeseries_resource.aggregation(title="changed from the Little Bear River, UT").metadata.title == "changed from the Little Bear River, UT"
+    assert (
+        timeseries_resource.aggregation(title="changed from the Little Bear River, UT").metadata.title
+        == "changed from the Little Bear River, UT"
+    )
 
-    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name",
-                                                title="changed from the Little Bear River, UT")) == 1
-    assert timeseries_resource.aggregation(period_coverage__name="period_coverage name",
-                                           title="changed from the Little Bear River, UT").metadata.period_coverage.name == "period_coverage name"
+    assert (
+        len(
+            timeseries_resource.aggregations(
+                period_coverage__name="period_coverage name", title="changed from the Little Bear River, UT"
+            )
+        )
+        == 1
+    )
+    assert (
+        timeseries_resource.aggregation(
+            period_coverage__name="period_coverage name", title="changed from the Little Bear River, UT"
+        ).metadata.period_coverage.name
+        == "period_coverage name"
+    )
 
-    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name",
-                                                title="bad")) == 0
+    assert len(timeseries_resource.aggregations(period_coverage__name="period_coverage name", title="bad")) == 0
 
     assert not timeseries_resource.aggregation(period_coverage__name="bad")
     assert len(timeseries_resource.aggregations(period_coverage__name="bad")) == 0
 
     assert len(timeseries_resource.aggregations(bad="does not matter")) == 0
     assert not timeseries_resource.aggregation(bad="does not matter")
+
 
 def test_filtering_aggregations_by_files(timeseries_resource):
     assert len(timeseries_resource.aggregations(file__path="ODM2_Multi_Site_One_Variable.sqlite")) == 1
@@ -86,11 +108,14 @@ def test_filtering_aggregations_by_files(timeseries_resource):
     assert len(timeseries_resource.aggregations(files__path="No_match.sqlite")) == 0
     assert not timeseries_resource.aggregation(files__path="No_match.sqlite")
 
+
 def test_filtering_files(resource):
     resource.folder_create("asdf")
     resource.file_upload("data/test_resource_metadata_files/asdf/testing.xml", destination_path="asdf")
     resource.folder_create("referenced_time_series")
-    resource.file_upload("data/test_resource_metadata_files/msf_version.refts.json", destination_path="referenced_time_series")
+    resource.file_upload(
+        "data/test_resource_metadata_files/msf_version.refts.json", destination_path="referenced_time_series"
+    )
 
     assert len(resource.files(search_aggregations=True)) == 6
     assert len(resource.files()) == 2
@@ -115,8 +140,9 @@ def test_filtering_files(resource):
     assert len(resource.files(bad="testing.xml")) == 0
     assert not resource.file(bad="testing.xml")
 
+
 def test_creator_order(new_resource):
-    res = new_resource#hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
+    res = new_resource  # hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
     assert res.metadata.creators[0].name == "Black, Scott S"
@@ -126,6 +152,7 @@ def test_creator_order(new_resource):
     res.save()
     assert res.metadata.creators[1].name == "Black, Scott S"
     assert res.metadata.creators[0].name == "Testing"
+
 
 def test_resource_metadata_updating(new_resource):
 
@@ -150,10 +177,12 @@ def test_resource_metadata_updating(new_resource):
 
     assert new_resource.metadata.relations == [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
+
 def test_system_metadata(new_resource):
 
     sys_metadata = new_resource.system_metadata()
     assert 'date_created' in sys_metadata
+
 
 def test_resource_delete(hydroshare, new_resource):
     res_id = new_resource.resource_id
@@ -163,11 +192,13 @@ def test_resource_delete(hydroshare, new_resource):
     except Exception as e:
         assert str(e) == "failed to retrieve {}".format(res._map_url)
 
+
 def test_files_aggregations(resource):
     assert len(resource.files()) == 1
     assert len(resource.aggregations()) == 1
     assert len(resource.aggregations()[0].files()) == 3
     assert len(resource.aggregations()[0].aggregations()) == 0
+
 
 def test_resource_download(new_resource):
     with tempfile.TemporaryDirectory() as tmp:
@@ -175,12 +206,14 @@ def test_resource_download(new_resource):
         assert os.path.exists(bag)
         assert bag.endswith(".zip")
 
+
 def test_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
         file = resource.files()[0]
         downloaded_file = resource.file_download(file, save_path=tmp)
         assert os.path.exists(downloaded_file)
         assert os.path.basename(downloaded_file) == file.name
+
 
 def test_aggregation_download(resource):
     assert len(resource.aggregations()) == 1
@@ -191,6 +224,7 @@ def test_aggregation_download(resource):
         assert len(files) == 1
         assert files[0] == "logan.vrt.zip"
 
+
 def test_aggregation_delete(resource):
     assert len(resource.aggregations()) == 1
     assert len(resource.files()) == 1
@@ -198,6 +232,7 @@ def test_aggregation_delete(resource):
     resource.aggregation_delete(agg)
     assert len(resource.aggregations()) == 0
     assert len(resource.files()) == 1
+
 
 def test_aggregation_remove(resource):
     assert len(resource.aggregations()) == 1
@@ -207,6 +242,7 @@ def test_aggregation_remove(resource):
     assert len(resource.aggregations()) == 0
     assert len(resource.files()) == 4
 
+
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 0
     new_resource.file_upload("data/other.txt")
@@ -214,6 +250,7 @@ def test_file_upload_and_rename(new_resource):
     file = new_resource.files()[0]
     new_resource.file_rename(file, "updated.txt")
     assert new_resource.files()[0].name == "updated.txt"
+
 
 def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
@@ -224,6 +261,7 @@ def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.aggregations()[0].files()) == 1
+
 
 def test_create_update_reference(new_resource):
     assert len(new_resource.aggregations()) == 0
@@ -245,6 +283,7 @@ def test_create_update_reference(new_resource):
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "https://duckduckgo.com" in str(f.read())
 
+
 def test_file_unzip(new_resource):
     new_resource.file_upload("data/georaster_composite.zip")
     assert len(new_resource.files()) == 1
@@ -252,15 +291,18 @@ def test_file_unzip(new_resource):
     new_resource.file_unzip(new_resource.files()[0])
     assert len(new_resource.aggregations()) == 1
 
+
 def test_delete_file(new_resource):
     new_resource.file_upload("data/other.txt")
     assert len(new_resource.files()) == 1
     new_resource.file_delete(new_resource.files()[0])
     assert len(new_resource.files()) == 0
 
+
 def test_access_rules(new_resource):
     ap = new_resource.access_permission
     pass
+
 
 def test_refresh(resource):
     resource.metadata
@@ -279,6 +321,7 @@ def test_refresh(resource):
     assert resource._parsed_files is None
     assert resource._parsed_aggregations is None
 
+
 def test_empty_creator(new_resource):
     new_resource.metadata.creators.clear()
     try:
@@ -286,6 +329,7 @@ def test_empty_creator(new_resource):
         assert False, "should have thrown error"
     except ValueError as e:
         assert "creators list must have at least one creator" in str(e)
+
 
 def test_user_info(hydroshare):
     user = hydroshare.user(11)
@@ -308,18 +352,35 @@ def test_user_info(hydroshare):
     assert contributor.homepage == user.website
     assert contributor.identifiers == user.identifiers
 
-@pytest.mark.parametrize("files", [
-    ["logan1.tif", "logan2.tif", "logan.vrt", "logan_resmap.xml", "logan_meta.xml"],
-    ["msf_version.refts.json", "msf_version.refts_resmap.xml", "msf_version.refts_meta.xml"],
-    ["ODM2_Multi_Site_One_Variable.sqlite", "ODM2_Multi_Site_One_Variable_resmap.xml", "ODM2_Multi_Site_One_Variable_meta.xml"],
-    ["SWE_time.nc", "SWE_time_header_info.txt", "SWE_time_resmap.xml", "SWE_time_meta.xml"],
-    ["test.xml", "test_resmap.xml", "test_meta.xml"],
-    ["watersheds.shp", "watersheds.cpg", "watersheds.dbf", "watersheds.prj", "watersheds.sbn", "watersheds.sbx",
-     "watersheds.shx", "watersheds_resmap.xml", "watersheds_meta.xml"]
-])
+
+@pytest.mark.parametrize(
+    "files",
+    [
+        ["logan1.tif", "logan2.tif", "logan.vrt", "logan_resmap.xml", "logan_meta.xml"],
+        ["msf_version.refts.json", "msf_version.refts_resmap.xml", "msf_version.refts_meta.xml"],
+        [
+            "ODM2_Multi_Site_One_Variable.sqlite",
+            "ODM2_Multi_Site_One_Variable_resmap.xml",
+            "ODM2_Multi_Site_One_Variable_meta.xml",
+        ],
+        ["SWE_time.nc", "SWE_time_header_info.txt", "SWE_time_resmap.xml", "SWE_time_meta.xml"],
+        ["test.xml", "test_resmap.xml", "test_meta.xml"],
+        [
+            "watersheds.shp",
+            "watersheds.cpg",
+            "watersheds.dbf",
+            "watersheds.prj",
+            "watersheds.sbn",
+            "watersheds.sbx",
+            "watersheds.shx",
+            "watersheds_resmap.xml",
+            "watersheds_meta.xml",
+        ],
+    ],
+)
 def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
-    file_count = len(files) - 2 # exclude rdf/xml file
+    file_count = len(files) - 2  # exclude rdf/xml file
     new_resource.file_upload(*[root_path + file for file in files])
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
@@ -344,12 +405,19 @@ def test_aggregations(new_resource, files):
     assert len(new_resource.files()) == 0
 
 
-@pytest.mark.parametrize("files", [
-    ["asdf/testing.xml", "asdf/asdf_resmap.xml", "asdf/asdf_meta.xml"], # requires hydrosare updates in bag_ingestion_patches
-])
+@pytest.mark.parametrize(
+    "files",
+    [
+        [
+            "asdf/testing.xml",
+            "asdf/asdf_resmap.xml",
+            "asdf/asdf_meta.xml",
+        ],  # requires hydrosare updates in bag_ingestion_patches
+    ],
+)
 def test_aggregation_fileset(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
-    file_count = len(files) - 2 # exclude rdf/xml file
+    file_count = len(files) - 2  # exclude rdf/xml file
     new_resource.folder_create("asdf")
     new_resource.file_upload(*[root_path + file for file in files], destination_path="asdf")
     assert len(new_resource.aggregations()) == 1
@@ -374,19 +442,24 @@ def test_aggregation_fileset(new_resource, files):
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == 0
 
+
 def test_pandas_series_local(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
     series_result = next(
-        r for r in timeseries.metadata.time_series_results if r.series_id == "2837b7d9-1ebc-11e6-a16e-f45c8999816f")
+        r for r in timeseries.metadata.time_series_results if r.series_id == "2837b7d9-1ebc-11e6-a16e-f45c8999816f"
+    )
     series = timeseries.as_series(series_result.series_id, "data/test_resource_metadata_files")
     assert len(series) == 1333
+
 
 def test_pandas_series_remote(timeseries_resource):
     timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
     series_result = next(
-        r for r in timeseries.metadata.time_series_results if r.series_id == "3b9037f8-1ebc-11e6-a304-f45c8999816f")
+        r for r in timeseries.metadata.time_series_results if r.series_id == "3b9037f8-1ebc-11e6-a304-f45c8999816f"
+    )
     series_map = timeseries.as_series(series_result.series_id)
     assert len(series_map) == 1440
+
 
 def test_folder_zip(new_resource):
     new_resource.folder_create("test_folder")
@@ -396,6 +469,7 @@ def test_folder_zip(new_resource):
     assert new_resource.file().path == "test_folder.zip"
     assert not new_resource.file(path="data/other.txt")
 
+
 def test_folder_zip_specify_name(new_resource):
     new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
@@ -403,11 +477,13 @@ def test_folder_zip_specify_name(new_resource):
     assert new_resource.file(path="test.zip").path == "test.zip"
     assert new_resource.file(path="test_folder/other.txt").path == "test_folder/other.txt"
 
+
 def test_folder_rename(new_resource):
     new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
     new_resource.folder_rename("test_folder", "renamed_folder")
     assert new_resource.file(path="renamed_folder/other.txt")
+
 
 def test_folder_delete(new_resource):
     new_resource.folder_create("test_folder")
@@ -416,11 +492,13 @@ def test_folder_delete(new_resource):
     new_resource.folder_delete("test_folder")
     assert not new_resource.file()
 
+
 def test_zipped_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
         bag = resource.file_download(resource.file(path="other.txt").path, zipped=True, save_path=tmp)
         assert os.path.exists(bag)
         assert bag.endswith(".zip")
+
 
 def test_folder_download(new_resource):
     new_resource.folder_create("test_folder")
@@ -430,7 +508,8 @@ def test_folder_download(new_resource):
         downloaded_folder = new_resource.folder_download("test_folder", save_path=td)
         assert os.path.basename(downloaded_folder) == "test_folder.zip"
 
-#@pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
+
+# @pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
 def test_filename_spaces(hydroshare):
     res = hydroshare.create()
     res.folder_create("with spaces")

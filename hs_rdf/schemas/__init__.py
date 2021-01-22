@@ -3,36 +3,53 @@ from datetime import datetime
 from enum import Enum
 
 from pydantic import AnyUrl, BaseModel
-from rdflib import Graph, URIRef, Literal
-from hs_rdf.namespaces import HSTERMS, RDF, XSD, DC, RDFS1, ORE
-from hs_rdf.schemas.aggregations import GeographicRasterMetadata, \
-    GeographicFeatureMetadata, MultidimensionalMetadata, ReferencedTimeSeriesMetadata, FileSetMetadata, \
-    SingleFileMetadata, TimeSeriesMetadata
+from rdflib import Graph, Literal, URIRef
+
+from hs_rdf.namespaces import DC, HSTERMS, ORE, RDF, RDFS1, XSD
+from hs_rdf.schemas.aggregations import (
+    FileSetMetadata,
+    GeographicFeatureMetadata,
+    GeographicRasterMetadata,
+    MultidimensionalMetadata,
+    ReferencedTimeSeriesMetadata,
+    SingleFileMetadata,
+    TimeSeriesMetadata,
+)
 from hs_rdf.schemas.enums import TermEnum
-from hs_rdf.schemas.rdf.aggregations import GeographicRasterMetadataInRDF, GeographicFeatureMetadataInRDF, \
-    MultidimensionalMetadataInRDF, ReferencedTimeSeriesMetadataInRDF, FileSetMetadataInRDF, SingleFileMetadataInRDF, \
-    TimeSeriesMetadataInRDF
-from hs_rdf.schemas.resource import ResourceMetadata
+from hs_rdf.schemas.rdf.aggregations import (
+    FileSetMetadataInRDF,
+    GeographicFeatureMetadataInRDF,
+    GeographicRasterMetadataInRDF,
+    MultidimensionalMetadataInRDF,
+    ReferencedTimeSeriesMetadataInRDF,
+    SingleFileMetadataInRDF,
+    TimeSeriesMetadataInRDF,
+)
 from hs_rdf.schemas.rdf.resource import ResourceMap, ResourceMetadataInRDF
+from hs_rdf.schemas.resource import ResourceMetadata
 
-rdf_schemas = {ORE.ResourceMap: ResourceMap,
-               HSTERMS.CompositeResource: ResourceMetadataInRDF,
-               HSTERMS.GeographicRasterAggregation: GeographicRasterMetadataInRDF,
-               HSTERMS.GeographicFeatureAggregation: GeographicFeatureMetadataInRDF,
-               HSTERMS.MultidimensionalAggregation: MultidimensionalMetadataInRDF,
-               HSTERMS.ReferencedTimeSeriesAggregation: ReferencedTimeSeriesMetadataInRDF,
-               HSTERMS.FileSetAggregation: FileSetMetadataInRDF,
-               HSTERMS.SingleFileAggregation: SingleFileMetadataInRDF,
-               HSTERMS.TimeSeriesAggregation: TimeSeriesMetadataInRDF}
+rdf_schemas = {
+    ORE.ResourceMap: ResourceMap,
+    HSTERMS.CompositeResource: ResourceMetadataInRDF,
+    HSTERMS.GeographicRasterAggregation: GeographicRasterMetadataInRDF,
+    HSTERMS.GeographicFeatureAggregation: GeographicFeatureMetadataInRDF,
+    HSTERMS.MultidimensionalAggregation: MultidimensionalMetadataInRDF,
+    HSTERMS.ReferencedTimeSeriesAggregation: ReferencedTimeSeriesMetadataInRDF,
+    HSTERMS.FileSetAggregation: FileSetMetadataInRDF,
+    HSTERMS.SingleFileAggregation: SingleFileMetadataInRDF,
+    HSTERMS.TimeSeriesAggregation: TimeSeriesMetadataInRDF,
+}
 
-user_schemas = {ResourceMetadataInRDF: ResourceMetadata,
-                GeographicRasterMetadataInRDF: GeographicRasterMetadata,
-                GeographicFeatureMetadataInRDF: GeographicFeatureMetadata,
-                MultidimensionalMetadataInRDF: MultidimensionalMetadata,
-                ReferencedTimeSeriesMetadataInRDF: ReferencedTimeSeriesMetadata,
-                FileSetMetadataInRDF: FileSetMetadata,
-                SingleFileMetadataInRDF: SingleFileMetadata,
-                TimeSeriesMetadataInRDF: TimeSeriesMetadata}
+user_schemas = {
+    ResourceMetadataInRDF: ResourceMetadata,
+    GeographicRasterMetadataInRDF: GeographicRasterMetadata,
+    GeographicFeatureMetadataInRDF: GeographicFeatureMetadata,
+    MultidimensionalMetadataInRDF: MultidimensionalMetadata,
+    ReferencedTimeSeriesMetadataInRDF: ReferencedTimeSeriesMetadata,
+    FileSetMetadataInRDF: FileSetMetadata,
+    SingleFileMetadataInRDF: SingleFileMetadata,
+    TimeSeriesMetadataInRDF: TimeSeriesMetadata,
+}
 
 
 def load_rdf(rdf_str, file_format='xml'):
@@ -77,8 +94,10 @@ def _rdf_fields(schema):
                     predicate = config_field_info.get('rdf_predicate', None)
             if not predicate:
                 raise Exception(
-                    "Schema configuration error for {}, all fields must specify a rdf_predicate".format(schema))
+                    "Schema configuration error for {}, all fields must specify a rdf_predicate".format(schema)
+                )
             yield f, predicate
+
 
 def _rdf_graph(schema, graph=None):
     for f, predicate in _rdf_fields(schema):
@@ -119,8 +138,10 @@ def _rdf_graph(schema, graph=None):
         graph.add((URIRef(str(schema.rdf_type)), RDFS1.isDefinedBy, URIRef("https://www.hydroshare.org/terms/")))
     return graph
 
+
 def get_args(t):
     return getattr(t, "__args__", None)
+
 
 def _parse(schema, metadata_graph, subject=None):
     def nested_class(field):

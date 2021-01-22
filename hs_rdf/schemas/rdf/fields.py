@@ -1,14 +1,28 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field, AnyUrl, root_validator, PositiveInt, EmailStr, HttpUrl
+from pydantic import AnyUrl, BaseModel, EmailStr, Field, HttpUrl, PositiveInt, root_validator
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
-from hs_rdf.namespaces import RDFS, HSTERMS, DCTERMS, RDF
-from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, MultidimensionalSpatialReferenceType, DateType
-from hs_rdf.schemas.fields import CellInformation, Rights, AwardInfo, BandInformation, FieldInformation, \
-    GeometryInformation, Variable, Publisher, TimeSeriesVariable, TimeSeriesSite, TimeSeriesMethod, ProcessingLevel, \
-    Unit, UTCOffSet, TimeSeriesResult
+from hs_rdf.namespaces import DCTERMS, HSTERMS, RDF, RDFS
+from hs_rdf.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
+from hs_rdf.schemas.fields import (
+    AwardInfo,
+    BandInformation,
+    CellInformation,
+    FieldInformation,
+    GeometryInformation,
+    ProcessingLevel,
+    Publisher,
+    Rights,
+    TimeSeriesMethod,
+    TimeSeriesResult,
+    TimeSeriesSite,
+    TimeSeriesVariable,
+    Unit,
+    UTCOffSet,
+    Variable,
+)
 from hs_rdf.schemas.rdf.root_validators import parse_relation_rdf, split_user_identifiers
 
 
@@ -55,14 +69,15 @@ class ExtendedMetadataInRDF(RDFBaseModel):
 
 
 class CellInformationInRDF(CellInformation, RDFBaseModel):
-
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'rows': {"rdf_predicate": HSTERMS.rows},
-                  'columns': {"rdf_predicate": HSTERMS.columns},
-                  'cell_size_x_value': {"rdf_predicate": HSTERMS.cellSizeXValue},
-                  'cell_data_type': {"rdf_predicate": HSTERMS.cellDataType},
-                  'cell_size_y_value': {"rdf_predicate": HSTERMS.cellSizeYValue}}
+        fields = {
+            'name': {"rdf_predicate": HSTERMS.name},
+            'rows': {"rdf_predicate": HSTERMS.rows},
+            'columns': {"rdf_predicate": HSTERMS.columns},
+            'cell_size_x_value': {"rdf_predicate": HSTERMS.cellSizeXValue},
+            'cell_data_type': {"rdf_predicate": HSTERMS.cellDataType},
+            'cell_size_y_value': {"rdf_predicate": HSTERMS.cellSizeYValue},
+        }
 
 
 class DateInRDF(RDFBaseModel):
@@ -71,10 +86,8 @@ class DateInRDF(RDFBaseModel):
 
 
 class RightsInRDF(Rights, RDFBaseModel):
-
     class Config:
-        fields = {'statement': {"rdf_predicate": HSTERMS.rightsStatement},
-                  'url': {"rdf_predicate": HSTERMS.URL}}
+        fields = {'statement': {"rdf_predicate": HSTERMS.rightsStatement}, 'url': {"rdf_predicate": HSTERMS.URL}}
 
 
 class CreatorInRDF(RDFBaseModel):
@@ -93,17 +106,19 @@ class CreatorInRDF(RDFBaseModel):
     _group_identifiers = root_validator(pre=True, allow_reuse=True)(split_user_identifiers)
 
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'creator_order': {"rdf_predicate": HSTERMS.creatorOrder},
-                  'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
-                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
-                  'phone': {"rdf_predicate": HSTERMS.phone},
-                  'ORCID': {"rdf_predicate": HSTERMS.ORCID},
-                  'address': {"rdf_predicate": HSTERMS.address},
-                  'organization': {"rdf_predicate": HSTERMS.organization},
-                  'email': {"rdf_predicate": HSTERMS.email},
-                  'homepage': {"rdf_predicate": HSTERMS.homepage},
-                  'description': {"rdf_predicate": HSTERMS.description}}
+        fields = {
+            'name': {"rdf_predicate": HSTERMS.name},
+            'creator_order': {"rdf_predicate": HSTERMS.creatorOrder},
+            'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
+            'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
+            'phone': {"rdf_predicate": HSTERMS.phone},
+            'ORCID': {"rdf_predicate": HSTERMS.ORCID},
+            'address': {"rdf_predicate": HSTERMS.address},
+            'organization': {"rdf_predicate": HSTERMS.organization},
+            'email': {"rdf_predicate": HSTERMS.email},
+            'homepage': {"rdf_predicate": HSTERMS.homepage},
+            'description': {"rdf_predicate": HSTERMS.description},
+        }
 
 
 class ContributorInRDF(RDFBaseModel):
@@ -121,38 +136,42 @@ class ContributorInRDF(RDFBaseModel):
     _group_identifiers = root_validator(pre=True, allow_reuse=True)(split_user_identifiers)
 
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'phone': {"rdf_predicate": HSTERMS.phone},
-                  'address': {"rdf_predicate": HSTERMS.address},
-                  'organization': {"rdf_predicate": HSTERMS.organization},
-                  'email': {"rdf_predicate": HSTERMS.email},
-                  'homepage': {"rdf_predicate": HSTERMS.homepage},
-                  'ORCID': {"rdf_predicate": HSTERMS.ORCID},
-                  'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
-                  'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
-                  'description': {"rdf_predicate": HSTERMS.description}}
+        fields = {
+            'name': {"rdf_predicate": HSTERMS.name},
+            'phone': {"rdf_predicate": HSTERMS.phone},
+            'address': {"rdf_predicate": HSTERMS.address},
+            'organization': {"rdf_predicate": HSTERMS.organization},
+            'email': {"rdf_predicate": HSTERMS.email},
+            'homepage': {"rdf_predicate": HSTERMS.homepage},
+            'ORCID': {"rdf_predicate": HSTERMS.ORCID},
+            'google_scholar_id': {"rdf_predicate": HSTERMS.GoogleScholarID},
+            'research_gate_id': {"rdf_predicate": HSTERMS.ResearchGateID},
+            'description': {"rdf_predicate": HSTERMS.description},
+        }
 
 
 class AwardInfoInRDF(AwardInfo, RDFBaseModel):
-
     class Config:
-        fields = {'funding_agency_name': {"rdf_predicate": HSTERMS.fundingAgencyName},
-                  'title': {"rdf_predicate": HSTERMS.awardTitle},
-                  'number': {"rdf_predicate": HSTERMS.awardNumber},
-                  'funding_agency_url': {"rdf_predicate": HSTERMS.fundingAgencyURL}}
+        fields = {
+            'funding_agency_name': {"rdf_predicate": HSTERMS.fundingAgencyName},
+            'title': {"rdf_predicate": HSTERMS.awardTitle},
+            'number': {"rdf_predicate": HSTERMS.awardNumber},
+            'funding_agency_url': {"rdf_predicate": HSTERMS.fundingAgencyURL},
+        }
 
 
 class BandInformationInRDF(BandInformation, RDFBaseModel):
-
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'variable_name': {"rdf_predicate": HSTERMS.variableName},
-                  'variable_unit': {"rdf_predicate": HSTERMS.variableUnit},
-                  'no_data_value': {"rdf_predicate": HSTERMS.noDataValue},
-                  'maximum_value': {"rdf_predicate": HSTERMS.maximumValue},
-                  'comment': {"rdf_predicate": HSTERMS.comment},
-                  'method': {"rdf_predicate": HSTERMS.method},
-                  'minimum_value': {"rdf_predicate": HSTERMS.minimumValue}}
+        fields = {
+            'name': {"rdf_predicate": HSTERMS.name},
+            'variable_name': {"rdf_predicate": HSTERMS.variableName},
+            'variable_unit': {"rdf_predicate": HSTERMS.variableUnit},
+            'no_data_value': {"rdf_predicate": HSTERMS.noDataValue},
+            'maximum_value': {"rdf_predicate": HSTERMS.maximumValue},
+            'comment': {"rdf_predicate": HSTERMS.comment},
+            'method': {"rdf_predicate": HSTERMS.method},
+            'minimum_value': {"rdf_predicate": HSTERMS.minimumValue},
+        }
 
 
 class CoverageInRDF(RDFBaseModel):
@@ -171,92 +190,97 @@ class MultidimensionalSpatialReferenceInRDF(RDFBaseModel):
 
 
 class FieldInformationInRDF(FieldInformation, RDFBaseModel):
-
     class Config:
-        fields = {'field_name': {"rdf_predicate": HSTERMS.fieldName},
-                  'field_type': {"rdf_predicate": HSTERMS.fieldType},
-                  'field_type_code': {"rdf_predicate": HSTERMS.fieldTypeCode},
-                  'field_width': {"rdf_predicate": HSTERMS.fieldWidth},
-                  'field_precision': {"rdf_predicate": HSTERMS.fieldPrecision}}
+        fields = {
+            'field_name': {"rdf_predicate": HSTERMS.fieldName},
+            'field_type': {"rdf_predicate": HSTERMS.fieldType},
+            'field_type_code': {"rdf_predicate": HSTERMS.fieldTypeCode},
+            'field_width': {"rdf_predicate": HSTERMS.fieldWidth},
+            'field_precision': {"rdf_predicate": HSTERMS.fieldPrecision},
+        }
 
 
 class GeometryInformationInRDF(GeometryInformation, RDFBaseModel):
-
     class Config:
-        fields = {'feature_count': {"rdf_predicate": HSTERMS.featureCount},
-                  'geometry_type': {"rdf_predicate": HSTERMS.geometryType}}
+        fields = {
+            'feature_count': {"rdf_predicate": HSTERMS.featureCount},
+            'geometry_type': {"rdf_predicate": HSTERMS.geometryType},
+        }
 
 
 class VariableInRDF(Variable, RDFBaseModel):
-
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.name},
-                  'unit': {"rdf_predicate": HSTERMS.unit},
-                  'type': {"rdf_predicate": HSTERMS.type},
-                  'shape': {"rdf_predicate": HSTERMS.shape},
-                  'descriptive_name': {"rdf_predicate": HSTERMS.descriptive_name},
-                  'method': {"rdf_predicate": HSTERMS.method},
-                  'missing_value': {"rdf_predicate": HSTERMS.missing_value}}
+        fields = {
+            'name': {"rdf_predicate": HSTERMS.name},
+            'unit': {"rdf_predicate": HSTERMS.unit},
+            'type': {"rdf_predicate": HSTERMS.type},
+            'shape': {"rdf_predicate": HSTERMS.shape},
+            'descriptive_name': {"rdf_predicate": HSTERMS.descriptive_name},
+            'method': {"rdf_predicate": HSTERMS.method},
+            'missing_value': {"rdf_predicate": HSTERMS.missing_value},
+        }
 
 
 class PublisherInRDF(Publisher, RDFBaseModel):
-
     class Config:
-        fields = {'name': {"rdf_predicate": HSTERMS.publisherName},
-                  'url': {"rdf_predicate": HSTERMS.publisherURL}}
+        fields = {'name': {"rdf_predicate": HSTERMS.publisherName}, 'url': {"rdf_predicate": HSTERMS.publisherURL}}
 
 
 class TimeSeriesVariableInRDF(TimeSeriesVariable, RDFBaseModel):
-
     class Config:
-        fields = {'variable_code': {"rdf_predicate": HSTERMS.VariableCode},
-                  'variable_name': {"rdf_predicate": HSTERMS.VariableName},
-                  'variable_type': {"rdf_predicate": HSTERMS.VariableType},
-                  'no_data_value': {"rdf_predicate": HSTERMS.NoDataValue},
-                  'variable_definition': {"rdf_predicate": HSTERMS.VariableDefinition},
-                  'speciation': {"rdf_predicate": HSTERMS.Speciation}}
+        fields = {
+            'variable_code': {"rdf_predicate": HSTERMS.VariableCode},
+            'variable_name': {"rdf_predicate": HSTERMS.VariableName},
+            'variable_type': {"rdf_predicate": HSTERMS.VariableType},
+            'no_data_value': {"rdf_predicate": HSTERMS.NoDataValue},
+            'variable_definition': {"rdf_predicate": HSTERMS.VariableDefinition},
+            'speciation': {"rdf_predicate": HSTERMS.Speciation},
+        }
 
 
 class TimeSeriesSiteInRDF(TimeSeriesSite, RDFBaseModel):
-
     class Config:
-        fields = {'site_code': {"rdf_predicate": HSTERMS.SiteCode},
-                  'site_name': {"rdf_predicate": HSTERMS.SiteName},
-                  'elevation_m': {"rdf_predicate": HSTERMS.Elevation_m},
-                  'elevation_datum': {"rdf_predicate": HSTERMS.ElevationDatum},
-                  'site_type': {"rdf_predicate": HSTERMS.SiteType},
-                  'latitude': {"rdf_predicate": HSTERMS.Latitude},
-                  'longitude': {"rdf_predicate": HSTERMS.Longitude}}
+        fields = {
+            'site_code': {"rdf_predicate": HSTERMS.SiteCode},
+            'site_name': {"rdf_predicate": HSTERMS.SiteName},
+            'elevation_m': {"rdf_predicate": HSTERMS.Elevation_m},
+            'elevation_datum': {"rdf_predicate": HSTERMS.ElevationDatum},
+            'site_type': {"rdf_predicate": HSTERMS.SiteType},
+            'latitude': {"rdf_predicate": HSTERMS.Latitude},
+            'longitude': {"rdf_predicate": HSTERMS.Longitude},
+        }
 
 
 class TimeSeriesMethodInRDF(TimeSeriesMethod, RDFBaseModel):
-
     class Config:
-        fields = {'method_code': {"rdf_predicate": HSTERMS.MethodCode},
-                  'method_name': {"rdf_predicate": HSTERMS.MethodName},
-                  'method_type': {"rdf_predicate": HSTERMS.MethodType},
-                  'method_description': {"rdf_predicate": HSTERMS.MethodDescription},
-                  'method_link': {"rdf_predicate": HSTERMS.MethodLink}}
+        fields = {
+            'method_code': {"rdf_predicate": HSTERMS.MethodCode},
+            'method_name': {"rdf_predicate": HSTERMS.MethodName},
+            'method_type': {"rdf_predicate": HSTERMS.MethodType},
+            'method_description': {"rdf_predicate": HSTERMS.MethodDescription},
+            'method_link': {"rdf_predicate": HSTERMS.MethodLink},
+        }
 
 
 class ProcessingLevelInRDF(ProcessingLevel, RDFBaseModel):
-
     class Config:
-        fields = {'processing_level_code': {"rdf_predicate": HSTERMS.ProcessingLevelCode},
-                  'definition': {"rdf_predicate": HSTERMS.Definition},
-                  'explanation': {"rdf_predicate": HSTERMS.Explanation}}
+        fields = {
+            'processing_level_code': {"rdf_predicate": HSTERMS.ProcessingLevelCode},
+            'definition': {"rdf_predicate": HSTERMS.Definition},
+            'explanation': {"rdf_predicate": HSTERMS.Explanation},
+        }
 
 
 class UnitInRDF(Unit, RDFBaseModel):
-
     class Config:
-        fields = {'type': {"rdf_predicate": HSTERMS.UnitsType},
-                  'name': {"rdf_predicate": HSTERMS.UnitsName},
-                  'abbreviation': {"rdf_predicate": HSTERMS.UnitsAbbreviation}}
+        fields = {
+            'type': {"rdf_predicate": HSTERMS.UnitsType},
+            'name': {"rdf_predicate": HSTERMS.UnitsName},
+            'abbreviation': {"rdf_predicate": HSTERMS.UnitsAbbreviation},
+        }
 
 
 class UTCOffSetInRDF(UTCOffSet, RDFBaseModel):
-
     class Config:
         fields = {'value': {"rdf_predicate": HSTERMS.value}}
 
@@ -271,9 +295,11 @@ class TimeSeriesResultInRDF(TimeSeriesResult, RDFBaseModel):
     utc_offset: UTCOffSetInRDF = Field(rdf_predicate=HSTERMS.UTCOffSet, default=None)
 
     class Config:
-        fields = {'series_id': {"rdf_predicate": HSTERMS.timeSeriesResultUUID},
-                  'status': {"rdf_predicate": HSTERMS.Status},
-                  'sample_medium': {"rdf_predicate": HSTERMS.SampleMedium},
-                  'value_count': {"rdf_predicate": HSTERMS.ValueCount},
-                  'aggregation_statistics': {"rdf_predicate": HSTERMS.AggregationStatistic},
-                  'series_label': {"rdf_predicate": HSTERMS.SeriesLabel}}
+        fields = {
+            'series_id': {"rdf_predicate": HSTERMS.timeSeriesResultUUID},
+            'status': {"rdf_predicate": HSTERMS.Status},
+            'sample_medium': {"rdf_predicate": HSTERMS.SampleMedium},
+            'value_count': {"rdf_predicate": HSTERMS.ValueCount},
+            'aggregation_statistics': {"rdf_predicate": HSTERMS.AggregationStatistic},
+            'series_label': {"rdf_predicate": HSTERMS.SeriesLabel},
+        }

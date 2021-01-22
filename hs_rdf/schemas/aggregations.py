@@ -1,15 +1,28 @@
 from typing import List, Union
 
-from pydantic import AnyUrl, Field, validator, root_validator
+from pydantic import AnyUrl, Field, root_validator, validator
 
 from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.enums import AggregationType
-from hs_rdf.schemas.fields import BandInformation, CellInformation, FieldInformation, GeometryInformation, Variable, \
-    TimeSeriesResult, BoxSpatialReference, MultidimensionalBoxSpatialReference, PointSpatialReference, \
-    MultidimensionalPointSpatialReference, PointCoverage, BoxCoverage, PeriodCoverage, Rights
+from hs_rdf.schemas.fields import (
+    BandInformation,
+    BoxCoverage,
+    BoxSpatialReference,
+    CellInformation,
+    FieldInformation,
+    GeometryInformation,
+    MultidimensionalBoxSpatialReference,
+    MultidimensionalPointSpatialReference,
+    PeriodCoverage,
+    PointCoverage,
+    PointSpatialReference,
+    Rights,
+    TimeSeriesResult,
+    Variable,
+)
 from hs_rdf.schemas.rdf.validators import language_constraint
-from hs_rdf.schemas.root_validators import parse_additional_metadata, split_coverages, parse_url
-from hs_rdf.schemas.validators import parse_spatial_reference, parse_multidimensional_spatial_reference
+from hs_rdf.schemas.root_validators import parse_additional_metadata, parse_url, split_coverages
+from hs_rdf.schemas.validators import parse_multidimensional_spatial_reference, parse_spatial_reference
 
 
 class BaseAggregationMetadata(BaseMetadata):
@@ -52,9 +65,13 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
     type: AggregationType = Field(const=True, default=AggregationType.MultidimensionalAggregation)
 
     variables: List[Variable] = Field()
-    spatial_reference: Union[MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference] = Field(default=None)
+    spatial_reference: Union[MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference] = Field(
+        default=None
+    )
 
-    _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(parse_multidimensional_spatial_reference)
+    _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(
+        parse_multidimensional_spatial_reference
+    )
 
 
 class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):

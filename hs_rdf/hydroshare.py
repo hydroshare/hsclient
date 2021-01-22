@@ -1,27 +1,25 @@
-import os
-from typing import List, Dict
-from urllib.request import url2pathname, pathname2url
-
-import requests
 import getpass
+import os
+import sqlite3
 import tempfile
 import time
-import pandas
-import sqlite3
-
-from zipfile import ZipFile
+from posixpath import basename, dirname, join as urljoin, splitext
+from typing import Dict, List
 from urllib.parse import urlparse
-from posixpath import join as urljoin, basename, splitext, dirname
+from urllib.request import pathname2url, url2pathname
+from zipfile import ZipFile
+
+import pandas
+import requests
 
 from hs_rdf.schemas import load_rdf, rdf_string
 from hs_rdf.schemas.base_models import BaseMetadata
 from hs_rdf.schemas.enums import AggregationType
 from hs_rdf.schemas.fields import User
-from hs_rdf.utils import is_aggregation, main_file_type, attribute_filter
+from hs_rdf.utils import attribute_filter, is_aggregation, main_file_type
 
 
 class File(str):
-
     def __new__(cls, value, file_url, checksum):
         return super(File, cls).__new__(cls, value)
 
@@ -55,7 +53,6 @@ class File(str):
 
 
 class Aggregation:
-
     def __init__(self, map_path, hs_session, checksums=None):
         self._map_path = map_path
         self._hs_session = hs_session
@@ -93,9 +90,13 @@ class Aggregation:
             for file in self._map.describes.files:
                 if not is_aggregation(str(file.path)):
                     if not file.path == self.metadata_path:
-                        if not str(file.path).endswith('/'): # checking for folders, shouldn't have to do this
+                        if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
-                            file_path = url2pathname(file_checksum_path.split("data/contents/",)[1])
+                            file_path = url2pathname(
+                                file_checksum_path.split(
+                                    "data/contents/",
+                                )[1]
+                            )
                             # f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
                             f = File(file_path, url2pathname(file.path), None)
                             self._parsed_files.append(f)
@@ -125,7 +126,7 @@ class Aggregation:
 
     @property
     def _resource_path(self):
-        resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
+        resource_path = self.metadata_path[: len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
         return resource_path
 
     def _retrieve_and_parse(self, path):
@@ -135,7 +136,10 @@ class Aggregation:
 
     def _retrieve_checksums(self, path):
         file_str = self._hs_session.retrieve_string(path)
-        data = {pathname2url(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)}
+        data = {
+            pathname2url(path): checksum
+            for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)
+        }
         return data
 
     def _download(self, save_path: str = "", unzip_to: str = None) -> str:
@@ -148,6 +152,7 @@ class Aggregation:
 
         if unzip_to:
             import zipfile
+
             with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
                 zip_ref.extractall(unzip_to)
                 os.remove(downloaded_zip)
@@ -203,10 +208,10 @@ class Aggregation:
         aggregations = self._aggregations
         for key, value in kwargs.items():
             if key.startswith('file__'):
-                file_args = {key[len('file__'):]: value}
+                file_args = {key[len('file__') :]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             elif key.startswith('files__'):
-                file_args = {key[len('files__'):]: value}
+                file_args = {key[len('files__') :]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             else:
                 aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
@@ -229,8 +234,11 @@ class Aggregation:
     def as_series(self, series_id: str, agg_path: str = None) -> Dict[int, pandas.Series]:
         def to_series(timeseries_file: str):
             con = sqlite3.connect(timeseries_file)
-            return pandas.read_sql(f'SELECT * FROM TimeSeriesResultValues WHERE ResultID IN '
-                                   f'(SELECT ResultID FROM Results WHERE ResultUUID = "{series_id}");', con).squeeze()
+            return pandas.read_sql(
+                f'SELECT * FROM TimeSeriesResultValues WHERE ResultID IN '
+                f'(SELECT ResultID FROM Results WHERE ResultUUID = "{series_id}");',
+                con,
+            ).squeeze()
 
         if agg_path is None:
             with tempfile.TemporaryDirectory() as td:
@@ -242,7 +250,6 @@ class Aggregation:
 
 
 class Resource(Aggregation):
-
     @property
     def _hsapi_path(self):
         path = urlparse(self.metadata.identifier).path
@@ -307,16 +314,20 @@ class Resource(Aggregation):
 
     def reference_create(self, file_name: str, url: str, path: str = '') -> None:
         request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data-store-add-reference")
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
-                                                  "ref_url": url},
-                              status_code=200)
+        self._hs_session.post(
+            request_path,
+            data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name, "ref_url": url},
+            status_code=200,
+        )
         self.refresh()
 
     def reference_update(self, file_name: str, url: str, path: str = '') -> None:
         request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data_store_edit_reference_url")
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
-                                                  "url_filename": file_name, "new_ref_url": url},
-                              status_code=200)
+        self._hs_session.post(
+            request_path,
+            data={"res_id": self.resource_id, "curr_path": path, "url_filename": file_name, "new_ref_url": url},
+            status_code=200,
+        )
         self.refresh()
 
     # file operations
@@ -335,18 +346,23 @@ class Resource(Aggregation):
     def folder_download(self, *paths: str, save_path: str = "", zipped: bool = False):
         if len(paths) > 1:
             raise NotImplementedError(
-                "Currently may only download one folder at a time, hydroshare needs to be updated to allow for more")
+                "Currently may only download one folder at a time, hydroshare needs to be updated to allow for more"
+            )
         path = paths[0]
-        return self._hs_session.retrieve_zip(urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"})
+        return self._hs_session.retrieve_zip(
+            urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"}
+        )
 
     def file_download(self, *paths: str, save_path: str = "", zipped: bool = False):
         if len(paths) > 1:
             raise NotImplementedError(
-                "Currently may only download one file at a time, hydroshare needs to be updated to allow for more")
+                "Currently may only download one file at a time, hydroshare needs to be updated to allow for more"
+            )
         path = paths[0]
         if zipped:
-            return self._hs_session.retrieve_zip(urljoin(self._resource_path, "data", "contents", path), save_path,
-                                                 params={"zipped": "true"})
+            return self._hs_session.retrieve_zip(
+                urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"}
+            )
         else:
             return self._hs_session.retrieve_file(urljoin(self._resource_path, "data", "contents", path), save_path)
 
@@ -356,8 +372,7 @@ class Resource(Aggregation):
 
     def file_rename(self, path: str, new_path: str) -> None:
         rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
-        self._hs_session.post(rename_path, status_code=200,
-                              data={"source_path": path, "target_path": new_path})
+        self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
         self.refresh()
 
     def file_zip(self, path: str, zip_name: str = None, remove_files: bool = True) -> None:
@@ -398,21 +413,37 @@ class Resource(Aggregation):
                     for file in files:
                         zipped.write(file, basename(file))
                 self._upload(zipped_file, destination_path=destination_path)
-                unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip')
-                self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+                unzip_path = urljoin(
+                    self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip'
+                )
+                self._hs_session.post(
+                    unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"}
+                )
         self.refresh()
         # TODO, return those files?
 
     # aggregation operations
 
     def aggregation_remove(self, aggregation: Aggregation) -> None:
-        path = urljoin(aggregation._hsapi_path, "functions", "remove-file-type", aggregation.metadata.type.value + "LogicalFile", aggregation.main_file_path)
+        path = urljoin(
+            aggregation._hsapi_path,
+            "functions",
+            "remove-file-type",
+            aggregation.metadata.type.value + "LogicalFile",
+            aggregation.main_file_path,
+        )
         aggregation._hs_session.post(path, status_code=200)
         aggregation.refresh()
         self.refresh()
 
     def aggregation_delete(self, aggregation: Aggregation) -> None:
-        path = urljoin(aggregation._hsapi_path, "functions", "delete-file-type", aggregation.metadata.type.value + "LogicalFile", aggregation.main_file_path)
+        path = urljoin(
+            aggregation._hsapi_path,
+            "functions",
+            "delete-file-type",
+            aggregation.metadata.type.value + "LogicalFile",
+            aggregation.main_file_path,
+        )
         aggregation._hs_session.delete(path, status_code=200)
         aggregation.refresh()
         self.refresh()
@@ -422,7 +453,6 @@ class Resource(Aggregation):
 
 
 class HydroShareSession:
-
     def __init__(self, username, password, host, protocol, port):
         self._session = requests.Session()
         self.set_auth((username, password))
@@ -490,32 +520,36 @@ class HydroShareSession:
         url = encode_resource_url(self._build_url(path))
         response = self._session.post(url, params=params, data=data, **kwargs)
         if response.status_code != status_code:
-            raise Exception("Failed POST {}, status_code {}, message {}".format(url, response.status_code,
-                                                                                response.content))
+            raise Exception(
+                "Failed POST {}, status_code {}, message {}".format(url, response.status_code, response.content)
+            )
         return response
 
     def put(self, path, status_code, data=None, **kwargs):
         url = encode_resource_url(self._build_url(path))
         response = self._session.put(url, data=data, **kwargs)
         if response.status_code != status_code:
-            raise Exception("Failed PUT {}, status_code {}, message {}".format(url, response.status_code,
-                                                                               response.content))
+            raise Exception(
+                "Failed PUT {}, status_code {}, message {}".format(url, response.status_code, response.content)
+            )
         return response
 
     def get(self, path, status_code, **kwargs):
         url = encode_resource_url(self._build_url(path))
         response = self._session.get(url, **kwargs)
         if response.status_code != status_code:
-            raise Exception("Failed GET {}, status_code {}, message {}".format(url, response.status_code,
-                                                                               response.content))
+            raise Exception(
+                "Failed GET {}, status_code {}, message {}".format(url, response.status_code, response.content)
+            )
         return response
 
     def delete(self, path, status_code, **kwargs):
         url = encode_resource_url(self._build_url(path))
         response = self._session.delete(url, **kwargs)
         if response.status_code != status_code:
-            raise Exception("Failed DELETE {}, status_code {}, message {}".format(url, response.status_code,
-                                                                                  response.content))
+            raise Exception(
+                "Failed DELETE {}, status_code {}, message {}".format(url, response.status_code, response.content)
+            )
         return response
 
 
@@ -525,9 +559,17 @@ class HydroShare:
     default_protocol = "https"
     default_port = 443
 
-    def __init__(self, username: str = None, password: str = None, host: str = default_host,
-                 protocol: str = default_protocol, port: int = default_port):
-        self._hs_session = HydroShareSession(username=username, password=password, host=host, protocol=protocol, port=port)
+    def __init__(
+        self,
+        username: str = None,
+        password: str = None,
+        host: str = default_host,
+        protocol: str = default_protocol,
+        port: int = default_port,
+    ):
+        self._hs_session = HydroShareSession(
+            username=username, password=password, host=host, protocol=protocol, port=port
+        )
 
     def sign_in(self) -> None:
         username = input("Username: ").strip()
@@ -560,10 +602,12 @@ def encode_resource_url(url):
     :return: url encoded string
     """
     import urllib
+
     parsed_url = urllib.parse.urlparse(url)
     url_encoded_path = pathname2url(parsed_url.path)
     encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
     return encoded_url
+
 
 def is_folder(path):
     """Checks for an extension to determine if the path is to a folder"""

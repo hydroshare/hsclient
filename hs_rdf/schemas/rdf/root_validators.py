@@ -1,6 +1,6 @@
 from rdflib import URIRef
 
-from hs_rdf.schemas.enums import CoverageType, SpatialReferenceType, MultidimensionalSpatialReferenceType, DateType
+from hs_rdf.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
 from hs_rdf.utils import to_coverage_value_string
 
 

@@ -5,15 +5,16 @@ from pydantic.error_wrappers import ValidationError
 
 from hs_rdf.namespaces import DCTERMS
 from hs_rdf.schemas import load_rdf
-from hs_rdf.schemas.enums import VariableType, DateType
-from hs_rdf.schemas.fields import Variable, Rights, Creator, BoxCoverage, PeriodCoverage
-from hs_rdf.schemas.rdf.fields import ExtendedMetadataInRDF, DateInRDF
+from hs_rdf.schemas.enums import DateType, VariableType
+from hs_rdf.schemas.fields import BoxCoverage, Creator, PeriodCoverage, Rights, Variable
+from hs_rdf.schemas.rdf.fields import DateInRDF, ExtendedMetadataInRDF
 
 
 @pytest.fixture()
 def res_md():
     with open("data/metadata/resourcemetadata.xml", 'r') as f:
         return load_rdf(f.read())
+
 
 def test_resource_metadata_language(res_md):
     try:
@@ -33,6 +34,7 @@ def test_extended_metadata():
     except ValueError as ve:
         assert "field required" in str(ve)
 
+
 def test_dates():
     now = datetime.now()
     d = DateInRDF(type=str(DCTERMS.modified), value=now)
@@ -44,9 +46,17 @@ def test_dates():
     except ValidationError as ve:
         assert "2 validation errors for Date" in str(ve)
 
+
 def test_variables():
-    variable = Variable(name="name", type=VariableType.Byte, unit="unit", shape="shape",
-                        descriptive_name="descriptive_name", method="method", missing_value="missing_value")
+    variable = Variable(
+        name="name",
+        type=VariableType.Byte,
+        unit="unit",
+        shape="shape",
+        descriptive_name="descriptive_name",
+        method="method",
+        missing_value="missing_value",
+    )
     assert variable.name == "name"
     assert variable.type == VariableType.Byte
     assert variable.unit == "unit"
@@ -65,35 +75,44 @@ def test_variables():
         assert "type" in str(ve)
         assert "shape" in str(ve)
 
+
 def test_rights():
-    assert Rights.Creative_Commons_Attribution_CC_BY() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution CC BY.",
-                  url="http://creativecommons.org/licenses/by/4.0/")
+    assert Rights.Creative_Commons_Attribution_CC_BY() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution CC BY.",
+        url="http://creativecommons.org/licenses/by/4.0/",
+    )
 
-    assert Rights.Creative_Commons_Attribution_ShareAlike_CC_BY() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
-                  url="http://creativecommons.org/licenses/by-sa/4.0/")
+    assert Rights.Creative_Commons_Attribution_ShareAlike_CC_BY() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
+        url="http://creativecommons.org/licenses/by-sa/4.0/",
+    )
 
-    assert Rights.Creative_Commons_Attribution_NoDerivs_CC_BY_ND() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
-                  url="http://creativecommons.org/licenses/by-nd/4.0/")
+    assert Rights.Creative_Commons_Attribution_NoDerivs_CC_BY_ND() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution-ShareAlike CC BY-SA.",
+        url="http://creativecommons.org/licenses/by-nd/4.0/",
+    )
 
-    assert Rights.Creative_Commons_Attribution_NoCommercial_ShareAlike_CC_BY_NC_SA() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-ShareAlike"
-                            " CC BY-NC-SA.",
-                  url="http://creativecommons.org/licenses/by-nc-sa/4.0/")
+    assert Rights.Creative_Commons_Attribution_NoCommercial_ShareAlike_CC_BY_NC_SA() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution-NoCommercial-ShareAlike"
+        " CC BY-NC-SA.",
+        url="http://creativecommons.org/licenses/by-nc-sa/4.0/",
+    )
 
-    assert Rights.Creative_Commons_Attribution_NoCommercial_CC_BY_NC() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial CC BY-NC.",
-                  url="http://creativecommons.org/licenses/by-nc/4.0/")
+    assert Rights.Creative_Commons_Attribution_NoCommercial_CC_BY_NC() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution-NoCommercial CC BY-NC.",
+        url="http://creativecommons.org/licenses/by-nc/4.0/",
+    )
 
-    assert Rights.Creative_Commons_Attribution_NoCommercial_NoDerivs_CC_BY_NC_ND() == \
-           Rights(statement="This resource is shared under the Creative Commons Attribution-NoCommercial-NoDerivs "
-                            "CC BY-NC-ND.",
-                  url="http://creativecommons.org/licenses/by-nc-nd/4.0/")
+    assert Rights.Creative_Commons_Attribution_NoCommercial_NoDerivs_CC_BY_NC_ND() == Rights(
+        statement="This resource is shared under the Creative Commons Attribution-NoCommercial-NoDerivs "
+        "CC BY-NC-ND.",
+        url="http://creativecommons.org/licenses/by-nc-nd/4.0/",
+    )
 
-    assert Rights.Other("a statement", "https://www.hydroshare.org") == \
-           Rights(statement="a statement", url="https://www.hydroshare.org")
+    assert Rights.Other("a statement", "https://www.hydroshare.org") == Rights(
+        statement="a statement", url="https://www.hydroshare.org"
+    )
+
 
 def test_period_constraints_error():
     start = datetime.now()
@@ -104,6 +123,7 @@ def test_period_constraints_error():
     except ValueError as e:
         assert f"start date [{start}] is after end date [{end}]" in str(e)
 
+
 def test_period_constraint_happy_path():
     start = datetime.now()
     end = datetime.now() + timedelta(seconds=1)
@@ -112,10 +132,17 @@ def test_period_constraint_happy_path():
     assert pc.end == end
     assert pc.name == "hello"
 
+
 def test_box_constraints_north_south():
-    box_coverage = BoxCoverage(name="asdfsadf", northlimit=42.1505, eastlimit=-84.5739,
-                               projection='WGS 84 EPSG:4326', southlimit=30.282,
-                               units='Decimal Degrees', westlimit=-104.7887)
+    box_coverage = BoxCoverage(
+        name="asdfsadf",
+        northlimit=42.1505,
+        eastlimit=-84.5739,
+        projection='WGS 84 EPSG:4326',
+        southlimit=30.282,
+        units='Decimal Degrees',
+        westlimit=-104.7887,
+    )
 
     try:
         box_coverage.northlimit = 29
@@ -123,10 +150,10 @@ def test_box_constraints_north_south():
     except ValueError as e:
         assert "North latitude [29.0] must be greater than or equal to South latitude [30.282]" in str(e)
 
+
 def test_invalid_email():
     try:
         creator = Creator(email="bad")
         assert False, "Should have thrown error"
     except ValueError as e:
         assert "value is not a valid email address" in str(e)
-

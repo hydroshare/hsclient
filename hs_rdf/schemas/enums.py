@@ -6,8 +6,10 @@ from hs_rdf.namespaces import DCTERMS, HSTERMS
 class StringEnum(str, Enum):
     pass
 
+
 class TermEnum(StringEnum):
     pass
+
 
 class CoverageType(TermEnum):
     period = str(DCTERMS.period)

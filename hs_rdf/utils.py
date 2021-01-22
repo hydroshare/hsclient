@@ -10,10 +10,15 @@ def to_coverage_dict(value):
         value_dict[k] = v
     return value_dict
 
+
 def to_coverage_value_string(value: dict):
-    return "; ".join(["=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
-                      for key, val in value.items()
-                      if key != "type" and val])
+    return "; ".join(
+        [
+            "=".join([key, val.isoformat() if isinstance(val, datetime) else str(val)])
+            for key, val in value.items()
+            if key != "type" and val
+        ]
+    )
 
 
 def is_aggregation(path):
@@ -32,6 +37,7 @@ def main_file_type(type: AggregationType):
     if type == AggregationType.TimeSeriesAggregation:
         return ".sqlite"
     return None
+
 
 def attribute_filter(o, key, value) -> bool:
     if isinstance(o, list):

@@ -1,16 +1,29 @@
 from datetime import datetime
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
-from pydantic import Field, AnyUrl, validator, root_validator
+from pydantic import AnyUrl, Field, root_validator, validator
 
 from hs_rdf.schemas.base_models import BaseMetadata
-
-from hs_rdf.schemas.fields import Creator, Contributor, Relation, Rights, AwardInfo, Publisher, BoxCoverage, \
-    PointCoverage, PeriodCoverage
-from hs_rdf.schemas.root_validators import split_dates, split_coverages
-from hs_rdf.schemas.validators import parse_identifier, parse_sources, list_not_empty
+from hs_rdf.schemas.fields import (
+    AwardInfo,
+    BoxCoverage,
+    Contributor,
+    Creator,
+    PeriodCoverage,
+    PointCoverage,
+    Publisher,
+    Relation,
+    Rights,
+)
 from hs_rdf.schemas.rdf.validators import language_constraint
-from hs_rdf.schemas.root_validators import parse_additional_metadata, parse_abstract, parse_url
+from hs_rdf.schemas.root_validators import (
+    parse_abstract,
+    parse_additional_metadata,
+    parse_url,
+    split_coverages,
+    split_dates,
+)
+from hs_rdf.schemas.validators import list_not_empty, parse_identifier, parse_sources
 
 
 class ResourceMetadata(BaseMetadata):
@@ -49,5 +62,3 @@ class ResourceMetadata(BaseMetadata):
 
     _language_constraint = validator('language', allow_reuse=True)(language_constraint)
     _creators_constraint = validator('creators')(list_not_empty)
-
-

@@ -10,6 +10,7 @@ def parse_rdf_sources(cls, value):
 
 def rdf_parse_extended_metadata(cls, value):
     from hs_rdf.schemas.rdf.fields import ExtendedMetadataInRDF
+
     assert isinstance(value, list)
     if len(value) > 0:
         if isinstance(value[0], ExtendedMetadataInRDF):
@@ -46,6 +47,7 @@ def coverages_constraint(cls, coverages):
     def one_or_none_of_type(type):
         cov = list(filter(lambda d: d.type == type, coverages))
         assert len(cov) <= 1
+
     one_or_none_of_type(CoverageType.point)
     one_or_none_of_type(CoverageType.period)
     one_or_none_of_type(CoverageType.box)

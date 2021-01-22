@@ -1,20 +1,45 @@
 import uuid
 from typing import List
 
-from pydantic import BaseModel, Field, AnyUrl, root_validator, validator
+from pydantic import AnyUrl, BaseModel, Field, root_validator, validator
 from rdflib.term import Identifier as RDFIdentifier
 
-from hs_rdf.namespaces import RDF, CITOTERMS, DC, HSTERMS, HSRESOURCE, ORE, DCTERMS
-from hs_rdf.schemas.rdf.fields import DescriptionInRDF, IdentifierInRDF, CreatorInRDF, ContributorInRDF, SourceInRDF, \
-    RelationInRDF, ExtendedMetadataInRDF, RightsInRDF, DateInRDF, AwardInfoInRDF, CoverageInRDF, PublisherInRDF
-from hs_rdf.schemas.rdf.root_validators import parse_coverages, rdf_parse_description, rdf_parse_rdf_subject, \
-    parse_rdf_extended_metadata, parse_rdf_dates
-from hs_rdf.schemas.rdf.validators import parse_rdf_sources, rdf_parse_identifier, language_constraint, \
-    dates_constraint, coverages_constraint, coverages_spatial_constraint, sort_creators
+from hs_rdf.namespaces import CITOTERMS, DC, DCTERMS, HSRESOURCE, HSTERMS, ORE, RDF
+from hs_rdf.schemas.rdf.fields import (
+    AwardInfoInRDF,
+    ContributorInRDF,
+    CoverageInRDF,
+    CreatorInRDF,
+    DateInRDF,
+    DescriptionInRDF,
+    ExtendedMetadataInRDF,
+    IdentifierInRDF,
+    PublisherInRDF,
+    RelationInRDF,
+    RightsInRDF,
+    SourceInRDF,
+)
+from hs_rdf.schemas.rdf.root_validators import (
+    parse_coverages,
+    parse_rdf_dates,
+    parse_rdf_extended_metadata,
+    rdf_parse_description,
+    rdf_parse_rdf_subject,
+)
+from hs_rdf.schemas.rdf.validators import (
+    coverages_constraint,
+    coverages_spatial_constraint,
+    dates_constraint,
+    language_constraint,
+    parse_rdf_sources,
+    rdf_parse_identifier,
+    sort_creators,
+)
 
 
 def hs_uid():
     return getattr(HSRESOURCE, uuid.uuid4().hex)
+
 
 class FileMap(BaseModel):
     rdf_subject: RDFIdentifier = Field(default_factory=hs_uid)
@@ -32,7 +57,7 @@ class ResourceMap(BaseModel):
 
     describes: FileMap = Field(rdf_predicate=ORE.describes)
     identifier: str = Field(rdf_predicate=DC.identifier, default=None)
-    #modified: datetime = Field(rdf_predicate=DCTERMS.modified)
+    # modified: datetime = Field(rdf_predicate=DCTERMS.modified)
     creator: str = Field(rdf_predicate=DC.creator, default=None)
 
 
