@@ -1,5 +1,5 @@
-from hs_rdf.schemas.enums import CoverageType, DateType
-from hs_rdf.schemas.languages_iso import languages
+from hsclient.schemas.enums import CoverageType, DateType
+from hsclient.schemas.languages_iso import languages
 
 
 def parse_rdf_sources(cls, value):
@@ -9,7 +9,7 @@ def parse_rdf_sources(cls, value):
 
 
 def rdf_parse_extended_metadata(cls, value):
-    from hs_rdf.schemas.rdf.fields import ExtendedMetadataInRDF
+    from hsclient.schemas.rdf.fields import ExtendedMetadataInRDF
 
     assert isinstance(value, list)
     if len(value) > 0:

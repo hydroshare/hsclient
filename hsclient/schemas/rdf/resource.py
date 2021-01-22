@@ -4,8 +4,8 @@ from typing import List
 from pydantic import AnyUrl, BaseModel, Field, root_validator, validator
 from rdflib.term import Identifier as RDFIdentifier
 
-from hs_rdf.namespaces import CITOTERMS, DC, DCTERMS, HSRESOURCE, HSTERMS, ORE, RDF
-from hs_rdf.schemas.rdf.fields import (
+from hsclient.namespaces import CITOTERMS, DC, DCTERMS, HSRESOURCE, HSTERMS, ORE, RDF
+from hsclient.schemas.rdf.fields import (
     AwardInfoInRDF,
     ContributorInRDF,
     CoverageInRDF,
@@ -19,14 +19,14 @@ from hs_rdf.schemas.rdf.fields import (
     RightsInRDF,
     SourceInRDF,
 )
-from hs_rdf.schemas.rdf.root_validators import (
+from hsclient.schemas.rdf.root_validators import (
     parse_coverages,
     parse_rdf_dates,
     parse_rdf_extended_metadata,
     rdf_parse_description,
     rdf_parse_rdf_subject,
 )
-from hs_rdf.schemas.rdf.validators import (
+from hsclient.schemas.rdf.validators import (
     coverages_constraint,
     coverages_spatial_constraint,
     dates_constraint,

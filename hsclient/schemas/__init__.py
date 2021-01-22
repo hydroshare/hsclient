@@ -5,8 +5,8 @@ from enum import Enum
 from pydantic import AnyUrl, BaseModel
 from rdflib import Graph, Literal, URIRef
 
-from hs_rdf.namespaces import DC, HSTERMS, ORE, RDF, RDFS1, XSD
-from hs_rdf.schemas.aggregations import (
+from hsclient.namespaces import DC, HSTERMS, ORE, RDF, RDFS1, XSD
+from hsclient.schemas.aggregations import (
     FileSetMetadata,
     GeographicFeatureMetadata,
     GeographicRasterMetadata,
@@ -15,8 +15,8 @@ from hs_rdf.schemas.aggregations import (
     SingleFileMetadata,
     TimeSeriesMetadata,
 )
-from hs_rdf.schemas.enums import TermEnum
-from hs_rdf.schemas.rdf.aggregations import (
+from hsclient.schemas.enums import TermEnum
+from hsclient.schemas.rdf.aggregations import (
     FileSetMetadataInRDF,
     GeographicFeatureMetadataInRDF,
     GeographicRasterMetadataInRDF,
@@ -25,8 +25,8 @@ from hs_rdf.schemas.rdf.aggregations import (
     SingleFileMetadataInRDF,
     TimeSeriesMetadataInRDF,
 )
-from hs_rdf.schemas.rdf.resource import ResourceMap, ResourceMetadataInRDF
-from hs_rdf.schemas.resource import ResourceMetadata
+from hsclient.schemas.rdf.resource import ResourceMap, ResourceMetadataInRDF
+from hsclient.schemas.resource import ResourceMetadata
 
 rdf_schemas = {
     ORE.ResourceMap: ResourceMap,

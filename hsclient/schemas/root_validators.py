@@ -1,5 +1,5 @@
-from hs_rdf.schemas.enums import CoverageType, DateType, RelationType, UserIdentifierType
-from hs_rdf.utils import to_coverage_dict
+from hsclient.schemas.enums import CoverageType, DateType, RelationType, UserIdentifierType
+from hsclient.utils import to_coverage_dict
 
 
 def split_dates(cls, values):
@@ -20,7 +20,7 @@ def split_dates(cls, values):
 
 
 def split_coverages(cls, values):
-    from hs_rdf.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
+    from hsclient.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
 
     if "spatial_coverage" in values or "period_coverage" in values:
         return values

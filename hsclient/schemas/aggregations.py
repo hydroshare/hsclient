@@ -2,9 +2,9 @@ from typing import List, Union
 
 from pydantic import AnyUrl, Field, root_validator, validator
 
-from hs_rdf.schemas.base_models import BaseMetadata
-from hs_rdf.schemas.enums import AggregationType
-from hs_rdf.schemas.fields import (
+from hsclient.schemas.base_models import BaseMetadata
+from hsclient.schemas.enums import AggregationType
+from hsclient.schemas.fields import (
     BandInformation,
     BoxCoverage,
     BoxSpatialReference,
@@ -20,9 +20,9 @@ from hs_rdf.schemas.fields import (
     TimeSeriesResult,
     Variable,
 )
-from hs_rdf.schemas.rdf.validators import language_constraint
-from hs_rdf.schemas.root_validators import parse_additional_metadata, parse_url, split_coverages
-from hs_rdf.schemas.validators import parse_multidimensional_spatial_reference, parse_spatial_reference
+from hsclient.schemas.rdf.validators import language_constraint
+from hsclient.schemas.root_validators import parse_additional_metadata, parse_url, split_coverages
+from hsclient.schemas.validators import parse_multidimensional_spatial_reference, parse_spatial_reference
 
 
 class BaseAggregationMetadata(BaseMetadata):

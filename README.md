@@ -1,10 +1,10 @@
-# hs_rdf
+# hsclient
 a python client for interacting with HydroShare in an object oriented way.
 
 ## Example:
 
 ```python
-from hs_rdf.implementations.hydroshare import HydroShare
+from hsclient.implementations.hydroshare import HydroShare
 
 # username/password can be passed to Hydroshare constructor
 hs = HydroShare()

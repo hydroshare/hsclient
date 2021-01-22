@@ -3,10 +3,10 @@ from typing import Dict
 
 from pydantic import AnyUrl, BaseModel, EmailStr, Field, HttpUrl, root_validator, validator
 
-from hs_rdf.schemas import base_models
-from hs_rdf.schemas.enums import RelationType, UserIdentifierType, VariableType
-from hs_rdf.schemas.root_validators import group_user_identifiers, parse_relation
-from hs_rdf.schemas.validators import validate_user_url
+from hsclient.schemas import base_models
+from hsclient.schemas.enums import RelationType, UserIdentifierType, VariableType
+from hsclient.schemas.root_validators import group_user_identifiers, parse_relation
+from hsclient.schemas.validators import validate_user_url
 
 
 class User(BaseModel):

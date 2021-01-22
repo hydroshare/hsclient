@@ -2,7 +2,7 @@
 
 Authentication
 ```python
-from hs_rdf.hydroshare import HydroShare
+from hsclient import HydroShare
 
 hs = HydroShare('username', 'password')
 # or
@@ -48,7 +48,7 @@ create/remove aggregations and update metadata
 ```python
 file = res.file(name="file1.txt")
 
-from hs_rdf.hydroshare import AggregationType
+from hsclient.hydroshare import AggregationType
 
 agg = file.aggregate(AggregationType.SingleFileAggregation)
 

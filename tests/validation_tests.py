@@ -3,11 +3,11 @@ from datetime import datetime, timedelta
 import pytest
 from pydantic.error_wrappers import ValidationError
 
-from hs_rdf.namespaces import DCTERMS
-from hs_rdf.schemas import load_rdf
-from hs_rdf.schemas.enums import DateType, VariableType
-from hs_rdf.schemas.fields import BoxCoverage, Creator, PeriodCoverage, Rights, Variable
-from hs_rdf.schemas.rdf.fields import DateInRDF, ExtendedMetadataInRDF
+from hsclient.namespaces import DCTERMS
+from hsclient.schemas import load_rdf
+from hsclient.schemas.enums import DateType, VariableType
+from hsclient.schemas.fields import BoxCoverage, Creator, PeriodCoverage, Rights, Variable
+from hsclient.schemas.rdf.fields import DateInRDF, ExtendedMetadataInRDF
 
 
 @pytest.fixture()

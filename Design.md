@@ -69,9 +69,9 @@ g = Graph().parse("resourcemetadata.xml")
 put all the rdf bits into a schema
 ```python
 import uuid
-from hs_rdf.schemas.rdf_pydantic import RDFBaseModel, RDFIdentifier
+from hsclient.schemas.rdf_pydantic import RDFBaseModel, RDFIdentifier
 from pydantic import Field, AnyUrl
-from hs_rdf.namespaces import HSRESOURCE, HSTERMS
+from hsclient.namespaces import HSRESOURCE, HSTERMS
 from rdflib.namespace import RDF, DC, DCTERMS
 
 def hs_uid():
@@ -158,7 +158,7 @@ Currently, model validation is spread across django models, forms, functions, an
 This project is translating the schemas for us to provide an object oriented experience of interacting with HydroShare metadata
 
 ```python
-from hs_rdf.implementations.hydroshare import HydroShare
+from hsclient.implementations.hydroshare import HydroShare
 
 # username/password can be passed to Hydroshare constructor
 hs = HydroShare()

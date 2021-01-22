@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import AnyUrl, Field, root_validator
 
-from hs_rdf.namespaces import DC, HSTERMS, RDF
-from hs_rdf.schemas.rdf.fields import (
+from hsclient.namespaces import DC, HSTERMS, RDF
+from hsclient.schemas.rdf.fields import (
     BandInformationInRDF,
     CellInformationInRDF,
     CoverageInRDF,
@@ -17,7 +17,7 @@ from hs_rdf.schemas.rdf.fields import (
     TimeSeriesResultInRDF,
     VariableInRDF,
 )
-from hs_rdf.schemas.rdf.root_validators import (
+from hsclient.schemas.rdf.root_validators import (
     parse_coverages,
     parse_rdf_extended_metadata,
     parse_rdf_multidimensional_spatial_reference,

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
-isort = isort hs_rdf tests
-black = black -S -l 120 --target-version py38 hs_rdf tests
+isort = isort hsclient tests
+black = black -S -l 120 --target-version py38 hsclient tests
 
 .PHONY: format
 format:

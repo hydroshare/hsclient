@@ -12,11 +12,11 @@ from zipfile import ZipFile
 import pandas
 import requests
 
-from hs_rdf.schemas import load_rdf, rdf_string
-from hs_rdf.schemas.base_models import BaseMetadata
-from hs_rdf.schemas.enums import AggregationType
-from hs_rdf.schemas.fields import User
-from hs_rdf.utils import attribute_filter, is_aggregation, main_file_type
+from hsclient.schemas import load_rdf, rdf_string
+from hsclient.schemas.base_models import BaseMetadata
+from hsclient.schemas.enums import AggregationType
+from hsclient.schemas.fields import User
+from hsclient.utils import attribute_filter, is_aggregation, main_file_type
 
 
 class File(str):

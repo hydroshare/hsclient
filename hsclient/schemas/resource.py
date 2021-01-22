@@ -3,8 +3,8 @@ from typing import Dict, List, Union
 
 from pydantic import AnyUrl, Field, root_validator, validator
 
-from hs_rdf.schemas.base_models import BaseMetadata
-from hs_rdf.schemas.fields import (
+from hsclient.schemas.base_models import BaseMetadata
+from hsclient.schemas.fields import (
     AwardInfo,
     BoxCoverage,
     Contributor,
@@ -15,15 +15,15 @@ from hs_rdf.schemas.fields import (
     Relation,
     Rights,
 )
-from hs_rdf.schemas.rdf.validators import language_constraint
-from hs_rdf.schemas.root_validators import (
+from hsclient.schemas.rdf.validators import language_constraint
+from hsclient.schemas.root_validators import (
     parse_abstract,
     parse_additional_metadata,
     parse_url,
     split_coverages,
     split_dates,
 )
-from hs_rdf.schemas.validators import list_not_empty, parse_identifier, parse_sources
+from hsclient.schemas.validators import list_not_empty, parse_identifier, parse_sources
 
 
 class ResourceMetadata(BaseMetadata):

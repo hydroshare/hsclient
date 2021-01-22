@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='hs_rdf',
+    name='hsclient',
     version='0.1',
-    packages=find_packages(include=['hs_rdf', 'hs_rdf.*', 'hs_rdf.schemas.*', 'hs_rdf.schemas.rdf.*']),
+    packages=find_packages(include=['hsclient', 'hsclient.*', 'hsclient.schemas.*', 'hsclient.schemas.rdf.*']),
     install_requires=[
         'rdflib',
         'requests',
@@ -11,7 +11,7 @@ setup(
         'email-validator',
         'pandas'
     ],
-    url='https://github.com/sblack-usu/hs_rdf',
+    url='https://github.com/sblack-usu/hsclient',
     license='',
     author='Scott Black',
     author_email='scott.black@usu.edu',

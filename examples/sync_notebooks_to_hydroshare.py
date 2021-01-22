@@ -1,4 +1,4 @@
-from hs_rdf.hydroshare import HydroShare
+from hsclient.hydroshare import HydroShare
 import os
 
 hs = HydroShare()

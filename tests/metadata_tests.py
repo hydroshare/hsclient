@@ -5,11 +5,11 @@ import pytest
 from rdflib import Graph
 from rdflib.compare import _squashed_graphs_triples
 
-from hs_rdf.namespaces import RDF
-from hs_rdf.schemas import load_rdf, rdf_graph
-from hs_rdf.schemas.enums import RelationType, UserIdentifierType
-from hs_rdf.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
-from hs_rdf.utils import to_coverage_dict
+from hsclient.namespaces import RDF
+from hsclient.schemas import load_rdf, rdf_graph
+from hsclient.schemas.enums import RelationType, UserIdentifierType
+from hsclient.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
+from hsclient.utils import to_coverage_dict
 
 
 @pytest.fixture()

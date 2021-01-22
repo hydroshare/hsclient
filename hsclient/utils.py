@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from hs_rdf.schemas.enums import AggregationType
+from hsclient.schemas.enums import AggregationType
 
 
 def to_coverage_dict(value):

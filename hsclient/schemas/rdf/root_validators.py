@@ -1,7 +1,7 @@
 from rdflib import URIRef
 
-from hs_rdf.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
-from hs_rdf.utils import to_coverage_value_string
+from hsclient.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
+from hsclient.utils import to_coverage_value_string
 
 
 def parse_coverages(cls, values):

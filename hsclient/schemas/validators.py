@@ -1,5 +1,5 @@
-from hs_rdf.schemas import enums, fields
-from hs_rdf.utils import to_coverage_dict
+from hsclient.schemas import enums, fields
+from hsclient.utils import to_coverage_dict
 
 
 def parse_spatial_reference(cls, value):

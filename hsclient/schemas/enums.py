@@ -1,6 +1,6 @@
 from enum import Enum
 
-from hs_rdf.namespaces import DCTERMS, HSTERMS
+from hsclient.namespaces import DCTERMS, HSTERMS
 
 
 class StringEnum(str, Enum):

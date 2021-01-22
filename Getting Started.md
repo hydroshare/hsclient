@@ -3,17 +3,17 @@
 
 Installation
 ```bash
-python -m pip install git+https://github.com/sblack-usu/hs_rdf.git
+python -m pip install git+https://github.com/sblack-usu/hsclient.git
 ```
 
 Upgrading
 ```bash
-python -m pip install --upgrade --force-reinstall git+https://github.com/sblack-usu/hs_rdf.git
+python -m pip install --upgrade --force-reinstall git+https://github.com/sblack-usu/hsclient.git
 ```
 
 Authentication
 ```python
-from hs_rdf.hydroshare import HydroShare
+from hsclient import HydroShare
 username = "username"
 password = "password"
 hs = HydroShare(username, password, 'dev-hs-1.cuahsi.org', 'https', 443)
@@ -58,7 +58,7 @@ create/remove aggregations and update metadata (not complete)
 ```python
 file = res.file(name="readme.txt")
 
-from hs_rdf.hydroshare import AggregationType
+from hsclient.hydroshare import AggregationType
 
 agg = file.aggregate(AggregationType.SingleFileAggregation)
 

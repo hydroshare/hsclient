@@ -4,9 +4,9 @@ from pydantic import AnyUrl, BaseModel, EmailStr, Field, HttpUrl, PositiveInt, r
 from rdflib import BNode
 from rdflib.term import Identifier as RDFIdentifier
 
-from hs_rdf.namespaces import DCTERMS, HSTERMS, RDF, RDFS
-from hs_rdf.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
-from hs_rdf.schemas.fields import (
+from hsclient.namespaces import DCTERMS, HSTERMS, RDF, RDFS
+from hsclient.schemas.enums import CoverageType, DateType, MultidimensionalSpatialReferenceType, SpatialReferenceType
+from hsclient.schemas.fields import (
     AwardInfo,
     BandInformation,
     CellInformation,
@@ -23,7 +23,7 @@ from hs_rdf.schemas.fields import (
     UTCOffSet,
     Variable,
 )
-from hs_rdf.schemas.rdf.root_validators import parse_relation_rdf, split_user_identifiers
+from hsclient.schemas.rdf.root_validators import parse_relation_rdf, split_user_identifiers
 
 
 class RDFBaseModel(BaseModel):
