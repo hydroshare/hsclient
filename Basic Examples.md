@@ -2,7 +2,7 @@
 
 Authentication
 ```python
-from hs_rdf.implementations.hydroshare import HydroShare
+from hs_rdf.hydroshare import HydroShare
 
 hs = HydroShare('username', 'password')
 # or
@@ -11,6 +11,7 @@ hs.sign_in()
 ```
 ### Resource Creation
 access/update metadata
+
 ```python
 new_resource = hs.create()
 
@@ -32,38 +33,36 @@ res = hs.resource("84805fd615a04d63b4eada65644a1e20")
 res.download("bag/download/save/path")
 
 # download single file
-file = next(file for file in res.files if file.name == "filename.txt")
-file.download("file/download/save/path")
+file = res.file(name="filename.txt")
+res.file_download(file, "file/download/save/path")
 
 # delete file
-file.delete()
+res.file_delete(file)
 
 # upload one or more files
-hs.upload("file1.txt", "file2.txt")
+res.file_upload("file1.txt", "file2.txt")
 ```
 ### Aggregations
 create/remove aggregations and update metadata
+
 ```python
-file = next(file for file in res.files if file.name == "file1.txt")
+file = res.file(name="file1.txt")
 
-from hs_rdf.implementations.hydroshare import AggregationType
+from hs_rdf.hydroshare import AggregationType
 
-file.aggregate(AggregationType.SingleFileAggregation)
+agg = file.aggregate(AggregationType.SingleFileAggregation)
 
-res.refresh()
-
-agg = next(agg for agg in res.aggregations if any(file for file in agg.files if file.name == "file1.txt"))
 agg.metadata.title = "Adding an aggregation title to an aggregation"
 agg.metadata.subject = ['aggregation', 'keywords']
 agg.save()
 
-agg.remove() # remove metadata from files
-agg.delete() # deletes metadata along with files within aggregation
+res.aggregation_remove(agg) # remove metadata from files
+res.aggregation_delete(agg)  # deletes metadata along with files within aggregation
 ```
 ### Analyses
 moving file to python performant data structures
 ```python
-agg = next(agg for agg in res.aggregations if agg.type == "TimeSeries")
+agg = res.aggregation(type="TimeSeries")
 
-dataframe = agg.as_dataframe()
+#dataframe = agg.as_series(res.metadata.)
 ```

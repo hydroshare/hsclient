@@ -13,13 +13,14 @@ python -m pip install --upgrade --force-reinstall git+https://github.com/sblack-
 
 Authentication
 ```python
-from hs_rdf.implementations.hydroshare import HydroShare
+from hs_rdf.hydroshare import HydroShare
 username = "username"
 password = "password"
 hs = HydroShare(username, password, 'dev-hs-1.cuahsi.org', 'https', 443)
 ```
 ### Resource Creation
 access/update metadata
+
 ```python
 new_resource = hs.create()
 print(new_resource.metadata.url.path)
@@ -42,32 +43,30 @@ res = hs.resource("1248abc1afc6454199e65c8f642b99a0")
 res.download("downloads")
 
 # download single file
-file = next(file for file in res.files if file.name == "readme.txt")
-file.download("downloads")
+file = res.file(name="readme.txt")
+res.file_download(file, "downloads")
 
 # delete file
-file.delete()
+res.file_delete(file)
 
 # upload one or more files
-res.upload("downloads/readme.txt")
+res.file_upload("downloads/readme.txt")
 ```
 ### Aggregations
 create/remove aggregations and update metadata (not complete)
+
 ```python
-file = next(file for file in res.files if file.name == "readme.txt")
+file = res.file(name="readme.txt")
 
-from hs_rdf.implementations.hydroshare import AggregationType
+from hs_rdf.hydroshare import AggregationType
 
-file.aggregate(AggregationType.SingleFileAggregation)
+agg = file.aggregate(AggregationType.SingleFileAggregation)
 
-res.refresh()
-
-agg = next(agg for agg in res.aggregations if any(file for file in agg.files if file.name == "readme.txt"))
 agg.metadata.title = "Adding an aggregation title to an aggregation"
 agg.metadata.subjects = ['aggregation', 'keywords']
 agg.save()
 
-agg.remove() # remove metadata from files
-agg.delete() # deletes metadata along with files within aggregation
+res.aggregation_remove(agg)  # remove metadata from files
+res.aggregation_delete(agg)  # deletes metadata along with files within aggregation
 ```
 
