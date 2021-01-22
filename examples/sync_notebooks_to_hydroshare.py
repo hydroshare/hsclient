@@ -9,6 +9,6 @@ for root, directories, files in os.walk("."):
     root = root[2:]
     file_paths = [os.path.join(root, f) for f in files if f[0] != "." and f.endswith(".ipynb")]
     if not res.file(folder=root):
-        res.create_folder(root)
-    res.upload(*file_paths, destination_path=root)
+        res.folder_create(root)
+    res.file_upload(*file_paths, destination_path=root)
     break
