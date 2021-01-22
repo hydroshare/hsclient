@@ -24,18 +24,15 @@ def new_resource(hydroshare):
 
 @pytest.fixture()
 def resource(new_resource):
-    new_resource.upload("data/georaster_composite.zip")
-    new_resource.refresh()
-    new_resource.unzip(new_resource.files()[0])
-    new_resource.refresh()
+    new_resource.file_upload("data/georaster_composite.zip")
+    new_resource.file_unzip(new_resource.files()[0])
     return new_resource
 
 @pytest.fixture()
 def timeseries_resource(new_resource):
     files = ["ODM2_Multi_Site_One_Variable.sqlite", "ODM2_Multi_Site_One_Variable_resmap.xml", "ODM2_Multi_Site_One_Variable_meta.xml"]
     root_path = "data/test_resource_metadata_files/"
-    new_resource.upload(*[root_path + file for file in files])
-    new_resource.refresh()
+    new_resource.file_upload(*[root_path + file for file in files])
     return new_resource
 
 def test_filtering_aggregations(timeseries_resource):
@@ -90,11 +87,10 @@ def test_filtering_aggregations_by_files(timeseries_resource):
     assert not timeseries_resource.aggregation(files__path="No_match.sqlite")
 
 def test_filtering_files(resource):
-    resource.create_folder("asdf")
-    resource.upload("data/test_resource_metadata_files/asdf/testing.xml", dest_relative_path="asdf")
-    resource.create_folder("referenced_time_series")
-    resource.upload("data/test_resource_metadata_files/msf_version.refts.json", dest_relative_path="referenced_time_series")
-    resource.refresh()
+    resource.folder_create("asdf")
+    resource.file_upload("data/test_resource_metadata_files/asdf/testing.xml", destination_path="asdf")
+    resource.folder_create("referenced_time_series")
+    resource.file_upload("data/test_resource_metadata_files/msf_version.refts.json", destination_path="referenced_time_series")
 
     assert len(resource.files(search_aggregations=True)) == 6
     assert len(resource.files()) == 2
@@ -123,13 +119,11 @@ def test_creator_order(new_resource):
     res = new_resource#hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
-    res.refresh()
     assert res.metadata.creators[0].name == "Black, Scott S"
     assert res.metadata.creators[1].name == "Testing"
     reversed = [res.metadata.creators[1], res.metadata.creators[0]]
     res.metadata.creators = reversed
     res.save()
-    res.refresh()
     assert res.metadata.creators[1].name == "Black, Scott S"
     assert res.metadata.creators[0].name == "Testing"
 
@@ -144,7 +138,6 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.relations = [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
     new_resource.save()
-    new_resource.refresh()
 
     assert 'resource test' == new_resource.metadata.title
     assert len(new_resource.metadata.subjects) == 2
@@ -185,7 +178,7 @@ def test_resource_download(new_resource):
 def test_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
         file = resource.files()[0]
-        downloaded_file = resource.download(file, save_path=tmp)
+        downloaded_file = resource.file_download(file, save_path=tmp)
         assert os.path.exists(downloaded_file)
         assert os.path.basename(downloaded_file) == file.name
 
@@ -193,7 +186,7 @@ def test_aggregation_download(resource):
     assert len(resource.aggregations()) == 1
     agg = resource.aggregations()[0]
     with tempfile.TemporaryDirectory() as tmp:
-        agg.download(tmp)
+        resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
         assert files[0] == "logan.vrt.zip"
@@ -202,8 +195,7 @@ def test_aggregation_delete(resource):
     assert len(resource.aggregations()) == 1
     assert len(resource.files()) == 1
     agg = resource.aggregations()[0]
-    agg.delete()
-    resource.refresh()
+    resource.aggregation_delete(agg)
     assert len(resource.aggregations()) == 0
     assert len(resource.files()) == 1
 
@@ -211,69 +203,59 @@ def test_aggregation_remove(resource):
     assert len(resource.aggregations()) == 1
     assert len(resource.files()) == 1
     agg = resource.aggregations()[0]
-    agg.remove()
-    resource.refresh()
+    resource.aggregation_remove(agg)
     assert len(resource.aggregations()) == 0
     assert len(resource.files()) == 4
 
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 0
-    new_resource.upload("data/other.txt")
-    new_resource.refresh()
+    new_resource.file_upload("data/other.txt")
     assert len(new_resource.files()) == 1
     file = new_resource.files()[0]
-    new_resource.rename(file, "updated.txt")
-    new_resource.refresh()
+    new_resource.file_rename(file, "updated.txt")
     assert new_resource.files()[0].name == "updated.txt"
 
 def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
-    new_resource.create_folder("folder")
-    new_resource.upload("data/other.txt", dest_relative_path="folder")
-    new_resource.refresh()
+    new_resource.folder_create("folder")
+    new_resource.file_upload("data/other.txt", destination_path="folder")
     assert len(new_resource.files()) == 1
-    new_resource.aggregate(new_resource.files()[0], agg_type=AggregationType.SingleFileAggregation)
-    new_resource.refresh()
+    new_resource.file_aggregate(new_resource.files()[0], agg_type=AggregationType.SingleFileAggregation)
     assert len(new_resource.files()) == 0
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.aggregations()[0].files()) == 1
 
 def test_create_update_reference(new_resource):
     assert len(new_resource.aggregations()) == 0
-    new_resource.create_reference("reference", "http://studio.bakajo.com")
-    new_resource.refresh()
+    new_resource.reference_create("reference", "http://studio.bakajo.com")
     assert len(new_resource.aggregations()) == 1
     aggregation = new_resource.aggregations()[0]
     assert len(aggregation.files()) == 1
     file = aggregation.files()[0]
     assert file.name == "reference.url"
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(file, save_path=tmp)
+        new_resource.file_download(file, save_path=tmp)
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "http://studio.bakajo.com" in str(f.read())
 
-    new_resource.update_reference(new_resource.aggregations()[0].files()[0].name, "https://duckduckgo.com")
+    new_resource.reference_update(new_resource.aggregations()[0].files()[0].name, "https://duckduckgo.com")
 
     with tempfile.TemporaryDirectory() as tmp:
-        new_resource.download(new_resource.aggregations()[0].files()[0], save_path=tmp)
+        new_resource.file_download(new_resource.aggregations()[0].files()[0], save_path=tmp)
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "https://duckduckgo.com" in str(f.read())
 
 def test_file_unzip(new_resource):
-    new_resource.upload("data/georaster_composite.zip")
-    new_resource.refresh()
+    new_resource.file_upload("data/georaster_composite.zip")
     assert len(new_resource.files()) == 1
     assert len(new_resource.aggregations()) == 0
-    new_resource.unzip(new_resource.files()[0])
-    new_resource.refresh()
+    new_resource.file_unzip(new_resource.files()[0])
     assert len(new_resource.aggregations()) == 1
 
 def test_delete_file(new_resource):
-    new_resource.upload("data/other.txt")
-    new_resource.refresh()
+    new_resource.file_upload("data/other.txt")
     assert len(new_resource.files()) == 1
-    new_resource.delete(new_resource.files()[0])
-    new_resource.refresh()
+    new_resource.file_delete(new_resource.files()[0])
     assert len(new_resource.files()) == 0
 
 def test_access_rules(new_resource):
@@ -338,29 +320,26 @@ def test_user_info(hydroshare):
 def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2 # exclude rdf/xml file
-    new_resource.upload(*[root_path + file for file in files])
-    new_resource.refresh()
+    new_resource.file_upload(*[root_path + file for file in files])
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
     agg_type = agg.metadata.type
     assert len(agg.files()) == file_count
-    agg.remove()
-    new_resource.refresh()
+    new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
-    agg = new_resource.aggregate(main_file, agg_type)
+    agg = new_resource.file_aggregate(main_file, agg_type)
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
-        agg.download(tmp)
+        new_resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
-    agg.delete()
-    new_resource.refresh()
+    new_resource.aggregation_delete(agg)
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == 0
 
@@ -371,31 +350,27 @@ def test_aggregations(new_resource, files):
 def test_aggregation_fileset(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2 # exclude rdf/xml file
-    new_resource.create_folder("asdf")
-    new_resource.upload(*[root_path + file for file in files], dest_relative_path="asdf")
-    new_resource.refresh()
+    new_resource.folder_create("asdf")
+    new_resource.file_upload(*[root_path + file for file in files], destination_path="asdf")
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
     agg_type = agg.metadata.type
     assert len(agg.files()) == file_count
-    agg.remove()
-    new_resource.refresh()
+    new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
-    agg = new_resource.aggregate(main_file, agg_type=agg_type)
-    new_resource.refresh()
+    agg = new_resource.file_aggregate(main_file, agg_type=agg_type)
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     assert len(agg.files()) == file_count
     with tempfile.TemporaryDirectory() as tmp:
-        agg.download(tmp)
+        new_resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
-    agg.delete()
-    new_resource.refresh()
+    new_resource.aggregation_delete(agg)
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == 0
 
@@ -414,63 +389,56 @@ def test_pandas_series_remote(timeseries_resource):
     assert len(series_map) == 1440
 
 def test_folder_zip(new_resource):
-    new_resource.create_folder("test_folder")
-    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
-    new_resource.zip("test_folder")
+    new_resource.folder_create("test_folder")
+    new_resource.file_upload("data/other.txt", destination_path="test_folder")
+    new_resource.file_zip("test_folder")
     new_resource.refresh()
     assert new_resource.file().path == "test_folder.zip"
     assert not new_resource.file(path="data/other.txt")
 
 def test_folder_zip_specify_name(new_resource):
-    new_resource.create_folder("test_folder")
-    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
-    new_resource.zip("test_folder", "test.zip", False)
-    new_resource.refresh()
+    new_resource.folder_create("test_folder")
+    new_resource.file_upload("data/other.txt", destination_path="test_folder")
+    new_resource.file_zip("test_folder", "test.zip", False)
     assert new_resource.file(path="test.zip").path == "test.zip"
     assert new_resource.file(path="test_folder/other.txt").path == "test_folder/other.txt"
 
 def test_folder_rename(new_resource):
-    new_resource.create_folder("test_folder")
-    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
-    new_resource.rename("test_folder", "renamed_folder")
-    new_resource.refresh()
+    new_resource.folder_create("test_folder")
+    new_resource.file_upload("data/other.txt", destination_path="test_folder")
+    new_resource.folder_rename("test_folder", "renamed_folder")
     assert new_resource.file(path="renamed_folder/other.txt")
 
 def test_folder_delete(new_resource):
-    new_resource.create_folder("test_folder")
-    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
-    new_resource.refresh()
+    new_resource.folder_create("test_folder")
+    new_resource.file_upload("data/other.txt", destination_path="test_folder")
     assert len(new_resource.files()) == 1
-    new_resource.delete("test_folder")
-    new_resource.refresh()
+    new_resource.folder_delete("test_folder")
     assert not new_resource.file()
 
 def test_zipped_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
-        bag = resource.download(resource.file(path="other.txt").path, zipped=True, save_path=tmp)
+        bag = resource.file_download(resource.file(path="other.txt").path, zipped=True, save_path=tmp)
         assert os.path.exists(bag)
         assert bag.endswith(".zip")
 
 def test_folder_download(new_resource):
-    new_resource.create_folder("test_folder")
-    new_resource.upload("data/other.txt", dest_relative_path="test_folder")
-    new_resource.refresh()
+    new_resource.folder_create("test_folder")
+    new_resource.file_upload("data/other.txt", destination_path="test_folder")
     assert len(new_resource.files()) == 1
     with tempfile.TemporaryDirectory() as td:
-        downloaded_folder = new_resource.download("test_folder", save_path=td)
+        downloaded_folder = new_resource.folder_download("test_folder", save_path=td)
         assert os.path.basename(downloaded_folder) == "test_folder.zip"
 
 #@pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
 def test_filename_spaces(hydroshare):
     res = hydroshare.create()
-    res.create_folder("with spaces")
-    res.upload("data/other.txt", dest_relative_path="with spaces")
-    res.refresh()
+    res.folder_create("with spaces")
+    res.file_upload("data/other.txt", destination_path="with spaces")
     file = res.file(path="with spaces/other.txt")
     assert file
-    res.rename(file, "with spaces/with spaces file.txt")
-    res.refresh()
+    res.file_rename(file, "with spaces/with spaces file.txt")
     file = res.file(path="with spaces/with spaces file.txt")
     with tempfile.TemporaryDirectory() as td:
-        filename = res.download(file, save_path=td)
+        filename = res.file_download(file, save_path=td)
         assert os.path.basename(filename) == "with spaces file.txt"

@@ -65,6 +65,9 @@ class Aggregation:
         self._parsed_aggregations = None
         self._parsed_checksums = checksums
 
+    def __str__(self):
+        return self._map_path
+
     @property
     def _map(self):
         if not self._retrieved_map:
@@ -109,14 +112,77 @@ class Aggregation:
         return self._parsed_aggregations
 
     @property
+    def _checksums_path(self):
+        path = self.metadata_path.split("/data/", 1)[0]
+        path = urljoin(path, "manifest-md5.txt")
+        return path
+
+    @property
+    def _hsapi_path(self):
+        resource_path = self._resource_path
+        hsapi_path = urljoin("hsapi", resource_path)
+        return hsapi_path
+
+    @property
+    def _resource_path(self):
+        resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
+        return resource_path
+
+    def _retrieve_and_parse(self, path):
+        file_str = self._hs_session.retrieve_string(path)
+        instance = load_rdf(file_str)
+        return instance
+
+    def _retrieve_checksums(self, path):
+        file_str = self._hs_session.retrieve_string(path)
+        data = {pathname2url(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)}
+        return data
+
+    def _download(self, save_path: str = "", unzip_to: str = None) -> str:
+        main_file_path = self.main_file_path
+
+        path = urljoin(self._resource_path, "data", "contents", main_file_path)
+        params = {"zipped": "true", "aggregation": "true"}
+        path = path.replace('resource', 'django_irods/rest_download', 1)
+        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path, params=params)
+
+        if unzip_to:
+            import zipfile
+            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
+                zip_ref.extractall(unzip_to)
+                os.remove(downloaded_zip)
+            return unzip_to
+        return downloaded_zip
+
+    @property
     def metadata_file(self):
         return self.metadata_path.split("/data/contents/", 1)[1]
+
+    @property
+    def metadata(self) -> BaseMetadata:
+        return self._metadata
+
+    @property
+    def metadata_path(self) -> str:
+        return urlparse(str(self._map.describes.is_documented_by)).path
+
+    @property
+    def main_file_path(self) -> str:
+        mft = main_file_type(self.metadata.type)
+        if mft:
+            for file in self.files():
+                if str(file).endswith(mft):
+                    return file.path
+        if self.metadata.type == AggregationType.FileSetAggregation:
+            return self.files()[0].folder
+        return self.files()[0].path
 
     def save(self) -> None:
         metadata_file = self.metadata_file
         metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         url = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
+        self.refresh()
 
     def files(self, search_aggregations=False, **kwargs) -> List[File]:
         files = self._files
@@ -152,80 +218,8 @@ class Aggregation:
             return aggregations[0]
         return None
 
-    @property
-    def metadata(self) -> BaseMetadata:
-        return self._metadata
-
-    @property
-    def metadata_path(self) -> str:
-        return urlparse(str(self._map.describes.is_documented_by)).path
-
-    @property
-    def _checksums_path(self):
-        path = self.metadata_path.split("/data/", 1)[0]
-        path = urljoin(path, "manifest-md5.txt")
-        return path
-
-    @property
-    def main_file_path(self) -> str:
-        mft = main_file_type(self.metadata.type)
-        if mft:
-            for file in self.files():
-                if str(file).endswith(mft):
-                    return file.path
-        if self.metadata.type == AggregationType.FileSetAggregation:
-            return self.files()[0].folder
-        return self.files()[0].path
-
-    @property
-    def _hsapi_path(self):
-        resource_path = self._resource_path
-        hsapi_path = urljoin("hsapi", resource_path)
-        return hsapi_path
-
-    @property
-    def _resource_path(self):
-        resource_path = self.metadata_path[:len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
-        return resource_path
-
-    def download(self, save_path: str = "", unzip_to: str = None) -> str:
-        main_file_path = self.main_file_path
-
-        path = urljoin(self._resource_path, "data", "contents", main_file_path)
-        params = {"zipped": "true", "aggregation": "true"}
-        path = path.replace('resource', 'django_irods/rest_download', 1)
-        downloaded_zip = self._hs_session.retrieve_zip(path, save_path=save_path, params=params)
-
-        if unzip_to:
-            import zipfile
-            with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
-                zip_ref.extractall(unzip_to)
-                os.remove(downloaded_zip)
-            return unzip_to
-        return downloaded_zip
-
-    def remove(self) -> None:
-        path = urljoin(self._hsapi_path, "functions", "remove-file-type", self.metadata.type.value + "LogicalFile", self.main_file_path)
-        self._hs_session.post(path, status_code=200)
-
-    def delete(self) -> None:
-        path = urljoin(self._hsapi_path, "functions", "delete-file-type", self.metadata.type.value + "LogicalFile", self.main_file_path)
-        self._hs_session.delete(path, status_code=200)
-
-    def __str__(self):
-        return self._map_path
-
-    def _retrieve_and_parse(self, path):
-        file_str = self._hs_session.retrieve_string(path)
-        instance = load_rdf(file_str)
-        return instance
-
-    def _retrieve_checksums(self, path):
-        file_str = self._hs_session.retrieve_string(path)
-        data = {pathname2url(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)}
-        return data
-
     def refresh(self) -> None:
+        # TODO, refresh should destroy the aggregation objects and async fetch everything.
         self._retrieved_map = None
         self._retrieved_metadata = None
         self._parsed_files = None
@@ -240,7 +234,7 @@ class Aggregation:
 
         if agg_path is None:
             with tempfile.TemporaryDirectory() as td:
-                self.download(unzip_to=td)
+                self._download(unzip_to=td)
                 # zip extracted to folder with main file name
                 file_name = self.file(extension=".sqlite").name
                 return to_series(urljoin(td, file_name, file_name))
@@ -254,84 +248,9 @@ class Resource(Aggregation):
         path = urlparse(self.metadata.identifier).path
         return '/hsapi' + path
 
-    def save(self) -> None:
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
-        path = urljoin(self._hsapi_path, "ingest_metadata")
-        self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
-
-    @property
-    def resource_id(self) -> str:
-        return self._map.identifier
-
-    @property
-    def access_permission(self):
-        path = urljoin(self._hsapi_path, "access")
-        response = self._hs_session.get(path, status_code=200)
-        return response.json()
-
-    def system_metadata(self):
-        hsapi_path = urljoin(self._hsapi_path, 'sysmeta')
-        return self._hs_session.get(hsapi_path, status_code=200).json()
-
-    def access_rules(self, public: bool):
-        url = urljoin(self._hsapi_path, "access")
-        raise NotImplementedError("TODO")
-
-    def create_folder(self, folder: str) -> None:
-        path = urljoin(self._hsapi_path, "folders", folder)
-        self._hs_session.put(path, status_code=201)
-
-    def create_reference(self, file_name: str, url: str, path: str = '') -> None:
-        request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data-store-add-reference")
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
-                                                  "ref_url": url},
-                              status_code=200)
-
-    def update_reference(self, file_name: str, url: str, path: str = '') -> None:
-        request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data_store_edit_reference_url")
-        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
-                                                  "url_filename": file_name, "new_ref_url": url},
-                              status_code=200)
-
-    def upload(self, *files: str, dest_relative_path: str ="") -> None:
-        if len(files) == 1:
-            self._upload(files[0], dest_relative_path=dest_relative_path)
-        else:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zipped_file = urljoin(tmpdir, 'files.zip')
-                with ZipFile(urljoin(tmpdir, zipped_file), 'w') as zipped:
-                    for file in files:
-                        zipped.write(file, basename(file))
-                self._upload(zipped_file, dest_relative_path=dest_relative_path)
-                unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", dest_relative_path, 'files.zip')
-                self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
-
-    def _upload(self, file, dest_relative_path):
-        path = urljoin(self._hsapi_path, "files", dest_relative_path.strip("/"))
+    def _upload(self, file, destination_path):
+        path = urljoin(self._hsapi_path, "files", destination_path.strip("/"))
         self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
-
-    def download(self, *paths: str, save_path: str = "", zipped: bool = False, unzip_to: str = None) -> str:
-        if len(paths) == 0:
-            return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
-        if len(paths) > 1:
-            raise NotImplementedError("Currently may only download one file at a time, hydroshare needs to be updated to allow for more")
-        path = paths[0]
-        if zipped or is_folder(path):
-            return self._hs_session.retrieve_zip(urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"})
-        else:
-            return self._hs_session.retrieve_file(urljoin(self._resource_path, "data", "contents", path), save_path)
-
-    def delete(self, path: str = None) -> None:
-        """"""
-        if path is None:
-            hsapi_path = self._hsapi_path
-            self._hs_session.delete(hsapi_path, status_code=204)
-            self.refresh()
-        else:
-            if is_folder(path):
-                self._delete_file_folder(path)
-            else:
-                self._delete_file(path)
 
     def _delete_file(self, path) -> None:
         path = urljoin(self._hsapi_path, "files", path)
@@ -344,24 +263,118 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "folders", path)
         self._hs_session.delete(path, status_code=200)
 
-    def rename(self, path: str, new_path: str) -> None:
+    # system information
+
+    @property
+    def resource_id(self) -> str:
+        return self._map.identifier
+
+    def system_metadata(self):
+        hsapi_path = urljoin(self._hsapi_path, 'sysmeta')
+        return self._hs_session.get(hsapi_path, status_code=200).json()
+
+    # access operations
+
+    def access_rules(self, public: bool):
+        url = urljoin(self._hsapi_path, "access")
+        raise NotImplementedError("TODO")
+
+    @property
+    def access_permission(self):
+        path = urljoin(self._hsapi_path, "access")
+        response = self._hs_session.get(path, status_code=200)
+        return response.json()
+
+    # resource operations
+
+    def download(self, save_path: str = "") -> str:
+        return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
+
+    def delete(self) -> None:
+        """"""
+        hsapi_path = self._hsapi_path
+        self._hs_session.delete(hsapi_path, status_code=204)
+        self.refresh()
+        self.refresh()
+
+    def save(self) -> None:
+        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        path = urljoin(self._hsapi_path, "ingest_metadata")
+        self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
+        self.refresh()
+
+    # referenced content operations
+
+    def reference_create(self, file_name: str, url: str, path: str = '') -> None:
+        request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data-store-add-reference")
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name,
+                                                  "ref_url": url},
+                              status_code=200)
+        self.refresh()
+
+    def reference_update(self, file_name: str, url: str, path: str = '') -> None:
+        request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data_store_edit_reference_url")
+        self._hs_session.post(request_path, data={"res_id": self.resource_id, "curr_path": path,
+                                                  "url_filename": file_name, "new_ref_url": url},
+                              status_code=200)
+        self.refresh()
+
+    # file operations
+
+    def folder_create(self, folder: str) -> None:
+        path = urljoin(self._hsapi_path, "folders", folder)
+        self._hs_session.put(path, status_code=201)
+
+    def folder_rename(self, path: str, new_path: str) -> None:
+        self.file_rename(path=path, new_path=new_path)
+
+    def folder_delete(self, path: str = None) -> None:
+        self._delete_file_folder(path)
+        self.refresh()
+
+    def folder_download(self, *paths: str, save_path: str = "", zipped: bool = False):
+        if len(paths) > 1:
+            raise NotImplementedError(
+                "Currently may only download one folder at a time, hydroshare needs to be updated to allow for more")
+        path = paths[0]
+        return self._hs_session.retrieve_zip(urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"})
+
+    def file_download(self, *paths: str, save_path: str = "", zipped: bool = False):
+        if len(paths) > 1:
+            raise NotImplementedError(
+                "Currently may only download one file at a time, hydroshare needs to be updated to allow for more")
+        path = paths[0]
+        if zipped:
+            return self._hs_session.retrieve_zip(urljoin(self._resource_path, "data", "contents", path), save_path,
+                                                 params={"zipped": "true"})
+        else:
+            return self._hs_session.retrieve_file(urljoin(self._resource_path, "data", "contents", path), save_path)
+
+    def file_delete(self, path: str = None) -> None:
+        self._delete_file(path)
+        self.refresh()
+
+    def file_rename(self, path: str, new_path: str) -> None:
         rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
         self._hs_session.post(rename_path, status_code=200,
                               data={"source_path": path, "target_path": new_path})
+        self.refresh()
 
-    def zip(self, path: str, zip_name: str = None, remove_files: bool = True) -> None:
+    def file_zip(self, path: str, zip_name: str = None, remove_files: bool = True) -> None:
         zip_name = basename(path) + ".zip" if not zip_name else zip_name
         data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_files}
         zip_path = urljoin(self._hsapi_path, "functions", "zip")
         self._hs_session.post(zip_path, status_code=200, data=data)
+        self.refresh()
 
-    def unzip(self, path: str) -> None:
+    def file_unzip(self, path: str) -> None:
         if not path.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
         unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", path)
         self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+        self.refresh()
 
-    def aggregate(self, path, agg_type: AggregationType) -> None:
+    def file_aggregate(self, path, agg_type: AggregationType) -> None:
         type_value = agg_type.value
         data = {}
         if agg_type == AggregationType.SingleFileAggregation:
@@ -375,10 +388,37 @@ class Resource(Aggregation):
         self.refresh()
         return self.aggregation(file__path=path)
 
+    def file_upload(self, *files: str, destination_path: str = "") -> None:
+        if len(files) == 1:
+            self._upload(files[0], destination_path=destination_path)
+        else:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                zipped_file = urljoin(tmpdir, 'files.zip')
+                with ZipFile(urljoin(tmpdir, zipped_file), 'w') as zipped:
+                    for file in files:
+                        zipped.write(file, basename(file))
+                self._upload(zipped_file, destination_path=destination_path)
+                unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip')
+                self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+        self.refresh()
+        # TODO, return those files?
 
-def is_folder(path):
-    """Checks for an extension to determine if the path is to a folder"""
-    return splitext(path)[1] == ''
+    # aggregation operations
+
+    def aggregation_remove(self, aggregation: Aggregation) -> None:
+        path = urljoin(aggregation._hsapi_path, "functions", "remove-file-type", aggregation.metadata.type.value + "LogicalFile", aggregation.main_file_path)
+        aggregation._hs_session.post(path, status_code=200)
+        aggregation.refresh()
+        self.refresh()
+
+    def aggregation_delete(self, aggregation: Aggregation) -> None:
+        path = urljoin(aggregation._hsapi_path, "functions", "delete-file-type", aggregation.metadata.type.value + "LogicalFile", aggregation.main_file_path)
+        aggregation._hs_session.delete(path, status_code=200)
+        aggregation.refresh()
+        self.refresh()
+
+    def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
+        return aggregation._download(save_path=save_path, unzip_to=unzip_to)
 
 
 class HydroShareSession:
@@ -478,17 +518,6 @@ class HydroShareSession:
                                                                                   response.content))
         return response
 
-def encode_resource_url(url):
-    """
-    URL encodes a full resource file/folder url.
-    :param url: a string url
-    :return: url encoded string
-    """
-    import urllib
-    parsed_url = urllib.parse.urlparse(url)
-    url_encoded_path = pathname2url(parsed_url.path)
-    encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
-    return encoded_url
 
 class HydroShare:
 
@@ -522,3 +551,20 @@ class HydroShare:
     def user(self, user_id: int) -> User:
         response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
         return User(**response.json())
+
+
+def encode_resource_url(url):
+    """
+    URL encodes a full resource file/folder url.
+    :param url: a string url
+    :return: url encoded string
+    """
+    import urllib
+    parsed_url = urllib.parse.urlparse(url)
+    url_encoded_path = pathname2url(parsed_url.path)
+    encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
+    return encoded_url
+
+def is_folder(path):
+    """Checks for an extension to determine if the path is to a folder"""
+    return splitext(path)[1] == ''
