@@ -5,19 +5,9 @@ from pydantic import AnyUrl, BaseModel, EmailStr, Field, HttpUrl, root_validator
 
 from hsclient.schemas import base_models
 from hsclient.schemas.enums import RelationType, UserIdentifierType, VariableType
+from hsclient.schemas.json_models import User
 from hsclient.schemas.root_validators import group_user_identifiers, parse_relation
 from hsclient.schemas.validators import validate_user_url
-
-
-class User(BaseModel):
-    name: str = None
-    email: str = None
-    url: AnyUrl = None
-    phone: str = None
-    address: str = None
-    organization: str = None
-    website: AnyUrl = None
-    identifiers: Dict[UserIdentifierType, str] = {}
 
 
 class Relation(BaseModel):
@@ -112,6 +102,10 @@ class Creator(BaseModel):
             user_dict["homepage"] = user.website
 
         return Creator(**user_dict)
+
+
+class Author(Creator):
+    pass
 
 
 class Contributor(BaseModel):

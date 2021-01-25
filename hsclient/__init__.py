@@ -1,1 +1,1 @@
-from hsclient.hydroshare import File, Aggregation, Resource, HydroShare
+from hsclient.hydroshare import Aggregation, File, HydroShare, Resource

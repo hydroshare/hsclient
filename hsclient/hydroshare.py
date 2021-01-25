@@ -3,8 +3,9 @@ import os
 import sqlite3
 import tempfile
 import time
+from datetime import datetime
 from posixpath import basename, dirname, join as urljoin, splitext
-from typing import Dict, List
+from typing import Dict, List, Union
 from urllib.parse import urlparse
 from urllib.request import pathname2url, url2pathname
 from zipfile import ZipFile
@@ -15,7 +16,8 @@ import requests
 from hsclient.schemas import load_rdf, rdf_string
 from hsclient.schemas.base_models import BaseMetadata
 from hsclient.schemas.enums import AggregationType
-from hsclient.schemas.fields import User
+from hsclient.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
+from hsclient.schemas.json_models import ResourcePreview, User
 from hsclient.utils import attribute_filter, is_aggregation, main_file_type
 
 
@@ -501,7 +503,9 @@ class HydroShareSession:
         response = self.get(f"/hsapi/taskstatus/{task_id}/", status_code=200)
         return response.json()['status']
 
-    def retrieve_zip(self, path, save_path="", params={}):
+    def retrieve_zip(self, path, save_path="", params=None):
+        if params is None:
+            params = {}
         file = self.get(path, status_code=200, allow_redirects=True, params=params)
 
         json_response = file.json()
@@ -576,11 +580,89 @@ class HydroShare:
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
 
-    def search(self):
-        raise NotImplementedError("TODO")
+    def search(
+        self,
+        creator: str = None,
+        contributor: str = None,
+        owner: str = None,
+        group_name: str = None,
+        from_date: datetime = None,
+        to_date: datetime = None,
+        edit_permission: bool = False,
+        resource_types: List[str] = [],
+        subject: List[str] = [],
+        full_text_search: str = None,
+        published: bool = False,
+        period_coverage: PeriodCoverage = None,
+        spatial_coverage: Union[BoxCoverage, PointCoverage] = None,
+    ):
+        """
+        Query the GET /hsapi/resource/ REST end point of the HydroShare server.
+        :param creator: Filter results by the HydroShare username or email
+        :param author: Filter results by the HydroShare username or email
+        :param owner: Filter results by the HydroShare username or email
+        :param group_name: Filter results by the HydroShare group name associated with resources
+        :param from_date: Filter results to those created after from_date.  Must be datetime.date.
+        :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have
+            no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get
+            resources created up to and including 2015-05-05)
+        :param types: Filter results to particular HydroShare resource types. (Deprecated, resources have migrated to Composite)
+        :param subject: Filter by comma separated list of subjects
+        :param full_text_search: Filter by full text search
+        :param edit_permission: Filter by boolean edit permission
+        :param published: Filter by boolean published status
+        :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use.
+        """
+
+        params = {"edit_permission": edit_permission, "published": published}
+        if creator:
+            params["creator"] = creator
+        if contributor:
+            params["author"] = contributor
+        if owner:
+            params["owner"] = owner
+        if group_name:
+            params["group"] = group_name
+        if resource_types:
+            params["type[]"] = resource_types
+        if subject:
+            params["subject"] = ",".join(subject)
+        if full_text_search:
+            params["full_text_search"] = full_text_search
+        if period_coverage:
+            params["from_date"] = period_coverage.start
+            params["to_date"] = period_coverage.end
+        if spatial_coverage:
+            params["coverage_type"] = spatial_coverage.type
+            if spatial_coverage.type == "point":
+                params["north"] = spatial_coverage.north
+                params["east"] = spatial_coverage.east
+            else:
+                params["north"] = spatial_coverage.northlimit
+                params["east"] = spatial_coverage.eastlimit
+                params["south"] = spatial_coverage.southlimit
+                params["west"] = spatial_coverage.westlimit
+        response = self._hs_session.get("/hsapi/resource/", 200, params=params)
+
+        res = response.json()
+        results = res['results']
+        print(res['count'])
+        for item in results:
+            yield ResourcePreview(**item)
+
+        while res['next']:
+            next_url = res['next']
+            next_url = urlparse(next_url)
+            path = next_url.path
+            params = next_url.query
+            response = self._hs_session.get(path, 200, params=params)
+            res = response.json()
+            results = res['results']
+            for item in results:
+                yield ResourcePreview(**item)
 
     def resource(self, resource_id: str, validate: bool = True) -> Resource:
-        return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
+        res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
             res.metadata
         return res
