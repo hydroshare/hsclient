@@ -44,6 +44,13 @@ class BaseAggregationMetadata(BaseMetadata):
 
 
 class GeographicRasterMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.GeographicRasterAggregation, description="TODO Jeff", title="TODO Jeff"
     )
@@ -58,6 +65,13 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
 
 
 class GeographicFeatureMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.GeographicFeatureAggregation, description="TODO Jeff", title="TODO Jeff"
     )
@@ -72,6 +86,13 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
 
 
 class MultidimensionalMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.MultidimensionalAggregation, description="TODO Jeff", title="TODO Jeff"
     )
@@ -87,24 +108,52 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
 
 
 class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.ReferencedTimeSeriesAggregation, description="TODO Jeff", title="TODO Jeff"
     )
 
 
 class FileSetMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.FileSetAggregation, description="TODO Jeff", title="TODO Jeff"
     )
 
 
 class SingleFileMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.SingleFileAggregation, description="TODO Jeff", title="TODO Jeff"
     )
 
 
 class TimeSeriesMetadata(BaseAggregationMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AggregationType = Field(
         const=True, default=AggregationType.TimeSeriesAggregation, description="TODO Jeff", title="TODO Jeff"
     )

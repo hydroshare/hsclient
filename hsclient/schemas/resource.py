@@ -27,6 +27,13 @@ from hsclient.schemas.validators import list_not_empty, parse_identifier, parse_
 
 
 class ResourceMetadata(BaseMetadata):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: AnyUrl = Field(const=True, default="CompositeResource", description="TODO Jeff", title="TODO Jeff")
 
     url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")

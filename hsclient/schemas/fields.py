@@ -11,6 +11,13 @@ from hsclient.schemas.validators import validate_user_url
 
 
 class Relation(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: RelationType = Field(description="TODO Jeff", title="TODO Jeff")
     value: str = Field(max_length=500, description="TODO Jeff", title="TODO Jeff")
 
@@ -18,6 +25,13 @@ class Relation(BaseModel):
 
 
 class CellInformation(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(default=None, max_length=500, description="TODO Jeff", title="TODO Jeff")
     rows: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     columns: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
@@ -27,6 +41,13 @@ class CellInformation(BaseModel):
 
 
 class Rights(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     statement: str = Field(description="TODO Jeff", title="TODO Jeff")
     url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
 
@@ -80,6 +101,13 @@ class Rights(BaseModel):
 
 
 class Creator(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(default=None, max_length=100, description="TODO Jeff", title="TODO Jeff")
 
     phone: str = Field(default=None, max_length=25, description="TODO Jeff", title="TODO Jeff")
@@ -105,10 +133,24 @@ class Creator(BaseModel):
 
 
 class Author(Creator):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     pass
 
 
 class Contributor(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     phone: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     address: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
@@ -136,6 +178,13 @@ class Contributor(BaseModel):
 
 
 class AwardInfo(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     funding_agency_name: str = Field(description="TODO Jeff", title="TODO Jeff")
     title: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     number: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
@@ -143,6 +192,13 @@ class AwardInfo(BaseModel):
 
 
 class BandInformation(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(max_length=500, description="TODO Jeff", title="TODO Jeff")
     variable_name: str = Field(default=None, max_length=100, description="TODO Jeff", title="TODO Jeff")
     variable_unit: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
@@ -155,6 +211,13 @@ class BandInformation(BaseModel):
 
 
 class FieldInformation(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     field_name: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
     field_type: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
     field_type_code: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
@@ -163,11 +226,25 @@ class FieldInformation(BaseModel):
 
 
 class GeometryInformation(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     feature_count: int = Field(default=0, description="TODO Jeff", title="TODO Jeff")
     geometry_type: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
 
 
 class Variable(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(max_length=1000, description="TODO Jeff", title="TODO Jeff")
     unit: str = Field(max_length=1000, description="TODO Jeff", title="TODO Jeff")
     type: VariableType = Field(description="TODO Jeff", title="TODO Jeff")
@@ -178,11 +255,25 @@ class Variable(BaseModel):
 
 
 class Publisher(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
     url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
 
 
 class TimeSeriesVariable(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     variable_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
     variable_name: str = Field(max_length=100, description="TODO Jeff", title="TODO Jeff")
     variable_type: str = Field(max_length=100, description="TODO Jeff", title="TODO Jeff")
@@ -192,6 +283,13 @@ class TimeSeriesVariable(BaseModel):
 
 
 class TimeSeriesSite(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     site_code: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
     site_name: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
     elevation_m: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
@@ -202,6 +300,13 @@ class TimeSeriesSite(BaseModel):
 
 
 class TimeSeriesMethod(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     method_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
     method_name: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
     method_type: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
@@ -210,22 +315,50 @@ class TimeSeriesMethod(BaseModel):
 
 
 class ProcessingLevel(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     processing_level_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
     definition: str = Field(default=None, max_length=200, description="TODO Jeff", title="TODO Jeff")
     explanation: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
 
 
 class Unit(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
     name: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
     abbreviation: str = Field(max_length=20, description="TODO Jeff", title="TODO Jeff")
 
 
 class UTCOffSet(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     value: float = Field(default=0, description="TODO Jeff", title="TODO Jeff")
 
 
 class TimeSeriesResult(BaseModel):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     series_id: str = Field(max_length=36, description="TODO Jeff", title="TODO Jeff")
     unit: Unit = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     status: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
@@ -241,6 +374,13 @@ class TimeSeriesResult(BaseModel):
 
 
 class BoxCoverage(base_models.BaseCoverage):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: str = Field(default="box", const=True, description="TODO Jeff", title="TODO Jeff")
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     northlimit: float = Field(gt=-90, lt=90, description="TODO Jeff", title="TODO Jeff")
@@ -259,6 +399,13 @@ class BoxCoverage(base_models.BaseCoverage):
 
 
 class BoxSpatialReference(base_models.BaseCoverage):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: str = Field(default="box", const=True, description="TODO Jeff", title="TODO Jeff")
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     northlimit: float = Field(description="TODO Jeff", title="TODO Jeff")
@@ -274,10 +421,22 @@ class BoxSpatialReference(base_models.BaseCoverage):
 
 
 class MultidimensionalBoxSpatialReference(BoxSpatialReference):
-    pass
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
 
 
 class PointCoverage(base_models.BaseCoverage):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: str = Field(default="point", const=True, description="TODO Jeff", title="TODO Jeff")
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     east: float = Field(gt=-180, lt=180, description="TODO Jeff", title="TODO Jeff")
@@ -287,6 +446,13 @@ class PointCoverage(base_models.BaseCoverage):
 
 
 class PointSpatialReference(base_models.BaseCoverage):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     type: str = Field(default="point", const=True, description="TODO Jeff", title="TODO Jeff")
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     east: float = Field(description="TODO Jeff", title="TODO Jeff")
@@ -299,10 +465,22 @@ class PointSpatialReference(base_models.BaseCoverage):
 
 
 class MultidimensionalPointSpatialReference(PointSpatialReference):
-    pass
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
 
 
 class PeriodCoverage(base_models.BaseCoverage):
+    """
+    TODO Jeff (description of class)
+    """
+
+    class Config:
+        title = 'TODO Jeff (title of class)'
+
     name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
     start: datetime = Field(description="TODO Jeff", title="TODO Jeff")
     end: datetime = Field(description="TODO Jeff", title="TODO Jeff")
