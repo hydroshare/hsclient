@@ -521,3 +521,32 @@ def test_filename_spaces(hydroshare):
     with tempfile.TemporaryDirectory() as td:
         filename = res.file_download(file, save_path=td)
         assert os.path.basename(filename) == "with spaces file.txt"
+
+
+def test_copy(new_resource):
+    try:
+        res_copy = new_resource.copy()
+        assert res_copy.metadata.title == new_resource.metadata.title
+        assert res_copy.resource_id != new_resource.resource_id
+    finally:
+        res_copy.delete()
+
+
+def test_resource_version(new_resource):
+    try:
+        res_version = new_resource.new_version()
+        assert res_version.metadata.title == new_resource.metadata.title
+        assert res_version.resource_id != new_resource.resource_id
+        version_of = next(
+            relation.value for relation in res_version.metadata.relations if relation.type == RelationType.isVersionOf
+        )
+        version_of = version_of.split("/")[-1]
+        assert version_of == new_resource.resource_id
+    finally:
+        res_version.delete()
+
+
+def test_resource_public(resource):
+    assert resource.system_metadata()['public'] is False
+    resource.set_sharing_status(public=True)
+    assert resource.system_metadata()['public'] is True

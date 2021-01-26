@@ -286,9 +286,10 @@ class Resource(Aggregation):
 
     # access operations
 
-    def access_rules(self, public: bool):
-        url = urljoin(self._hsapi_path, "access")
-        raise NotImplementedError("TODO")
+    def set_sharing_status(self, public: bool):
+        path = urljoin("hsapi", "resource", "accessRules", self.resource_id)
+        data = {'public': public}
+        self._hs_session.put(path, status_code=200, data=data)
 
     @property
     def access_permission(self):
@@ -297,6 +298,18 @@ class Resource(Aggregation):
         return response.json()
 
     # resource operations
+
+    def new_version(self):
+        path = urljoin(self._hsapi_path, "version")
+        response = self._hs_session.post(path, status_code=202)
+        resource_id = response.text
+        return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
+
+    def copy(self):
+        path = urljoin(self._hsapi_path, "copy")
+        response = self._hs_session.post(path, status_code=202)
+        resource_id = response.text
+        return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
 
     def download(self, save_path: str = "") -> str:
         return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
