@@ -593,7 +593,6 @@ class HydroShare:
         subject: List[str] = [],
         full_text_search: str = None,
         published: bool = False,
-        period_coverage: PeriodCoverage = None,
         spatial_coverage: Union[BoxCoverage, PointCoverage] = None,
     ):
         """
