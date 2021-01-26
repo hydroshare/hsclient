@@ -629,9 +629,10 @@ class HydroShare:
             params["subject"] = ",".join(subject)
         if full_text_search:
             params["full_text_search"] = full_text_search
-        if period_coverage:
-            params["from_date"] = period_coverage.start
-            params["to_date"] = period_coverage.end
+        if from_date:
+            params["from_date"] = from_date.strftime('%Y-%m-%d')
+        if to_date:
+            params["to_date"] = to_date.strftime('%Y-%m-%d')
         if spatial_coverage:
             params["coverage_type"] = spatial_coverage.type
             if spatial_coverage.type == "point":
