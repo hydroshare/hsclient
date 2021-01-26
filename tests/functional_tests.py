@@ -189,8 +189,9 @@ def test_resource_delete(hydroshare, new_resource):
     new_resource.delete()
     try:
         res = hydroshare.resource(res_id)
+        assert False
     except Exception as e:
-        assert str(e) == "failed to retrieve {}".format(res._map_url)
+        assert f"No resource was found for resource id:{res_id}" in str(e)
 
 
 def test_files_aggregations(resource):
