@@ -610,7 +610,7 @@ class HydroShare:
         self._hs_session.set_auth((username, password))
         self.my_user_info()  # validate credentials
 
-    def hs_juptyerhub(self, hs_auth_path="/home/jovyan/.hs_auth"):
+    def hs_juptyerhub(self, hs_auth_path="/home/jovyan/data/.hs_auth"):
         if not os.path.isfile(hs_auth_path):
             raise ValueError(f"hs_auth_path {hs_auth_path} does not exist.")
         with open(hs_auth_path, 'rb') as f:
@@ -715,5 +715,5 @@ class HydroShare:
         return User(**response.json())
 
     def my_user_info(self):
-        response = self._hs_session.get('hsapi/userInfo/', status_code=200)
+        response = self._hs_session.get('/hsapi/userInfo/', status_code=200)
         return response.json()
