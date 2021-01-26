@@ -64,7 +64,6 @@ class RelationType(StringEnum):
 
 
 class AggregationType(StringEnum):
-
     SingleFileAggregation = "Generic"
     FileSetAggregation = "FileSet"
     GeographicRasterAggregation = "GeoRaster"

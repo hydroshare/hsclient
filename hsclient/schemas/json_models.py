@@ -1,7 +1,6 @@
-from datetime import datetime
 from typing import Dict, List
 
-from pydantic import AnyUrl, BaseModel, Field, validator
+from pydantic import AnyUrl, BaseModel, validator
 
 from hsclient.schemas.enums import UserIdentifierType
 

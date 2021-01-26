@@ -27,29 +27,31 @@ from hsclient.schemas.validators import list_not_empty, parse_identifier, parse_
 
 
 class ResourceMetadata(BaseMetadata):
-    type: AnyUrl = Field(const=True, default="CompositeResource")
+    type: AnyUrl = Field(const=True, default="CompositeResource", description="TODO Jeff", title="TODO Jeff")
 
-    url: AnyUrl = Field()
+    url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
 
-    identifier: AnyUrl = Field()
-    title: str = Field(max_length=300, default=None, description="The description of a title")
-    abstract: str = Field(default=None)
-    language: str
-    subjects: List[str] = []
-    creators: List[Creator] = Field(default=[], description="A list of creators")
-    contributors: List[Contributor] = []
-    sources: List[str] = Field(default=[])
-    relations: List[Relation] = Field(default=[])
-    additional_metadata: Dict[str, str] = Field(default={})
-    rights: Rights = Field()
-    created: datetime = Field(default_factory=datetime.now)
-    modified: datetime = Field(default_factory=datetime.now)
-    published: datetime = Field(default=None)
-    awards: List[AwardInfo] = Field(default=[])
-    spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(default=None)
-    period_coverage: PeriodCoverage = Field(default=None)
-    publisher: Publisher = Field(default=None)
-    citation: str = Field(default=None, description="blah")
+    identifier: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
+    title: str = Field(max_length=300, default=None, description="TODO Jeff", title="TODO Jeff")
+    abstract: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    language: str = Field(description="TODO Jeff", title="TODO Jeff")
+    subjects: List[str] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    creators: List[Creator] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    contributors: List[Contributor] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    sources: List[str] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    relations: List[Relation] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    additional_metadata: Dict[str, str] = Field(default={}, description="TODO Jeff", title="TODO Jeff")
+    rights: Rights = Field(description="TODO Jeff", title="TODO Jeff")
+    created: datetime = Field(default_factory=datetime.now, description="TODO Jeff", title="TODO Jeff")
+    modified: datetime = Field(default_factory=datetime.now, description="TODO Jeff", title="TODO Jeff")
+    published: datetime = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    awards: List[AwardInfo] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(
+        default=None, description="TODO Jeff", title="TODO Jeff"
+    )
+    period_coverage: PeriodCoverage = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    publisher: Publisher = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    citation: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)
