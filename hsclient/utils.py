@@ -1,4 +1,6 @@
 from datetime import datetime
+from os.path import splitext
+from urllib.request import pathname2url
 
 from hsclient.schemas.enums import AggregationType
 
@@ -60,3 +62,22 @@ def attribute_filter(o, key, value) -> bool:
         # raise AttributeError(f"{o} has no attribute {key}")
     attr = getattr(o, key)
     return attr == value
+
+
+def encode_resource_url(url):
+    """
+    URL encodes a full resource file/folder url.
+    :param url: a string url
+    :return: url encoded string
+    """
+    import urllib
+
+    parsed_url = urllib.parse.urlparse(url)
+    url_encoded_path = pathname2url(parsed_url.path)
+    encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
+    return encoded_url
+
+
+def is_folder(path):
+    """Checks for an extension to determine if the path is to a folder"""
+    return splitext(path)[1] == ''

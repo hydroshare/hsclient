@@ -1,5 +1,6 @@
 import getpass
 import os
+import pickle
 import sqlite3
 import tempfile
 import time
@@ -12,13 +13,15 @@ from zipfile import ZipFile
 
 import pandas
 import requests
+from oauthlib.oauth2 import LegacyApplicationClient
+from requests_oauthlib import OAuth2Session
 
 from hsclient.schemas import load_rdf, rdf_string
 from hsclient.schemas.base_models import BaseMetadata
 from hsclient.schemas.enums import AggregationType
-from hsclient.schemas.fields import BoxCoverage, PeriodCoverage, PointCoverage
+from hsclient.schemas.fields import BoxCoverage, PointCoverage
 from hsclient.schemas.json_models import ResourcePreview, User
-from hsclient.utils import attribute_filter, is_aggregation, main_file_type
+from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
 
 class File(str):
@@ -455,15 +458,28 @@ class Resource(Aggregation):
 
 
 class HydroShareSession:
-    def __init__(self, username, password, host, protocol, port):
-        self._session = requests.Session()
-        self.set_auth((username, password))
+    def __init__(self, username, password, host, protocol, port, client_id=None, token=None):
         self._host = host
         self._protocol = protocol
         self._port = port
+        self._client_id = client_id
+        self._token = token
+        if client_id or token:
+            if not token or not client_id:
+                raise ValueError("Oauth2 requires both token and client_id be provided")
+            else:
+                self._session = OAuth2Session(client_id=client_id, token=token)
+        else:
+            self._session = requests.Session()
+            self.set_auth((username, password))
 
     def set_auth(self, auth):
+        if self._client_id:
+            raise NotImplementedError(f"This session is an Oauth2 session and does not provide the set_oauth method")
         self._session.auth = auth
+
+    def set_oauth(self, client_id, token):
+        self._session = OAuth2Session(client_id=client_id, token=token)
 
     @property
     def host(self):
@@ -570,15 +586,37 @@ class HydroShare:
         host: str = default_host,
         protocol: str = default_protocol,
         port: int = default_port,
+        client_id: str = None,
+        token: str = None,
     ):
-        self._hs_session = HydroShareSession(
-            username=username, password=password, host=host, protocol=protocol, port=port
-        )
+        if client_id or token:
+            if not client_id or not token:
+                raise ValueError("Oauth2 requires a client_id to be paired with a token")
+            else:
+                self._hs_session = HydroShareSession(
+                    host=host, protocol=protocol, port=port, client_id=client_id, token=token
+                )
+                self.my_user_info()  # validate credentials
+        else:
+            self._hs_session = HydroShareSession(
+                username=username, password=password, host=host, protocol=protocol, port=port
+            )
+            if username or password:
+                self.my_user_info()  # validate credentials
 
     def sign_in(self) -> None:
         username = input("Username: ").strip()
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
+        self.my_user_info()  # validate credentials
+
+    def hs_juptyerhub(self, hs_auth_path="/home/jovyan/.hs_auth"):
+        if not os.path.isfile(hs_auth_path):
+            raise ValueError(f"hs_auth_path {hs_auth_path} does not exist.")
+        with open(hs_auth_path, 'rb') as f:
+            client_id, token = pickle.load(f)
+            self._hs_session.set_oauth(client_id, token)
+            self.my_user_info()  # validate credentials
 
     def search(
         self,
@@ -676,21 +714,6 @@ class HydroShare:
         response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
         return User(**response.json())
 
-
-def encode_resource_url(url):
-    """
-    URL encodes a full resource file/folder url.
-    :param url: a string url
-    :return: url encoded string
-    """
-    import urllib
-
-    parsed_url = urllib.parse.urlparse(url)
-    url_encoded_path = pathname2url(parsed_url.path)
-    encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
-    return encoded_url
-
-
-def is_folder(path):
-    """Checks for an extension to determine if the path is to a folder"""
-    return splitext(path)[1] == ''
+    def my_user_info(self):
+        response = self._hs_session.get('hsapi/userInfo/', status_code=200)
+        return response.json()
