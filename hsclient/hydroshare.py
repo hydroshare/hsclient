@@ -13,7 +13,6 @@ from zipfile import ZipFile
 
 import pandas
 import requests
-from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 
 from hsclient.schemas import load_rdf, rdf_string
