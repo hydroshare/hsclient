@@ -614,7 +614,7 @@ class HydroShare:
         if not os.path.isfile(hs_auth_path):
             raise ValueError(f"hs_auth_path {hs_auth_path} does not exist.")
         with open(hs_auth_path, 'rb') as f:
-            client_id, token = pickle.load(f)
+            token, client_id = pickle.load(f)
             self._hs_session.set_oauth(client_id, token)
             self.my_user_info()  # validate credentials
 
