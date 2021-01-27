@@ -34,31 +34,31 @@ class ResourceMetadata(BaseMetadata):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: AnyUrl = Field(const=True, default="CompositeResource", description="TODO Jeff", title="TODO Jeff")
+    type: AnyUrl = Field(const=True, default="CompositeResource", title="TODO Jeff", description="TODO Jeff")
 
-    url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
+    url: AnyUrl = Field(title="TODO Jeff", description="TODO Jeff")
 
-    identifier: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
-    title: str = Field(max_length=300, default=None, description="TODO Jeff", title="TODO Jeff")
-    abstract: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    language: str = Field(description="TODO Jeff", title="TODO Jeff")
-    subjects: List[str] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    creators: List[Creator] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    contributors: List[Contributor] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    sources: List[str] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    relations: List[Relation] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    additional_metadata: Dict[str, str] = Field(default={}, description="TODO Jeff", title="TODO Jeff")
-    rights: Rights = Field(description="TODO Jeff", title="TODO Jeff")
-    created: datetime = Field(default_factory=datetime.now, description="TODO Jeff", title="TODO Jeff")
-    modified: datetime = Field(default_factory=datetime.now, description="TODO Jeff", title="TODO Jeff")
-    published: datetime = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    awards: List[AwardInfo] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
+    identifier: AnyUrl = Field(title="TODO Jeff", description="TODO Jeff")
+    title: str = Field(max_length=300, default=None, title="TODO Jeff", description="TODO Jeff")
+    abstract: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    language: str = Field(title="TODO Jeff", description="TODO Jeff")
+    subjects: List[str] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    creators: List[Creator] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    contributors: List[Contributor] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    sources: List[str] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    relations: List[Relation] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    additional_metadata: Dict[str, str] = Field(default={}, title="TODO Jeff", description="TODO Jeff")
+    rights: Rights = Field(title="TODO Jeff", description="TODO Jeff")
+    created: datetime = Field(default_factory=datetime.now, title="TODO Jeff", description="TODO Jeff")
+    modified: datetime = Field(default_factory=datetime.now, title="TODO Jeff", description="TODO Jeff")
+    published: datetime = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    awards: List[AwardInfo] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
     spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(
-        default=None, description="TODO Jeff", title="TODO Jeff"
+        default=None, title="TODO Jeff", description="TODO Jeff"
     )
-    period_coverage: PeriodCoverage = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    publisher: Publisher = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    citation: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    period_coverage: PeriodCoverage = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    publisher: Publisher = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    citation: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)

@@ -26,16 +26,16 @@ from hsclient.schemas.validators import parse_multidimensional_spatial_reference
 
 
 class BaseAggregationMetadata(BaseMetadata):
-    url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
-    title: str = Field(description="TODO Jeff", title="TODO Jeff")
-    subjects: List[str] = Field(default=[], description="TODO Jeff", title="TODO Jeff")
-    language: str = Field(default="eng", description="TODO Jeff", title="TODO Jeff")
-    additional_metadata: dict = Field(default={}, description="TODO Jeff", title="TODO Jeff")
+    url: AnyUrl = Field(title="TODO Jeff", description="TODO Jeff")
+    title: str = Field(title="TODO Jeff", description="TODO Jeff")
+    subjects: List[str] = Field(default=[], title="TODO Jeff", description="TODO Jeff")
+    language: str = Field(default="eng", title="TODO Jeff", description="TODO Jeff")
+    additional_metadata: dict = Field(default={}, title="TODO Jeff", description="TODO Jeff")
     spatial_coverage: Union[PointCoverage, BoxCoverage] = Field(
-        default=None, description="TODO Jeff", title="TODO Jeff"
+        default=None, title="TODO Jeff", description="TODO Jeff"
     )
-    period_coverage: PeriodCoverage = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    rights: Rights = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    period_coverage: PeriodCoverage = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    rights: Rights = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
     _parse_additional_metadata = root_validator(pre=True, allow_reuse=True)(parse_additional_metadata)
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
@@ -52,14 +52,14 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.GeographicRasterAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.GeographicRasterAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
-    band_information: BandInformation = Field(description="TODO Jeff", title="TODO Jeff")
+    band_information: BandInformation = Field(title="TODO Jeff", description="TODO Jeff")
     spatial_reference: Union[BoxSpatialReference, PointSpatialReference] = Field(
-        default=None, description="TODO Jeff", title="TODO Jeff"
+        default=None, title="TODO Jeff", description="TODO Jeff"
     )
-    cell_information: CellInformation = Field(description="TODO Jeff", title="TODO Jeff")
+    cell_information: CellInformation = Field(title="TODO Jeff", description="TODO Jeff")
 
     _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(parse_spatial_reference)
 
@@ -73,13 +73,13 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.GeographicFeatureAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.GeographicFeatureAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
-    field_information: List[FieldInformation] = Field(description="TODO Jeff", title="TODO Jeff")
-    geometry_information: GeometryInformation = Field(description="TODO Jeff", title="TODO Jeff")
+    field_information: List[FieldInformation] = Field(title="TODO Jeff", description="TODO Jeff")
+    geometry_information: GeometryInformation = Field(title="TODO Jeff", description="TODO Jeff")
     spatial_reference: Union[BoxSpatialReference, PointSpatialReference] = Field(
-        default=None, description="TODO Jeff", title="TODO Jeff"
+        default=None, title="TODO Jeff", description="TODO Jeff"
     )
 
     _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(parse_spatial_reference)
@@ -94,12 +94,12 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.MultidimensionalAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.MultidimensionalAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
-    variables: List[Variable] = Field(description="TODO Jeff", title="TODO Jeff")
+    variables: List[Variable] = Field(title="TODO Jeff", description="TODO Jeff")
     spatial_reference: Union[MultidimensionalBoxSpatialReference, MultidimensionalPointSpatialReference] = Field(
-        default=None, description="TODO Jeff", title="TODO Jeff"
+        default=None, title="TODO Jeff", description="TODO Jeff"
     )
 
     _parse_spatial_reference = validator("spatial_reference", pre=True, allow_reuse=True)(
@@ -116,7 +116,7 @@ class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.ReferencedTimeSeriesAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.ReferencedTimeSeriesAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
 
@@ -129,7 +129,7 @@ class FileSetMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.FileSetAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.FileSetAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
 
@@ -142,7 +142,7 @@ class SingleFileMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.SingleFileAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.SingleFileAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
 
@@ -155,7 +155,7 @@ class TimeSeriesMetadata(BaseAggregationMetadata):
         title = 'TODO Jeff (title of class)'
 
     type: AggregationType = Field(
-        const=True, default=AggregationType.TimeSeriesAggregation, description="TODO Jeff", title="TODO Jeff"
+        const=True, default=AggregationType.TimeSeriesAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
-    time_series_results: List[TimeSeriesResult] = Field(description="TODO Jeff", title="TODO Jeff")
+    time_series_results: List[TimeSeriesResult] = Field(title="TODO Jeff", description="TODO Jeff")

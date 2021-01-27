@@ -18,8 +18,8 @@ class Relation(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: RelationType = Field(description="TODO Jeff", title="TODO Jeff")
-    value: str = Field(max_length=500, description="TODO Jeff", title="TODO Jeff")
+    type: RelationType = Field(title="TODO Jeff", description="TODO Jeff")
+    value: str = Field(max_length=500, title="TODO Jeff", description="TODO Jeff")
 
     _parse_relation = root_validator(pre=True)(parse_relation)
 
@@ -32,12 +32,12 @@ class CellInformation(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(default=None, max_length=500, description="TODO Jeff", title="TODO Jeff")
-    rows: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    columns: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    cell_size_x_value: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    cell_data_type: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
-    cell_size_y_value: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(default=None, max_length=500, title="TODO Jeff", description="TODO Jeff")
+    rows: int = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    columns: int = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    cell_size_x_value: float = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    cell_data_type: str = Field(default=None, max_length=50, title="TODO Jeff", description="TODO Jeff")
+    cell_size_y_value: float = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class Rights(BaseModel):
@@ -48,8 +48,8 @@ class Rights(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    statement: str = Field(description="TODO Jeff", title="TODO Jeff")
-    url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
+    statement: str = Field(title="TODO Jeff", description="TODO Jeff")
+    url: AnyUrl = Field(title="TODO Jeff", description="TODO Jeff")
 
     @classmethod
     def Creative_Commons_Attribution_CC_BY(cls):
@@ -108,15 +108,15 @@ class Creator(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(default=None, max_length=100, description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(default=None, max_length=100, title="TODO Jeff", description="TODO Jeff")
 
-    phone: str = Field(default=None, max_length=25, description="TODO Jeff", title="TODO Jeff")
-    address: str = Field(default=None, max_length=250, description="TODO Jeff", title="TODO Jeff")
-    organization: str = Field(default=None, max_length=200, description="TODO Jeff", title="TODO Jeff")
-    email: EmailStr = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    homepage: HttpUrl = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    description: str = Field(max_length=50, default=None, description="TODO Jeff", title="TODO Jeff")
-    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, description="TODO Jeff", title="TODO Jeff")
+    phone: str = Field(default=None, max_length=25, title="TODO Jeff", description="TODO Jeff")
+    address: str = Field(default=None, max_length=250, title="TODO Jeff", description="TODO Jeff")
+    organization: str = Field(default=None, max_length=200, title="TODO Jeff", description="TODO Jeff")
+    email: EmailStr = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    homepage: HttpUrl = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    description: str = Field(max_length=50, default=None, title="TODO Jeff", description="TODO Jeff")
+    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, title="TODO Jeff", description="TODO Jeff")
 
     _description_validator = validator("description", pre=True)(validate_user_url)
 
@@ -151,14 +151,14 @@ class Contributor(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    phone: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    address: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    organization: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    email: EmailStr = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    homepage: HttpUrl = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    description: str = Field(max_length=50, default=None, description="TODO Jeff", title="TODO Jeff")
-    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    phone: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    address: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    organization: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    email: EmailStr = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    homepage: HttpUrl = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    description: str = Field(max_length=50, default=None, title="TODO Jeff", description="TODO Jeff")
+    identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, title="TODO Jeff", description="TODO Jeff")
 
     _split_identifiers = root_validator(pre=True, allow_reuse=True)(group_user_identifiers)
 
@@ -185,10 +185,10 @@ class AwardInfo(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    funding_agency_name: str = Field(description="TODO Jeff", title="TODO Jeff")
-    title: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    number: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    funding_agency_url: AnyUrl = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    funding_agency_name: str = Field(title="TODO Jeff", description="TODO Jeff")
+    title: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    number: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    funding_agency_url: AnyUrl = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class BandInformation(BaseModel):
@@ -199,15 +199,15 @@ class BandInformation(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(max_length=500, description="TODO Jeff", title="TODO Jeff")
-    variable_name: str = Field(default=None, max_length=100, description="TODO Jeff", title="TODO Jeff")
-    variable_unit: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(max_length=500, title="TODO Jeff", description="TODO Jeff")
+    variable_name: str = Field(default=None, max_length=100, title="TODO Jeff", description="TODO Jeff")
+    variable_unit: str = Field(default=None, max_length=50, title="TODO Jeff", description="TODO Jeff")
 
-    no_data_value: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    maximum_value: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    comment: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    method: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    minimum_value: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    no_data_value: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    maximum_value: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    comment: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    method: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    minimum_value: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class FieldInformation(BaseModel):
@@ -218,11 +218,11 @@ class FieldInformation(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    field_name: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
-    field_type: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
-    field_type_code: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
-    field_width: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    field_precision: int = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    field_name: str = Field(max_length=128, title="TODO Jeff", description="TODO Jeff")
+    field_type: str = Field(max_length=128, title="TODO Jeff", description="TODO Jeff")
+    field_type_code: str = Field(default=None, max_length=50, title="TODO Jeff", description="TODO Jeff")
+    field_width: int = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    field_precision: int = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class GeometryInformation(BaseModel):
@@ -233,8 +233,8 @@ class GeometryInformation(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    feature_count: int = Field(default=0, description="TODO Jeff", title="TODO Jeff")
-    geometry_type: str = Field(max_length=128, description="TODO Jeff", title="TODO Jeff")
+    feature_count: int = Field(default=0, title="TODO Jeff", description="TODO Jeff")
+    geometry_type: str = Field(max_length=128, title="TODO Jeff", description="TODO Jeff")
 
 
 class Variable(BaseModel):
@@ -245,13 +245,13 @@ class Variable(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(max_length=1000, description="TODO Jeff", title="TODO Jeff")
-    unit: str = Field(max_length=1000, description="TODO Jeff", title="TODO Jeff")
-    type: VariableType = Field(description="TODO Jeff", title="TODO Jeff")
-    shape: str = Field(max_length=1000, description="TODO Jeff", title="TODO Jeff")
-    descriptive_name: str = Field(default=None, max_length=1000, description="TODO Jeff", title="TODO Jeff")
-    method: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    missing_value: str = Field(default=None, max_length=1000, description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(max_length=1000, title="TODO Jeff", description="TODO Jeff")
+    unit: str = Field(max_length=1000, title="TODO Jeff", description="TODO Jeff")
+    type: VariableType = Field(title="TODO Jeff", description="TODO Jeff")
+    shape: str = Field(max_length=1000, title="TODO Jeff", description="TODO Jeff")
+    descriptive_name: str = Field(default=None, max_length=1000, title="TODO Jeff", description="TODO Jeff")
+    method: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    missing_value: str = Field(default=None, max_length=1000, title="TODO Jeff", description="TODO Jeff")
 
 
 class Publisher(BaseModel):
@@ -262,8 +262,8 @@ class Publisher(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
-    url: AnyUrl = Field(description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(max_length=200, title="TODO Jeff", description="TODO Jeff")
+    url: AnyUrl = Field(title="TODO Jeff", description="TODO Jeff")
 
 
 class TimeSeriesVariable(BaseModel):
@@ -274,12 +274,12 @@ class TimeSeriesVariable(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    variable_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
-    variable_name: str = Field(max_length=100, description="TODO Jeff", title="TODO Jeff")
-    variable_type: str = Field(max_length=100, description="TODO Jeff", title="TODO Jeff")
-    no_data_value: int = Field(description="TODO Jeff", title="TODO Jeff")
-    variable_definition: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
-    speciation: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
+    variable_code: str = Field(max_length=50, title="TODO Jeff", description="TODO Jeff")
+    variable_name: str = Field(max_length=100, title="TODO Jeff", description="TODO Jeff")
+    variable_type: str = Field(max_length=100, title="TODO Jeff", description="TODO Jeff")
+    no_data_value: int = Field(title="TODO Jeff", description="TODO Jeff")
+    variable_definition: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
+    speciation: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
 
 
 class TimeSeriesSite(BaseModel):
@@ -290,13 +290,13 @@ class TimeSeriesSite(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    site_code: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
-    site_name: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
-    elevation_m: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    elevation_datum: str = Field(default=None, max_length=50, description="TODO Jeff", title="TODO Jeff")
-    site_type: str = Field(default=None, max_length=100, description="TODO Jeff", title="TODO Jeff")
-    latitude: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    longitude: float = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    site_code: str = Field(max_length=200, title="TODO Jeff", description="TODO Jeff")
+    site_name: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
+    elevation_m: float = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    elevation_datum: str = Field(default=None, max_length=50, title="TODO Jeff", description="TODO Jeff")
+    site_type: str = Field(default=None, max_length=100, title="TODO Jeff", description="TODO Jeff")
+    latitude: float = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    longitude: float = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class TimeSeriesMethod(BaseModel):
@@ -307,11 +307,11 @@ class TimeSeriesMethod(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    method_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
-    method_name: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
-    method_type: str = Field(max_length=200, description="TODO Jeff", title="TODO Jeff")
-    method_description: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    method_link: AnyUrl = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    method_code: str = Field(max_length=50, title="TODO Jeff", description="TODO Jeff")
+    method_name: str = Field(max_length=200, title="TODO Jeff", description="TODO Jeff")
+    method_type: str = Field(max_length=200, title="TODO Jeff", description="TODO Jeff")
+    method_description: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    method_link: AnyUrl = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class ProcessingLevel(BaseModel):
@@ -322,9 +322,9 @@ class ProcessingLevel(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    processing_level_code: str = Field(max_length=50, description="TODO Jeff", title="TODO Jeff")
-    definition: str = Field(default=None, max_length=200, description="TODO Jeff", title="TODO Jeff")
-    explanation: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    processing_level_code: str = Field(max_length=50, title="TODO Jeff", description="TODO Jeff")
+    definition: str = Field(default=None, max_length=200, title="TODO Jeff", description="TODO Jeff")
+    explanation: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class Unit(BaseModel):
@@ -335,9 +335,9 @@ class Unit(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
-    name: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
-    abbreviation: str = Field(max_length=20, description="TODO Jeff", title="TODO Jeff")
+    type: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
+    abbreviation: str = Field(max_length=20, title="TODO Jeff", description="TODO Jeff")
 
 
 class UTCOffSet(BaseModel):
@@ -348,7 +348,7 @@ class UTCOffSet(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    value: float = Field(default=0, description="TODO Jeff", title="TODO Jeff")
+    value: float = Field(default=0, title="TODO Jeff", description="TODO Jeff")
 
 
 class TimeSeriesResult(BaseModel):
@@ -359,18 +359,18 @@ class TimeSeriesResult(BaseModel):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    series_id: str = Field(max_length=36, description="TODO Jeff", title="TODO Jeff")
-    unit: Unit = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    status: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
-    sample_medium: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
-    value_count: int = Field(description="TODO Jeff", title="TODO Jeff")
-    aggregation_statistics: str = Field(max_length=255, description="TODO Jeff", title="TODO Jeff")
-    series_label: str = Field(default=None, max_length=255, description="TODO Jeff", title="TODO Jeff")
-    site: TimeSeriesSite = Field(description="TODO Jeff", title="TODO Jeff")
-    variable: TimeSeriesVariable = Field(description="TODO Jeff", title="TODO Jeff")
-    method: TimeSeriesMethod = Field(description="TODO Jeff", title="TODO Jeff")
-    processing_level: ProcessingLevel = Field(description="TODO Jeff", title="TODO Jeff")
-    utc_offset: UTCOffSet = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    series_id: str = Field(max_length=36, title="TODO Jeff", description="TODO Jeff")
+    unit: Unit = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    status: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
+    sample_medium: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
+    value_count: int = Field(title="TODO Jeff", description="TODO Jeff")
+    aggregation_statistics: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
+    series_label: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
+    site: TimeSeriesSite = Field(title="TODO Jeff", description="TODO Jeff")
+    variable: TimeSeriesVariable = Field(title="TODO Jeff", description="TODO Jeff")
+    method: TimeSeriesMethod = Field(title="TODO Jeff", description="TODO Jeff")
+    processing_level: ProcessingLevel = Field(title="TODO Jeff", description="TODO Jeff")
+    utc_offset: UTCOffSet = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class BoxCoverage(base_models.BaseCoverage):
@@ -381,14 +381,14 @@ class BoxCoverage(base_models.BaseCoverage):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: str = Field(default="box", const=True, description="TODO Jeff", title="TODO Jeff")
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    northlimit: float = Field(gt=-90, lt=90, description="TODO Jeff", title="TODO Jeff")
-    eastlimit: float = Field(gt=-180, lt=180, description="TODO Jeff", title="TODO Jeff")
-    southlimit: float = Field(gt=-90, lt=90, description="TODO Jeff", title="TODO Jeff")
-    westlimit: float = Field(gt=-180, lt=180, description="TODO Jeff", title="TODO Jeff")
-    units: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    type: str = Field(default="box", const=True, title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    northlimit: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
+    eastlimit: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
+    southlimit: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
+    westlimit: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
+    units: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
     @root_validator
     def compare_north_south(cls, values):
@@ -406,18 +406,18 @@ class BoxSpatialReference(base_models.BaseCoverage):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: str = Field(default="box", const=True, description="TODO Jeff", title="TODO Jeff")
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    northlimit: float = Field(description="TODO Jeff", title="TODO Jeff")
-    eastlimit: float = Field(description="TODO Jeff", title="TODO Jeff")
-    southlimit: float = Field(description="TODO Jeff", title="TODO Jeff")
-    westlimit: float = Field(description="TODO Jeff", title="TODO Jeff")
-    units: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    projection_string: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection_string_type: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    datum: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    projection_name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    type: str = Field(default="box", const=True, title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    northlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
+    eastlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
+    southlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
+    westlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
+    units: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    projection_string: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection_string_type: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    datum: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    projection_name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class MultidimensionalBoxSpatialReference(BoxSpatialReference):
@@ -437,12 +437,12 @@ class PointCoverage(base_models.BaseCoverage):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: str = Field(default="point", const=True, description="TODO Jeff", title="TODO Jeff")
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    east: float = Field(gt=-180, lt=180, description="TODO Jeff", title="TODO Jeff")
-    north: float = Field(gt=-90, lt=90, description="TODO Jeff", title="TODO Jeff")
-    units: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection: str = Field(description="TODO Jeff", title="TODO Jeff")
+    type: str = Field(default="point", const=True, title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    east: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
+    north: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
+    units: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection: str = Field(title="TODO Jeff", description="TODO Jeff")
 
 
 class PointSpatialReference(base_models.BaseCoverage):
@@ -453,15 +453,15 @@ class PointSpatialReference(base_models.BaseCoverage):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    type: str = Field(default="point", const=True, description="TODO Jeff", title="TODO Jeff")
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    east: float = Field(description="TODO Jeff", title="TODO Jeff")
-    north: float = Field(description="TODO Jeff", title="TODO Jeff")
-    units: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection_string: str = Field(description="TODO Jeff", title="TODO Jeff")
-    projection_string_type: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    projection_name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
+    type: str = Field(default="point", const=True, title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    east: float = Field(title="TODO Jeff", description="TODO Jeff")
+    north: float = Field(title="TODO Jeff", description="TODO Jeff")
+    units: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection_string: str = Field(title="TODO Jeff", description="TODO Jeff")
+    projection_string_type: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    projection_name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
 
 
 class MultidimensionalPointSpatialReference(PointSpatialReference):
@@ -481,9 +481,9 @@ class PeriodCoverage(base_models.BaseCoverage):
     class Config:
         title = 'TODO Jeff (title of class)'
 
-    name: str = Field(default=None, description="TODO Jeff", title="TODO Jeff")
-    start: datetime = Field(description="TODO Jeff", title="TODO Jeff")
-    end: datetime = Field(description="TODO Jeff", title="TODO Jeff")
+    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    start: datetime = Field(title="TODO Jeff", description="TODO Jeff")
+    end: datetime = Field(title="TODO Jeff", description="TODO Jeff")
 
     @root_validator
     def start_before_end(cls, values):
