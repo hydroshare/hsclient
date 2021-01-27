@@ -1,3 +1,4 @@
+import asyncio
 import getpass
 import os
 import pickle
@@ -75,32 +76,37 @@ class Aggregation:
     def __init__(self, map_path, hs_session, checksums=None):
         self._map_path = map_path
         self._hs_session = hs_session
-        self._retrieved_map = None
-        self._retrieved_metadata = None
-        self._parsed_files = None
-        self._parsed_aggregations = None
         self._parsed_checksums = checksums
+
+        self.refresh()
+
+    async def _retrieve(self, checksums):
+        if checksums is None:
+            await asyncio.gather(
+                self._retrieve_map(),
+                self._retrieve_metadata(),
+                self._retrieve_checksums()
+            )
+        else:
+            await asyncio.gather(
+                self._retrieve_map(),
+                self._retrieve_metadata()
+            )
+
+        self._parsed_aggregations = None
+
 
     def __str__(self):
         return self._map_path
 
-    @property
-    def _map(self):
-        if not self._retrieved_map:
-            self._retrieved_map = self._retrieve_and_parse(self._map_path)
-        return self._retrieved_map
+    async def _retrieve_map(self):
+        self._map = self._retrieve_and_parse(self._map_path)
 
-    @property
-    def _metadata(self):
-        if not self._retrieved_metadata:
-            self._retrieved_metadata = self._retrieve_and_parse(self.metadata_path)
-        return self._retrieved_metadata
+    async def _retrieve_metadata(self):
+        self._metadata = self._retrieve_and_parse(self._metadata_path)
 
-    @property
-    def _checksums(self):
-        if not self._parsed_checksums:
-            self._parsed_checksums = self._retrieve_checksums(self._checksums_path)
-        return self._parsed_checksums
+    async def _retrieve_checksums(self):
+        self._checksums = self._retrieve_and_parse_checksums(self._checksums_path)
 
     @property
     def _files(self):
@@ -108,7 +114,7 @@ class Aggregation:
             self._parsed_files = []
             for file in self._map.describes.files:
                 if not is_aggregation(str(file.path)):
-                    if not file.path == self.metadata_path:
+                    if not file.path == self._metadata_path:
                         if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
                             file_path = url2pathname(
@@ -123,7 +129,7 @@ class Aggregation:
 
     @property
     def _aggregations(self):
-        if not self._parsed_aggregations:
+        if self._parsed_aggregations is None:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file.path)):
@@ -132,8 +138,12 @@ class Aggregation:
         return self._parsed_aggregations
 
     @property
+    def _metadata_path(self):
+        return self._map_path[:len(self._map_path) - len("_resmap.xml#aggregation")] + "_meta.xml"
+
+    @property
     def _checksums_path(self):
-        path = self.metadata_path.split("/data/", 1)[0]
+        path = self._metadata_path.split("/data/", 1)[0]
         path = urljoin(path, "manifest-md5.txt")
         return path
 
@@ -145,7 +155,7 @@ class Aggregation:
 
     @property
     def _resource_path(self):
-        resource_path = self.metadata_path[: len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
+        resource_path = self._metadata_path[: len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
         return resource_path
 
     def _retrieve_and_parse(self, path):
@@ -153,7 +163,7 @@ class Aggregation:
         instance = load_rdf(file_str)
         return instance
 
-    def _retrieve_checksums(self, path):
+    def _retrieve_and_parse_checksums(self, path):
         file_str = self._hs_session.retrieve_string(path)
         data = {
             pathname2url(path): checksum
@@ -181,17 +191,12 @@ class Aggregation:
     @property
     def metadata_file(self):
         """The path to the metadata file"""
-        return self.metadata_path.split("/data/contents/", 1)[1]
+        return self._metadata_path.split("/data/contents/", 1)[1]
 
     @property
     def metadata(self) -> BaseMetadata:
         """A metadata object for reading and updating metadata values"""
         return self._metadata
-
-    @property
-    def metadata_path(self) -> str:
-        """The path to the metadata file"""
-        return urlparse(str(self._map.describes.is_documented_by)).path
 
     @property
     def main_file_path(self) -> str:
@@ -208,7 +213,7 @@ class Aggregation:
     def save(self) -> None:
         """Saves the metadata back to HydroShare"""
         metadata_file = self.metadata_file
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        metadata_string = rdf_string(self._metadata, rdf_format="xml")
         url = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
         self.refresh()
@@ -272,18 +277,23 @@ class Aggregation:
             return aggregations[0]
         return None
 
-    def refresh(self) -> None:
-        """
-        Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will
-        only retrieve those files again after another call to access them is made.  This will be later updated to be
-        eager and retrieve the files asynchronously.
-        """
-        # TODO, refresh should destroy the aggregation objects and async fetch everything.
-        self._retrieved_map = None
-        self._retrieved_metadata = None
+    def _reset(self):
+        self._map = None
+        self._metadata = None
         self._parsed_files = None
         self._parsed_aggregations = None
         self._parsed_checksums = None
+
+    def _fetch(self) -> None:
+        """
+        Asynchronously fetches all files needed for the resource
+        """
+        asyncio.run(self._retrieve(None))
+        self.aggregations()
+
+    def refresh(self):
+        self._reset()
+        self._fetch()
 
     def as_series(self, series_id: str, agg_path: str = None) -> Dict[int, pandas.Series]:
         """
@@ -319,6 +329,10 @@ class Resource(Aggregation):
         path = urlparse(self.metadata.identifier).path
         return '/hsapi' + path
 
+    @property
+    def _metadata_path(self):
+        return self._map_path[:len(self._map_path)-len("resourcemap.xml")] + "resourcemetadata.xml"
+
     def _upload(self, file, destination_path):
         path = urljoin(self._hsapi_path, "files", destination_path.strip("/"))
         self._hs_session.upload_file(path, files={'file': open(file, 'rb')}, status_code=201)
@@ -333,6 +347,11 @@ class Resource(Aggregation):
     def _delete_file_folder(self, path: str) -> None:
         path = urljoin(self._hsapi_path, "folders", path)
         self._hs_session.delete(path, status_code=200)
+
+    @property
+    def metadata_file(self):
+        """The path to the metadata file"""
+        return "resourcemetadata.xml"
 
     # system information
 
@@ -404,11 +423,11 @@ class Resource(Aggregation):
         """Deletes the resource on HydroShare"""
         hsapi_path = self._hsapi_path
         self._hs_session.delete(hsapi_path, status_code=204)
-        self.refresh()
+        self._reset()
 
     def save(self) -> None:
         """Saves the metadata to HydroShare"""
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        metadata_string = rdf_string(self._metadata, rdf_format="xml")
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
         self.refresh()
@@ -600,7 +619,7 @@ class Resource(Aggregation):
             aggregation.main_file_path,
         )
         aggregation._hs_session.post(path, status_code=200)
-        aggregation.refresh()
+        aggregation._reset()
         self.refresh()
 
     def aggregation_delete(self, aggregation: Aggregation) -> None:
@@ -616,7 +635,7 @@ class Resource(Aggregation):
             aggregation.main_file_path,
         )
         aggregation._hs_session.delete(path, status_code=200)
-        aggregation.refresh()
+        aggregation._reset()
         self.refresh()
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
@@ -830,14 +849,14 @@ class HydroShare:
         """
         Query the GET /hsapi/resource/ REST end point of the HydroShare server.
         :param creator: Filter results by the HydroShare username or email
-        :param author: Filter results by the HydroShare username or email
+        :param contributor: Filter results by the HydroShare username or email
         :param owner: Filter results by the HydroShare username or email
         :param group_name: Filter results by the HydroShare group name associated with resources
         :param from_date: Filter results to those created after from_date.  Must be datetime.date.
         :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have
             no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get
             resources created up to and including 2015-05-05)
-        :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)
+        :param resource_types: Filter results by resource types (Deprecated, all types are Composite)
         :param subject: Filter by comma separated list of subjects
         :param full_text_search: Filter by full text search
         :param edit_permission: Filter by boolean edit permission

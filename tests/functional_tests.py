@@ -300,29 +300,6 @@ def test_delete_file(new_resource):
     assert len(new_resource.files()) == 0
 
 
-def test_access_rules(new_resource):
-    ap = new_resource.access_permission
-    pass
-
-
-def test_refresh(resource):
-    resource.metadata
-    resource.files()
-    resource.aggregations()
-
-    assert resource._retrieved_map is not None
-    assert resource._retrieved_metadata is not None
-    assert resource._parsed_files is not None
-    assert resource._parsed_aggregations is not None
-
-    resource.refresh()
-
-    assert resource._retrieved_map is None
-    assert resource._retrieved_metadata is None
-    assert resource._parsed_files is None
-    assert resource._parsed_aggregations is None
-
-
 def test_empty_creator(new_resource):
     new_resource.metadata.creators.clear()
     try:
