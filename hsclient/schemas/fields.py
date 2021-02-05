@@ -16,7 +16,7 @@ class Relation(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Related Resource Metadata'
 
     type: RelationType = Field(title="Relation type", description="The type of relationship with the related resource")
     value: str = Field(max_length=500, title="Value", description="String expressing the Full text citation, URL link for, or description of the related resource")
@@ -30,10 +30,10 @@ class CellInformation(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Raster Cell Metadata'
 
-    # TODO: Is there such a thing as name for CellInformation
-    name: str = Field(default=None, max_length=500, title="TODO Jeff", description="TODO Jeff")
+    # TODO: Is there such a thing as "name" for CellInformation?
+    name: str = Field(default=None, max_length=500, title="Name", description="Name of the cell information")
     rows: int = Field(default=None, title="Rows", description="The integer number of rows in the raster dataset")
     columns: int = Field(default=None, title="Columns", description="The integer number of columns in the raster dataset")
     cell_size_x_value: float = Field(default=None, title="Cell size x value", description="The size of the raster grid cell in the x-direction expressed as a float")
@@ -47,7 +47,7 @@ class Rights(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Rights Metadata'
 
     statement: str = Field(title="Statement", description="A string containing the text of the license or rights statement")
     url: AnyUrl = Field(title="URL", description="An object containing the URL pointing to a description of the license or rights statement")
@@ -107,7 +107,7 @@ class Creator(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Creator Metadata'
 
     name: str = Field(default=None, max_length=100, title="Name", description="A string containing the name of the creator")
     phone: str = Field(default=None, max_length=25, title="Phone", description="A string containing a phone number for the creator")
@@ -115,7 +115,7 @@ class Creator(BaseModel):
     organization: str = Field(default=None, max_length=200, title="Organization", description="A string containing the name of the organization with which the creator is affiliated")
     email: EmailStr = Field(default=None, title="Email", description="A string containing an email address for the creator")
     homepage: HttpUrl = Field(default=None, title="Homepage", description="An object containing the URL for website associated with the creator")
-    # TODO: Is there such a thing as a description property for Creator?
+    # TODO: Is there such a thing as a "description" property for Creator?
     description: str = Field(max_length=50, default=None, title="Description", description="A string containing a description of the creator")
     identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, title="Creator identifiers", description="A dictionary containing identifier types and URL links to alternative identiers for the creator")
 
@@ -136,11 +136,10 @@ class Creator(BaseModel):
 class Author(Creator):
     """
     A class used to represent the metadata associated with an author of a resource
-    TODO: How is this different than the Creator class, and what is it used for?
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Author Metadata'
 
     pass
 
@@ -151,7 +150,7 @@ class Contributor(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Contributor Metadata'
 
     name: str = Field(default=None, title="Name", description="A string containing the name of the contributor")
     phone: str = Field(default=None, title="Phone", description="A string containing a phone number for the contributor")
@@ -159,7 +158,7 @@ class Contributor(BaseModel):
     organization: str = Field(default=None, title="Organization", description="A string containing the name of the organization with which the contributor is affiliated")
     email: EmailStr = Field(default=None, title="Email", description="A string containing an email address for the contributor")
     homepage: HttpUrl = Field(default=None, title="Homepage", description="An object containing the URL for website associated with the contributor")
-    # TODO: is there such a thing as a description property for contributor?
+    # TODO: is there such a thing as a "description" property for contributor?
     description: str = Field(max_length=50, default=None, title="Description", description="A string containing a description of the contributor")
     identifiers: Dict[UserIdentifierType, AnyUrl] = Field(default={}, title="Contributor identifiers", description="A dictionary containing identifier types and URL links to alternative identiers for the contributor")
 
@@ -186,7 +185,7 @@ class AwardInfo(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Funding Agency Metadata'
 
     funding_agency_name: str = Field(title="Agency name", description="A string containing the name of the funding agency or organization")
     title: str = Field(default=None, title="Award title", description="A string containing the title of the project or award")
@@ -200,7 +199,7 @@ class BandInformation(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Raster Band Metadata'
 
     name: str = Field(max_length=500, title="Name", description="A string containing the name of the raster band")
     variable_name: str = Field(default=None, max_length=100, title="Variable name", description="A string containing the name of the variable represented by the raster band")
@@ -214,15 +213,16 @@ class BandInformation(BaseModel):
 
 class FieldInformation(BaseModel):
     """
-    A class used to represent the metadata associated with a field in the attribute table for a geographic feature aggregation
+    A class used to represent the metadata associated with a field in the attribute table for a geographic
+    feature aggregation
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Geographic Feature Field Metadata'
 
     field_name: str = Field(max_length=128, title="Field name", description="A string containing the name of the attribute table field")
     field_type: str = Field(max_length=128, title="Field type", description="A string containing the data type of the values in the field")
-    # TODO: What is the field_type_code? It's not displayed on the resource landing page, but it's encoded in the
+    # TODO: What is the "field_type_code"? It's not displayed on the resource landing page, but it's encoded in the
     #  aggregation metadata as an integer value.
     field_type_code: str = Field(default=None, max_length=50, title="Field type code", description="A string value containing a code that indicates the field type")
     field_width: int = Field(default=None, title="Field width", description="An integer value containing the width of the attribute field")
@@ -235,7 +235,7 @@ class GeometryInformation(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Geographic Feature Geometry Metadata'
 
     feature_count: int = Field(default=0, title="Feature count", description="An integer containing the number of features in the geographic feature aggregation")
     geometry_type: str = Field(max_length=128, title="Geometry type", description="A string containing the type of features in the geographic feature aggregation")
@@ -247,7 +247,7 @@ class Variable(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Multidimensional Variable Metadata'
 
     name: str = Field(max_length=1000, title="Variable name", description="A string containing the name of the variable")
     unit: str = Field(max_length=1000, title="Units", description="A string containing the units in which the values for the variable are expressed")
@@ -264,7 +264,7 @@ class Publisher(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Publisher Metadata'
 
     name: str = Field(max_length=200, title="Publisher name", description="A string containing the name of the publisher")
     url: AnyUrl = Field(title="Publisher URL", description="An object containing a URL that points to the publisher website")
@@ -276,13 +276,13 @@ class TimeSeriesVariable(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Variable Metadata'
 
     variable_code: str = Field(max_length=50, title="Variable code", description="A string containing a short but meaningful code that identifies a variable")
     variable_name: str = Field(max_length=100, title="Variable name", description="A string containing the name of the variable")
     variable_type: str = Field(max_length=100, title="Variable type", description="A string containing the type of variable from the ODM2 VariableType controlled vocabulary")
     # TODO: The NoData value for a variable in an ODM2 database is not always an integer.
-    #  It could be a floating point value. We might want to change this to a string
+    #  It could be a floating point value. We might want to change this to a string or a floating point value
     no_data_value: int = Field(title="NoData value", description="The NoData value for the variable")
     variable_definition: str = Field(default=None, max_length=255, title="Variable definition", description="A string containing a detailed description of the variable")
     speciation: str = Field(default=None, max_length=255, title="Speciation", description="A string containing the speciation for the variable from the ODM2 Speciation controllec vocabulary")
@@ -294,7 +294,7 @@ class TimeSeriesSite(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Site Metadata'
 
     site_code: str = Field(max_length=200, title="Site code", description="A string containing a short but meaningful code identifying the site")
     site_name: str = Field(default=None, max_length=255, title="Site name", description="A string containing the name of the site")
@@ -311,7 +311,7 @@ class TimeSeriesMethod(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Method Metadata'
 
     method_code: str = Field(max_length=50, title="Method code", description="A string containing a short but meaningful code identifying the method")
     method_name: str = Field(max_length=200, title="Method name", description="A string containing the name of the method")
@@ -322,11 +322,12 @@ class TimeSeriesMethod(BaseModel):
 
 class ProcessingLevel(BaseModel):
     """
-    A class used to represent the metadata associated with a processing level contained within a time series aggregation
+    A class used to represent the metadata associated with a processing level contained within a time series
+    aggregation
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Processing Level Metadata'
 
     processing_level_code: str = Field(max_length=50, title="Processing level code", description="A string containing a short but meaningful code identifying the processing level")
     definition: str = Field(default=None, max_length=200, title="Definition", description="A string containing a description of the processing level")
@@ -339,7 +340,7 @@ class Unit(BaseModel):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Units Metadata'
 
     type: str = Field(max_length=255, title="Unit type", description="A string containing the type of unit from the ODM2 Units Type controlled vocabulary")
     name: str = Field(max_length=255, title="Unit name", description="A string containing the name of the unit from the ODM2 units list")
@@ -348,53 +349,57 @@ class Unit(BaseModel):
 
 class UTCOffSet(BaseModel):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with a UTC time offset within a time series aggregation)
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series UTC Offset Metadata'
 
-    value: float = Field(default=0, title="TODO Jeff", description="TODO Jeff")
+    value: float = Field(default=0, title="UTC offset value", description="A floating point number containing the UTC time offset associated with the data values expressed in hours")
 
 
 class TimeSeriesResult(BaseModel):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with a time series result within a time series aggregation
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Result Metadata'
 
-    series_id: str = Field(max_length=36, title="TODO Jeff", description="TODO Jeff")
-    unit: Unit = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    status: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
-    sample_medium: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
-    value_count: int = Field(title="TODO Jeff", description="TODO Jeff")
-    aggregation_statistics: str = Field(max_length=255, title="TODO Jeff", description="TODO Jeff")
-    series_label: str = Field(default=None, max_length=255, title="TODO Jeff", description="TODO Jeff")
-    site: TimeSeriesSite = Field(title="TODO Jeff", description="TODO Jeff")
-    variable: TimeSeriesVariable = Field(title="TODO Jeff", description="TODO Jeff")
-    method: TimeSeriesMethod = Field(title="TODO Jeff", description="TODO Jeff")
-    processing_level: ProcessingLevel = Field(title="TODO Jeff", description="TODO Jeff")
-    utc_offset: UTCOffSet = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    series_id: str = Field(max_length=36, title="Series ID", description="A string containing a unique identifier for the time series result")
+    unit: Unit = Field(default=None, title="Units", description="An object containing the units in which the values of the time series are expressed")
+    status: str = Field(default=None, max_length=255, title="Status", description="A string containing the status of the time series result chosen from the ODM2 Status controlled vocabulary")
+    sample_medium: str = Field(max_length=255, title="Sample medium", description="A string containing the sample medium in which the time series result was measured chosen from the ODM2 Medium controlled vocabulary")
+    value_count: int = Field(title="Value count", description="An integer value containing the number of data values contained within the time series result")
+    # TODO: "aggregation_statistic" should be singular
+    aggregation_statistics: str = Field(max_length=255, title="Aggregation statistic", description="A string containing the aggregation statistic associated with the values of the time series result chosen from the ODM2 Aggregation Statistic controlled vocabulary")
+    # TODO: Not sure what "series_label" is. It's not an ODM2 thing
+    series_label: str = Field(default=None, max_length=255, title="Series label", description="A string containing a label for the time series result")
+    site: TimeSeriesSite = Field(title="Site", description="An object containing metadata about the site at which the time series result was created")
+    variable: TimeSeriesVariable = Field(title="Variablef", description="An object containing metadata about the observed variable associated with the time series result values")
+    method: TimeSeriesMethod = Field(title="Method", description="An object containing metadata about the method used to produce the time series result values")
+    processing_level: ProcessingLevel = Field(title="Processing level", description="An object containing metadata about the processing level or level of quality control to which the time series result values have been subjected")
+    # TODO: Does "UTCOffset" really need to be an object given that it's just a floating point value?
+    utc_offset: UTCOffSet = Field(default=None, title="UTC Offset", description="An object containing a floating point value that represents the time offset from UTC time in hours associated with the time series result value timestamps")
 
 
 class BoxCoverage(base_models.BaseCoverage):
     """
-    TODO Jeff (description of class)
+    A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+    latitude-longitude bounding box
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Box Coverage Metadata'
 
-    type: str = Field(default="box", const=True, title="TODO Jeff", description="TODO Jeff")
-    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    northlimit: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
-    eastlimit: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
-    southlimit: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
-    westlimit: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
-    units: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    type: str = Field(default="box", const=True, title="Geographic coverage type", description="A string containing the type of geographic coverage")
+    name: str = Field(default=None, title="Name", description="A string containing a name for the place associated with the geographic coverage")
+    northlimit: float = Field(gt=-90, lt=90, title="North limit", description="A floating point value containing the constant coordinate for the northernmost face or edge of the bounding box")
+    eastlimit: float = Field(gt=-180, lt=180, title="East limit", description="A floating point value containing the constant coordinate for the easternmost face or edge of the bounding box")
+    southlimit: float = Field(gt=-90, lt=90, title="South limit", description="A floating point value containing the constant coordinate for the southernmost face or edge of the bounding box")
+    westlimit: float = Field(gt=-180, lt=180, title="West limit", description="A floating point value containing the constant coordinate for the westernmost face or edge of the bounding box")
+    units: str = Field(title="Units", description="A string containing the units applying to the unlabelled numeric values of northlimit, eastlimit, southlimit, and westlimit")
+    projection: str = Field(default=None, title="Projection", description="A string containing the name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc.")
 
     @root_validator
     def compare_north_south(cls, values):
@@ -406,90 +411,98 @@ class BoxCoverage(base_models.BaseCoverage):
 
 class BoxSpatialReference(base_models.BaseCoverage):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with the spatial reference of a geographic
+    feature or raster aggregation expressed as a bounding box
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Box Spatial Reference Metadata'
 
-    type: str = Field(default="box", const=True, title="TODO Jeff", description="TODO Jeff")
-    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    northlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
-    eastlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
-    southlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
-    westlimit: float = Field(title="TODO Jeff", description="TODO Jeff")
-    units: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    projection_string: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection_string_type: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    datum: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    projection_name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    type: str = Field(default="box", const=True, title="Spatial reference type", description="A string containing the type of spatial reference")
+    name: str = Field(default=None, title="Name", description="A string containing a name for the place associated with the spatial reference")
+    northlimit: float = Field(title="North limit", description="A floating point value containing the constant coordinate for the northernmost face or edge of the bounding box")
+    eastlimit: float = Field(title="East limit", description="A floating point value containing the constant coordinate for the easternmost face or edge of the bounding box")
+    southlimit: float = Field(title="South limit", description="A floating point value containing the constant coordinate for the southernmost face or edge of the bounding box")
+    westlimit: float = Field(title="West limit", description="A floating point value containing the constant coordinate for the westernmost face or edge of the bounding box")
+    units: str = Field(title="Units", description="A string containing the units applying to the unlabelled numeric values of northlimit, eastlimit, southlimit, and westlimit")
+    # TODO: "projection" should probably be "projection_name"
+    projection: str = Field(default=None, title="Projection", description="A string containing the name of the coordinate system used by the spatial reference")
+    projection_string: str = Field(title="Projection string", description="A string containing an encoding of the coordinate system parameters")
+    # TODO: I'm not sure what "projection_string_type" is - I don't see it in the RDF/XML encoding
+    projection_string_type: str = Field(default=None, title="Projection string type", description="A string containing a description of the type of encoding for the projection string")
+    datum: str = Field(default=None, title="Datum", description="A string containing the name of the datum used by the coordinate system")
+    projection_name: str = Field(default=None, title="Projection name", description="A string containing the name of the coordinate system")
 
 
 class MultidimensionalBoxSpatialReference(BoxSpatialReference):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with the spatial reference of a multidimensional
+    aggregation expressed as a bounding box
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Multidimensional Box Spatial Reference Metadata'
 
 
 class PointCoverage(base_models.BaseCoverage):
     """
-    TODO Jeff (description of class)
+    A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+    point location
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Point Coverage Metadata'
 
-    type: str = Field(default="point", const=True, title="TODO Jeff", description="TODO Jeff")
-    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    east: float = Field(gt=-180, lt=180, title="TODO Jeff", description="TODO Jeff")
-    north: float = Field(gt=-90, lt=90, title="TODO Jeff", description="TODO Jeff")
-    units: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection: str = Field(title="TODO Jeff", description="TODO Jeff")
+    type: str = Field(default="point", const=True, title="Geographic coverage type", description="A string containing the type of geographic coverage")
+    name: str = Field(default=None, title="Name", description="A string containing a name for the place associated with the geographic coverage")
+    east: float = Field(gt=-180, lt=180, title="East", description="The coordinate of the point location measured in the east direction")
+    north: float = Field(gt=-90, lt=90, title="North", description="The coordinate of the point location measured in the north direction")
+    units: str = Field(title="Units", description="The units applying to the unlabelled numeric values of north and east")
+    projection: str = Field(title="Projection", description="The name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc.")
 
 
 class PointSpatialReference(base_models.BaseCoverage):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with the spatial reference of a geographic
+    feature or raster aggregation expressed as a point
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Point Spatial Reference Metadata'
 
-    type: str = Field(default="point", const=True, title="TODO Jeff", description="TODO Jeff")
-    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    east: float = Field(title="TODO Jeff", description="TODO Jeff")
-    north: float = Field(title="TODO Jeff", description="TODO Jeff")
-    units: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection_string: str = Field(title="TODO Jeff", description="TODO Jeff")
-    projection_string_type: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    projection_name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
+    type: str = Field(default="point", const=True, title="Spatial reference type", description="A string containing the type of spatial reference")
+    name: str = Field(default=None, title="Name", description="A string containing a name for the place associated with the spatial reference")
+    east: float = Field(title="East", description="The coordinate of the point location measured in the east direction")
+    north: float = Field(title="North", description="The coordinate of the point location measured in the north direction")
+    units: str = Field(title="Units", description="The units applying to the unlabelled numeric values of north and east")
+    projection: str = Field(title="Projection", description="A string containing the name of the coordinate system used by the spatial reference")
+    projection_string: str = Field(title="Projection string", description="A string containing an encoding of the coordinate system parameters")
+    # TODO: I'm not sure what "projection_string_type" is - I don't see it in the RDF/XML encoding
+    projection_string_type: str = Field(default=None, title="Projection string type", description="A string containing a description of the type of encoding for the projection string")
+    projection_name: str = Field(default=None, title="Projection name", description="A string containing the name of the coordinate system")
 
 
 class MultidimensionalPointSpatialReference(PointSpatialReference):
     """
-    TODO Jeff (description of class)
+    A class used to represent the metadata associated with the spatial reference of a multidimensional
+    aggregation expressed as a point
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Multidimensional Point Spatial Reference Metadata'
 
 
 class PeriodCoverage(base_models.BaseCoverage):
     """
-    TODO Jeff (description of class)
+    A class used to represent temporal coverage metadata for a resource or aggregation
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Period Coverage Metadata'
 
-    name: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
-    start: datetime = Field(title="TODO Jeff", description="TODO Jeff")
-    end: datetime = Field(title="TODO Jeff", description="TODO Jeff")
+    name: str = Field(default=None, title="Name", description="A string containing a name for the time interval")
+    start: datetime = Field(title="Start", description="A datetime object containing the instant corresponding to the commencement of the time interval")
+    end: datetime = Field(title="End", description="A datetime object containing the instant corresponding to the termination of the time interval")
 
     @root_validator
     def start_before_end(cls, values):

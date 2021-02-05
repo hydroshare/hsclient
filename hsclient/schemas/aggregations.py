@@ -53,7 +53,7 @@ class GeographicRasterMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Geographic Raster Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.GeographicRasterAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -78,7 +78,7 @@ class GeographicFeatureMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Geographic Feature Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.GeographicFeatureAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -103,7 +103,7 @@ class MultidimensionalMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Multidimensional Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.MultidimensionalAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -129,7 +129,7 @@ class ReferencedTimeSeriesMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Referenced Time Series Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.ReferencedTimeSeriesAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -146,7 +146,7 @@ class FileSetMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'File Set Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.FileSetAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -162,7 +162,7 @@ class SingleFileMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Single File Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.SingleFileAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
@@ -181,7 +181,7 @@ class TimeSeriesMetadata(BaseAggregationMetadata):
     """
 
     class Config:
-        title = 'TODO Jeff (title of class)'
+        title = 'Time Series Aggregation Metadata'
 
     type: AggregationType = Field(
         const=True, default=AggregationType.TimeSeriesAggregation, title="Aggregation type", description="A string expressing the aggregation type from the list of HydroShare aggregation types"
