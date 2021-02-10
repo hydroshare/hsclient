@@ -21,7 +21,7 @@ from hsclient.schemas.fields import (
     Variable,
 )
 from hsclient.schemas.rdf.validators import language_constraint
-from hsclient.schemas.root_validators import parse_additional_metadata, parse_url, split_coverages
+from hsclient.schemas.root_validators import parse_additional_metadata, parse_url, split_coverages, parse_abstract
 from hsclient.schemas.validators import parse_multidimensional_spatial_reference, parse_spatial_reference
 
 
@@ -158,4 +158,7 @@ class TimeSeriesMetadata(BaseAggregationMetadata):
         const=True, default=AggregationType.TimeSeriesAggregation, title="TODO Jeff", description="TODO Jeff"
     )
 
+    abstract: str = Field(default=None, title="TODO Jeff", description="TODO Jeff")
     time_series_results: List[TimeSeriesResult] = Field(title="TODO Jeff", description="TODO Jeff")
+
+    _parse_abstract = root_validator(pre=True, allow_reuse=True)(parse_abstract)

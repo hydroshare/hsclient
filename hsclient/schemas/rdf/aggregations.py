@@ -15,14 +15,14 @@ from hsclient.schemas.rdf.fields import (
     RightsInRDF,
     SpatialReferenceInRDF,
     TimeSeriesResultInRDF,
-    VariableInRDF,
+    VariableInRDF, DescriptionInRDF,
 )
 from hsclient.schemas.rdf.root_validators import (
     parse_coverages,
     parse_rdf_extended_metadata,
     parse_rdf_multidimensional_spatial_reference,
     parse_rdf_spatial_reference,
-    rdf_parse_rdf_subject,
+    rdf_parse_rdf_subject, rdf_parse_description,
 )
 
 
@@ -100,8 +100,11 @@ class TimeSeriesMetadataInRDF(BaseAggregationMetadataInRDF):
         "SQLite file and optional source comma separated (.csv) files",
     )
     dc_type: AnyUrl = Field(rdf_predicate=DC.type, default=HSTERMS.TimeSeriesAggregation, const=True)
+    description: DescriptionInRDF = Field(rdf_predicate=DC.description, default_factory=DescriptionInRDF)
 
     time_series_results: List[TimeSeriesResultInRDF] = Field(rdf_predicate=HSTERMS.timeSeriesResult)
+
+    _parse_description = root_validator(pre=True, allow_reuse=True)(rdf_parse_description)
 
 
 class ReferencedTimeSeriesMetadataInRDF(BaseAggregationMetadataInRDF):

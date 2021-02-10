@@ -63,7 +63,7 @@ class ResourceMetadata(BaseMetadata):
     _parse_coverages = root_validator(pre=True, allow_reuse=True)(split_coverages)
     _parse_dates = root_validator(pre=True, allow_reuse=True)(split_dates)
     _parse_additional_metadata = root_validator(pre=True, allow_reuse=True)(parse_additional_metadata)
-    _parse_abstract = root_validator(pre=True)(parse_abstract)
+    _parse_abstract = root_validator(pre=True, allow_reuse=True)(parse_abstract)
     _parse_url = root_validator(pre=True, allow_reuse=True)(parse_url)
 
     _parse_identifier = validator("identifier", pre=True)(parse_identifier)
