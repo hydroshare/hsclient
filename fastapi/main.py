@@ -1,11 +1,8 @@
 import uvicorn as uvicorn
 from fastapi import FastAPI
 
-from hsclient.implementations.hydroshare import HydroShare
-from hsclient.schemas.enums import CoverageType
-from hsclient.schemas.resource import ResourceMetadata
-from hsclient.schemas.rdf.resource import ResourceMetadataInRDF
-from hsclient.schemas.fields import BoxCoverage, PointCoverage, PeriodCoverage
+from hsclient.hydroshare import HydroShare
+from hsmodels.schemas.resource import ResourceMetadata
 
 app = FastAPI()
 hs = HydroShare('admin', 'default')

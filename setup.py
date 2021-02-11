@@ -5,10 +5,8 @@ setup(
     version='0.1',
     packages=find_packages(include=['hsclient', 'hsclient.*', 'hsclient.schemas.*', 'hsclient.schemas.rdf.*']),
     install_requires=[
-        'rdflib',
+        'hsmodels',
         'requests',
-        'pydantic',
-        'email-validator',
         'pandas'
     ],
     url='https://github.com/sblack-usu/hsclient',

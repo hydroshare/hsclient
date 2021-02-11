@@ -15,11 +15,11 @@ import pandas
 import requests
 from requests_oauthlib import OAuth2Session
 
-from hsclient.schemas import load_rdf, rdf_string
-from hsclient.schemas.base_models import BaseMetadata
-from hsclient.schemas.enums import AggregationType
-from hsclient.schemas.fields import BoxCoverage, PointCoverage
-from hsclient.schemas.json_models import ResourcePreview, User
+from hsmodels.schemas import load_rdf, rdf_string
+from hsmodels.schemas.base_models import BaseMetadata
+from hsmodels.schemas.enums import AggregationType
+from hsmodels.schemas.fields import BoxCoverage, PointCoverage
+from hsmodels.schemas.json_models import ResourcePreview, User
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
 

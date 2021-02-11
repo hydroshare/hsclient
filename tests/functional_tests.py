@@ -4,8 +4,8 @@ import tempfile
 import pytest
 
 from hsclient import HydroShare
-from hsclient.schemas.enums import RelationType, AggregationType
-from hsclient.schemas.fields import Contributor, Creator, Relation
+from hsmodels.schemas.enums import RelationType, AggregationType
+from hsmodels.schemas.fields import Contributor, Creator, Relation
 
 
 @pytest.fixture()
