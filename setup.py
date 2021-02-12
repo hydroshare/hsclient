@@ -14,5 +14,6 @@ setup(
     license='',
     author='Scott Black',
     author_email='scott.black@usu.edu',
-    description='A python client for managing HydroShare resources'
+    description='A python client for managing HydroShare resources',
+    python_requires='>=3.6',
 )
