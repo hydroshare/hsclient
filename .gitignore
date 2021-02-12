@@ -1,2 +1,5 @@
 venv/
+dist/
+site/
+hsclient.egg-info/
 .idea/

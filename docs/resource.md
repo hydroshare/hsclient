@@ -1,0 +1,2 @@
+
+:::hsclient.hydroshare.Resource
