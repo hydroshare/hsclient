@@ -18,3 +18,7 @@ docs:
 .PHONY: docs-serve
 docs-serve:
 	mkdocs serve
+
+.PHONY: test
+test:
+	pytest -n 8 tests

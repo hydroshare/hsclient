@@ -8,8 +8,15 @@ from hsmodels.schemas.fields import Contributor, Creator, Relation
 from hsclient import HydroShare
 
 
+@pytest.fixture(scope="function")
+def change_test_dir(request):
+    os.chdir(request.fspath.dirname)
+    yield
+    os.chdir(request.config.invocation_dir)
+
+
 @pytest.fixture()
-def hydroshare():
+def hydroshare(change_test_dir):
     hs = HydroShare('admin', 'default', port=8000, protocol='http', host='localhost')
     return hs
 
