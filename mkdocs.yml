@@ -1,7 +1,6 @@
 site_name: hsclient
 
-theme:
-  name: "material"
+theme: readthedocs
 
 plugins:
   - search
@@ -10,3 +9,7 @@ plugins:
 markdown_extensions:
   - tables
   - pymdownx.snippets:
+
+nav:
+    - Home: index.md
+    - About: hydroshare.md
