@@ -10,3 +10,11 @@ format:
 .PHONY: install
 install:
 	pip install -r requirements.txt
+
+.PHONY: docs
+docs:
+	mkdocs build
+
+.PHONY: docs-serve
+docs-serve:
+	mkdocs serve
