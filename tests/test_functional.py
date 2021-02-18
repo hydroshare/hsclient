@@ -17,7 +17,7 @@ def change_test_dir(request):
 
 @pytest.fixture()
 def hydroshare(change_test_dir):
-    hs = HydroShare('admin', 'default', port=8000, protocol='http', host='localhost')
+    hs = HydroShare(os.getenv("HYDRO_USERNAME"), os.getenv("HYDRO_PASSWORD"))
     return hs
 
 
