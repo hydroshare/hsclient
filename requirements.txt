@@ -5,3 +5,6 @@ email-validator
 pandas
 isort
 black
+pytest-xdist
+pytest-cov
+requests_oauthlib

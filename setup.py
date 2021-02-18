@@ -11,6 +11,7 @@ setup(
     install_requires=[
         'hsmodels==0.1.1',
         'requests',
+        'requests_oauthlib',
         'pandas'
     ],
     url='https://github.com/hydroshare/hsclient',
