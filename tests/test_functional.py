@@ -556,7 +556,3 @@ def test_resource_public(resource):
     assert resource.system_metadata()['public'] is False
     resource.set_sharing_status(public=True)
     assert resource.system_metadata()['public'] is True
-
-
-def test_search(hydroshare):
-
