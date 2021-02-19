@@ -21,8 +21,8 @@ docs-serve:
 
 .PHONY: test
 test:
-	pytest -n 2 tests
+	pytest -n 8 tests
 
 .PHONY: test-cov
 test-cov:
-	pytest -n 2 --cov=hsclient --cov-report html
+	pytest -n 8 --cov=hsclient --cov-report html
