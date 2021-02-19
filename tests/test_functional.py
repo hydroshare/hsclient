@@ -152,12 +152,10 @@ def test_creator_order(new_resource):
     res = new_resource  # hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
-    assert res.metadata.creators[0].name == "Black, Scott Steven"
     assert res.metadata.creators[1].name == "Testing"
     reversed = [res.metadata.creators[1], res.metadata.creators[0]]
     res.metadata.creators = reversed
     res.save()
-    assert res.metadata.creators[1].name == "Black, Scott Steven"
     assert res.metadata.creators[0].name == "Testing"
 
 
