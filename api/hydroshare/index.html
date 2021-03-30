@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>HydroShare - hsclient</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../css/ansi-colours.css" rel="stylesheet" />
+  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "HydroShare";
+    var mkdocs_page_input_path = "api/hydroshare.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> hsclient</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Operations</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">HydroShare</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../resource/">Resource</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../file/">File</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../aggregation/">Aggregation</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">hsclient</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API &raquo;</li>
+        
+      
+    
+    <li>HydroShare</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div class="doc doc-object doc-class">
+<h2 class="hidden-toc" id="hsclient.hydroshare.HydroShare" style="visibility: hidden; position: absolute;">
+        </h2>
+<div class="doc doc-contents first">
+<p>A HydroShare object for querying HydroShare's REST API.  Provide a username and password at initialization or call
+the sign_in() method to prompt for the username and password.</p>
+<p>If using OAuth2 is desired, provide the client_id and token to use.  If on CUAHSI JupyterHub or another JupyterHub
+environment that authenticates with Hydroshare, call the hs_juptyerhub() method to read the credentials from
+Jupyterhub.</p>
+<p>:param username: A HydroShare username
+:param password: A HydroShare password associated with the username
+:param host: The host to use, defaults to <code>www.hydroshare.org</code>
+:param protocol: The protocol to use, defaults to <code>https</code>
+:param port: The port to use, defaults to <code>443</code>
+:param client_id: The client id associated with the OAuth2 token
+:param token: The OAuth2 token to use</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.create">
+
+<code class="highlight">create(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Creates a new resource on HydroShare
+:return: A Resource object representing a resource on HydroShare</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def create(self) -&gt; Resource:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Creates a new resource on HydroShare</span>
+<span class="err">    :return: A Resource object representing a resource on HydroShare</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    response = self._hs_session.post(&#39;/hsapi/resource/&#39;, status_code=201)</span>
+<span class="err">    resource_id = response.json()[&#39;resource_id&#39;]</span>
+<span class="err">    return self.resource(resource_id)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.hs_juptyerhub">
+
+<code class="highlight">hs_juptyerhub(self, hs_auth_path='/home/jovyan/data/.hs_auth')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication
+:param hs_auth_path: Provide the path to the .hs_auth file if different than the default of
+<code>/home/jovyan/data/.hs_auth</code></p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">hs_juptyerhub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication</span>
+<span class="sd">    :param hs_auth_path: Provide the path to the .hs_auth file if different than the default of</span>
+<span class="sd">    `/home/jovyan/data/.hs_auth`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">):</span>
+        <span class="n">raise</span> <span class="n">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;hs_auth_path {hs_auth_path} does not exist.&quot;</span><span class="p">)</span>
+    <span class="n">with</span> <span class="n">open</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">token</span><span class="p">,</span> <span class="n">client_id</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">set_oauth</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.my_user_info">
+
+<code class="highlight">my_user_info(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Retrieves the user info of the user's credentials provided
+:return: JSON object representing the user info</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def my_user_info(self):</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Retrieves the user info of the user&#39;s credentials provided</span>
+<span class="err">    :return: JSON object representing the user info</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    response = self._hs_session.get(&#39;/hsapi/userInfo/&#39;, status_code=200)</span>
+<span class="err">    return response.json()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.resource">
+
+<code class="highlight">resource(self, resource_id, validate=True)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Creates a resource object from HydroShare with the provided resource_id
+:param resource_id: The resource id of the resource to retrieve
+:param validate: Defaults to True, set to False to not validate the resource exists
+:return: A Resource object representing a resource on HydroShare</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def resource(self, resource_id: str, validate: bool = True) -&gt; Resource:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Creates a resource object from HydroShare with the provided resource_id</span>
+<span class="err">    :param resource_id: The resource id of the resource to retrieve</span>
+<span class="err">    :param validate: Defaults to True, set to False to not validate the resource exists</span>
+<span class="err">    :return: A Resource object representing a resource on HydroShare</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    res = Resource(&quot;/resource/{}/data/resourcemap.xml&quot;.format(resource_id), self._hs_session)</span>
+<span class="err">    if validate:</span>
+<span class="err">        res.metadata</span>
+<span class="err">    return res</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.search">
+
+<code class="highlight">search(self, creator=None, contributor=None, owner=None, group_name=None, from_date=None, to_date=None, edit_permission=False, resource_types=[], subject=[], full_text_search=None, published=False, spatial_coverage=None)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Query the GET /hsapi/resource/ REST end point of the HydroShare server.
+:param creator: Filter results by the HydroShare username or email
+:param author: Filter results by the HydroShare username or email
+:param owner: Filter results by the HydroShare username or email
+:param group_name: Filter results by the HydroShare group name associated with resources
+:param from_date: Filter results to those created after from_date.  Must be datetime.date.
+:param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have
+    no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get
+    resources created up to and including 2015-05-05)
+:param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)
+:param subject: Filter by comma separated list of subjects
+:param full_text_search: Filter by full text search
+:param edit_permission: Filter by boolean edit permission
+:param published: Filter by boolean published status
+:param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</p>
+<p>:return: A generator to iterate over a ResourcePreview object</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="k">search</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">self</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">creator</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">contributor</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">owner</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">group_name</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">from_date</span><span class="p">:</span><span class="w"> </span><span class="nc">datetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">to_date</span><span class="p">:</span><span class="w"> </span><span class="nc">datetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">edit_permission</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">False</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">resource_types</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">str</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">subject</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">str</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">full_text_search</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">published</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">False</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nl">spatial_coverage</span><span class="p">:</span><span class="w"> </span><span class="ow">Union</span><span class="o">[</span><span class="n">BoxCoverage, PointCoverage</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
+<span class="p">)</span><span class="err">:</span><span class="w"></span>
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
+<span class="ss">    Query the GET /hsapi/resource/ REST end point of the HydroShare server.</span>
+<span class="ss">    :param creator: Filter results by the HydroShare username or email</span>
+<span class="ss">    :param author: Filter results by the HydroShare username or email</span>
+<span class="ss">    :param owner: Filter results by the HydroShare username or email</span>
+<span class="ss">    :param group_name: Filter results by the HydroShare group name associated with resources</span>
+<span class="ss">    :param from_date: Filter results to those created after from_date.  Must be datetime.date.</span>
+<span class="ss">    :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have</span>
+<span class="ss">        no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get</span>
+<span class="ss">        resources created up to and including 2015-05-05)</span>
+<span class="ss">    :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)</span>
+<span class="ss">    :param subject: Filter by comma separated list of subjects</span>
+<span class="ss">    :param full_text_search: Filter by full text search</span>
+<span class="ss">    :param edit_permission: Filter by boolean edit permission</span>
+<span class="ss">    :param published: Filter by boolean published status</span>
+<span class="ss">    :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</span>
+
+<span class="ss">    :return: A generator to iterate over a ResourcePreview object</span>
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="ss">&quot;edit_permission&quot;</span><span class="err">:</span><span class="w"> </span><span class="n">edit_permission</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;published&quot;</span><span class="err">:</span><span class="w"> </span><span class="n">published</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">creator</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;creator&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">creator</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">contributor</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;author&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">contributor</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">owner</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;owner&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">owner</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">group_name</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;group&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">group_name</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">resource_types</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;type[</span><span class="o">]</span><span class="ss">&quot;] = resource_types</span>
+<span class="ss">    if subject:</span>
+<span class="ss">        params[&quot;</span><span class="n">subject</span><span class="ss">&quot;] = &quot;</span><span class="p">,</span><span class="ss">&quot;.join(subject)</span>
+<span class="ss">    if full_text_search:</span>
+<span class="ss">        params[&quot;</span><span class="n">full_text_search</span><span class="ss">&quot;] = full_text_search</span>
+<span class="ss">    if from_date:</span>
+<span class="ss">        params[&quot;</span><span class="n">from_date</span><span class="ss">&quot;] = from_date.strftime(&#39;%Y-%m-%d&#39;)</span>
+<span class="ss">    if to_date:</span>
+<span class="ss">        params[&quot;</span><span class="n">to_date</span><span class="ss">&quot;] = to_date.strftime(&#39;%Y-%m-%d&#39;)</span>
+<span class="ss">    if spatial_coverage:</span>
+<span class="ss">        params[&quot;</span><span class="n">coverage_type</span><span class="ss">&quot;] = spatial_coverage.type</span>
+<span class="ss">        if spatial_coverage.type == &quot;</span><span class="n">point</span><span class="ss">&quot;:</span>
+<span class="ss">            params[&quot;</span><span class="n">north</span><span class="ss">&quot;] = spatial_coverage.north</span>
+<span class="ss">            params[&quot;</span><span class="n">east</span><span class="ss">&quot;] = spatial_coverage.east</span>
+<span class="ss">        else:</span>
+<span class="ss">            params[&quot;</span><span class="n">north</span><span class="ss">&quot;] = spatial_coverage.northlimit</span>
+<span class="ss">            params[&quot;</span><span class="n">east</span><span class="ss">&quot;] = spatial_coverage.eastlimit</span>
+<span class="ss">            params[&quot;</span><span class="n">south</span><span class="ss">&quot;] = spatial_coverage.southlimit</span>
+<span class="ss">            params[&quot;</span><span class="n">west</span><span class="ss">&quot;] = spatial_coverage.westlimit</span>
+<span class="ss">    response = self._hs_session.get(&quot;</span><span class="o">/</span><span class="n">hsapi</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="err">&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;results&#39;</span><span class="o">]</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">results</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">yield</span><span class="w"> </span><span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;next&#39;</span><span class="o">]</span><span class="err">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">next_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;next&#39;</span><span class="o">]</span><span class="w"></span>
+<span class="w">        </span><span class="n">next_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">urlparse</span><span class="p">(</span><span class="n">next_url</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_url</span><span class="p">.</span><span class="k">path</span><span class="w"></span>
+<span class="w">        </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_url</span><span class="p">.</span><span class="n">query</span><span class="w"></span>
+<span class="w">        </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="k">path</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;results&#39;</span><span class="o">]</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">results</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">yield</span><span class="w"> </span><span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.sign_in">
+
+<code class="highlight">sign_in(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def sign_in(self) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook&quot;&quot;&quot;</span>
+<span class="err">    username = input(&quot;Username: &quot;).strip()</span>
+<span class="err">    password = getpass.getpass(&quot;Password for {}: &quot;.format(username))</span>
+<span class="err">    self._hs_session.set_auth((username, password))</span>
+<span class="err">    self.my_user_info()  # validate credentials</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.user">
+
+<code class="highlight">user(self, user_id)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Retrieves the user details of a Hydroshare user
+:param user_id: The user id of the user details to retrieve
+:return: User object representing the user details</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def user(self, user_id: int) -&gt; User:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Retrieves the user details of a Hydroshare user</span>
+<span class="err">    :param user_id: The user id of the user details to retrieve</span>
+<span class="err">    :return: User object representing the user details</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    response = self._hs_session.get(f&#39;/hsapi/userDetails/{user_id}/&#39;, status_code=200)</span>
+<span class="err">    return User(**response.json())</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../resource/" class="btn btn-neutral float-right" title="Resource">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../examples/Metadata_Operations/" class="btn btn-neutral" title="Metadata Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../../examples/Metadata_Operations/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../resource/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

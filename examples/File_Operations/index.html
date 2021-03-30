@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>File Operations - hsclient</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../css/ansi-colours.css" rel="stylesheet" />
+  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "File Operations";
+    var mkdocs_page_input_path = "examples/File_Operations.ipynb";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> hsclient</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Operations</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../Basic_Operations/">Basic Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../Aggregation_Operations/">Aggregation Operations</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">File Operations</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-the-hs-rdf-python-client">Install the HS RDF Python Client</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#authenticating-with-hydroshare">Authenticating with HydroShare</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-new-empty-resource">Create a New Empty Resource</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#resource-file-handling">Resource File Handling</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#adding-files-to-a-resource">Adding Files to a Resource</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#searching-for-files-within-a-resource">Searching for Files within a Resource</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#get-a-list-of-files">Get a List of Files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#search-for-a-single-file">Search for a Single File</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-the-properties-of-a-file">Get the Properties of a File</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#renaming-and-moving-files">Renaming and Moving Files</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#downloading-files-from-a-resource">Downloading Files from a Resource</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#removing-files-from-a-resource">Removing Files from a Resource</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#todo-the-following-items-are-being-worked-on">TODO: The following items are being worked on</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../Metadata_Operations/">Metadata Operations</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/resource/">Resource</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/file/">File</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">hsclient</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Operations &raquo;</li>
+        
+      
+    
+    <li>File Operations</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="hs-rdf-hydroshare-python-client-resource-file-operation-examples">HS RDF HydroShare Python Client Resource File Operation Examples</h1>
+<hr />
+<p>The following code snippets show examples for how to use the HS RDF HydroShare Python Client to manipulate files within a HydroShare Resource. </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="install-the-hs-rdf-python-client">Install the HS RDF Python Client</h2>
+<p>The HS RDF Python Client for HydroShare won't be installed by default, so it has to be installed first before you can work with it. Use the following command to install the Python Client from the GitHub repository. Eventually we will distribute this package via the Python Package Index (PyPi) so that it can be installed via pip from PyPi.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">hsclient</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="authenticating-with-hydroshare">Authenticating with HydroShare</h2>
+<p>Before you start interacting with resources in HydroShare you will need to authenticate. </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">hsclient</span> <span class="kn">import</span> <span class="n">HydroShare</span>
+
+<span class="n">hs</span> <span class="o">=</span> <span class="n">HydroShare</span><span class="p">()</span>
+<span class="n">hs</span><span class="o">.</span><span class="n">sign_in</span><span class="p">()</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="create-a-new-empty-resource">Create a New Empty Resource</h2>
+<p>A "resource" is a container for your content in HydroShare. Think of it as a "working directory" into which you are going to organize the code and/or data you are using and want to share. The following code can be used to create a new, empty resource within which you can create content and metadata.</p>
+<p>This code creates a new resource in HydroShare. It also creates an in-memory object representation of that resource in your local environmment that you can then manipulate with further code.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Create the new, empty resource</span>
+<span class="n">new_resource</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># Get the HydroShare identifier for the new resource</span>
+<span class="n">resIdentifier</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">resource_id</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The HydroShare Identifier for your new resource is: &#39;</span> <span class="o">+</span> <span class="n">resIdentifier</span><span class="p">)</span>
+
+<span class="c1"># Construct a hyperlink for the new resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your new resource is available at: &#39;</span> <span class="o">+</span>  <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="resource-file-handling">Resource File Handling</h2>
+<p>HydroShare resources can have any number of files within them organized within a file/directory structure. File handing operations allow you to manage the content files within a resource.</p>
+<p>First, show the list of files within the resource, which is initially empty. The <code>search_aggregations</code> argument tells the client whether you want to look at all of the files in the resource (<code>search_aggregations=True</code>) or if you want to want to only look at files that do not belong to a content aggregation (<code>search_aggregations=False</code>).</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Print the title of the resource and the list of files it contains</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Working on: &#39;</span> <span class="o">+</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File list:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="adding-files-to-a-resource">Adding Files to a Resource</h3>
+<p>You may need to add content files to your resource. The examples here upload files from the <code>Example_Files</code> folder that is included with the HydroShare resource that contains these Jupyter Notebook examples. If you are running in your own local Python environment and want to load files from your local machine, you would specify the path to the file(s) on your hard drive. If you want to upload multiple files at once, you can pass multiple file paths separated by commas to the <code>upload()</code> function.</p>
+<p>Note that if you upload files that already exist, those files will be overwritten.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Upload one or more files to your resource </span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/Data_File1.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/Data_File2.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the names of the files in the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Updated file list after adding a file: &#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>HydroShare also allows you to create a folder heirarchy within your resource. You can use this functionality to keep your content organized, just as you would on your own computer. You can upload files to specific folders within the resource. Paths to folders are specified relative to the "content" directory of the resource.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># First create a new folder</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">folder_create</span><span class="p">(</span><span class="s1">&#39;New_Folder&#39;</span><span class="p">)</span>
+
+<span class="c1"># Upload one or more files to a specific folder within a resource</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/Data_File2.csv&#39;</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="s1">&#39;New_Folder&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the names of the files in the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Updated file list after adding a file: &#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="searching-for-files-within-a-resource">Searching for Files within a Resource</h3>
+<p>If you need to find/get one or more files within a resource so you can download or remove it from the resource, there are several filters available that allow you to return a list of files that meet your search criteria or a single file.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="get-a-list-of-files">Get a List of Files</h4>
+<p>Execute a filter to return a list of files within the resource that meet the search critera.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get a list of all of the files in the resource that are not part of an aggregation</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All files that are not part of an aggregation:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of all of the files in the resource inclusive of files that are inside </span>
+<span class="c1"># content type aggregations</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All files in the resource:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of all of the files within a folder in the resource</span>
+<span class="c1"># Note that you have to pass the full relative path to the folder you are searching</span>
+<span class="c1"># because there may be multiple folders within a resource with the same name.</span>
+<span class="c1"># To get files in the root folder, pass an empty string (folder=&quot;&quot;)</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;New_Folder&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All files within a specific folder:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of all files that have a specific extension. This searches all folders</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All files with a .csv file extension:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Filters can be combined</span>
+<span class="c1"># Get a list of all files in a particular folder that have a specific extension</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">folder</span><span class="o">=</span><span class="s2">&quot;New_Folder&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All files with a .csv file extension in a particular folder:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="search-for-a-single-file">Search for a Single File</h4>
+<p>Execute a filter to look for a single file in the resource that meets the search critera.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get a single file using its path relative to the resource content directory</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;New_Folder/Data_File2.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File retrieved using path:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get a single file using its name</span>
+<span class="c1"># Note that if you have multiple files in your resource with the same name, but in different</span>
+<span class="c1"># folders, you should search for a particular file using the path parameter to ensure that</span>
+<span class="c1"># you get the right file</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Data_File2.csv&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File retrieved using name:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="get-the-properties-of-a-file">Get the Properties of a File</h3>
+<p>When you use the filters to return a file from a resource, you get back a file object that holds properties of the file.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Search for a file within a resource</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;New_Folder/Data_File2.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the properties of the file</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File name: &#39;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File extension:&#39;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">extension</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File folder name: &#39;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File path: &#39;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File url_path:  &#39;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<span class="c1">#print(&#39;File checksum:&#39; + file.checksum)</span>
+
+<span class="c1"># TODO: The checksum property is not implemented yet</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="renaming-and-moving-files">Renaming and Moving Files</h3>
+<p>You may need to rename or move files once they have been added to a resource. First get the file object and then rename or move it.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get a file to rename - use the relative path to the file to make sure you have the right one</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;Data_File2.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Rename the file to whatever you want</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_rename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;Data_File2_Renamed.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the names of the files in the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Updated file list after adding a file: &#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Moving files is similar to renaming. Instead of just changing the file name, change the relative path of the file to move it to the new location within the resource.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get a file to move</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;Data_File1.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Move the file to a different folder</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_rename</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;New_Folder/Data_File1.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the names of the files in the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Updated file list after adding a file: &#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="downloading-files-from-a-resource">Downloading Files from a Resource</h3>
+<p>You can download individual files from an existing HydroShare resource. You can use the filters shown above to specify which file(s) you want to download.</p>
+<p>When you call the <code>download()</code> function on an individual file, you can pass a path where you want to save the file as a string. Leaving the path blank downloads the files to the same directory as your Jupyter Notebook.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Download a single file from a resource</span>
+<span class="c1"># Note that if you have multiple files within the same resource that have the same name,</span>
+<span class="c1"># and you want a particular file, you need to specify the relative path to the specific file</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;New_Folder/Data_File1.csv&#39;</span><span class="p">)</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_download</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you want to, you can clean up the file that was just downloaded by deleting it using a terminal command.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="err">!</span><span class="n">rm</span> <span class="s1">&#39;Data_File1.csv&#39;</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="removing-files-from-a-resource">Removing Files from a Resource</h3>
+<p>You can also delete files from a resource. In this example, I remove one of the files I added to the resource above. You have to delete each individual file. Make sure you call delete using the <code>path</code> parameter to make sure you are deleting the right file.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Specify the file you want to delete</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;New_Folder/Data_File2.csv&quot;</span><span class="p">)</span>
+
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_delete</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+<span class="c1"># Print the names of the files in the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updated file list after removing file: &quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+  <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="todo-the-following-items-are-being-worked-on">TODO: The following items are being worked on</h3>
+<ul>
+<li>Delete a folder and all of the files within it.</li>
+<li>Moving a folder.</li>
+<li>Zip a file or a folder.</li>
+<li>Rename a folder.</li>
+<li>Download a folder as a zipped file.</li>
+</ul>
+</div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Metadata_Operations/" class="btn btn-neutral float-right" title="Metadata Operations">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Aggregation_Operations/" class="btn btn-neutral" title="Aggregation Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Aggregation_Operations/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Metadata_Operations/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

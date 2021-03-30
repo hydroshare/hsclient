@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Aggregation Operations - hsclient</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../css/ansi-colours.css" rel="stylesheet" />
+  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Aggregation Operations";
+    var mkdocs_page_input_path = "examples/Aggregation_Operations.ipynb";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> hsclient</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Operations</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../Basic_Operations/">Basic Operations</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Aggregation Operations</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-the-hs-rdf-python-client">Install the HS RDF Python Client</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#authenticating-with-hydroshare">Authenticating with HydroShare</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-new-empty-resource">Create a New Empty Resource</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#resource-aggregation-handling">Resource Aggregation Handling</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#create-a-single-file-aggregation">Create a Single File Aggregation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-metadata-to-the-aggregation">Add Metadata to the Aggregation</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#title-and-keywords">Title and Keywords</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#extended-metadata-elements">Extended Metadata Elements</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#spatial-and-temporal-coverage">Spatial and Temporal Coverage</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-other-aggregation-types">Creating Other Aggregation Types</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#geographic-feature-aggregation">Geographic Feature Aggregation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#geographic-raster-aggregation">Geographic Raster Aggregation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multidimensional-netcdf-aggregation">Multidimensional NetCDF Aggregation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#time-series-aggregation">Time Series Aggregation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#file-set-aggregation">File Set Aggregation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#get-aggregation-properties">Get Aggregation Properties</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#searching-for-aggregations-within-a-resource">Searching for Aggregations within a Resource</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#downloading-an-aggregation">Downloading an Aggregation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#remove-and-delete-an-aggregation">Remove and Delete an Aggregation</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../File_Operations/">File Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../Metadata_Operations/">Metadata Operations</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/resource/">Resource</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/file/">File</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">hsclient</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Operations &raquo;</li>
+        
+      
+    
+    <li>Aggregation Operations</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="hs-rdf-hydroshare-python-client-resource-aggregation-operation-examples">HS RDF HydroShare Python Client Resource Aggregation Operation Examples</h1>
+<hr />
+<p>The following code snippets show examples for how to use the HS RDF HydroShare Python Client to manipulate aggregations of known content types in HydroShare. HydroShare's content type aggregations include individual file, fileset, time series, geographic feature, geographic raster, and multidimensional NetCDF.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="install-the-hs-rdf-python-client">Install the HS RDF Python Client</h2>
+<p>The HS RDF Python Client for HydroShare won't be installed by default, so it has to be installed first before you can work with it. Use the following command to install the Python Client from the GitHub repository. Eventually we will distribute this package via the Python Package Index (PyPi) so that it can be installed via pip from PyPi.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">hsclient</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="authenticating-with-hydroshare">Authenticating with HydroShare</h2>
+<p>Before you start interacting with resources in HydroShare you will need to authenticate.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">hsclient</span> <span class="kn">import</span> <span class="n">HydroShare</span>
+
+<span class="n">hs</span> <span class="o">=</span> <span class="n">HydroShare</span><span class="p">()</span>
+<span class="n">hs</span><span class="o">.</span><span class="n">sign_in</span><span class="p">()</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="create-a-new-empty-resource">Create a New Empty Resource</h2>
+<p>A "resource" is a container for your content in HydroShare. Think of it as a "working directory" into which you are going to organize the code and/or data you are using and want to share. The following code can be used to create a new, empty resource within which you can create content and metadata.</p>
+<p>This code creates a new resource in HydroShare. It also creates an in-memory object representation of that resource in your local environmment that you can then manipulate with further code.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Create the new, empty resource</span>
+<span class="n">new_resource</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># Get the HydroShare identifier for the new resource</span>
+<span class="n">resIdentifier</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">resource_id</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The HydroShare Identifier for your new resource is: &#39;</span> <span class="o">+</span> <span class="n">resIdentifier</span><span class="p">)</span>
+
+<span class="c1"># Construct a hyperlink for the new resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your new resource is available at: &#39;</span> <span class="o">+</span>  <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="resource-aggregation-handling">Resource Aggregation Handling</h2>
+<p>HydroShare allows you to create and manage aggregations of content files within resources that have specific types and associated metadata. These known content types include:</p>
+<ul>
+<li>Time series</li>
+<li>Geographic feature</li>
+<li>Geographic raster</li>
+<li>Multidimensional NetCDF</li>
+<li>Single file</li>
+<li>File set</li>
+</ul>
+<p>The general process for creating an aggregation within a resource requires adding files to the resource and then applying the appropriate aggregation type. For some of the aggregation types, some of the aggregation metadata fields will be automatically extracted from the files you upload. You can then set the values of the other aggregation-level metadata elements. </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="create-a-single-file-aggregation">Create a Single File Aggregation</h2>
+<p>A single file aggregation in a HydroShare is any individual file to which you want to add extra metadata. </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Import the aggregation types</span>
+<span class="kn">from</span> <span class="nn">hsmodels.schemas.enums</span> <span class="kn">import</span> <span class="n">AggregationType</span>
+
+<span class="c1"># Upload a single content file to the resource. This is a generic sample comma separated </span>
+<span class="c1"># values (CSV) data file with some tabular data</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/Data_File1.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Specify the file you want to add the aggregation to</span>
+<span class="n">file</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;Data_File1.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create a single file aggregation on the file and refresh the resource</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">file_aggregate</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">SingleFileAggregation</span><span class="p">)</span>
+
+<span class="c1"># Print the title for the aggregation that was added to the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following aggregation was added to the resource: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="add-metadata-to-the-aggregation">Add Metadata to the Aggregation</h3>
+<p>Once you have created an aggregation, you can edit and add metadata elements. For a single file aggregation, you can add a title, subject keywords, extended metadata as key-value pairs, and spatial and temporal coverage. </p>
+<p>All of the metadata edits are stored locally until you call the <code>save()</code> function on the aggregation to write the edits you have made to HydroShare.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="title-and-keywords">Title and Keywords</h4>
+<p>The title of an aggregation is a string. Subject keywords are handled as a list of strings.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Set the title and subject keywords for the aggregation</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;A CSV Data File Single File Aggregation&quot;</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CSV&#39;</span><span class="p">,</span><span class="s1">&#39;Aggregation&#39;</span><span class="p">,</span> <span class="s1">&#39;Single File&#39;</span><span class="p">,</span><span class="s1">&#39;Data&#39;</span><span class="p">]</span>
+
+<span class="c1"># Print the title and keywords for the aggregation</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Title: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Keywords: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">))</span>
+
+<span class="c1"># Save the aggregation to write all of the metadata to HydroShare</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="extended-metadata-elements">Extended Metadata Elements</h4>
+<p>Extended metadata elements for an aggregation are handled using a Python dictionary. You can add new elements using key-value pairs.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Add an extended metadata element to the aggregation as a key-value pair </span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="p">[</span><span class="s1">&#39;New Element Key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Text value of new element.&#39;</span>
+
+<span class="c1"># Remove an individual key-value pair from the aggregation using its key</span>
+<span class="k">del</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="p">[</span><span class="s1">&#39;New Element Key&#39;</span><span class="p">]</span>
+
+<span class="c1"># Or, you can clear out all of the extended metadata elements that might exist</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<span class="c1"># Add multiple key-value pairs to the aggregation at once using a Python dictionary</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Observed Variable&#39;</span><span class="p">:</span> <span class="s1">&#39;Water use&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Site Location&#39;</span><span class="p">:</span> <span class="s1">&#39;Valley View Tower Dormatory on Utah State University</span><span class="se">\&#39;</span><span class="s1">s Campus in Logan, UT&#39;</span>
+<span class="p">}</span>
+
+<span class="c1"># Print the extended metadata elements</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The extended metadata elements for the aggregation include:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<span class="c1"># Save the aggregation to write all of the metadata to HydroShare</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="spatial-and-temporal-coverage">Spatial and Temporal Coverage</h4>
+<p>Spatial and temporal coverage for an aggregation are handled in the same way they are handled for resource level metadata. Initially the spatial and temporal coverage for an aggregation are empty. To set them, you have to create a coverage object of the right type and set the spatial or temporal coverage to that object.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata classes for coverage objects</span>
+<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">BoxCoverage</span><span class="p">,</span> <span class="n">PointCoverage</span><span class="p">,</span> <span class="n">PeriodCoverage</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="c1"># Set the spatial coverage of the aggregation to a BoxCoverage object</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="n">BoxCoverage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Logan, Utah&#39;</span><span class="p">,</span>
+                                            <span class="n">northlimit</span><span class="o">=</span><span class="mf">41.7910</span><span class="p">,</span>
+                                            <span class="n">eastlimit</span><span class="o">=-</span><span class="mf">111.7664</span><span class="p">,</span>
+                                            <span class="n">southlimit</span><span class="o">=</span><span class="mf">41.6732</span><span class="p">,</span>
+                                            <span class="n">westlimit</span><span class="o">=-</span><span class="mf">111.9079</span><span class="p">,</span>
+                                            <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;WGS 84 EPSG:4326&#39;</span><span class="p">,</span>
+                                            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span>
+                                            <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Decimal degrees&#39;</span><span class="p">)</span>
+
+<span class="c1"># You can remove the spatial coverage element by setting it to None</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># If you want to set the spatial coverage to a PointCoverage instead</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="n">PointCoverage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Logan, Utah&#39;</span><span class="p">,</span>
+                                              <span class="n">north</span><span class="o">=</span><span class="mf">41.7371</span><span class="p">,</span>
+                                              <span class="n">east</span><span class="o">=-</span><span class="mf">111.8351</span><span class="p">,</span>
+                                              <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;WGS 84 EPSG:4326&#39;</span><span class="p">,</span>
+                                              <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;point&#39;</span><span class="p">,</span>
+                                              <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Decimal degrees&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create a beginning and ending date for a time period</span>
+<span class="n">beginDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s1">&#39;2020-12-01T00:00:00Z&#39;</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S</span><span class="si">%f</span><span class="s1">Z&#39;</span><span class="p">)</span>
+<span class="n">endDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s1">&#39;2020-12-31T00:00:00Z&#39;</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S</span><span class="si">%f</span><span class="s1">Z&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set the temporal coverage of the aggregation to a PeriodCoverage object</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">period_coverage</span> <span class="o">=</span> <span class="n">PeriodCoverage</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">beginDate</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">endDate</span><span class="p">)</span>
+
+<span class="c1"># Print the temporal coverage information</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Temporal Coverage&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">period_coverage</span><span class="p">)</span>
+
+<span class="c1"># Print the spatial coverage information</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Spatial Coverage&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span><span class="p">)</span>
+
+<span class="c1"># Save the aggregation to write all of the metadata to HydroShare</span>
+<span class="n">agg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="creating-other-aggregation-types">Creating Other Aggregation Types</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="geographic-feature-aggregation">Geographic Feature Aggregation</h3>
+<p>Geographic feature aggregations are created in HydroShare from the set of files that make up an ESRI Shapefile. You need to upload the shapefile and then HydroShare will automatically set the aggregation on the set of files you upload. You can then retrieve the aggregation using its title or by searching for one of the files it contains.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Create a list of the files that make up the shapefile to be uploaded </span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Example_Files/watersheds.cpg&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/watersheds.dbf&#39;</span><span class="p">,</span> 
+             <span class="s1">&#39;Example_Files/watersheds.prj&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/watersheds.sbn&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Example_Files/watersheds.sbx&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/watersheds.shp&#39;</span><span class="p">,</span> 
+             <span class="s1">&#39;Example_Files/watersheds.shx&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/watersheds.shp.xml&#39;</span><span class="p">]</span>
+
+<span class="c1"># Upload the files to the resource all at the same time</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Files uploaded!&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you upload all of the files of a shapefile together as shown above, HydroShare automatically recognizes the files as a shapefile and auto-aggregates the files into a geographic feature aggregation for you. So, you then just need to get the aggregation that was created if you want to further operate on it - e.g., to modify the aggregation-level metadata.</p>
+<p>Metadata for a geographic feature aggregation includes a title, subject keywords, extended key-value pairs, temporal coverage, spatial coverage, geometry information, spatial reference, and field information. When HydroShare creates the aggregation on the shapefile, the spatial coverage, geometry information, spatial reference, and attribute field information metadata will be automatically set for you. You can then set all of the other metadata elements as shown above for the single file aggregation if you need to.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the aggregation that was just created</span>
+
+<span class="c1"># You can get the aggregation by searching for a file that is inside of it</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__name</span><span class="o">=</span><span class="s2">&quot;watersheds.shp&quot;</span><span class="p">)</span>
+
+<span class="c1"># Or, you can get the aggregation by searching for its title, which is initially</span>
+<span class="c1"># set to the name of the shapefile</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;watersheds&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the title for the aggregation that was added to the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following aggregation was added to the resource: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="geographic-raster-aggregation">Geographic Raster Aggregation</h3>
+<p>Geographic raster aggregations are created in HydroShare from one or more raster data files that make up a raster dataset. HydroShare uses GeoTiff files for raster datasets. Like the geographic feature aggregation, when you upload all of the files for a geographic raster dataset (all .tif and a .vrt file) at once, HydroShare will automatically create the aggregation for you. You can then get the aggregation and set the other metadata elements as shown above for the single file aggregation.</p>
+<p>HydroShare initially sets the title of the geographic raster aggregation to the first .tif file that appears in the .vrt file. The spatial coverage, spatial reference, and cell information are set automatically based on information extracted from the dataset. </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Upload the files making up the raster dataset to the resource</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Example_Files/logan1.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/logan2.tif&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/logan.vrt&#39;</span><span class="p">]</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">)</span>
+
+<span class="c1"># Get the aggregation that was just created - initially the title will be &quot;logan1&quot;</span>
+<span class="c1"># based on the name of the first .tif file that appears in the .vrt file</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;logan1&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the title for the aggregation that was added to the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following aggregation was added to the resource: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="multidimensional-netcdf-aggregation">Multidimensional NetCDF Aggregation</h3>
+<p>Multidimensional aggregations are created in HydroShare from a NetCDF file. Like the other aggregation types, you can upload the NetCDF file and HydroShare will automatically create the aggregation for you. HydroShare also automatically extracts metadata from the NetCDF file to populate the aggregation metadata. Some of this metadata may get propagated to the resource level if you haven't set things like the title and keywords. You can then get the aggregation and set the other metadata elements as shown above for the single file aggregation.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Upload the NetCDF file to the resource</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/SWE_time.nc&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get the aggregation by searching for the NetCDF file that is inside of it</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__name</span><span class="o">=</span><span class="s2">&quot;SWE_time.nc&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the title for the aggregation that was added to the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following aggregation was added to the resource: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="time-series-aggregation">Time Series Aggregation</h3>
+<p>Time series aggregations are created in HydroShare from an ODM2 SQLite database file. The ODM2 SQLite database contain one or more time series </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Upload the SQLite file to the resource</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/ODM2.sqlite&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get the aggregation by searching for the SQLite file that is inside of it</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__name</span><span class="o">=</span><span class="s2">&quot;ODM2.sqlite&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the title for the aggregation that was added to the resource</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following aggregation was added to the resource: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="file-set-aggregation">File Set Aggregation</h3>
+<p>A file set aggregation is any folder within a resource to which you want to add metadata. If you want to create a file set aggregation, you first have to create a folder, then upload files to it. After that, you can set the aggregation on the folder.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Create a new folder for the file set aggregation</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">folder_create</span><span class="p">(</span><span class="s1">&#39;Fileset_Aggregation&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add some files to the folder</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="s1">&#39;Example_Files/Data_File1.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;Example_Files/Data_File2.csv&#39;</span><span class="p">,</span>
+                    <span class="n">destination_path</span><span class="o">=</span><span class="s1">&#39;Fileset_Aggregation&#39;</span><span class="p">)</span>
+
+<span class="c1"># TODO: How to set a fileset aggregation on a folder containing files?</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="get-aggregation-properties">Get Aggregation Properties</h2>
+<p>Each aggregation in a resource has metadata properties associated with it. You can query/retrieve those properties for display. The following shows an example for the time series aggregation that was created above.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the time series aggregation that was created above</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;TimeSeries&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print the metadata associated with the aggregation</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Title: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Type: &#39;</span> <span class="o">+</span> <span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Keywords: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Temporal Coverage: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">period_coverage</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Aggregation Spatial Coverage: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span><span class="p">))</span>
+
+<span class="c1"># Print the list of files in the aggregation</span>
+<span class="n">file_list</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List of files contained within the aggregation:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">file_list</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="searching-for-aggregations-within-a-resource">Searching for Aggregations within a Resource</h2>
+<p>If you need to find/get one or more aggregations within a resource so you can download or remove it from the resource, there are several filters available that allow you to return a list of aggregations that meet your search criteria.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the list of all aggregations in the resource</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">()</span>
+
+<span class="c1"># Get a list of all aggregations of a particular type</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;TimeSeries&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations with extended metadata searching by key</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">additional_metadata__key</span><span class="o">=</span><span class="s2">&quot;Observed Variable&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations with extended metadata searching by value</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">additional_metadata__value</span><span class="o">=</span><span class="s2">&quot;Water Use&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations with a subject keyword searching by value</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">subjects__contains</span><span class="o">=</span><span class="s2">&quot;Temperature&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations searching by title (or any metadata attribute)</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;watersheds&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations searching by a nested metadata attribute (__)</span>
+<span class="n">aggregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">period_coverage__name</span><span class="o">=</span><span class="s2">&quot;period_coverage name&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get a list of aggregations by combining field searching, filtered with “AND”</span>
+<span class="n">aggrregations</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="n">period_coverage__name</span><span class="o">=</span><span class="s2">&quot;period_coverage name&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;watersheds&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can also search for individual aggregations within a resource.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Search for an aggregation of type time series</span>
+<span class="n">aggregation</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;TimeSeries&quot;</span><span class="p">)</span>
+
+<span class="c1"># Search for an aggregation with a specific title</span>
+<span class="n">aggregation</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;watersheds&quot;</span><span class="p">)</span>
+
+<span class="c1"># Search for an aggregation that contains a particular file name</span>
+<span class="n">aggregation</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__name</span><span class="o">=</span><span class="s2">&quot;ODM2.sqlite&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="downloading-an-aggregation">Downloading an Aggregation</h2>
+<p>When working with a resource, you may want to download one of the aggregations contained within the resource. If you want to download it to a particular location on your disk, you can pass a path to the location where you want the aggregation to be saved to the <code>download()</code> function as a string. Aggregations are downloaded as a zipped file containing the aggregation content and metadata files.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the geographic feature aggregation that was created above</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;watersheds&quot;</span><span class="p">)</span>
+
+<span class="c1"># Download the aggregation</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation_download</span><span class="p">(</span><span class="n">agg</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Clean up the zippled aggregation file that was just downloaded.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="err">!</span><span class="n">rm</span> <span class="s1">&#39;watersheds.shp.zip&#39;</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="remove-and-delete-an-aggregation">Remove and Delete an Aggregation</h2>
+<p>You may wish to remove an aggregation from a resource. There are two functions you can use to do this. The difference between the two is whether the aggregation's content files are preserved in the resource or deleted. To remove the aggregation-specific metadata and associations while maintaining the content files, call the <code>remove()</code> function on the aggregation.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the geographic raster aggregation that was created above</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;logan1&quot;</span><span class="p">)</span>
+
+<span class="c1"># Remove the aggregation and delete its metadata, but leave the file(s)</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation_remove</span><span class="p">(</span><span class="n">agg</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you want to delete the aggregation, including its metadata and the associated content files, you can call the <code>delete()</code> function on the aggregation. Once you have called the <code>remove()</code> function on an aggregation, the <code>delete()</code> function will no longer work and you will have to delete the files individually.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># Get the multidimensional NetCDF aggregation that was created above</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;NetCDF&quot;</span><span class="p">)</span>
+
+<span class="c1"># Delete the aggregation and metadata along with files within aggregation</span>
+<span class="n">new_resource</span><span class="o">.</span><span class="n">aggregation_delete</span><span class="p">(</span><span class="n">agg</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<div class="codehilite"><pre><span></span><code>
+</code></pre></div>
+
+
+
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../File_Operations/" class="btn btn-neutral float-right" title="File Operations">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Basic_Operations/" class="btn btn-neutral" title="Basic Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Basic_Operations/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../File_Operations/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

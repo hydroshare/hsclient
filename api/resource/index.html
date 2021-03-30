@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Resource - hsclient</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../css/ansi-colours.css" rel="stylesheet" />
+  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Resource";
+    var mkdocs_page_input_path = "api/resource.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> hsclient</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Operations</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../hydroshare/">HydroShare</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Resource</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../file/">File</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../aggregation/">Aggregation</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">hsclient</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API &raquo;</li>
+        
+      
+    
+    <li>Resource</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div class="doc doc-object doc-class">
+<h2 class="hidden-toc" id="hsclient.hydroshare.Resource" style="visibility: hidden; position: absolute;">
+        </h2>
+<div class="doc doc-contents first">
+<p>Represents a Resource in HydroShare</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.access_permission">
+
+<code class="highlight">access_permission</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Retrieves the access permissions of the resource
+:return: JSON object</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.resource_id">
+
+<code class="highlight">resource_id: str</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-property"><code>property</code></small>
+      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>The resource id (guid) of the HydroShare resource</p>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.aggregation_delete">
+
+<code class="highlight">aggregation_delete(self, aggregation)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
+:param aggregation: The aggregation object to delete</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def aggregation_delete(self, aggregation: Aggregation) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.</span>
+<span class="err">    :param aggregation: The aggregation object to delete</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(</span>
+<span class="err">        aggregation._hsapi_path,</span>
+<span class="err">        &quot;functions&quot;,</span>
+<span class="err">        &quot;delete-file-type&quot;,</span>
+<span class="err">        aggregation.metadata.type.value + &quot;LogicalFile&quot;,</span>
+<span class="err">        aggregation.main_file_path,</span>
+<span class="err">    )</span>
+<span class="err">    aggregation._hs_session.delete(path, status_code=200)</span>
+<span class="err">    aggregation.refresh()</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.aggregation_download">
+
+<code class="highlight">aggregation_download(self, aggregation, save_path='', unzip_to=None)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Download an aggregation from HydroShare
+:param aggregation: The aggreation to download
+:param save_path: The local path to save the aggregation to, defaults to the current directory
+:param unzip_to: If set, the resulting download will be unzipped to the specified path</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">aggregation_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">:</span> <span class="n">Aggregation</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">unzip_to</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download an aggregation from HydroShare</span>
+<span class="sd">    :param aggregation: The aggreation to download</span>
+<span class="sd">    :param save_path: The local path to save the aggregation to, defaults to the current directory</span>
+<span class="sd">    :param unzip_to: If set, the resulting download will be unzipped to the specified path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">aggregation</span><span class="o">.</span><span class="n">_download</span><span class="p">(</span><span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span> <span class="n">unzip_to</span><span class="o">=</span><span class="n">unzip_to</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.aggregation_remove">
+
+<code class="highlight">aggregation_remove(self, aggregation)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.
+:param aggregation: The aggregation object to remove</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def aggregation_remove(self, aggregation: Aggregation) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.</span>
+<span class="err">    :param aggregation: The aggregation object to remove</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(</span>
+<span class="err">        aggregation._hsapi_path,</span>
+<span class="err">        &quot;functions&quot;,</span>
+<span class="err">        &quot;remove-file-type&quot;,</span>
+<span class="err">        aggregation.metadata.type.value + &quot;LogicalFile&quot;,</span>
+<span class="err">        aggregation.main_file_path,</span>
+<span class="err">    )</span>
+<span class="err">    aggregation._hs_session.post(path, status_code=200)</span>
+<span class="err">    aggregation.refresh()</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.copy">
+
+<code class="highlight">copy(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Copies this Resource into a new resource on HydroShare
+returns: A Resource object of the newly copied resource</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def copy(self):</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Copies this Resource into a new resource on HydroShare</span>
+<span class="err">    returns: A Resource object of the newly copied resource</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(self._hsapi_path, &quot;copy&quot;)</span>
+<span class="err">    response = self._hs_session.post(path, status_code=202)</span>
+<span class="err">    resource_id = response.text</span>
+<span class="err">    return Resource(&quot;/resource/{}/data/resourcemap.xml&quot;.format(resource_id), self._hs_session)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.delete">
+
+<code class="highlight">delete(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Deletes the resource on HydroShare</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def delete(self) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;Deletes the resource on HydroShare&quot;&quot;&quot;</span>
+<span class="err">    hsapi_path = self._hsapi_path</span>
+<span class="err">    self._hs_session.delete(hsapi_path, status_code=204)</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.download">
+
+<code class="highlight">download(self, save_path='')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Downloads a zipped bagit archive of the resource from HydroShare
+param save_path: A local path to save the bag to, defaults to the current working directory
+returns: The relative pathname of the download</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads a zipped bagit archive of the resource from HydroShare</span>
+<span class="sd">    param save_path: A local path to save the bag to, defaults to the current working directory</span>
+<span class="sd">    returns: The relative pathname of the download</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_bag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_aggregate">
+
+<code class="highlight">file_aggregate(self, path, agg_type)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Aggregate a file to a HydroShare aggregation type.  Aggregating files allows you to specify metadata specific
+to the files associated with the aggregation.  To set a FileSet aggregation, include the path to the folder or
+a file in the folder you would like to create a FileSet aggregation from.
+:param path: The path to the file to aggregate
+:param agg_type: The AggregationType to create
+:returns: The newly created Aggregation object</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_aggregate</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nl">agg_type:</span> <span class="n">AggregationType</span><span class="p">)</span><span class="o">:</span>
+    <span class="s">&quot;&quot;&quot;</span>
+    <span class="n">Aggregate</span> <span class="n">a</span> <span class="n">file</span> <span class="n">to</span> <span class="n">a</span> <span class="n">HydroShare</span> <span class="n">aggregation</span> <span class="k">type</span><span class="p">.</span>  <span class="n">Aggregating</span> <span class="n">files</span> <span class="n">allows</span> <span class="n">you</span> <span class="n">to</span> <span class="k">specify</span> <span class="n">metadata</span> <span class="n">specific</span>
+    <span class="n">to</span> <span class="n">the</span> <span class="n">files</span> <span class="n">associated</span> <span class="n">with</span> <span class="n">the</span> <span class="n">aggregation</span><span class="p">.</span>  <span class="n">To</span> <span class="n">set</span> <span class="n">a</span> <span class="n">FileSet</span> <span class="n">aggregation</span><span class="p">,</span> <span class="n">include</span> <span class="n">the</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">folder</span> <span class="k">or</span>
+    <span class="n">a</span> <span class="n">file</span> <span class="n">in</span> <span class="n">the</span> <span class="n">folder</span> <span class="n">you</span> <span class="n">would</span> <span class="n">like</span> <span class="n">to</span> <span class="n">create</span> <span class="n">a</span> <span class="n">FileSet</span> <span class="n">aggregation</span> <span class="n">from</span><span class="p">.</span>
+    <span class="o">:</span><span class="n">param</span> <span class="nl">path:</span> <span class="n">The</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">to</span> <span class="n">aggregate</span>
+    <span class="o">:</span><span class="n">param</span> <span class="nl">agg_type:</span> <span class="n">The</span> <span class="n">AggregationType</span> <span class="n">to</span> <span class="n">create</span>
+    <span class="o">:</span><span class="nl">returns:</span> <span class="n">The</span> <span class="n">newly</span> <span class="n">created</span> <span class="n">Aggregation</span> <span class="n">object</span>
+    <span class="s">&quot;&quot;&quot;</span>
+    <span class="n">type_value</span> <span class="o">=</span> <span class="n">agg_type</span><span class="p">.</span><span class="n">value</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">agg_type</span> <span class="o">==</span> <span class="n">AggregationType</span><span class="p">.</span><span class="nl">SingleFileAggregation:</span>
+        <span class="n">type_value</span> <span class="o">=</span> <span class="p">&#39;</span><span class="n">SingleFile</span><span class="p">&#39;</span>
+    <span class="k">if</span> <span class="n">agg_type</span> <span class="o">==</span> <span class="n">AggregationType</span><span class="p">.</span><span class="nl">FileSetAggregation:</span>
+        <span class="n">relative_path</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;folder_path&quot;</span><span class="o">:</span> <span class="n">relative_path</span><span class="p">}</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s">&quot;functions&quot;</span><span class="p">,</span> <span class="s">&quot;set-file-type&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_value</span><span class="p">)</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mh">201</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">refresh</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_delete">
+
+<code class="highlight">file_delete(self, path=None)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Delete a file on HydroShare
+:param path: The path to the file</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def file_delete(self, path: str = None) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Delete a file on HydroShare</span>
+<span class="err">    :param path: The path to the file</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    self._delete_file(path)</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_download">
+
+<code class="highlight">file_download(self, path, save_path='', zipped=False)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Downloads a file from HydroShare
+:param path: The path to the file
+:param save_path: The local path to save the file to
+:param zipped: Defaults to False, set to True to download the file zipped
+:returns: The path to the downloaded file</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">:</span> <span class="nb nb-Type">bool</span> <span class="o">=</span> <span class="n">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads a file from HydroShare</span>
+<span class="sd">    :param path: The path to the file</span>
+<span class="sd">    :param save_path: The local path to save the file to</span>
+<span class="sd">    :param zipped: Defaults to False, set to True to download the file zipped</span>
+<span class="sd">    :returns: The path to the downloaded file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">zipped</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_zip</span><span class="p">(</span>
+            <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;zipped&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_file</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">save_path</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_rename">
+
+<code class="highlight">file_rename(self, path, new_path)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Rename a file on HydroShare
+:param path: The path to the file
+:param new_path: the renamed path to the file</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def file_rename(self, path: str, new_path: str) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Rename a file on HydroShare</span>
+<span class="err">    :param path: The path to the file</span>
+<span class="err">    :param new_path: the renamed path to the file</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    rename_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;move-or-rename&quot;)</span>
+<span class="err">    self._hs_session.post(rename_path, status_code=200, data={&quot;source_path&quot;: path, &quot;target_path&quot;: new_path})</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_unzip">
+
+<code class="highlight">file_unzip(self, path)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Unzips a file on HydroShare
+:param path: The path to the file to unzip</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def file_unzip(self, path: str) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Unzips a file on HydroShare</span>
+<span class="err">    :param path: The path to the file to unzip</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    if not path.endswith(&quot;.zip&quot;):</span>
+<span class="err">        raise Exception(&quot;File {} is not a zip, and cannot be unzipped&quot;.format(path))</span>
+<span class="err">    unzip_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;unzip&quot;, &quot;data&quot;, &quot;contents&quot;, path)</span>
+<span class="err">    self._hs_session.post(unzip_path, status_code=200, data={&quot;overwrite&quot;: &quot;true&quot;, &quot;ingest_metadata&quot;: &quot;true&quot;})</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_upload">
+
+<code class="highlight">file_upload(self, *files, *, destination_path='')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Uploads files to a folder in HydroShare
+:param *files: The local file paths to upload
+:param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">files</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uploads files to a folder in HydroShare</span>
+<span class="sd">    :param *files: The local file paths to upload</span>
+<span class="sd">    :param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+            <span class="n">zipped_file</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s1">&#39;files.zip&#39;</span><span class="p">)</span>
+            <span class="n">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">zipped_file</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="n">zipped</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_upload</span><span class="p">(</span><span class="n">zipped_file</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+            <span class="n">unzip_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;functions&quot;</span><span class="p">,</span> <span class="s2">&quot;unzip&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="s1">&#39;files.zip&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="n">unzip_path</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
+            <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_zip">
+
+<code class="highlight">file_zip(self, path, zip_name=None, remove_file=True)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Zip a file on HydroShare
+:param path: The path to the file
+:param zip_name: The name of the zipped file
+:param remove_file: Defaults to True, set to False to not delete the file that was zipped</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Zip a file on HydroShare</span>
+<span class="err">    :param path: The path to the file</span>
+<span class="err">    :param zip_name: The name of the zipped file</span>
+<span class="err">    :param remove_file: Defaults to True, set to False to not delete the file that was zipped</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    zip_name = basename(path) + &quot;.zip&quot; if not zip_name else zip_name</span>
+<span class="err">    data = {&quot;input_coll_path&quot;: path, &quot;output_zip_file_name&quot;: zip_name, &quot;remove_original_after_zip&quot;: remove_file}</span>
+<span class="err">    zip_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;zip&quot;)</span>
+<span class="err">    self._hs_session.post(zip_path, status_code=200, data=data)</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.folder_create">
+
+<code class="highlight">folder_create(self, folder)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Creates a folder on HydroShare
+:param folder: the folder path to create</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def folder_create(self, folder: str) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Creates a folder on HydroShare</span>
+<span class="err">    :param folder: the folder path to create</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(self._hsapi_path, &quot;folders&quot;, folder)</span>
+<span class="err">    self._hs_session.put(path, status_code=201)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.folder_delete">
+
+<code class="highlight">folder_delete(self, path=None)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Deletes a folder on HydroShare
+:param path: the path to the folder</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def folder_delete(self, path: str = None) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Deletes a folder on HydroShare</span>
+<span class="err">    :param path: the path to the folder</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    self._delete_file_folder(path)</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.folder_download">
+
+<code class="highlight">folder_download(self, path, save_path='')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Downloads a folder from HydroShare
+:param path: The path to folder
+:param save_path: The local path to save the download to, defaults to the current directory
+:returns: The path to the download zipped folder</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">folder_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads a folder from HydroShare</span>
+<span class="sd">    :param path: The path to folder</span>
+<span class="sd">    :param save_path: The local path to save the download to, defaults to the current directory</span>
+<span class="sd">    :returns: The path to the download zipped folder</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_zip</span><span class="p">(</span>
+        <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;zipped&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.folder_rename">
+
+<code class="highlight">folder_rename(self, path, new_path)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Renames a folder on HydroShare
+:param path: the path to the folder to rename
+:param new_path: the new path folder name</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def folder_rename(self, path: str, new_path: str) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Renames a folder on HydroShare</span>
+<span class="err">    :param path: the path to the folder to rename</span>
+<span class="err">    :param new_path: the new path folder name</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    self.file_rename(path=path, new_path=new_path)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.new_version">
+
+<code class="highlight">new_version(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Creates a new version of the resource on HydroShare
+:return: A Resource object of the newly created resource version</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def new_version(self):</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Creates a new version of the resource on HydroShare</span>
+<span class="err">    :return: A Resource object of the newly created resource version</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(self._hsapi_path, &quot;version&quot;)</span>
+<span class="err">    response = self._hs_session.post(path, status_code=202)</span>
+<span class="err">    resource_id = response.text</span>
+<span class="err">    return Resource(&quot;/resource/{}/data/resourcemap.xml&quot;.format(resource_id), self._hs_session)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.reference_create">
+
+<code class="highlight">reference_create(self, file_name, url, path='')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Creates a HydroShare reference object to reference content outside of the resource
+:param file_name: the file name of the resulting .url file
+:param url: the url of the referenced content
+:param path: the path to create the reference in</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def reference_create(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Creates a HydroShare reference object to reference content outside of the resource</span>
+<span class="err">    :param file_name: the file name of the resulting .url file</span>
+<span class="err">    :param url: the url of the referenced content</span>
+<span class="err">    :param path: the path to create the reference in</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    request_path = urljoin(self._hsapi_path.replace(self.resource_id, &quot;&quot;), &quot;data-store-add-reference&quot;)</span>
+<span class="err">    self._hs_session.post(</span>
+<span class="err">        request_path,</span>
+<span class="err">        data={&quot;res_id&quot;: self.resource_id, &quot;curr_path&quot;: path, &quot;ref_name&quot;: file_name, &quot;ref_url&quot;: url},</span>
+<span class="err">        status_code=200,</span>
+<span class="err">    )</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.reference_update">
+
+<code class="highlight">reference_update(self, file_name, url, path='')</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Updates a HydroShare reference object
+:param file_name: the file name for the .url file
+:param url: the url of the referenced content
+:param path: the path to the directory where the reference is located</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def reference_update(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Updates a HydroShare reference object</span>
+<span class="err">    :param file_name: the file name for the .url file</span>
+<span class="err">    :param url: the url of the referenced content</span>
+<span class="err">    :param path: the path to the directory where the reference is located</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    request_path = urljoin(self._hsapi_path.replace(self.resource_id, &quot;&quot;), &quot;data_store_edit_reference_url&quot;)</span>
+<span class="err">    self._hs_session.post(</span>
+<span class="err">        request_path,</span>
+<span class="err">        data={&quot;res_id&quot;: self.resource_id, &quot;curr_path&quot;: path, &quot;url_filename&quot;: file_name, &quot;new_ref_url&quot;: url},</span>
+<span class="err">        status_code=200,</span>
+<span class="err">    )</span>
+<span class="err">    self.refresh()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.save">
+
+<code class="highlight">save(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Saves the metadata to HydroShare</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Saves the metadata to HydroShare&quot;&quot;&quot;</span>
+    <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;resourcemetadata.xml&#39;</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.set_sharing_status">
+
+<code class="highlight">set_sharing_status(self, public)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>Set the sharing status of the resource to public or private
+:param public: bool, set to True for public, False for private</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def set_sharing_status(self, public: bool):</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Set the sharing status of the resource to public or private</span>
+<span class="err">    :param public: bool, set to True for public, False for private</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    path = urljoin(&quot;hsapi&quot;, &quot;resource&quot;, &quot;accessRules&quot;, self.resource_id)</span>
+<span class="err">    data = {&#39;public&#39;: public}</span>
+<span class="err">    self._hs_session.put(path, status_code=200, data=data)</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-method">
+<h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.system_metadata">
+
+<code class="highlight">system_metadata(self)</code>
+
+
+      </h2>
+<div class="doc doc-contents ">
+<p>The system metadata associated with the HydroShare resource
+returns: JSON object</p>
+<details class="quote">
+          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
+          <div class="highlight python">
+<div class="codehilite"><pre><span></span><code><span class="err">def system_metadata(self):</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    The system metadata associated with the HydroShare resource</span>
+<span class="err">    returns: JSON object</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    hsapi_path = urljoin(self._hsapi_path, &#39;sysmeta&#39;)</span>
+<span class="err">    return self._hs_session.get(hsapi_path, status_code=200).json()</span>
+</code></pre></div>
+
+</div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../file/" class="btn btn-neutral float-right" title="File">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../hydroshare/" class="btn btn-neutral" title="HydroShare"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../hydroshare/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../file/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
