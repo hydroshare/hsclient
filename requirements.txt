@@ -8,3 +8,7 @@ black
 pytest-xdist
 pytest-cov
 requests_oauthlib
+
+#TODO split out test/doc/install requirements
+mknotebooks
+Pygments

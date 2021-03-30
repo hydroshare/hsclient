@@ -5,11 +5,22 @@ theme: readthedocs
 plugins:
   - search
   - mkdocstrings
+  - mknotebooks
 
 markdown_extensions:
   - tables
-  - pymdownx.snippets:
+  - pymdownx.snippets
+  - codehilite
 
 nav:
-    - Home: index.md
-    - About: hydroshare.md
+  - Operations:
+    - Basic Operations: examples/Basic_Operations.ipynb
+    - Aggregation Operations: examples/Aggregation_Operations.ipynb
+    - File Operations: examples/File_Operations.ipynb
+    - Metadata Operations: examples/Metadata_Operations.ipynb
+  - API:
+      HydroShare: api/hydroshare.md
+      Resource: api/resource.md
+      File: api/file.md
+      Aggregation: api/aggregation.md
+

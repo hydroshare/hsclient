@@ -9,7 +9,7 @@ HydroShare has a resource with example notebooks.  Click [here](https://www.hydr
 The HS RDF Python Client for HydroShare won't be installed by default, so it has to be installed first before you can work with it. Use the following command to install the Python Client from the GitHub repository. Eventually we will distribute this package via the Python Package Index (PyPi) so that it can be installed via pip from PyPi.
 
 ```bash
-pip install git+https://github.com/hydroshare/hsclient.git
+pip install hsclient
 ```
 
 ## Authenticate with HydroShare
