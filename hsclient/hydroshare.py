@@ -116,8 +116,7 @@ class Aggregation:
                                     "data/contents/",
                                 )[1]
                             )
-                            # f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
-                            f = File(file_path, url2pathname(file.path), None)
+                            f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -127,8 +126,9 @@ class Aggregation:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file.path)):
-                    # self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, self._checksums))
-                    self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, None))
+                    self._parsed_aggregations.append(
+                        Aggregation(url2pathname(file.path), self._hs_session, self._checksums)
+                    )
         return self._parsed_aggregations
 
     @property
