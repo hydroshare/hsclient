@@ -107,7 +107,7 @@ class Aggregation:
         if not self._parsed_files:
             self._parsed_files = []
             for file in self._map.describes.files:
-                if not is_aggregation(str(file.path)):
+                if not is_aggregation(str(file)):
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
@@ -116,8 +116,7 @@ class Aggregation:
                                     "data/contents/",
                                 )[1]
                             )
-                            # f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
-                            f = File(file_path, url2pathname(file.path), None)
+                            f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -126,9 +125,10 @@ class Aggregation:
         if not self._parsed_aggregations:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
-                if is_aggregation(str(file.path)):
-                    # self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, self._checksums))
-                    self._parsed_aggregations.append(Aggregation(url2pathname(file.path), self._hs_session, None))
+                if is_aggregation(str(file)):
+                    self._parsed_aggregations.append(
+                        Aggregation(url2pathname(file.path), self._hs_session, self._checksums)
+                    )
         return self._parsed_aggregations
 
     @property
@@ -340,6 +340,11 @@ class Resource(Aggregation):
     def resource_id(self) -> str:
         """The resource id (guid) of the HydroShare resource"""
         return self._map.identifier
+
+    @property
+    def metadata_file(self):
+        """The path to the metadata file"""
+        return self.metadata_path.split("/data/", 1)[1]
 
     def system_metadata(self):
         """

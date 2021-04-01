@@ -13,14 +13,23 @@ markdown_extensions:
   - codehilite
 
 nav:
-  - Operations:
-    - Basic Operations: examples/Basic_Operations.ipynb
-    - Aggregation Operations: examples/Aggregation_Operations.ipynb
-    - File Operations: examples/File_Operations.ipynb
-    - Metadata Operations: examples/Metadata_Operations.ipynb
-  - API:
-      HydroShare: api/hydroshare.md
-      Resource: api/resource.md
-      File: api/file.md
-      Aggregation: api/aggregation.md
+  - Usage Examples:
+      Basic Operations: examples/Basic_Operations.ipynb
+      Aggregation Operations: examples/Aggregation_Operations.ipynb
+      File Operations: examples/File_Operations.ipynb
+      Metadata Operations: examples/Metadata_Operations.ipynb
+  - Developer Documentation:
+    - Models:
+        Single File: metadata/SingleFile.md
+        File Set: metadata/FileSet.md
+        Geographic Feature: metadata/GeographicFeature.md
+        Geographic Raster: metadata/GeographicRaster.md
+        Multidimensional: metadata/Multidimensional.md
+        Referenced Time Series: metadata/ReferencedTimeSeries.md
+        Time Series: metadata/TimeSeries.md
+    - API:
+        HydroShare: api/hydroshare.md
+        Resource: api/resource.md
+        File: api/file.md
+        Aggregation: api/aggregation.md
 
