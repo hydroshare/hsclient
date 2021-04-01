@@ -107,7 +107,7 @@ class Aggregation:
         if not self._parsed_files:
             self._parsed_files = []
             for file in self._map.describes.files:
-                if not is_aggregation(str(file.path)):
+                if not is_aggregation(str(file)):
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
