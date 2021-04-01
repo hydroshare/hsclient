@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Geographic Raster - hsclient</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../css/ansi-colours.css" rel="stylesheet" />
+  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Geographic Raster";
+    var mkdocs_page_input_path = "metadata/GeographicRaster.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> hsclient</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <p class="caption"><span class="caption-text">Usage Examples</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="#">Models</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../SingleFile/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../FileSet/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../GeographicFeature/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="./">Geographic Raster</a>
+    <ul class="current">
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Multidimensional/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ReferencedTimeSeries/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../TimeSeries/">Time Series</a>
+                </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="#">API</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
+                </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">hsclient</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Models &raquo;</li>
+        
+      
+        
+          <li>Developer Documentation &raquo;</li>
+        
+      
+    
+    <li>Geographic Raster</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div class="doc doc-object doc-class">
+<h2 class="hidden-toc" id="hsmodels.schemas.aggregations.GeographicRasterMetadata" style="visibility: hidden; position: absolute;">
+        </h2>
+<div class="doc doc-contents first">
+<p>A class used to represent the metadata associated with a geographic raster aggregation</p>
+<p>A geographic raster aggregation consists of the multiple content files that make up a
+geographic raster dataset to which aggregation-level metadata have been added. Rasters
+may have multiple files and multiple bands and are stored in HydroShare as GeoTIFF files.</p>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.GeographicRasterMetadata.band_information">
+
+<code class="highlight">band_information: BandInformation</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+      <small class="doc doc-property doc-property-required"><code>required</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing information about the bands contained in the raster dataset</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.GeographicRasterMetadata.cell_information">
+
+<code class="highlight">cell_information: CellInformation</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+      <small class="doc doc-property doc-property-required"><code>required</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing information about the raster grid cells</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.GeographicRasterMetadata.spatial_reference">
+
+<code class="highlight">spatial_reference: Union[hsmodels.schemas.fields.BoxSpatialReference, hsmodels.schemas.fields.PointSpatialReference]</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing spatial reference information for the dataset</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.GeographicRasterMetadata.type">
+
+<code class="highlight">type: AggregationType</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>A string expressing the aggregation type from the list of HydroShare aggregation types</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="doc doc-object doc-class">
+<h2 class="hidden-toc" id="hsmodels.schemas.aggregations.BaseAggregationMetadata" style="visibility: hidden; position: absolute;">
+        </h2>
+<div class="doc doc-contents first">
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.additional_metadata">
+
+<code class="highlight">additional_metadata: dict</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>A list of extended metadata elements expressed as key-value pairs</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.language">
+
+<code class="highlight">language: str</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>The 3-character string for the language in which the metadata and content are expressed</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.period_coverage">
+
+<code class="highlight">period_coverage: PeriodCoverage</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing the temporal coverage for a resource expressed as a date range</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.rights">
+
+<code class="highlight">rights: Rights</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing information about the rights held in and over the resource and the license under which a resource is shared</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.spatial_coverage">
+
+<code class="highlight">spatial_coverage: Union[hsmodels.schemas.fields.PointCoverage, hsmodels.schemas.fields.BoxCoverage]</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing the geospatial coverage for the resource expressed as either a bounding box or point</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.subjects">
+
+<code class="highlight">subjects: str</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>A list of keyword strings expressing the topic of the resource</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.title">
+
+<code class="highlight">title: str</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+      <small class="doc doc-property doc-property-required"><code>required</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>A string containing a descriptive title for the resource</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.url">
+
+<code class="highlight">url: AnyUrl</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+      <small class="doc doc-property doc-property-required"><code>required</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing the URL of the resource</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Multidimensional/" class="btn btn-neutral float-right" title="Multidimensional">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../GeographicFeature/" class="btn btn-neutral" title="Geographic Feature"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../GeographicFeature/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Multidimensional/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
