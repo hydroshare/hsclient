@@ -1,0 +1,5 @@
+hsclient
+hsmodels
+requests == 2.24.0
+pandas
+requests_oauthlib

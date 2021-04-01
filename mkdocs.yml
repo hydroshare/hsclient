@@ -1,11 +1,18 @@
 site_name: hsclient
+repo_name: hydroshare/hsclient
+repo_url: https://github.com/hydroshare/hsclient
+edit_url: edit/master/docs/
 
 theme: readthedocs
 
 plugins:
   - search
   - mkdocstrings
-  - mknotebooks
+  - mknotebooks:
+      binder: true
+      binder_service_name: "gh"
+      binder_branch: "master"
+      binder_ui: "lab"
 
 markdown_extensions:
   - tables
