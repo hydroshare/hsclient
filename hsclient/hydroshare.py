@@ -125,7 +125,7 @@ class Aggregation:
         if not self._parsed_aggregations:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
-                if is_aggregation(str(file.path)):
+                if is_aggregation(str(file)):
                     self._parsed_aggregations.append(
                         Aggregation(url2pathname(file.path), self._hs_session, self._checksums)
                     )
@@ -340,6 +340,11 @@ class Resource(Aggregation):
     def resource_id(self) -> str:
         """The resource id (guid) of the HydroShare resource"""
         return self._map.identifier
+
+    @property
+    def metadata_file(self):
+        """The path to the metadata file"""
+        return self.metadata_path.split("/data/", 1)[1]
 
     def system_metadata(self):
         """
