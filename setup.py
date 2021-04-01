@@ -5,11 +5,11 @@ README = (pathlib.Path(__file__).parent / "README.md").read_text()
 
 setup(
     name='hsclient',
-    version='0.1.2',
+    version='0.1.3',
     packages=find_packages(include=['hsclient', 'hsclient.*'],
                            exclude=("tests",)),
     install_requires=[
-        'hsmodels==0.1.1',
+        'hsmodels==0.1.2',
         'requests',
         'requests_oauthlib',
         'pandas'
