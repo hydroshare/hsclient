@@ -1,10 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="utf-8"/>
+    <title>JSON Editor Interactive Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
+    <script src="./polyfills/assign.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+    <link rel='stylesheet' id='theme-link'>
+    <link rel='stylesheet' id='iconlib-link'>
 </head>
 <body>
-$END$
+<div class='container grid-xl'>
+    <div class="row columns md:flex">
+        <div class='col-8 col-md-8 w-8/12'>
+            <h1>Editor</h1>
+            <p>Below is the editor generated from the JSON Schema.</p>
+            <div id="json-editor-form"></div>
+        </div>
+    </div>
+</div>
+<script>
+
+  var defaultSchema = {
+    'title': 'Person',
+    'type': 'object',
+    'required': [
+      'name',
+      'age',
+      'date',
+      'favorite_color',
+      'gender',
+      'location',
+      'pets'
+    ],
+    'properties': {
+      'name': {
+        'type': 'string',
+        'description': 'First and Last name',
+        'minLength': 4,
+        'default': 'Jeremy Dorn'
+      },
+      'age': {
+        'type': 'integer',
+        'default': 25,
+        'minimum': 18,
+        'maximum': 99
+      },
+      'favorite_color': {
+        'type': 'string',
+        'format': 'color',
+        'title': 'favorite color',
+        'default': '#ffa500'
+      },
+      'gender': {
+        'type': 'string',
+        'enum': [
+          'male',
+          'female',
+          'other'
+        ]
+      },
+      'date': {
+        'type': 'string',
+        'format': 'date',
+      },
+      'location': {
+        'type': 'object',
+        'title': 'Location',
+        'properties': {
+          'city': {
+            'type': 'string',
+            'default': 'San Francisco'
+          },
+          'state': {
+            'type': 'string',
+            'default': 'CA'
+          },
+          'citystate': {
+            'type': 'string',
+            'description': 'This is generated automatically from the previous two fields',
+            'template': '{{city}}, {{state}}',
+            'watch': {
+              'city': 'location.city',
+              'state': 'location.state'
+            }
+          }
+        }
+      },
+      'pets': {
+        'type': 'array',
+        'format': 'table',
+        'title': 'Pets',
+        'uniqueItems': true,
+        'items': {
+          'type': 'object',
+          'title': 'Pet',
+          'properties': {
+            'type': {
+              'type': 'string',
+              'enum': [
+                'cat',
+                'dog',
+                'bird',
+                'reptile',
+                'other'
+              ],
+              'default': 'dog'
+            },
+            'name': {
+              'type': 'string'
+            }
+          }
+        },
+        'default': [
+          {
+            'type': 'dog',
+            'name': 'Walter'
+          }
+        ]
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------- data */
+
+  var data = {}
+
+  var defaultOptions = {
+    iconlib: 'fontawesome5',
+    object_layout: 'normal',
+    schema: defaultSchema,
+    show_errors: 'interaction',
+    theme: 'bootstrap4'
+  }
+
+  var jsoneditor = null
+
+  var head = document.getElementsByTagName('head')[0]
+  var iconlibLink = document.querySelector('#iconlib-link')
+  var jsonEditorForm = document.querySelector('#json-editor-form')
+  var themeLink = document.querySelector('#theme-link')
+  var validateTextarea = document.querySelector('#validate-textarea')
+
+  /* -------------------------------------------------------------- parse url */
+
+  var parseUrl = function () {
+    var url = window.location.search
+    var queryParamsString = url.substring(1, url.length)
+    var queryParams = queryParamsString.split('&')
+
+    if (queryParamsString.length) {
+      queryParams.forEach(function (queryParam) {
+        var splittedParam = queryParam.split('=')
+        var param = splittedParam[0]
+        var value = splittedParam[1]
+
+        // data query param
+        if (param === 'data') {
+          // compress schema and value
+          try {
+            data = JSON.parse(LZString.decompressFromBase64(value))
+          } catch (reason) {
+          }
+        }
+      })
+    }
+
+    mergeOptions()
+  }
+
+  /* ----------------------------------------------------------- mergeOptions */
+
+  var mergeOptions = function () {
+    data.options = Object.assign(defaultOptions, data.options)
+    refreshUI()
+  }
+
+  /* -------------------------------------------------------------- refreshUI */
+
+  var refreshUI = function () {
+
+    // theme
+    var themeMap = {
+      barebones: '',
+      bootstrap3: 'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css',
+      bootstrap4: 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+      html: '',
+      spectre: 'https://unpkg.com/spectre.css/dist/spectre.min.css',
+      tailwind: 'https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css'
+    }
+    themeLink.href = themeMap[data.options.theme]
+
+    // iconlLib
+    var iconLibMap = {
+      fontawesome3: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.css',
+      fontawesome4: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css',
+      fontawesome5: 'https://use.fontawesome.com/releases/v5.6.1/css/all.css',
+      jqueryui: 'https://code.jquery.com/ui/1.10.3/themes/south-street/jquery-ui.css',
+      openiconic: 'https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.min.css',
+      spectre: 'https://unpkg.com/spectre.css/dist/spectre-icons.min.css'
+    }
+    iconlibLink.href = iconLibMap[data.options.iconlib]
+
+    initJsoneditor()
+  }
+
+  /* --------------------------------------------------------- initJsoneditor */
+
+  var initJsoneditor = function () {
+    // destroy old JSONEditor instance if exists
+    if (jsoneditor) {
+      jsoneditor.destroy()
+    }
+
+    // new instance of JSONEditor
+    jsoneditor = new window.JSONEditor(jsonEditorForm, data.options)
+
+    // listen for changes
+    jsoneditor.on('change', function () {
+      // output
+      var json = jsoneditor.getValue()
+      outputTextarea.value = JSON.stringify(json, null, 2)
+
+      // validate
+      var validationErrors = jsoneditor.validate()
+      if (validationErrors.length) {
+        validateTextarea.value = JSON.stringify(validationErrors, null, 2)
+      } else {
+        validateTextarea.value = 'valid'
+      }
+    })
+  }
+
+
+  parseUrl()
+
+</script>
 </body>
 </html>
