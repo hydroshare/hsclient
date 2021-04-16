@@ -25,8 +25,7 @@ def resource(resource_id: str):
 @app.post("/resource/{resource_id}/")
 def save_resource(resource_id: str, metadata: ResourceMetadata):
     res = hs.resource(resource_id)
-    res.metadata = metadata
-    res.save()
+    res.save(metadata)
 
 
 @app.get("/schema/{schema_type}/")

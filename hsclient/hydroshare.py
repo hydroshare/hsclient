@@ -205,10 +205,13 @@ class Aggregation:
             return self.files()[0].folder
         return self.files()[0].path
 
-    def save(self) -> None:
+    def save(self, metadata=None) -> None:
         """Saves the metadata back to HydroShare"""
         metadata_file = self.metadata_file
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        if metadata:
+            metadata_string = rdf_string(metadata, rdf_format="xml")
+        else:
+            metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         url = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
         self.refresh()
@@ -411,9 +414,13 @@ class Resource(Aggregation):
         self._hs_session.delete(hsapi_path, status_code=204)
         self.refresh()
 
-    def save(self) -> None:
+    def save(self, metadata=None) -> None:
         """Saves the metadata to HydroShare"""
-        metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
+        metadata_file = self.metadata_file
+        if metadata:
+            metadata_string = rdf_string(metadata, rdf_format="xml")
+        else:
+            metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
         self.refresh()
