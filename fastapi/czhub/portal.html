@@ -76,6 +76,9 @@
                   schema = JSON.stringify(data);
                   $('#schema-textarea').val(schema);
                   refreshUI();
+                  $.get("/resource/" + value + "/", function(data) {
+                      jsoneditor.setValue(data);
+                  })
               });
         }
       })
