@@ -16,10 +16,17 @@ def read_root():
     return {"Hello": "World"}
 
 @app.get("/resource/{resource_id}/", response_model=ResourceMetadata)
-def resource_metadata(resource_id: str):
+def resource(resource_id: str):
     res = hs.resource(resource_id)
     metadata = res.metadata
     return metadata
+
+
+@app.post("/resource/{resource_id}/")
+def save_resource(resource_id: str, metadata: ResourceMetadata):
+    res = hs.resource(resource_id)
+    res.metadata = metadata
+    res.save()
 
 
 @app.get("/schema/{schema_type}/")

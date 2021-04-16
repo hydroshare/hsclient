@@ -10,6 +10,7 @@
     <link rel='stylesheet' id='iconlib-link'>
 </head>
 <body>
+<button id="save-resource-btn">Save</button>
 <div class='container grid-xl'>
     <div class="row columns md:flex">
         <div class='col-8 col-md-8 w-8/12'>
@@ -23,6 +24,8 @@
     <div class="row columns md:flex">
         <textarea hidden="true" id='schema-textarea' rows="30" style="width: 100%; font-family: monospace;"
                   class='form-control'></textarea>
+        <textarea id='json-textarea' rows="30" style="width: 100%; font-family: monospace;"
+                  class='form-control'></textarea>
     </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
@@ -34,11 +37,15 @@
   var data = {}
 
   var defaultOptions = {
+    template: 'hogan',
     iconlib: 'fontawesome5',
     object_layout: 'normal',
     schema: defaultSchema,
     show_errors: 'interaction',
-    theme: 'bootstrap4'
+    theme: 'bootstrap4',
+    remove_empty_properties: true,
+    //use_default_values: false,
+    disable_collapse: true,
   }
 
   var jsoneditor = null
@@ -47,6 +54,15 @@
   var iconlibLink = document.querySelector('#iconlib-link')
   var jsonEditorForm = document.querySelector('#json-editor-form')
   var themeLink = document.querySelector('#theme-link')
+
+
+  $("#save-resource-btn").on("click", function(e) {
+      var urlParams = new URLSearchParams(window.location.search)
+      var resource_id = urlParams.get('resource')
+      var postBody = JSON.stringify(jsoneditor.getValue());
+      $("#json-textarea").val(postBody);
+      $.post("/resource/" + resource_id + "/", postBody);
+  });
 
   /* -------------------------------------------------------------- parse url */
 
@@ -77,6 +93,7 @@
                   $('#schema-textarea').val(schema);
                   refreshUI();
                   $.get("/resource/" + value + "/", function(data) {
+                      $("#json-textarea").val(JSON.stringify(data));
                       jsoneditor.setValue(data);
                   })
               });
