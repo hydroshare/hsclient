@@ -19,108 +19,15 @@
         </div>
     </div>
 </div>
+
+    <div class="row columns md:flex">
+        <textarea hidden="true" id='schema-textarea' rows="30" style="width: 100%; font-family: monospace;"
+                  class='form-control'></textarea>
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
 
-  var defaultSchema = {
-    'title': 'Person',
-    'type': 'object',
-    'required': [
-      'name',
-      'age',
-      'date',
-      'favorite_color',
-      'gender',
-      'location',
-      'pets'
-    ],
-    'properties': {
-      'name': {
-        'type': 'string',
-        'description': 'First and Last name',
-        'minLength': 4,
-        'default': 'Jeremy Dorn'
-      },
-      'age': {
-        'type': 'integer',
-        'default': 25,
-        'minimum': 18,
-        'maximum': 99
-      },
-      'favorite_color': {
-        'type': 'string',
-        'format': 'color',
-        'title': 'favorite color',
-        'default': '#ffa500'
-      },
-      'gender': {
-        'type': 'string',
-        'enum': [
-          'male',
-          'female',
-          'other'
-        ]
-      },
-      'date': {
-        'type': 'string',
-        'format': 'date',
-      },
-      'location': {
-        'type': 'object',
-        'title': 'Location',
-        'properties': {
-          'city': {
-            'type': 'string',
-            'default': 'San Francisco'
-          },
-          'state': {
-            'type': 'string',
-            'default': 'CA'
-          },
-          'citystate': {
-            'type': 'string',
-            'description': 'This is generated automatically from the previous two fields',
-            'template': '{{city}}, {{state}}',
-            'watch': {
-              'city': 'location.city',
-              'state': 'location.state'
-            }
-          }
-        }
-      },
-      'pets': {
-        'type': 'array',
-        'format': 'table',
-        'title': 'Pets',
-        'uniqueItems': true,
-        'items': {
-          'type': 'object',
-          'title': 'Pet',
-          'properties': {
-            'type': {
-              'type': 'string',
-              'enum': [
-                'cat',
-                'dog',
-                'bird',
-                'reptile',
-                'other'
-              ],
-              'default': 'dog'
-            },
-            'name': {
-              'type': 'string'
-            }
-          }
-        },
-        'default': [
-          {
-            'type': 'dog',
-            'name': 'Walter'
-          }
-        ]
-      }
-    }
-  }
+  var defaultSchema = {}
 
   /* ------------------------------------------------------------------- data */
 
@@ -140,7 +47,6 @@
   var iconlibLink = document.querySelector('#iconlib-link')
   var jsonEditorForm = document.querySelector('#json-editor-form')
   var themeLink = document.querySelector('#theme-link')
-  var validateTextarea = document.querySelector('#validate-textarea')
 
   /* -------------------------------------------------------------- parse url */
 
@@ -150,6 +56,7 @@
     var queryParams = queryParamsString.split('&')
 
     if (queryParamsString.length) {
+
       queryParams.forEach(function (queryParam) {
         var splittedParam = queryParam.split('=')
         var param = splittedParam[0]
@@ -162,6 +69,14 @@
             data = JSON.parse(LZString.decompressFromBase64(value))
           } catch (reason) {
           }
+        }
+        if (param === 'resource') {
+              $('#schema-textarea').val("hello worlds");
+              $.get("/schema/hydroshare/", function(data) {
+                  schema = JSON.stringify(data);
+                  $('#schema-textarea').val(schema);
+                  refreshUI();
+              });
         }
       })
     }
@@ -180,6 +95,8 @@
 
   var refreshUI = function () {
 
+    data.options.schema = JSON.parse($('#schema-textarea').val());
+    //schemaTextarea.value = JSON.stringify(data.options.schema, null, 2)
     // theme
     var themeMap = {
       barebones: '',
@@ -215,21 +132,6 @@
 
     // new instance of JSONEditor
     jsoneditor = new window.JSONEditor(jsonEditorForm, data.options)
-
-    // listen for changes
-    jsoneditor.on('change', function () {
-      // output
-      var json = jsoneditor.getValue()
-      outputTextarea.value = JSON.stringify(json, null, 2)
-
-      // validate
-      var validationErrors = jsoneditor.validate()
-      if (validationErrors.length) {
-        validateTextarea.value = JSON.stringify(validationErrors, null, 2)
-      } else {
-        validateTextarea.value = 'valid'
-      }
-    })
   }
 
 
