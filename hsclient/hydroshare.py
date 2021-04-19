@@ -420,6 +420,7 @@ class Resource(Aggregation):
         if metadata:
             metadata_string = rdf_string(metadata, rdf_format="xml")
         else:
+            self._retrieved_metadata.modified = datetime.now()
             metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
@@ -652,7 +653,7 @@ class HydroShareSession:
             if not token or not client_id:
                 raise ValueError("Oauth2 requires both token and client_id be provided")
             else:
-                self._session = OAuth2Session(client_id=client_id, token=token)
+                self._session = OAuth2Session(client_id=client_id, token={"access_token": token, "token_type": "Bearer"})
         else:
             self._session = requests.Session()
             self.set_auth((username, password))
@@ -793,7 +794,7 @@ class HydroShare:
             if not client_id or not token:
                 raise ValueError("Oauth2 requires a client_id to be paired with a token")
             else:
-                self._hs_session = HydroShareSession(
+                self._hs_session = HydroShareSession(None, None,
                     host=host, protocol=protocol, port=port, client_id=client_id, token=token
                 )
                 self.my_user_info()  # validate credentials

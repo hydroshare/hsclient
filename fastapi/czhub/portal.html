@@ -10,12 +10,19 @@
     <link rel='stylesheet' id='iconlib-link'>
 </head>
 <body>
+remember to disable coverages and publisher
+<br>
+<a href="/login">Login</a>
+<br>
+<a href="/logout">Logout</a>
+<br>
+<input type="text" id="resource-id-txt" name="resource_id">
+<button id="get-resource-btn">Get Resource</button>
+<br>
 <button id="save-resource-btn">Save</button>
 <div class='container grid-xl'>
     <div class="row columns md:flex">
         <div class='col-8 col-md-8 w-8/12'>
-            <h1>Editor</h1>
-            <p>Below is the editor generated from the JSON Schema.</p>
             <div id="json-editor-form"></div>
         </div>
     </div>
@@ -24,7 +31,7 @@
     <div class="row columns md:flex">
         <textarea hidden="true" id='schema-textarea' rows="30" style="width: 100%; font-family: monospace;"
                   class='form-control'></textarea>
-        <textarea id='json-textarea' rows="30" style="width: 100%; font-family: monospace;"
+        <textarea hidden="true" id='json-textarea' rows="30" style="width: 100%; font-family: monospace;"
                   class='form-control'></textarea>
     </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -64,6 +71,11 @@
       $.post("/resource/" + resource_id + "/", postBody);
   });
 
+  $("#get-resource-btn").on("click", function(e) {
+      window.location.href="/czhub/portal.html?resource=" + $("#resource-id-txt").val()
+  });
+
+
   /* -------------------------------------------------------------- parse url */
 
   var parseUrl = function () {
@@ -88,14 +100,17 @@
         }
         if (param === 'resource') {
               $('#schema-textarea').val("hello worlds");
-              $.get("/schema/hydroshare/", function(data) {
+              $.get("/schema/hydroshare/", function(data, status) {
                   schema = JSON.stringify(data);
                   $('#schema-textarea').val(schema);
+                  $("#resource-id-txt").val(value);
                   refreshUI();
                   $.get("/resource/" + value + "/", function(data) {
                       $("#json-textarea").val(JSON.stringify(data));
                       jsoneditor.setValue(data);
-                  })
+                  }).fail(function(){
+                      alert("Not logged in");
+                  });
               });
         }
       })
