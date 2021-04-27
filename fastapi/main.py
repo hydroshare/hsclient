@@ -1,5 +1,8 @@
 import uvicorn as uvicorn
-from fastapi import FastAPI, Depends, Request, HTTPException
+import requests
+import json
+
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
@@ -9,6 +12,7 @@ from hsclient.hydroshare import HydroShare
 from hsmodels.schemas.resource import ResourceMetadata
 from fastapi.staticfiles import StaticFiles
 from authlib.integrations.starlette_client import OAuth, OAuthError
+from bs4 import BeautifulSoup
 
 
 app = FastAPI()
@@ -26,6 +30,11 @@ oauth.register(name='orcid',
                authorize_url='https://sandbox.orcid.org/oauth/authorize',
                token_endpoint='https://sandbox.orcid.org/oauth/token',
                client_kwargs={'scope': 'openid'})
+oauth.register(name='zenodo',
+               authorize_url='https://sandbox.zenodo.org/oauth/authorize',
+               client_kwargs={'scope': 'deposit:write'},
+               token_endpoint='https://sandbox.zenodo.org/oauth/token',
+               access_token_params={'grant_type': 'authorization_code'})
 
 db = {}
 
@@ -55,14 +64,13 @@ async def login(request: Request):
     redirect_uri = request.url_for('auth')
     return await oauth.orcid.authorize_redirect(request, redirect_uri)
 
-@app.route('/authorize/hydroshare')
-async def login_hydroshare(request: Request):
+@app.get('/authorize/{repository}')
+async def authorize_repository(repository: str, request: Request):
     orcid = request.session.get('orcid')
     if not orcid:
         return RedirectResponse("/login")
-    redirect_uri = request.url_for('auth_hydroshare')
-    return await oauth.hydroshare.authorize_redirect(request, redirect_uri)
-
+    redirect_uri = request.url_for('auth_repository', repository=repository)
+    return await getattr(oauth, repository).authorize_redirect(request, redirect_uri)
 
 @app.route('/auth')
 async def auth(request: Request):
@@ -78,10 +86,11 @@ async def auth(request: Request):
     request.session['orcid'] = token['orcid']
     return RedirectResponse(url='/')
 
-@app.route('/auth/hydroshare')
-async def auth_hydroshare(request: Request):
+@app.get("/auth/{repository}")
+async def auth_repository(request: Request, repository: str):
     try:
-        token = await oauth.hydroshare.authorize_access_token(request)
+        repo = getattr(oauth, repository)
+        token = await repo.authorize_access_token(request)
     except OAuthError as error:
         return HTMLResponse(f'<h1>{error.error}</h1>')
     orcid = request.session.get('orcid')
@@ -90,22 +99,13 @@ async def auth_hydroshare(request: Request):
     db[orcid]["hs_access_token"] = token['access_token']
     return RedirectResponse(url='/')
 
-
-
 @app.route('/logout')
 async def logout(request: Request):
     request.session.pop('orcid', None)
     return RedirectResponse(url='/')
 
-@app.get("/resource/{resource_id}/", response_model=ResourceMetadata)
-def resource(request: Request, resource_id: str):
-    res = hs(request).resource(resource_id)
-    metadata = res.metadata
-    return metadata
-
-
-@app.post("/resource/{resource_id}/")
-def save_resource(request: Request, resource_id: str, metadata: ResourceMetadata):
+@app.post("/hydroshare/{resource_id}/")
+def save_hydroshare(request: Request, resource_id: str, metadata: ResourceMetadata):
     '''
     Possible interface for saving to a repository:
     To avoid quirks in schema validation, we can provide a sanitize method to take the form json and do anything
@@ -114,10 +114,34 @@ def save_resource(request: Request, resource_id: str, metadata: ResourceMetadata
     res = hs(request).resource(resource_id)
     res.save(metadata)
 
+@app.get("/hydroshare/{resource_id}/", response_model=ResourceMetadata)
+def hydroshare(request: Request, resource_id: str):
+    res = hs(request).resource(resource_id)
+    metadata = res.metadata
+    res.file
+    return metadata
+
+@app.get("/earthchem/{id}")
+def earthchem(id: str):
+    data = requests.get(f"https://ecl.earthchem.org/view.php?id={id}")
+    soup = BeautifulSoup(data.text)
+    return json.loads(soup.find('script', type="application/ld+json").string.strip("\n"))
+
+@app.get("/zenodo/{id}")
+def zenodo(id: str):
+    data = requests.get(f"https://zenodo.org/api/deposit/depositions/{id}")
+    raise NotImplementedError('no implemented')
 
 @app.get("/schema/{schema_type}/")
-def schema_hydroshare(schema_type: str):
-    return ResourceMetadata.schema()
+def schema(schema_type: str):
+    if schema_type == 'hydroshare':
+        return ResourceMetadata.schema()
+    if schema_type == 'earthchem':
+        data = requests.get("https://ecl.earthchem.org/schema/1.0/json-schema.json")
+        return data.json()
+    if schema_type == "zenodo":
+        raise NotImplementedError("not implemented")
+    raise ValueError(f"{schema_type} not recognized (hydroshare, earthchem, zenodo supported).")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8001, ssl_keyfile='config/example.com+5-key.pem', ssl_certfile="config/example.com+5.pem")

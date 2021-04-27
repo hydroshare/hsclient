@@ -12,14 +12,13 @@
 <body>
 remember to disable coverages and publisher
 <br>
-<a href="/login">Login</a>
+<input type="text" id="hydroshare-id-txt" name="hydroshare_id">
+<button id="get-hydroshare-btn">Get hydroshare</button>
 <br>
-<a href="/logout">Logout</a>
+<input type="text" id="earthchem-id-txt" name="earthchem_id">
+<button id="get-earthchem-btn">Get EarthChem</button>
 <br>
-<input type="text" id="resource-id-txt" name="resource_id">
-<button id="get-resource-btn">Get Resource</button>
-<br>
-<button id="save-resource-btn">Save</button>
+<button id="save-hydroshare-btn">Save</button>
 <div class='container grid-xl'>
     <div class="row columns md:flex">
         <div class='col-8 col-md-8 w-8/12'>
@@ -63,16 +62,20 @@ remember to disable coverages and publisher
   var themeLink = document.querySelector('#theme-link')
 
 
-  $("#save-resource-btn").on("click", function(e) {
+  $("#save-hydroshare-btn").on("click", function(e) {
       var urlParams = new URLSearchParams(window.location.search)
-      var resource_id = urlParams.get('resource')
+      var hydroshare_id = urlParams.get('hydroshare')
       var postBody = JSON.stringify(jsoneditor.getValue());
       $("#json-textarea").val(postBody);
-      $.post("/resource/" + resource_id + "/", postBody);
+      $.post("/hydroshare/" + hydroshare_id + "/", postBody);
   });
 
-  $("#get-resource-btn").on("click", function(e) {
-      window.location.href="/czhub/portal.html?resource=" + $("#resource-id-txt").val()
+  $("#get-hydroshare-btn").on("click", function(e) {
+      window.location.href="/czhub/portal.html?hydroshare=" + $("#hydroshare-id-txt").val()
+  });
+
+  $("#get-earthchem-btn").on("click", function(e) {
+      window.location.href="/czhub/portal.html?earthchem=" + $("#earthchem-id-txt").val()
   });
 
 
@@ -98,14 +101,27 @@ remember to disable coverages and publisher
           } catch (reason) {
           }
         }
-        if (param === 'resource') {
-              $('#schema-textarea').val("hello worlds");
+        if (param === 'hydroshare') {
               $.get("/schema/hydroshare/", function(data, status) {
                   schema = JSON.stringify(data);
                   $('#schema-textarea').val(schema);
-                  $("#resource-id-txt").val(value);
+                  $("#hydroshare-id-txt").val(value);
                   refreshUI();
-                  $.get("/resource/" + value + "/", function(data) {
+                  $.get("/hydroshare/" + value + "/", function(data) {
+                      $("#json-textarea").val(JSON.stringify(data));
+                      jsoneditor.setValue(data);
+                  }).fail(function(){
+                      alert("Not logged in");
+                  });
+              });
+        }
+        if (param === 'earthchem') {
+              $.get("/schema/earthchem/", function(data, status) {
+                  schema = JSON.stringify(data);
+                  $('#schema-textarea').val(schema);
+                  $("#earthchem-id-txt").val(value);
+                  refreshUI();
+                  $.get("/earthchem/" + value + "/", function(data) {
                       $("#json-textarea").val(JSON.stringify(data));
                       jsoneditor.setValue(data);
                   }).fail(function(){
