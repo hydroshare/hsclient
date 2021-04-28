@@ -576,8 +576,8 @@ class Resource(Aggregation):
             self._upload(files[0], destination_path=destination_path)
         else:
             with tempfile.TemporaryDirectory() as tmpdir:
-                zipped_file = urljoin(tmpdir, 'files.zip')
-                with ZipFile(urljoin(tmpdir, zipped_file), 'w') as zipped:
+                zipped_file = os.path.join(tmpdir, 'files.zip')
+                with ZipFile(zipped_file, 'w') as zipped:
                     for file in files:
                         zipped.write(file, basename(file))
                 self._upload(zipped_file, destination_path=destination_path)
@@ -679,7 +679,7 @@ class HydroShareSession:
 
         cd = file.headers['content-disposition']
         filename = cd.split("filename=")[1].strip('"')
-        downloaded_file = urljoin(save_path, filename)
+        downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(file.content)
         return downloaded_file
