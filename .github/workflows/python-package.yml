@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -28,18 +28,9 @@ jobs:
         python -m pip install --upgrade pip
         make install
         pip install .
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        make format
     - name: Test with pytest
       env:
         HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
       run: |
-        make test-cov
-    - name: Code Coverage Report
-      uses: romeovs/lcov-reporter-action@v0.2.11
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+        pytest -n 8 tests
