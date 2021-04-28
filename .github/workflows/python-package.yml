@@ -10,9 +10,9 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-linux:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.7]
