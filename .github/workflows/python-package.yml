@@ -33,4 +33,4 @@ jobs:
         HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
       run: |
-        pytest -n 4 tests
+        pytest tests
