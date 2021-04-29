@@ -7,8 +7,7 @@ import time
 from datetime import datetime
 from posixpath import basename, dirname, join as urljoin, splitext
 from typing import Dict, List, Union
-from urllib.parse import urlparse
-from urllib.request import pathname2url, url2pathname
+from urllib.parse import urlparse, quote, unquote
 from zipfile import ZipFile
 
 import pandas
@@ -111,12 +110,12 @@ class Aggregation:
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
-                            file_path = url2pathname(
+                            file_path = unquote(
                                 file_checksum_path.split(
                                     "data/contents/",
                                 )[1]
                             )
-                            f = File(file_path, url2pathname(file.path), self._checksums[file_checksum_path])
+                            f = File(file_path, unquote(file.path), self._checksums[file_checksum_path])
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -127,7 +126,7 @@ class Aggregation:
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
                     self._parsed_aggregations.append(
-                        Aggregation(url2pathname(file.path), self._hs_session, self._checksums)
+                        Aggregation(unquote(file.path), self._hs_session, self._checksums)
                     )
         return self._parsed_aggregations
 
@@ -156,7 +155,7 @@ class Aggregation:
     def _retrieve_checksums(self, path):
         file_str = self._hs_session.retrieve_string(path)
         data = {
-            pathname2url(path): checksum
+            quote(path): checksum
             for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)
         }
         return data
@@ -174,7 +173,7 @@ class Aggregation:
 
             with zipfile.ZipFile(downloaded_zip, 'r') as zip_ref:
                 zip_ref.extractall(unzip_to)
-                os.remove(downloaded_zip)
+            os.remove(downloaded_zip)
             return unzip_to
         return downloaded_zip
 
@@ -576,8 +575,8 @@ class Resource(Aggregation):
             self._upload(files[0], destination_path=destination_path)
         else:
             with tempfile.TemporaryDirectory() as tmpdir:
-                zipped_file = urljoin(tmpdir, 'files.zip')
-                with ZipFile(urljoin(tmpdir, zipped_file), 'w') as zipped:
+                zipped_file = os.path.join(tmpdir, 'files.zip')
+                with ZipFile(zipped_file, 'w') as zipped:
                     for file in files:
                         zipped.write(file, basename(file))
                 self._upload(zipped_file, destination_path=destination_path)
@@ -679,7 +678,7 @@ class HydroShareSession:
 
         cd = file.headers['content-disposition']
         filename = cd.split("filename=")[1].strip('"')
-        downloaded_file = urljoin(save_path, filename)
+        downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(file.content)
         return downloaded_file
