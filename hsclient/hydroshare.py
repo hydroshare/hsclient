@@ -5,7 +5,7 @@ import sqlite3
 import tempfile
 import time
 from datetime import datetime
-from posixpath import basename, dirname, join as urljoin, splitext
+from posixpath import join as urljoin, splitext, basename, dirname
 from typing import Dict, List, Union
 from urllib.parse import urlparse, quote, unquote
 from zipfile import ZipFile
@@ -578,7 +578,7 @@ class Resource(Aggregation):
                 zipped_file = os.path.join(tmpdir, 'files.zip')
                 with ZipFile(zipped_file, 'w') as zipped:
                     for file in files:
-                        zipped.write(file, basename(file))
+                        zipped.write(file, os.path.basename(file))
                 self._upload(zipped_file, destination_path=destination_path)
                 unzip_path = urljoin(
                     self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip'

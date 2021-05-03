@@ -47,8 +47,24 @@ def timeseries_resource(new_resource):
         "ODM2_Multi_Site_One_Variable_meta.xml",
     ]
     root_path = "data/test_resource_metadata_files/"
-    new_resource.file_upload(*[root_path + file for file in files])
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in files])
     return new_resource
+
+
+def test_absolute_path_multiple_file_upload(new_resource):
+    files = [
+        "other.txt",
+        "another.txt",
+    ]
+    root_path = "data"
+    new_resource.file_upload(*[os.path.abspath(os.path.join(root_path, file)) for file in files])
+    assert len(new_resource.files()) == 2
+
+
+def test_absolute_path_single_file_upload(new_resource):
+    rel_path = os.path.join("data", "other.txt")
+    new_resource.file_upload(os.path.abspath(rel_path))
+    assert len(new_resource.files()) == 1
 
 
 def test_filtering_aggregations(timeseries_resource):
@@ -387,7 +403,7 @@ def test_user_info(hydroshare):
 def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2  # exclude rdf/xml file
-    new_resource.file_upload(*[root_path + file for file in files])
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in files])
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
@@ -425,7 +441,7 @@ def test_aggregation_fileset(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2  # exclude rdf/xml file
     new_resource.folder_create("asdf")
-    new_resource.file_upload(*[root_path + file for file in files], destination_path="asdf")
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], destination_path="asdf")
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
