@@ -5,7 +5,7 @@ import sqlite3
 import tempfile
 import time
 from datetime import datetime
-from posixpath import basename, dirname, join as urljoin, splitext
+from posixpath import join as urljoin, splitext
 from typing import Dict, List, Union
 from urllib.parse import urlparse, quote, unquote
 from zipfile import ZipFile
@@ -45,7 +45,7 @@ class File(str):
     @property
     def name(self) -> str:
         """The filename"""
-        return basename(self)
+        return os.path.basename(self)
 
     @property
     def extension(self) -> str:
@@ -55,7 +55,7 @@ class File(str):
     @property
     def folder(self) -> str:
         """The folder the file is in"""
-        return dirname(self)
+        return os.path.dirname(self)
 
     @property
     def checksum(self):
@@ -526,7 +526,7 @@ class Resource(Aggregation):
         :param zip_name: The name of the zipped file
         :param remove_file: Defaults to True, set to False to not delete the file that was zipped
         """
-        zip_name = basename(path) + ".zip" if not zip_name else zip_name
+        zip_name = os.path.basename(path) + ".zip" if not zip_name else zip_name
         data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_file}
         zip_path = urljoin(self._hsapi_path, "functions", "zip")
         self._hs_session.post(zip_path, status_code=200, data=data)
@@ -557,7 +557,7 @@ class Resource(Aggregation):
         if agg_type == AggregationType.SingleFileAggregation:
             type_value = 'SingleFile'
         if agg_type == AggregationType.FileSetAggregation:
-            relative_path = dirname(path)
+            relative_path = os.path.dirname(path)
             data = {"folder_path": relative_path}
 
         url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
@@ -578,7 +578,7 @@ class Resource(Aggregation):
                 zipped_file = os.path.join(tmpdir, 'files.zip')
                 with ZipFile(zipped_file, 'w') as zipped:
                     for file in files:
-                        zipped.write(file, basename(file))
+                        zipped.write(file, os.path.basename(file))
                 self._upload(zipped_file, destination_path=destination_path)
                 unzip_path = urljoin(
                     self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip'
