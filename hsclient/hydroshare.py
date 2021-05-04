@@ -5,6 +5,7 @@ import sqlite3
 import tempfile
 import time
 from datetime import datetime
+from functools import wraps
 from posixpath import join as urljoin, splitext, basename, dirname
 from typing import Dict, List, Union
 from urllib.parse import urlparse, quote, unquote
@@ -68,6 +69,21 @@ class File(str):
         return self._file_url
 
 
+def refresh(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        do_refresh = True
+        if "refresh" in kwargs.keys():
+            do_refresh = kwargs.pop("refresh")
+        result = f(*args, **kwargs)
+        if do_refresh:
+            self.refresh()
+        return result
+
+    return wrapper
+
+
 class Aggregation:
     """Represents an Aggregation in HydroShare"""
 
@@ -125,9 +141,7 @@ class Aggregation:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
-                    self._parsed_aggregations.append(
-                        Aggregation(unquote(file.path), self._hs_session, self._checksums)
-                    )
+                    self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, self._checksums))
         return self._parsed_aggregations
 
     @property
@@ -155,8 +169,7 @@ class Aggregation:
     def _retrieve_checksums(self, path):
         file_str = self._hs_session.retrieve_string(path)
         data = {
-            quote(path): checksum
-            for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)
+            quote(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)
         }
         return data
 
@@ -204,13 +217,13 @@ class Aggregation:
             return self.files()[0].folder
         return self.files()[0].path
 
+    @refresh
     def save(self) -> None:
         """Saves the metadata back to HydroShare"""
         metadata_file = self.metadata_file
         metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         url = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(url, files={'file': (metadata_file, metadata_string)})
-        self.refresh()
 
     def files(self, search_aggregations: bool = False, **kwargs) -> List[File]:
         """
@@ -404,21 +417,22 @@ class Resource(Aggregation):
         """
         return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
 
+    @refresh
     def delete(self) -> None:
         """Deletes the resource on HydroShare"""
         hsapi_path = self._hsapi_path
         self._hs_session.delete(hsapi_path, status_code=204)
-        self.refresh()
 
+    @refresh
     def save(self) -> None:
         """Saves the metadata to HydroShare"""
         metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
-        self.refresh()
 
     # referenced content operations
 
+    @refresh
     def reference_create(self, file_name: str, url: str, path: str = '') -> None:
         """
         Creates a HydroShare reference object to reference content outside of the resource
@@ -432,8 +446,8 @@ class Resource(Aggregation):
             data={"res_id": self.resource_id, "curr_path": path, "ref_name": file_name, "ref_url": url},
             status_code=200,
         )
-        self.refresh()
 
+    @refresh
     def reference_update(self, file_name: str, url: str, path: str = '') -> None:
         """
         Updates a HydroShare reference object
@@ -447,10 +461,10 @@ class Resource(Aggregation):
             data={"res_id": self.resource_id, "curr_path": path, "url_filename": file_name, "new_ref_url": url},
             status_code=200,
         )
-        self.refresh()
 
     # file operations
 
+    @refresh
     def folder_create(self, folder: str) -> None:
         """
         Creates a folder on HydroShare
@@ -459,6 +473,7 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "folders", folder)
         self._hs_session.put(path, status_code=201)
 
+    @refresh
     def folder_rename(self, path: str, new_path: str) -> None:
         """
         Renames a folder on HydroShare
@@ -467,13 +482,13 @@ class Resource(Aggregation):
         """
         self.file_rename(path=path, new_path=new_path)
 
+    @refresh
     def folder_delete(self, path: str = None) -> None:
         """
         Deletes a folder on HydroShare
         :param path: the path to the folder
         """
         self._delete_file_folder(path)
-        self.refresh()
 
     def folder_download(self, path: str, save_path: str = ""):
         """
@@ -501,14 +516,15 @@ class Resource(Aggregation):
         else:
             return self._hs_session.retrieve_file(urljoin(self._resource_path, "data", "contents", path), save_path)
 
+    @refresh
     def file_delete(self, path: str = None) -> None:
         """
         Delete a file on HydroShare
         :param path: The path to the file
         """
         self._delete_file(path)
-        self.refresh()
 
+    @refresh
     def file_rename(self, path: str, new_path: str) -> None:
         """
         Rename a file on HydroShare
@@ -517,8 +533,8 @@ class Resource(Aggregation):
         """
         rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
         self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
-        self.refresh()
 
+    @refresh
     def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -> None:
         """
         Zip a file on HydroShare
@@ -530,8 +546,8 @@ class Resource(Aggregation):
         data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_file}
         zip_path = urljoin(self._hsapi_path, "functions", "zip")
         self._hs_session.post(zip_path, status_code=200, data=data)
-        self.refresh()
 
+    @refresh
     def file_unzip(self, path: str) -> None:
         """
         Unzips a file on HydroShare
@@ -541,16 +557,16 @@ class Resource(Aggregation):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
         unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", path)
         self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
-        self.refresh()
 
-    def file_aggregate(self, path, agg_type: AggregationType):
+    def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
         """
         Aggregate a file to a HydroShare aggregation type.  Aggregating files allows you to specify metadata specific
         to the files associated with the aggregation.  To set a FileSet aggregation, include the path to the folder or
         a file in the folder you would like to create a FileSet aggregation from.
         :param path: The path to the file to aggregate
         :param agg_type: The AggregationType to create
-        :returns: The newly created Aggregation object
+        :param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
+        :returns: The newly created Aggregation object if refresh is True
         """
         type_value = agg_type.value
         data = {}
@@ -562,9 +578,11 @@ class Resource(Aggregation):
 
         url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
         self._hs_session.post(url, status_code=201, data=data)
-        self.refresh()
-        return self.aggregation(file__path=path)
+        if refresh:
+            self.refresh()
+            return self.aggregation(file__path=path)
 
+    @refresh
     def file_upload(self, *files: str, destination_path: str = "") -> None:
         """
         Uploads files to a folder in HydroShare
@@ -586,11 +604,11 @@ class Resource(Aggregation):
                 self._hs_session.post(
                     unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"}
                 )
-        self.refresh()
         # TODO, return those files?
 
     # aggregation operations
 
+    @refresh
     def aggregation_remove(self, aggregation: Aggregation) -> None:
         """
         Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.
@@ -605,8 +623,8 @@ class Resource(Aggregation):
         )
         aggregation._hs_session.post(path, status_code=200)
         aggregation.refresh()
-        self.refresh()
 
+    @refresh
     def aggregation_delete(self, aggregation: Aggregation) -> None:
         """
         Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
@@ -621,7 +639,6 @@ class Resource(Aggregation):
         )
         aggregation._hs_session.delete(path, status_code=200)
         aggregation.refresh()
-        self.refresh()
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
