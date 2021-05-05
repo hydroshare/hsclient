@@ -577,16 +577,19 @@ class Resource(Aggregation):
         self._hs_session.post(zip_path, status_code=200, data=data)
 
     @refresh
-    def file_unzip(self, path: str) -> None:
+    def file_unzip(self, path: str, overwrite: bool = True, ingest_metadata=True) -> None:
         """
         Unzips a file on HydroShare
         :param path: The path to the file to unzip
+        :param overwrite: Defaults to True, set to False to unzip the files into a folder with the zip filename
+        :param ingest_metadata: Defaults to True, set to False to not ingest HydroShare RDF metadata xml files
         :return: None
         """
         if not path.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
         unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", path)
-        self._hs_session.post(unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"})
+        self._hs_session.post(unzip_path, status_code=200,
+                              data={"overwrite": overwrite, "ingest_metadata": ingest_metadata})
 
     def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
         """
