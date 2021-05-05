@@ -70,6 +70,11 @@ class File(str):
 
 
 def refresh(f):
+    """
+    Decorator for refreshing metadata from HydroShare after the decorated method is called.
+    The docstring of a decorated method is updated to include
+    :param refresh: Defaults True, False to not refresh metadata from HydroShare
+    """
     @wraps(f)
     def wrapper(*args, **kwargs):
         self = args[0]
@@ -80,6 +85,15 @@ def refresh(f):
         if do_refresh:
             self.refresh()
         return result
+
+    # update docstring to include refresh parameter
+    doc_lines = f.__doc__.split("\n")
+    if doc_lines[-2].strip().startswith(":return:"):
+        insert_index = len(doc_lines) - 2
+    else:
+        insert_index = len(doc_lines) - 1
+    doc_lines.insert(insert_index, ":param refresh: Defaults True, False to not refresh metadata from HydroShare")
+    wrapper.__doc__ = "\n    ".join([l.strip() for l in doc_lines])
 
     return wrapper
 
@@ -219,7 +233,10 @@ class Aggregation:
 
     @refresh
     def save(self) -> None:
-        """Saves the metadata back to HydroShare"""
+        """
+        Saves the metadata back to HydroShare
+        :return: None
+        """
         metadata_file = self.metadata_file
         metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         url = urljoin(self._hsapi_path, "ingest_metadata")
@@ -419,13 +436,19 @@ class Resource(Aggregation):
 
     @refresh
     def delete(self) -> None:
-        """Deletes the resource on HydroShare"""
+        """
+        Deletes the resource on HydroShare
+        :return: None
+        """
         hsapi_path = self._hsapi_path
         self._hs_session.delete(hsapi_path, status_code=204)
 
     @refresh
     def save(self) -> None:
-        """Saves the metadata to HydroShare"""
+        """
+        Saves the metadata to HydroShare
+        :return: None
+        """
         metadata_string = rdf_string(self._retrieved_metadata, rdf_format="xml")
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
@@ -439,6 +462,7 @@ class Resource(Aggregation):
         :param file_name: the file name of the resulting .url file
         :param url: the url of the referenced content
         :param path: the path to create the reference in
+        :return: None
         """
         request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data-store-add-reference")
         self._hs_session.post(
@@ -454,6 +478,7 @@ class Resource(Aggregation):
         :param file_name: the file name for the .url file
         :param url: the url of the referenced content
         :param path: the path to the directory where the reference is located
+        :return: None
         """
         request_path = urljoin(self._hsapi_path.replace(self.resource_id, ""), "data_store_edit_reference_url")
         self._hs_session.post(
@@ -469,6 +494,7 @@ class Resource(Aggregation):
         """
         Creates a folder on HydroShare
         :param folder: the folder path to create
+        :return: None
         """
         path = urljoin(self._hsapi_path, "folders", folder)
         self._hs_session.put(path, status_code=201)
@@ -479,6 +505,7 @@ class Resource(Aggregation):
         Renames a folder on HydroShare
         :param path: the path to the folder to rename
         :param new_path: the new path folder name
+        :return: None
         """
         self.file_rename(path=path, new_path=new_path)
 
@@ -487,6 +514,7 @@ class Resource(Aggregation):
         """
         Deletes a folder on HydroShare
         :param path: the path to the folder
+        :return: None
         """
         self._delete_file_folder(path)
 
@@ -495,7 +523,7 @@ class Resource(Aggregation):
         Downloads a folder from HydroShare
         :param path: The path to folder
         :param save_path: The local path to save the download to, defaults to the current directory
-        :returns: The path to the download zipped folder
+        :return: The path to the download zipped folder
         """
         return self._hs_session.retrieve_zip(
             urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"}
@@ -507,7 +535,7 @@ class Resource(Aggregation):
         :param path: The path to the file
         :param save_path: The local path to save the file to
         :param zipped: Defaults to False, set to True to download the file zipped
-        :returns: The path to the downloaded file
+        :return: The path to the downloaded file
         """
         if zipped:
             return self._hs_session.retrieve_zip(
@@ -521,6 +549,7 @@ class Resource(Aggregation):
         """
         Delete a file on HydroShare
         :param path: The path to the file
+        :return: None
         """
         self._delete_file(path)
 
@@ -530,6 +559,7 @@ class Resource(Aggregation):
         Rename a file on HydroShare
         :param path: The path to the file
         :param new_path: the renamed path to the file
+        :return: None
         """
         rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
         self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
@@ -541,6 +571,7 @@ class Resource(Aggregation):
         :param path: The path to the file
         :param zip_name: The name of the zipped file
         :param remove_file: Defaults to True, set to False to not delete the file that was zipped
+        :return: None
         """
         zip_name = basename(path) + ".zip" if not zip_name else zip_name
         data = {"input_coll_path": path, "output_zip_file_name": zip_name, "remove_original_after_zip": remove_file}
@@ -552,6 +583,7 @@ class Resource(Aggregation):
         """
         Unzips a file on HydroShare
         :param path: The path to the file to unzip
+        :return: None
         """
         if not path.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
@@ -566,7 +598,7 @@ class Resource(Aggregation):
         :param path: The path to the file to aggregate
         :param agg_type: The AggregationType to create
         :param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
-        :returns: The newly created Aggregation object if refresh is True
+        :return: The newly created Aggregation object if refresh is True
         """
         type_value = agg_type.value
         data = {}
@@ -588,6 +620,7 @@ class Resource(Aggregation):
         Uploads files to a folder in HydroShare
         :param *files: The local file paths to upload
         :param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory
+        :return: None
         """
         if len(files) == 1:
             self._upload(files[0], destination_path=destination_path)
@@ -613,6 +646,7 @@ class Resource(Aggregation):
         """
         Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.
         :param aggregation: The aggregation object to remove
+        :return: None
         """
         path = urljoin(
             aggregation._hsapi_path,
@@ -629,6 +663,7 @@ class Resource(Aggregation):
         """
         Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
         :param aggregation: The aggregation object to delete
+        :return: None
         """
         path = urljoin(
             aggregation._hsapi_path,
@@ -646,6 +681,7 @@ class Resource(Aggregation):
         :param aggregation: The aggreation to download
         :param save_path: The local path to save the aggregation to, defaults to the current directory
         :param unzip_to: If set, the resulting download will be unzipped to the specified path
+        :return: None
         """
         return aggregation._download(save_path=save_path, unzip_to=unzip_to)
 
