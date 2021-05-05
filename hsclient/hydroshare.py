@@ -6,9 +6,9 @@ import tempfile
 import time
 from datetime import datetime
 from functools import wraps
-from posixpath import join as urljoin, splitext, basename, dirname
+from posixpath import basename, dirname, join as urljoin, splitext
 from typing import Dict, List, Union
-from urllib.parse import urlparse, quote, unquote
+from urllib.parse import quote, unquote, urlparse
 from zipfile import ZipFile
 
 import pandas
@@ -75,6 +75,7 @@ def refresh(f):
     The docstring of a decorated method is updated to include
     :param refresh: Defaults True, False to not refresh metadata from HydroShare
     """
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         self = args[0]
@@ -88,10 +89,7 @@ def refresh(f):
 
     # update docstring to include refresh parameter
     doc_lines = f.__doc__.split("\n")
-    if doc_lines[-2].strip().startswith(":return:"):
-        insert_index = len(doc_lines) - 2
-    else:
-        insert_index = len(doc_lines) - 1
+    insert_index = len(doc_lines) - 2
     doc_lines.insert(insert_index, ":param refresh: Defaults True, False to not refresh metadata from HydroShare")
     wrapper.__doc__ = "\n    ".join([l.strip() for l in doc_lines])
 
