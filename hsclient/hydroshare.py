@@ -79,9 +79,7 @@ def refresh(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         self = args[0]
-        do_refresh = True
-        if "refresh" in kwargs.keys():
-            do_refresh = kwargs.pop("refresh")
+        do_refresh = kwargs.pop("refresh", True)
         result = f(*args, **kwargs)
         if do_refresh:
             self.refresh()
@@ -180,8 +178,10 @@ class Aggregation:
 
     def _retrieve_checksums(self, path):
         file_str = self._hs_session.retrieve_string(path)
+        # split string by lines, then split line by delimiter into a dict
+        delimiter = "    "
         data = {
-            quote(path): checksum for checksum, path in (line.split("    ") for line in file_str.split("\n") if line)
+            quote(path): checksum for checksum, path in [line.split(delimiter) for line in file_str.split("\n") if line]
         }
         return data
 
@@ -588,8 +588,9 @@ class Resource(Aggregation):
         if not path.endswith(".zip"):
             raise Exception("File {} is not a zip, and cannot be unzipped".format(path))
         unzip_path = urljoin(self._hsapi_path, "functions", "unzip", "data", "contents", path)
-        self._hs_session.post(unzip_path, status_code=200,
-                              data={"overwrite": overwrite, "ingest_metadata": ingest_metadata})
+        self._hs_session.post(
+            unzip_path, status_code=200, data={"overwrite": overwrite, "ingest_metadata": ingest_metadata}
+        )
 
     def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
         """
@@ -612,6 +613,7 @@ class Resource(Aggregation):
         url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
         self._hs_session.post(url, status_code=201, data=data)
         if refresh:
+            # Only return the newly created aggregation if a refresh is requested
             self.refresh()
             return self.aggregation(file__path=path)
 
