@@ -796,6 +796,8 @@ class HydroShare:
             if username or password:
                 self.my_user_info()  # validate credentials
 
+        self._resource_object_cache = dict()
+
     def sign_in(self) -> None:
         """Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook"""
         username = input("Username: ").strip()
@@ -905,9 +907,14 @@ class HydroShare:
         :param validate: Defaults to True, set to False to not validate the resource exists
         :return: A Resource object representing a resource on HydroShare
         """
+        if resource_id in self._resource_object_cache:
+            return self._resource_object_cache[resource_id]
+
         res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
             res.metadata
+
+        self._resource_object_cache[resource_id] =  res
         return res
 
     def create(self) -> Resource:
