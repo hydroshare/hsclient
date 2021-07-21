@@ -224,7 +224,7 @@ def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
     res2 = hydroshare.resource(res_id)
     assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
 
-def test_resource_cached_by_HydroShare_instance(hydroshare, monkeypatch):
+def test_resource_cached_by_HydroShare_instances(hydroshare, monkeypatch):
     """ Monkeypatch resource to avoid hitting HydroShare.
     Verify resource object is present in resource object cache.
     """
