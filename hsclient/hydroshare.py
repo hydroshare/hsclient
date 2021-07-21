@@ -796,7 +796,7 @@ class HydroShare:
             if username or password:
                 self.my_user_info()  # validate credentials
 
-        self._resource_object_cache: Dict[str, Resource]= dict()
+        self._resource_object_cache: Dict[str, Resource] = dict()
 
     def sign_in(self) -> None:
         """Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook"""
