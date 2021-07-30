@@ -1,4 +1,4 @@
-hsmodels == 0.1.5
+hsmodels == 0.1.6
 pytest == 6.0.2
 requests == 2.24.0
 email-validator
