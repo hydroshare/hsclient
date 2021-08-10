@@ -900,21 +900,22 @@ class HydroShare:
             for item in results:
                 yield ResourcePreview(**item)
 
-    def resource(self, resource_id: str, validate: bool = True) -> Resource:
+    def resource(self, resource_id: str, validate: bool = True, use_cache: bool = True) -> Resource:
         """
         Creates a resource object from HydroShare with the provided resource_id
         :param resource_id: The resource id of the resource to retrieve
         :param validate: Defaults to True, set to False to not validate the resource exists
         :return: A Resource object representing a resource on HydroShare
         """
-        if resource_id in self._resource_object_cache:
+        if resource_id in self._resource_object_cache and use_cache:
             return self._resource_object_cache[resource_id]
 
         res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
             res.metadata
 
-        self._resource_object_cache[resource_id] =  res
+        if use_cache:
+            self._resource_object_cache[resource_id] =  res
         return res
 
     def create(self) -> Resource:
