@@ -905,6 +905,9 @@ class HydroShare:
         Creates a resource object from HydroShare with the provided resource_id
         :param resource_id: The resource id of the resource to retrieve
         :param validate: Defaults to True, set to False to not validate the resource exists
+        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+            resource from HydroShare. This parameter also does not cache the retrieved Resource
+            object.
         :return: A Resource object representing a resource on HydroShare
         """
         if resource_id in self._resource_object_cache and use_cache:
