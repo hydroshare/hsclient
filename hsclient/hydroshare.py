@@ -921,14 +921,14 @@ class HydroShare:
             self._resource_object_cache[resource_id] =  res
         return res
 
-    def create(self) -> Resource:
+    def create(self, use_cache: bool = True) -> Resource:
         """
         Creates a new resource on HydroShare
         :return: A Resource object representing a resource on HydroShare
         """
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
-        return self.resource(resource_id)
+        return self.resource(resource_id, use_cache=use_cache)
 
     def user(self, user_id: int) -> User:
         """
