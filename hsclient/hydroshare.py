@@ -924,6 +924,9 @@ class HydroShare:
     def create(self, use_cache: bool = True) -> Resource:
         """
         Creates a new resource on HydroShare
+        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+            resource from HydroShare. This parameter also does not cache the retrieved Resource
+            object.
         :return: A Resource object representing a resource on HydroShare
         """
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
