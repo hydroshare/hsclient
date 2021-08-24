@@ -216,6 +216,30 @@ def test_resource_delete(hydroshare, new_resource):
     except Exception as e:
         assert f"No resource was found for resource id:{res_id}" in str(e)
 
+def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
+    """ Verify resource object is present in resource object cache. """
+    res_id = new_resource.resource_id
+    res = hydroshare.resource(res_id)
+
+    assert res_id in hydroshare._resource_object_cache
+    assert id(hydroshare._resource_object_cache[res_id]) == id(res)
+    res2 = hydroshare.resource(res_id)
+    assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
+
+def test_resource_cached_by_HydroShare_instances(hydroshare, monkeypatch):
+    """ Monkeypatch resource to avoid hitting HydroShare.
+    Verify resource object is present in resource object cache.
+    """
+    from hsclient import Resource
+    res_id = "fakeresource"
+    monkeypatch.setattr(Resource, "metadata", lambda: None)
+
+    res = hydroshare.resource(res_id)
+
+    assert res_id in hydroshare._resource_object_cache
+    assert id(hydroshare._resource_object_cache[res_id]) == id(res)
+    res2 = hydroshare.resource(res_id)
+    assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
 
 def test_files_aggregations(resource):
     resource.refresh()

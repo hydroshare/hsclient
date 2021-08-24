@@ -852,6 +852,8 @@ class HydroShare:
             if username or password:
                 self.my_user_info()  # validate credentials
 
+        self._resource_object_cache: Dict[str, Resource]= dict()
+
     def sign_in(self) -> None:
         """Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook"""
         username = input("Username: ").strip()
@@ -954,26 +956,38 @@ class HydroShare:
             for item in results:
                 yield ResourcePreview(**item)
 
-    def resource(self, resource_id: str, validate: bool = True) -> Resource:
+    def resource(self, resource_id: str, validate: bool = True, use_cache: bool = True) -> Resource:
         """
         Creates a resource object from HydroShare with the provided resource_id
         :param resource_id: The resource id of the resource to retrieve
         :param validate: Defaults to True, set to False to not validate the resource exists
+        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+            resource from HydroShare. This parameter also does not cache the retrieved Resource
+            object.
         :return: A Resource object representing a resource on HydroShare
         """
+        if resource_id in self._resource_object_cache and use_cache:
+            return self._resource_object_cache[resource_id]
+
         res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
             res.metadata
+
+        if use_cache:
+            self._resource_object_cache[resource_id] =  res
         return res
 
-    def create(self) -> Resource:
+    def create(self, use_cache: bool = True) -> Resource:
         """
         Creates a new resource on HydroShare
+        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+            resource from HydroShare. This parameter also does not cache the retrieved Resource
+            object.
         :return: A Resource object representing a resource on HydroShare
         """
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
-        return self.resource(resource_id)
+        return self.resource(resource_id, use_cache=use_cache)
 
     def user(self, user_id: int) -> User:
         """
