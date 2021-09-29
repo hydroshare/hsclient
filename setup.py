@@ -9,7 +9,7 @@ setup(
     packages=find_packages(include=['hsclient', 'hsclient.*'],
                            exclude=("tests",)),
     install_requires=[
-        'hsmodels==0.2.0',
+        'hsmodels==0.2.5',
         'requests',
         'requests_oauthlib',
         'pandas'
