@@ -20,7 +20,7 @@ class ResourcePreview(BaseModel):
     resource_title: str = None
     resource_id: str = None
     abstract: str = None
-    authors: List[str] = None
+    authors: List[str] = []
     creator: str = None
     doi: str = None
     date_created: str = None
@@ -37,5 +37,5 @@ class ResourcePreview(BaseModel):
 
     @validator("authors", pre=True)
     def handle_null_author(cls, v):
-        if v is None:
-            return []
+        # return empty list when supplied authors field is None.
+        return [] if v is None else v
