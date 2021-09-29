@@ -211,7 +211,7 @@ def test_resource_delete(hydroshare, new_resource):
     res_id = new_resource.resource_id
     new_resource.delete()
     try:
-        res = hydroshare.resource(res_id)
+        res = hydroshare.resource(res_id, use_cache=False)
         assert False
     except Exception as e:
         assert f"No resource was found for resource id:{res_id}" in str(e)
