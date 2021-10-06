@@ -38,4 +38,5 @@ class ResourcePreview(BaseModel):
     @validator("authors", pre=True)
     def handle_null_author(cls, v):
         # return empty list when supplied authors field is None.
+        v = [i for i in v if i]
         return [] if v is None else v
