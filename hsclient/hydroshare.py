@@ -712,6 +712,7 @@ class HydroShareSession:
             if not token or not client_id:
                 raise ValueError("Oauth2 requires both token and client_id be provided")
             else:
+                token = self._validate_oauth2_token(token)
                 self._session = OAuth2Session(client_id=client_id, token=token)
         else:
             if username is None or password is None:
@@ -724,7 +725,8 @@ class HydroShareSession:
             raise NotImplementedError(f"This session is an Oauth2 session and does not provide the set_oauth method")
         self._session.auth = auth
 
-    def set_oauth(self, client_id, token):
+    def set_oauth(self, client_id: str, token: Union[Token, Dict[str, str]]):
+        token = self._validate_oauth2_token(token)
         self._session = OAuth2Session(client_id=client_id, token=token)
 
     @property
