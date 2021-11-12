@@ -690,7 +690,17 @@ class Resource(Aggregation):
 
 
 class HydroShareSession:
-    def __init__(self, username, password, host, protocol, port, client_id=None, token=None):
+    def __init__(
+        self,
+        host,
+        protocol,
+        port,
+        *,
+        username: str = None,
+        password: str = None,
+        client_id: str = None,
+        token: str = None,
+    ):
         self._host = host
         self._protocol = protocol
         self._port = port
