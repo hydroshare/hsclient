@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
+from pprint import pformat
 from typing import Dict, List, Union
 from urllib.parse import quote, unquote, urlparse
 from zipfile import ZipFile
@@ -816,6 +817,20 @@ class HydroShareSession:
                 "Failed DELETE {}, status_code {}, message {}".format(url, response.status_code, response.content)
             )
         return response
+
+    @staticmethod
+    def _validate_oauth2_token(token: Union[Token, Dict[str, str]]) -> dict:
+        """Validate that object follows OAuth2 token specification. return dictionary representation
+        of OAuth2 token dropping optional fields that are None."""
+        if isinstance(token, dict) or isinstance(token, Token):
+            # try to coerce into Token model
+            o = Token.parse_obj(token)
+            # drop None fields from output
+            return o.dict(exclude_none=True)
+        else:
+            error_message = ("token must be hsclient.Token or dictionary following schema:\n"
+                            "{}".format(pformat(Token.__annotations__, sort_dicts=False)))
+            raise ValueError(error_message)
 
 
 class HydroShare:
