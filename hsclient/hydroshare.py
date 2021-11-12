@@ -865,7 +865,7 @@ class HydroShare:
         protocol: str = default_protocol,
         port: int = default_port,
         client_id: str = None,
-        token: str = None,
+        token: Union[Token, Dict[str, str]]= None,
     ):
         if client_id or token:
             if not client_id or not token:
