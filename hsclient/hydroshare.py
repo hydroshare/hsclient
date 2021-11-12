@@ -21,6 +21,7 @@ from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
+from hsclient.oauth2_model import Token
 
 
 class File(str):
@@ -699,7 +700,7 @@ class HydroShareSession:
         username: str = None,
         password: str = None,
         client_id: str = None,
-        token: str = None,
+        token: Union[Token, Dict[str, str]] = None,
     ):
         self._host = host
         self._protocol = protocol
