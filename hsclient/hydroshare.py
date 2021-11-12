@@ -873,18 +873,22 @@ class HydroShare:
         self._hs_session.set_auth((username, password))
         self.my_user_info()  # validate credentials
 
-    def hs_juptyerhub(self, hs_auth_path="/home/jovyan/data/.hs_auth"):
+    @classmethod
+    def hs_juptyerhub(cls, hs_auth_path="/home/jovyan/data/.hs_auth"):
         """
-        Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication
-        :param hs_auth_path: Provide the path to the .hs_auth file if different than the default of
-        `/home/jovyan/data/.hs_auth`
+        Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI
+        Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).
+
+        Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with
+        :param hs_auth_path:.
         """
         if not os.path.isfile(hs_auth_path):
             raise ValueError(f"hs_auth_path {hs_auth_path} does not exist.")
         with open(hs_auth_path, 'rb') as f:
             token, client_id = pickle.load(f)
-            self._hs_session.set_oauth(client_id, token)
-            self.my_user_info()  # validate credentials
+        instance = cls(client_id=client_id, token=token)
+        instance.my_user_info()  # validate credentials
+        return instance
 
     def search(
         self,
