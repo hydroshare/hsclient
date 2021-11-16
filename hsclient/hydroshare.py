@@ -4,6 +4,7 @@ import pickle
 import sqlite3
 import tempfile
 import time
+import urllib.parse
 from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
@@ -749,7 +750,7 @@ class HydroShareSession:
         file = self.get(path, status_code=200, allow_redirects=True)
 
         cd = file.headers['content-disposition']
-        filename = cd.split("filename=")[1].strip('"')
+        filename = urllib.parse.unquote(cd.split("filename=")[1].strip('"'))
         downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(file.content)

@@ -447,7 +447,7 @@ def test_aggregations(new_resource, files):
             "asdf/testing.xml",
             "asdf/asdf_resmap.xml",
             "asdf/asdf_meta.xml",
-        ],  # requires hydrosare updates in bag_ingestion_patches
+        ],  # requires hydroshare updates in bag_ingestion_patches
     ],
 )
 def test_aggregation_fileset(new_resource, files):
