@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 from hsmodels.schemas.enums import AggregationType, RelationType
-from hsmodels.schemas.fields import Contributor, Creator, Relation
+from hsmodels.schemas.fields import Creator, Relation
 
 from hsclient import HydroShare
 
@@ -216,6 +216,7 @@ def test_resource_delete(hydroshare, new_resource):
     except Exception as e:
         assert f"No resource was found for resource id:{res_id}" in str(e)
 
+
 def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
     """ Verify resource object is present in resource object cache. """
     res_id = new_resource.resource_id
@@ -226,11 +227,13 @@ def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
     res2 = hydroshare.resource(res_id)
     assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
 
+
 def test_resource_cached_by_HydroShare_instances(hydroshare, monkeypatch):
-    """ Monkeypatch resource to avoid hitting HydroShare.
+    """Monkeypatch resource to avoid hitting HydroShare.
     Verify resource object is present in resource object cache.
     """
     from hsclient import Resource
+
     res_id = "fakeresource"
     monkeypatch.setattr(Resource, "metadata", lambda: None)
 
@@ -240,6 +243,7 @@ def test_resource_cached_by_HydroShare_instances(hydroshare, monkeypatch):
     assert id(hydroshare._resource_object_cache[res_id]) == id(res)
     res2 = hydroshare.resource(res_id)
     assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
+
 
 def test_files_aggregations(resource):
     resource.refresh()
@@ -382,28 +386,6 @@ def test_empty_creator(new_resource):
         assert False, "should have thrown error"
     except ValueError as e:
         assert "creators list must have at least one creator" in str(e)
-
-
-def test_user_info(hydroshare):
-    user = hydroshare.user(11)
-    creator = Creator.from_user(user)
-    assert creator.name == user.name
-    assert creator.phone == user.phone
-    assert creator.address == user.address
-    assert creator.organization == user.organization
-    assert creator.email == user.email
-    assert creator.homepage == user.website
-    assert creator.identifiers == user.identifiers
-    assert creator.description == user.url.path
-
-    contributor = Contributor.from_user(user)
-    assert contributor.name == user.name
-    assert contributor.phone == user.phone
-    assert contributor.address == user.address
-    assert contributor.organization == user.organization
-    assert contributor.email == user.email
-    assert contributor.homepage == user.website
-    assert contributor.identifiers == user.identifiers
 
 
 @pytest.mark.parametrize(

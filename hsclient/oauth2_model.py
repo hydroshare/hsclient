@@ -1,7 +1,8 @@
-from pydantic import BaseModel
-
 # typing imports
 from typing import Optional
+
+from pydantic import BaseModel
+
 
 # see rfc 6749 https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2
 class Token(BaseModel):

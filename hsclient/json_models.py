@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List
 
 from hsmodels.schemas.enums import UserIdentifierType
@@ -13,6 +14,15 @@ class User(BaseModel):
     organization: str = None
     website: str = None
     identifiers: Dict[UserIdentifierType, str] = {}
+    type: str = None
+    subject_areas: List[str] = []
+    date_joined: datetime = None
+
+    @validator('subject_areas', pre=True)
+    def split_subject_areas(cls, value):
+        if value:
+            return value.split(", ")
+        return value
 
 
 class ResourcePreview(BaseModel):

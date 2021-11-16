@@ -21,8 +21,8 @@ from hsmodels.schemas.fields import BoxCoverage, PointCoverage
 from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
-from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 from hsclient.oauth2_model import Token
+from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
 
 class File(str):
@@ -830,8 +830,9 @@ class HydroShareSession:
             # drop None fields from output
             return o.dict(exclude_none=True)
         else:
-            error_message = ("token must be hsclient.Token or dictionary following schema:\n"
-                            "{}".format(pformat(Token.__annotations__, sort_dicts=False)))
+            error_message = "token must be hsclient.Token or dictionary following schema:\n" "{}".format(
+                pformat(Token.__annotations__, sort_dicts=False)
+            )
             raise ValueError(error_message)
 
 
@@ -865,7 +866,7 @@ class HydroShare:
         protocol: str = default_protocol,
         port: int = default_port,
         client_id: str = None,
-        token: Union[Token, Dict[str, str]]= None,
+        token: Union[Token, Dict[str, str]] = None,
     ):
         if client_id or token:
             if not client_id or not token:
@@ -882,7 +883,7 @@ class HydroShare:
             if username or password:
                 self.my_user_info()  # validate credentials
 
-        self._resource_object_cache: Dict[str, Resource]= dict()
+        self._resource_object_cache: Dict[str, Resource] = dict()
 
     def sign_in(self) -> None:
         """Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook"""
@@ -1008,7 +1009,7 @@ class HydroShare:
             res.metadata
 
         if use_cache:
-            self._resource_object_cache[resource_id] =  res
+            self._resource_object_cache[resource_id] = res
         return res
 
     def create(self, use_cache: bool = True) -> Resource:
