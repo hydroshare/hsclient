@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
+from pprint import pformat
 from typing import Dict, List, Union
 from urllib.parse import quote, unquote, urlparse
 from zipfile import ZipFile
@@ -21,6 +22,7 @@ from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
+from hsclient.oauth2_model import Token
 
 
 class File(str):
@@ -690,7 +692,17 @@ class Resource(Aggregation):
 
 
 class HydroShareSession:
-    def __init__(self, username, password, host, protocol, port, client_id=None, token=None):
+    def __init__(
+        self,
+        host,
+        protocol,
+        port,
+        *,
+        username: str = None,
+        password: str = None,
+        client_id: str = None,
+        token: Union[Token, Dict[str, str]] = None,
+    ):
         self._host = host
         self._protocol = protocol
         self._port = port
@@ -700,8 +712,11 @@ class HydroShareSession:
             if not token or not client_id:
                 raise ValueError("Oauth2 requires both token and client_id be provided")
             else:
+                token = self._validate_oauth2_token(token)
                 self._session = OAuth2Session(client_id=client_id, token=token)
         else:
+            if username is None or password is None:
+                raise ValueError("Login requires either username and password or client_id and token be provided")
             self._session = requests.Session()
             self.set_auth((username, password))
 
@@ -710,7 +725,8 @@ class HydroShareSession:
             raise NotImplementedError(f"This session is an Oauth2 session and does not provide the set_oauth method")
         self._session.auth = auth
 
-    def set_oauth(self, client_id, token):
+    def set_oauth(self, client_id: str, token: Union[Token, Dict[str, str]]):
+        token = self._validate_oauth2_token(token)
         self._session = OAuth2Session(client_id=client_id, token=token)
 
     @property
@@ -804,6 +820,20 @@ class HydroShareSession:
             )
         return response
 
+    @staticmethod
+    def _validate_oauth2_token(token: Union[Token, Dict[str, str]]) -> dict:
+        """Validate that object follows OAuth2 token specification. return dictionary representation
+        of OAuth2 token dropping optional fields that are None."""
+        if isinstance(token, dict) or isinstance(token, Token):
+            # try to coerce into Token model
+            o = Token.parse_obj(token)
+            # drop None fields from output
+            return o.dict(exclude_none=True)
+        else:
+            error_message = ("token must be hsclient.Token or dictionary following schema:\n"
+                            "{}".format(pformat(Token.__annotations__, sort_dicts=False)))
+            raise ValueError(error_message)
+
 
 class HydroShare:
     """
@@ -835,7 +865,7 @@ class HydroShare:
         protocol: str = default_protocol,
         port: int = default_port,
         client_id: str = None,
-        token: str = None,
+        token: Union[Token, Dict[str, str]]= None,
     ):
         if client_id or token:
             if not client_id or not token:
@@ -861,18 +891,22 @@ class HydroShare:
         self._hs_session.set_auth((username, password))
         self.my_user_info()  # validate credentials
 
-    def hs_juptyerhub(self, hs_auth_path="/home/jovyan/data/.hs_auth"):
+    @classmethod
+    def hs_juptyerhub(cls, hs_auth_path="/home/jovyan/data/.hs_auth"):
         """
-        Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication
-        :param hs_auth_path: Provide the path to the .hs_auth file if different than the default of
-        `/home/jovyan/data/.hs_auth`
+        Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI
+        Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).
+
+        Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with
+        :param hs_auth_path:.
         """
         if not os.path.isfile(hs_auth_path):
             raise ValueError(f"hs_auth_path {hs_auth_path} does not exist.")
         with open(hs_auth_path, 'rb') as f:
             token, client_id = pickle.load(f)
-            self._hs_session.set_oauth(client_id, token)
-            self.my_user_info()  # validate credentials
+        instance = cls(client_id=client_id, token=token)
+        instance.my_user_info()  # validate credentials
+        return instance
 
     def search(
         self,
