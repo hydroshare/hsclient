@@ -21,6 +21,12 @@ def user(change_test_dir):
         return User(**json.loads(f.read()))
 
 
+def test_null_subject_areas():
+    fields = {"subject_areas": None}
+    o = User(**fields)
+    assert o.subject_areas == []
+
+
 def test_resource_preview_authors_field_default_is_empty_list():
     """verify all `authors` fields are instantiated with [] values."""
     test_data_dict = {"authors": None}
