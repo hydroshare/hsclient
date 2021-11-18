@@ -18,11 +18,9 @@ class User(BaseModel):
     subject_areas: List[str] = []
     date_joined: datetime = None
 
-    @validator('subject_areas', pre=True)
+    @validator("subject_areas", pre=True)
     def split_subject_areas(cls, value):
-        if value:
-            return value.split(", ")
-        return value
+        return value.split(", ") if value else []
 
 
 class ResourcePreview(BaseModel):
