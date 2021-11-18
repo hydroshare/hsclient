@@ -27,17 +27,21 @@ def test_null_subject_areas():
     assert o.subject_areas == []
 
 
-def test_resource_preview_authors_field_default_is_empty_list():
+AuthorsFieldResourcePreviewTestData = (
+    json.dumps({"authors": None}),
+    json.dumps({"authors": []}),
+    json.dumps({"authors": [None]}),
+)
+
+
+@pytest.mark.parametrize("test_data", AuthorsFieldResourcePreviewTestData)
+def test_resource_preview_authors_field_default_is_empty_list(test_data):
     """verify all `authors` fields are instantiated with [] values."""
-    test_data_dict = {"authors": None}
-    test_data_json = '{"authors": null}'
 
     base_case = ResourcePreview()
-    from_kwargs = ResourcePreview(**test_data_dict)
-    from_dict = ResourcePreview.parse_obj(test_data_dict)
-    from_json = ResourcePreview.parse_raw(test_data_json)
+    from_json = ResourcePreview.parse_raw(test_data)
 
-    assert all([x.authors == [] for x in [base_case, from_kwargs, from_dict, from_json]])
+    assert all([x.authors == [] for x in [base_case, from_json]])
 
 
 def test_user_info(user):
