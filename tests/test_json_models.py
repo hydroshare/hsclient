@@ -31,17 +31,25 @@ AuthorsFieldResourcePreviewTestData = (
     json.dumps({"authors": None}),
     json.dumps({"authors": []}),
     json.dumps({"authors": [None]}),
+    json.dumps({"authors": [""]}),
+    json.dumps({"authors": [[]]}),
 )
 
 
 @pytest.mark.parametrize("test_data", AuthorsFieldResourcePreviewTestData)
-def test_resource_preview_authors_field_default_is_empty_list(test_data):
-    """verify all `authors` fields are instantiated with [] values."""
+def test_resource_preview_authors_field_handles_none_cases(test_data):
+    """verify all `authors` fields are instantiated with [] values.
 
-    base_case = ResourcePreview()
+    coerced `authors` field should be [] with following input:
+        None
+        []
+        [None]
+        [None, ""]
+    """
+
     from_json = ResourcePreview.parse_raw(test_data)
 
-    assert all([x.authors == [] for x in [base_case, from_json]])
+    assert from_json.authors == []
 
 
 def test_user_info(user):
