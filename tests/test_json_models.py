@@ -52,6 +52,16 @@ def test_resource_preview_authors_field_handles_none_cases(test_data):
     assert from_json.authors == []
 
 
+def test_resource_preview_authors_raises_validation_error_on_string_input():
+    """verify that a string passed to authors field raises pydantic.ValidationError"""
+    from pydantic import ValidationError
+
+    data = json.dumps({"authors": "should_fail"})
+
+    with pytest.raises(ValidationError):
+        ResourcePreview.parse_raw(data)
+
+
 def test_user_info(user):
     assert user.name == "Castronova, Anthony M."
     assert user.email == "castronova.anthony@gmail.com"
