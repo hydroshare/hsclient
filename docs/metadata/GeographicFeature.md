@@ -1,3 +1,3 @@
 
 :::hsmodels.schemas.aggregations.GeographicFeatureMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadata
+:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn

@@ -1,3 +1,3 @@
 
 :::hsmodels.schemas.aggregations.TimeSeriesMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadata
+:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn

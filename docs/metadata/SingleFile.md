@@ -1,3 +1,3 @@
 
 :::hsmodels.schemas.aggregations.SingleFileMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadata
+:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn
