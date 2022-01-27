@@ -34,6 +34,8 @@ nav:
         Multidimensional: metadata/Multidimensional.md
         Referenced Time Series: metadata/ReferencedTimeSeries.md
         Time Series: metadata/TimeSeries.md
+        Model Program: metadata/ModelProgram.md
+        Model Instance: metadata/ModelInstance.md
     - API:
         HydroShare: api/hydroshare.md
         Resource: api/resource.md
