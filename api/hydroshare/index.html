@@ -79,6 +79,10 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
+                </li>
     </ul>
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
@@ -158,24 +162,30 @@ Jupyterhub.</p>
 <div class="doc doc-object doc-method">
 <h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.create">
 
-<code class="highlight">create(self)</code>
+<code class="highlight">create(self, use_cache=True)</code>
 
 
       </h2>
 <div class="doc doc-contents ">
 <p>Creates a new resource on HydroShare
+:param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+    resource from HydroShare. This parameter also does not cache the retrieved Resource
+    object.
 :return: A Resource object representing a resource on HydroShare</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def create(self) -&gt; Resource:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">def create(self, use_cache: bool = True) -&gt; Resource:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Creates a new resource on HydroShare</span>
+<span class="err">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="err">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="err">        object.</span>
 <span class="err">    :return: A Resource object representing a resource on HydroShare</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    response = self._hs_session.post(&#39;/hsapi/resource/&#39;, status_code=201)</span>
 <span class="err">    resource_id = response.json()[&#39;resource_id&#39;]</span>
-<span class="err">    return self.resource(resource_id)</span>
+<span class="err">    return self.resource(resource_id, use_cache=use_cache)</span>
 </code></pre></div>
 
 </div>
@@ -185,29 +195,37 @@ Jupyterhub.</p>
 <div class="doc doc-object doc-method">
 <h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.hs_juptyerhub">
 
-<code class="highlight">hs_juptyerhub(self, hs_auth_path='/home/jovyan/data/.hs_auth')</code>
+<code class="highlight">hs_juptyerhub(hs_auth_path='/home/jovyan/data/.hs_auth')</code>
 
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  </span>
 
       </h2>
 <div class="doc doc-contents ">
-<p>Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication
-:param hs_auth_path: Provide the path to the .hs_auth file if different than the default of
-<code>/home/jovyan/data/.hs_auth</code></p>
+<p>Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI
+Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</p>
+<p>Provide a non-default (default: <code>/home/jovyan/data/.hs_auth</code>) path to the hs_auth file with
+:param hs_auth_path:.</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">hs_juptyerhub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">classmethod</span>
+<span class="n">def</span> <span class="n">hs_juptyerhub</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Reads the OAuth2 client id and token from a Jupyterhub which uses HydroShare for authentication</span>
-<span class="sd">    :param hs_auth_path: Provide the path to the .hs_auth file if different than the default of</span>
-<span class="sd">    `/home/jovyan/data/.hs_auth`</span>
+<span class="sd">    Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI</span>
+<span class="sd">    Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</span>
+
+<span class="sd">    Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with</span>
+<span class="sd">    :param hs_auth_path:.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">):</span>
         <span class="n">raise</span> <span class="n">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;hs_auth_path {hs_auth_path} does not exist.&quot;</span><span class="p">)</span>
     <span class="n">with</span> <span class="n">open</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">token</span><span class="p">,</span> <span class="n">client_id</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">set_oauth</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+    <span class="k">return</span> <span class="n">instance</span>
 </code></pre></div>
 
 </div>
@@ -243,7 +261,7 @@ Jupyterhub.</p>
 <div class="doc doc-object doc-method">
 <h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.resource">
 
-<code class="highlight">resource(self, resource_id, validate=True)</code>
+<code class="highlight">resource(self, resource_id, validate=True, use_cache=True)</code>
 
 
       </h2>
@@ -251,21 +269,33 @@ Jupyterhub.</p>
 <p>Creates a resource object from HydroShare with the provided resource_id
 :param resource_id: The resource id of the resource to retrieve
 :param validate: Defaults to True, set to False to not validate the resource exists
+:param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
+    resource from HydroShare. This parameter also does not cache the retrieved Resource
+    object.
 :return: A Resource object representing a resource on HydroShare</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def resource(self, resource_id: str, validate: bool = True) -&gt; Resource:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Creates a resource object from HydroShare with the provided resource_id</span>
-<span class="err">    :param resource_id: The resource id of the resource to retrieve</span>
-<span class="err">    :param validate: Defaults to True, set to False to not validate the resource exists</span>
-<span class="err">    :return: A Resource object representing a resource on HydroShare</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    res = Resource(&quot;/resource/{}/data/resourcemap.xml&quot;.format(resource_id), self._hs_session)</span>
-<span class="err">    if validate:</span>
-<span class="err">        res.metadata</span>
-<span class="err">    return res</span>
+<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">resource</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nl">resource_id</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="p">,</span><span class="w"> </span><span class="nl">validate</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">True</span><span class="p">,</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">True</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nl">Resource</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
+<span class="ss">    Creates a resource object from HydroShare with the provided resource_id</span>
+<span class="ss">    :param resource_id: The resource id of the resource to retrieve</span>
+<span class="ss">    :param validate: Defaults to True, set to False to not validate the resource exists</span>
+<span class="ss">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="ss">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="ss">        object.</span>
+<span class="ss">    :return: A Resource object representing a resource on HydroShare</span>
+<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">resource_id</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="o">[</span><span class="n">resource_id</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Resource</span><span class="p">(</span><span class="ss">&quot;/resource/{}/data/resourcemap.xml&quot;</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">resource_id</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">validate</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">res</span><span class="p">.</span><span class="n">metadata</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="o">[</span><span class="n">resource_id</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
 </code></pre></div>
 
 </div>
@@ -451,7 +481,7 @@ Jupyterhub.</p>
         <a href="../resource/" class="btn btn-neutral float-right" title="Resource">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../../metadata/TimeSeries/" class="btn btn-neutral" title="Time Series"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../metadata/ModelInstance/" class="btn btn-neutral" title="Model Instance"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -477,7 +507,7 @@ Jupyterhub.</p>
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../../metadata/TimeSeries/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../metadata/ModelInstance/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../resource/" style="color: #fcfcfc">Next &raquo;</a></span>

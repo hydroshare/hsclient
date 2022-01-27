@@ -79,6 +79,10 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
+                </li>
     </ul>
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
@@ -199,14 +203,17 @@
       </h2>
 <div class="doc doc-contents ">
 <p>Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
-:param aggregation: The aggregation object to delete</p>
+:param aggregation: The aggregation object to delete
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def aggregation_delete(self, aggregation: Aggregation) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def aggregation_delete(self, aggregation: Aggregation) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.</span>
 <span class="err">    :param aggregation: The aggregation object to delete</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    path = urljoin(</span>
 <span class="err">        aggregation._hsapi_path,</span>
@@ -217,7 +224,6 @@
 <span class="err">    )</span>
 <span class="err">    aggregation._hs_session.delete(path, status_code=200)</span>
 <span class="err">    aggregation.refresh()</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -235,7 +241,8 @@
 <p>Download an aggregation from HydroShare
 :param aggregation: The aggreation to download
 :param save_path: The local path to save the aggregation to, defaults to the current directory
-:param unzip_to: If set, the resulting download will be unzipped to the specified path</p>
+:param unzip_to: If set, the resulting download will be unzipped to the specified path
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
@@ -245,6 +252,7 @@
 <span class="sd">    :param aggregation: The aggreation to download</span>
 <span class="sd">    :param save_path: The local path to save the aggregation to, defaults to the current directory</span>
 <span class="sd">    :param unzip_to: If set, the resulting download will be unzipped to the specified path</span>
+<span class="sd">    :return: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">aggregation</span><span class="o">.</span><span class="n">_download</span><span class="p">(</span><span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span> <span class="n">unzip_to</span><span class="o">=</span><span class="n">unzip_to</span><span class="p">)</span>
 </code></pre></div>
@@ -262,14 +270,17 @@
       </h2>
 <div class="doc doc-contents ">
 <p>Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.
-:param aggregation: The aggregation object to remove</p>
+:param aggregation: The aggregation object to remove
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def aggregation_remove(self, aggregation: Aggregation) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def aggregation_remove(self, aggregation: Aggregation) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.</span>
 <span class="err">    :param aggregation: The aggregation object to remove</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    path = urljoin(</span>
 <span class="err">        aggregation._hsapi_path,</span>
@@ -280,7 +291,6 @@
 <span class="err">    )</span>
 <span class="err">    aggregation._hs_session.post(path, status_code=200)</span>
 <span class="err">    aggregation.refresh()</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -323,15 +333,19 @@ returns: A Resource object of the newly copied resource</p>
 
       </h2>
 <div class="doc doc-contents ">
-<p>Deletes the resource on HydroShare</p>
+<p>Deletes the resource on HydroShare
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def delete(self) -&gt; None:</span>
-<span class="err">    &quot;&quot;&quot;Deletes the resource on HydroShare&quot;&quot;&quot;</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def delete(self) -&gt; None:</span>
+<span class="err">    &quot;&quot;&quot;</span>
+<span class="err">    Deletes the resource on HydroShare</span>
+<span class="err">    :return: None</span>
+<span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    hsapi_path = self._hsapi_path</span>
 <span class="err">    self._hs_session.delete(hsapi_path, status_code=204)</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -368,7 +382,7 @@ returns: The relative pathname of the download</p>
 <div class="doc doc-object doc-method">
 <h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_aggregate">
 
-<code class="highlight">file_aggregate(self, path, agg_type)</code>
+<code class="highlight">file_aggregate(self, path, agg_type, refresh=True)</code>
 
 
       </h2>
@@ -378,18 +392,20 @@ to the files associated with the aggregation.  To set a FileSet aggregation, inc
 a file in the folder you would like to create a FileSet aggregation from.
 :param path: The path to the file to aggregate
 :param agg_type: The AggregationType to create
-:returns: The newly created Aggregation object</p>
+:param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
+:return: The newly created Aggregation object if refresh is True</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_aggregate</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nl">agg_type:</span> <span class="n">AggregationType</span><span class="p">)</span><span class="o">:</span>
+<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_aggregate</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="nl">path:</span> <span class="n">str</span><span class="p">,</span> <span class="nl">agg_type:</span> <span class="n">AggregationType</span><span class="p">,</span> <span class="nl">refresh:</span> <span class="n">bool</span> <span class="o">=</span> <span class="n">True</span><span class="p">)</span><span class="o">:</span>
     <span class="s">&quot;&quot;&quot;</span>
     <span class="n">Aggregate</span> <span class="n">a</span> <span class="n">file</span> <span class="n">to</span> <span class="n">a</span> <span class="n">HydroShare</span> <span class="n">aggregation</span> <span class="k">type</span><span class="p">.</span>  <span class="n">Aggregating</span> <span class="n">files</span> <span class="n">allows</span> <span class="n">you</span> <span class="n">to</span> <span class="k">specify</span> <span class="n">metadata</span> <span class="n">specific</span>
     <span class="n">to</span> <span class="n">the</span> <span class="n">files</span> <span class="n">associated</span> <span class="n">with</span> <span class="n">the</span> <span class="n">aggregation</span><span class="p">.</span>  <span class="n">To</span> <span class="n">set</span> <span class="n">a</span> <span class="n">FileSet</span> <span class="n">aggregation</span><span class="p">,</span> <span class="n">include</span> <span class="n">the</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">folder</span> <span class="k">or</span>
     <span class="n">a</span> <span class="n">file</span> <span class="n">in</span> <span class="n">the</span> <span class="n">folder</span> <span class="n">you</span> <span class="n">would</span> <span class="n">like</span> <span class="n">to</span> <span class="n">create</span> <span class="n">a</span> <span class="n">FileSet</span> <span class="n">aggregation</span> <span class="n">from</span><span class="p">.</span>
     <span class="o">:</span><span class="n">param</span> <span class="nl">path:</span> <span class="n">The</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="n">to</span> <span class="n">aggregate</span>
     <span class="o">:</span><span class="n">param</span> <span class="nl">agg_type:</span> <span class="n">The</span> <span class="n">AggregationType</span> <span class="n">to</span> <span class="n">create</span>
-    <span class="o">:</span><span class="nl">returns:</span> <span class="n">The</span> <span class="n">newly</span> <span class="n">created</span> <span class="n">Aggregation</span> <span class="n">object</span>
+    <span class="o">:</span><span class="n">param</span> <span class="nl">refresh:</span> <span class="n">Defaults</span> <span class="n">True</span><span class="p">,</span> <span class="n">toggles</span> <span class="k">automatic</span> <span class="n">refreshing</span> <span class="n">of</span> <span class="n">the</span> <span class="n">updated</span> <span class="n">resource</span> <span class="n">in</span> <span class="n">HydroShare</span>
+    <span class="o">:</span><span class="k">return</span><span class="o">:</span> <span class="n">The</span> <span class="n">newly</span> <span class="n">created</span> <span class="n">Aggregation</span> <span class="n">object</span> <span class="k">if</span> <span class="n">refresh</span> <span class="n">is</span> <span class="n">True</span>
     <span class="s">&quot;&quot;&quot;</span>
     <span class="n">type_value</span> <span class="o">=</span> <span class="n">agg_type</span><span class="p">.</span><span class="n">value</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -401,8 +417,10 @@ a file in the folder you would like to create a FileSet aggregation from.
 
     <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s">&quot;functions&quot;</span><span class="p">,</span> <span class="s">&quot;set-file-type&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">type_value</span><span class="p">)</span>
     <span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mh">201</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">self</span><span class="p">.</span><span class="n">refresh</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nl">refresh:</span>
+        <span class="p">#</span> <span class="n">Only</span> <span class="k">return</span> <span class="n">the</span> <span class="n">newly</span> <span class="n">created</span> <span class="n">aggregation</span> <span class="k">if</span> <span class="n">a</span> <span class="n">refresh</span> <span class="n">is</span> <span class="n">requested</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">refresh</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
 </code></pre></div>
 
 </div>
@@ -418,17 +436,19 @@ a file in the folder you would like to create a FileSet aggregation from.
       </h2>
 <div class="doc doc-contents ">
 <p>Delete a file on HydroShare
-:param path: The path to the file</p>
+:param path: The path to the file
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def file_delete(self, path: str = None) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def file_delete(self, path: str = None) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Delete a file on HydroShare</span>
 <span class="err">    :param path: The path to the file</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    self._delete_file(path)</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -447,7 +467,7 @@ a file in the folder you would like to create a FileSet aggregation from.
 :param path: The path to the file
 :param save_path: The local path to save the file to
 :param zipped: Defaults to False, set to True to download the file zipped
-:returns: The path to the downloaded file</p>
+:return: The path to the downloaded file</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
@@ -457,7 +477,7 @@ a file in the folder you would like to create a FileSet aggregation from.
 <span class="sd">    :param path: The path to the file</span>
 <span class="sd">    :param save_path: The local path to save the file to</span>
 <span class="sd">    :param zipped: Defaults to False, set to True to download the file zipped</span>
-<span class="sd">    :returns: The path to the downloaded file</span>
+<span class="sd">    :return: The path to the downloaded file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">zipped</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_zip</span><span class="p">(</span>
@@ -481,19 +501,21 @@ a file in the folder you would like to create a FileSet aggregation from.
 <div class="doc doc-contents ">
 <p>Rename a file on HydroShare
 :param path: The path to the file
-:param new_path: the renamed path to the file</p>
+:param new_path: the renamed path to the file
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def file_rename(self, path: str, new_path: str) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def file_rename(self, path: str, new_path: str) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Rename a file on HydroShare</span>
 <span class="err">    :param path: The path to the file</span>
 <span class="err">    :param new_path: the renamed path to the file</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    rename_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;move-or-rename&quot;)</span>
 <span class="err">    self._hs_session.post(rename_path, status_code=200, data={&quot;source_path&quot;: path, &quot;target_path&quot;: new_path})</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -503,26 +525,34 @@ a file in the folder you would like to create a FileSet aggregation from.
 <div class="doc doc-object doc-method">
 <h2 class="doc doc-heading" id="hsclient.hydroshare.Resource.file_unzip">
 
-<code class="highlight">file_unzip(self, path)</code>
+<code class="highlight">file_unzip(self, path, overwrite=True, ingest_metadata=True)</code>
 
 
       </h2>
 <div class="doc doc-contents ">
 <p>Unzips a file on HydroShare
-:param path: The path to the file to unzip</p>
+:param path: The path to the file to unzip
+:param overwrite: Defaults to True, set to False to unzip the files into a folder with the zip filename
+:param ingest_metadata: Defaults to True, set to False to not ingest HydroShare RDF metadata xml files
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def file_unzip(self, path: str) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def file_unzip(self, path: str, overwrite: bool = True, ingest_metadata=True) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Unzips a file on HydroShare</span>
 <span class="err">    :param path: The path to the file to unzip</span>
+<span class="err">    :param overwrite: Defaults to True, set to False to unzip the files into a folder with the zip filename</span>
+<span class="err">    :param ingest_metadata: Defaults to True, set to False to not ingest HydroShare RDF metadata xml files</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    if not path.endswith(&quot;.zip&quot;):</span>
 <span class="err">        raise Exception(&quot;File {} is not a zip, and cannot be unzipped&quot;.format(path))</span>
 <span class="err">    unzip_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;unzip&quot;, &quot;data&quot;, &quot;contents&quot;, path)</span>
-<span class="err">    self._hs_session.post(unzip_path, status_code=200, data={&quot;overwrite&quot;: &quot;true&quot;, &quot;ingest_metadata&quot;: &quot;true&quot;})</span>
-<span class="err">    self.refresh()</span>
+<span class="err">    self._hs_session.post(</span>
+<span class="err">        unzip_path, status_code=200, data={&quot;overwrite&quot;: overwrite, &quot;ingest_metadata&quot;: ingest_metadata}</span>
+<span class="err">    )</span>
 </code></pre></div>
 
 </div>
@@ -539,24 +569,27 @@ a file in the folder you would like to create a FileSet aggregation from.
 <div class="doc doc-contents ">
 <p>Uploads files to a folder in HydroShare
 :param *files: The local file paths to upload
-:param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory</p>
+:param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">files</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">refresh</span>
+<span class="n">def</span> <span class="n">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">files</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uploads files to a folder in HydroShare</span>
 <span class="sd">    :param *files: The local file paths to upload</span>
 <span class="sd">    :param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory</span>
+<span class="sd">    :return: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upload</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
-            <span class="n">zipped_file</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s1">&#39;files.zip&#39;</span><span class="p">)</span>
-            <span class="n">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">zipped_file</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped</span><span class="p">:</span>
+            <span class="n">zipped_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s1">&#39;files.zip&#39;</span><span class="p">)</span>
+            <span class="n">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">zipped_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                    <span class="n">zipped</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+                    <span class="n">zipped</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_upload</span><span class="p">(</span><span class="n">zipped_file</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
             <span class="n">unzip_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;functions&quot;</span><span class="p">,</span> <span class="s2">&quot;unzip&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="s1">&#39;files.zip&#39;</span>
@@ -564,7 +597,6 @@ a file in the folder you would like to create a FileSet aggregation from.
             <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
                 <span class="n">unzip_path</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
             <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </code></pre></div>
 
 </div>
@@ -582,22 +614,24 @@ a file in the folder you would like to create a FileSet aggregation from.
 <p>Zip a file on HydroShare
 :param path: The path to the file
 :param zip_name: The name of the zipped file
-:param remove_file: Defaults to True, set to False to not delete the file that was zipped</p>
+:param remove_file: Defaults to True, set to False to not delete the file that was zipped
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Zip a file on HydroShare</span>
 <span class="err">    :param path: The path to the file</span>
 <span class="err">    :param zip_name: The name of the zipped file</span>
 <span class="err">    :param remove_file: Defaults to True, set to False to not delete the file that was zipped</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    zip_name = basename(path) + &quot;.zip&quot; if not zip_name else zip_name</span>
 <span class="err">    data = {&quot;input_coll_path&quot;: path, &quot;output_zip_file_name&quot;: zip_name, &quot;remove_original_after_zip&quot;: remove_file}</span>
 <span class="err">    zip_path = urljoin(self._hsapi_path, &quot;functions&quot;, &quot;zip&quot;)</span>
 <span class="err">    self._hs_session.post(zip_path, status_code=200, data=data)</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -613,14 +647,17 @@ a file in the folder you would like to create a FileSet aggregation from.
       </h2>
 <div class="doc doc-contents ">
 <p>Creates a folder on HydroShare
-:param folder: the folder path to create</p>
+:param folder: the folder path to create
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def folder_create(self, folder: str) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def folder_create(self, folder: str) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Creates a folder on HydroShare</span>
 <span class="err">    :param folder: the folder path to create</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    path = urljoin(self._hsapi_path, &quot;folders&quot;, folder)</span>
 <span class="err">    self._hs_session.put(path, status_code=201)</span>
@@ -639,17 +676,19 @@ a file in the folder you would like to create a FileSet aggregation from.
       </h2>
 <div class="doc doc-contents ">
 <p>Deletes a folder on HydroShare
-:param path: the path to the folder</p>
+:param path: the path to the folder
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def folder_delete(self, path: str = None) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def folder_delete(self, path: str = None) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Deletes a folder on HydroShare</span>
 <span class="err">    :param path: the path to the folder</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    self._delete_file_folder(path)</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -667,7 +706,7 @@ a file in the folder you would like to create a FileSet aggregation from.
 <p>Downloads a folder from HydroShare
 :param path: The path to folder
 :param save_path: The local path to save the download to, defaults to the current directory
-:returns: The path to the download zipped folder</p>
+:return: The path to the download zipped folder</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
@@ -676,7 +715,7 @@ a file in the folder you would like to create a FileSet aggregation from.
 <span class="sd">    Downloads a folder from HydroShare</span>
 <span class="sd">    :param path: The path to folder</span>
 <span class="sd">    :param save_path: The local path to save the download to, defaults to the current directory</span>
-<span class="sd">    :returns: The path to the download zipped folder</span>
+<span class="sd">    :return: The path to the download zipped folder</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_zip</span><span class="p">(</span>
         <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;zipped&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
@@ -697,15 +736,18 @@ a file in the folder you would like to create a FileSet aggregation from.
 <div class="doc doc-contents ">
 <p>Renames a folder on HydroShare
 :param path: the path to the folder to rename
-:param new_path: the new path folder name</p>
+:param new_path: the new path folder name
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def folder_rename(self, path: str, new_path: str) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def folder_rename(self, path: str, new_path: str) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Renames a folder on HydroShare</span>
 <span class="err">    :param path: the path to the folder to rename</span>
 <span class="err">    :param new_path: the new path folder name</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    self.file_rename(path=path, new_path=new_path)</span>
 </code></pre></div>
@@ -753,16 +795,19 @@ a file in the folder you would like to create a FileSet aggregation from.
 <p>Creates a HydroShare reference object to reference content outside of the resource
 :param file_name: the file name of the resulting .url file
 :param url: the url of the referenced content
-:param path: the path to create the reference in</p>
+:param path: the path to create the reference in
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def reference_create(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def reference_create(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Creates a HydroShare reference object to reference content outside of the resource</span>
 <span class="err">    :param file_name: the file name of the resulting .url file</span>
 <span class="err">    :param url: the url of the referenced content</span>
 <span class="err">    :param path: the path to create the reference in</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    request_path = urljoin(self._hsapi_path.replace(self.resource_id, &quot;&quot;), &quot;data-store-add-reference&quot;)</span>
 <span class="err">    self._hs_session.post(</span>
@@ -770,7 +815,6 @@ a file in the folder you would like to create a FileSet aggregation from.
 <span class="err">        data={&quot;res_id&quot;: self.resource_id, &quot;curr_path&quot;: path, &quot;ref_name&quot;: file_name, &quot;ref_url&quot;: url},</span>
 <span class="err">        status_code=200,</span>
 <span class="err">    )</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -788,16 +832,19 @@ a file in the folder you would like to create a FileSet aggregation from.
 <p>Updates a HydroShare reference object
 :param file_name: the file name for the .url file
 :param url: the url of the referenced content
-:param path: the path to the directory where the reference is located</p>
+:param path: the path to the directory where the reference is located
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def reference_update(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@refresh</span>
+<span class="err">def reference_update(self, file_name: str, url: str, path: str = &#39;&#39;) -&gt; None:</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    Updates a HydroShare reference object</span>
 <span class="err">    :param file_name: the file name for the .url file</span>
 <span class="err">    :param url: the url of the referenced content</span>
 <span class="err">    :param path: the path to the directory where the reference is located</span>
+<span class="err">    :return: None</span>
 <span class="err">    &quot;&quot;&quot;</span>
 <span class="err">    request_path = urljoin(self._hsapi_path.replace(self.resource_id, &quot;&quot;), &quot;data_store_edit_reference_url&quot;)</span>
 <span class="err">    self._hs_session.post(</span>
@@ -805,7 +852,6 @@ a file in the folder you would like to create a FileSet aggregation from.
 <span class="err">        data={&quot;res_id&quot;: self.resource_id, &quot;curr_path&quot;: path, &quot;url_filename&quot;: file_name, &quot;new_ref_url&quot;: url},</span>
 <span class="err">        status_code=200,</span>
 <span class="err">    )</span>
-<span class="err">    self.refresh()</span>
 </code></pre></div>
 
 </div>
@@ -820,16 +866,20 @@ a file in the folder you would like to create a FileSet aggregation from.
 
       </h2>
 <div class="doc doc-contents ">
-<p>Saves the metadata to HydroShare</p>
+<p>Saves the metadata to HydroShare
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Saves the metadata to HydroShare&quot;&quot;&quot;</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">refresh</span>
+<span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the metadata to HydroShare</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;resourcemetadata.xml&#39;</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </code></pre></div>
 
 </div>

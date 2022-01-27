@@ -79,6 +79,10 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
+                </li>
     </ul>
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
@@ -430,17 +434,21 @@ eager and retrieve the files asynchronously.</p>
 
       </h2>
 <div class="doc doc-contents ">
-<p>Saves the metadata back to HydroShare</p>
+<p>Saves the metadata back to HydroShare
+:return: None</p>
 <details class="quote">
           <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
           <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Saves the metadata back to HydroShare&quot;&quot;&quot;</span>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">refresh</span>
+<span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the metadata back to HydroShare</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span>
     <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </code></pre></div>
 
 </div>

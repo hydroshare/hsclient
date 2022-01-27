@@ -81,6 +81,10 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../TimeSeries/">Time Series</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ModelProgram/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ModelInstance/">Model Instance</a>
+                </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="#">API</a>
@@ -142,11 +146,21 @@
 <h2 class="hidden-toc" id="hsmodels.schemas.aggregations.FileSetMetadata" style="visibility: hidden; position: absolute;">
         </h2>
 <div class="doc doc-contents first">
-<p>A class used to represent the metadata associated with a file set aggregation</p>
-<p>A file set aggregation consists of an arbitrary collection of files that are logically
-grouped together as an aggregation and to which aggregation-level metadata have been
-added. There may be any number of files in the aggregation, and files may be of any type.</p>
 <div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.FileSetMetadata.rights">
+
+<code class="highlight">rights: Rights</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing information about the rights held in and over the aggregation and the license under which a aggregation is shared</p>
+</div>
+</div>
 <div class="doc doc-object doc-attribute">
 <h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.FileSetMetadata.type">
 
@@ -161,18 +175,33 @@ added. There may be any number of files in the aggregation, and files may be of 
 <p>A string expressing the aggregation type from the list of HydroShare aggregation types</p>
 </div>
 </div>
+<div class="doc doc-object doc-attribute">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.FileSetMetadata.url">
+
+<code class="highlight">url: AnyUrl</code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
+      <small class="doc doc-property doc-property-required"><code>required</code></small>
+  </span>
+
+      </h2>
+<div class="doc doc-contents ">
+<p>An object containing the URL of the aggregation</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="doc doc-object doc-class">
-<h2 class="hidden-toc" id="hsmodels.schemas.aggregations.BaseAggregationMetadata" style="visibility: hidden; position: absolute;">
+<h2 class="hidden-toc" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn" style="visibility: hidden; position: absolute;">
         </h2>
 <div class="doc doc-contents first">
 <div class="doc doc-children">
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.additional_metadata">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.additional_metadata">
 
-<code class="highlight">additional_metadata: dict</code>
+<code class="highlight">additional_metadata: str</code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
@@ -184,7 +213,7 @@ added. There may be any number of files in the aggregation, and files may be of 
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.language">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.language">
 
 <code class="highlight">language: str</code>
 
@@ -198,7 +227,7 @@ added. There may be any number of files in the aggregation, and files may be of 
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.period_coverage">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.period_coverage">
 
 <code class="highlight">period_coverage: PeriodCoverage</code>
 
@@ -208,25 +237,11 @@ added. There may be any number of files in the aggregation, and files may be of 
 
       </h2>
 <div class="doc doc-contents ">
-<p>An object containing the temporal coverage for a resource expressed as a date range</p>
+<p>An object containing the temporal coverage for a aggregation expressed as a date range</p>
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.rights">
-
-<code class="highlight">rights: Rights</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>An object containing information about the rights held in and over the resource and the license under which a resource is shared</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.spatial_coverage">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.spatial_coverage">
 
 <code class="highlight">spatial_coverage: Union[hsmodels.schemas.fields.PointCoverage, hsmodels.schemas.fields.BoxCoverage]</code>
 
@@ -236,11 +251,11 @@ added. There may be any number of files in the aggregation, and files may be of 
 
       </h2>
 <div class="doc doc-contents ">
-<p>An object containing the geospatial coverage for the resource expressed as either a bounding box or point</p>
+<p>An object containing the geospatial coverage for the aggregation expressed as either a bounding box or point</p>
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.subjects">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.subjects">
 
 <code class="highlight">subjects: str</code>
 
@@ -250,37 +265,21 @@ added. There may be any number of files in the aggregation, and files may be of 
 
       </h2>
 <div class="doc doc-contents ">
-<p>A list of keyword strings expressing the topic of the resource</p>
+<p>A list of keyword strings expressing the topic of the aggregation</p>
 </div>
 </div>
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.title">
+<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadataIn.title">
 
 <code class="highlight">title: str</code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
-      <small class="doc doc-property doc-property-required"><code>required</code></small>
   </span>
 
       </h2>
 <div class="doc doc-contents ">
-<p>A string containing a descriptive title for the resource</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsmodels.schemas.aggregations.BaseAggregationMetadata.url">
-
-<code class="highlight">url: AnyUrl</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-pydantic-field"><code>pydantic-field</code></small>
-      <small class="doc doc-property doc-property-required"><code>required</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>An object containing the URL of the resource</p>
+<p>A string containing a descriptive title for the aggregation</p>
 </div>
 </div>
 </div>
