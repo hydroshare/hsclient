@@ -718,7 +718,10 @@ class HydroShareSession:
         else:
             if username is None or password is None:
                 raise ValueError("Login requires either username and password or client_id and token be provided")
+
             self._session = requests.Session()
+            default_agent = self._session.headers['User-Agent']
+            self._session.headers['User-Agent'] = default_agent + ' (hsclient)'
             self.set_auth((username, password))
 
     def set_auth(self, auth):
