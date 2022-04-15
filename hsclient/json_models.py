@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from hsmodels.schemas.enums import UserIdentifierType
 from pydantic import AnyUrl, BaseModel, validator
@@ -46,4 +46,11 @@ class ResourcePreview(BaseModel):
     @validator("authors", pre=True)
     def handle_null_author(cls, v):
         # return empty list when supplied authors field is None.
-        return [] if v is None else v
+        if v is None:
+            return []
+
+        # assert iterable non-string
+        assert isinstance(v, (Tuple, List))
+
+        # filter to remove all empty x's in v ("", None, or equivalent)
+        return list(filter(lambda x: x, v))

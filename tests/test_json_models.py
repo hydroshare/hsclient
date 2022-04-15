@@ -27,17 +27,39 @@ def test_null_subject_areas():
     assert o.subject_areas == []
 
 
-def test_resource_preview_authors_field_default_is_empty_list():
-    """verify all `authors` fields are instantiated with [] values."""
-    test_data_dict = {"authors": None}
-    test_data_json = '{"authors": null}'
+AuthorsFieldResourcePreviewTestData = (
+    json.dumps({"authors": None}),
+    json.dumps({"authors": []}),
+    json.dumps({"authors": [None]}),
+    json.dumps({"authors": [""]}),
+    json.dumps({"authors": [[]]}),
+)
 
-    base_case = ResourcePreview()
-    from_kwargs = ResourcePreview(**test_data_dict)
-    from_dict = ResourcePreview.parse_obj(test_data_dict)
-    from_json = ResourcePreview.parse_raw(test_data_json)
 
-    assert all([x.authors == [] for x in [base_case, from_kwargs, from_dict, from_json]])
+@pytest.mark.parametrize("test_data", AuthorsFieldResourcePreviewTestData)
+def test_resource_preview_authors_field_handles_none_cases(test_data):
+    """verify all `authors` fields are instantiated with [] values.
+
+    coerced `authors` field should be [] with following input:
+        None
+        []
+        [None]
+        [None, ""]
+    """
+
+    from_json = ResourcePreview.parse_raw(test_data)
+
+    assert from_json.authors == []
+
+
+def test_resource_preview_authors_raises_validation_error_on_string_input():
+    """verify that a string passed to authors field raises pydantic.ValidationError"""
+    from pydantic import ValidationError
+
+    data = json.dumps({"authors": "should_fail"})
+
+    with pytest.raises(ValidationError):
+        ResourcePreview.parse_raw(data)
 
 
 def test_user_info(user):
