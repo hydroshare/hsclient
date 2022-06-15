@@ -93,7 +93,7 @@ def test_user_info(user):
     assert creator.email == user.email
     assert creator.homepage == user.website
     assert creator.identifiers == user.identifiers
-    assert creator.hydroshare_user_id == user.id
+    assert creator.hydroshare_user_id == int(user.url.split("/")[-2])
 
     contributor = Contributor.from_user(user)
     assert contributor.name == user.name
@@ -103,4 +103,4 @@ def test_user_info(user):
     assert contributor.email == user.email
     assert contributor.homepage == user.website
     assert contributor.identifiers == user.identifiers
-    assert contributor.hydroshare_user_id == user.id
+    assert contributor.hydroshare_user_id == int(user.url.split("/")[-2])
