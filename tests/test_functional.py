@@ -586,3 +586,6 @@ def test_resource_public(resource):
     assert resource.system_metadata()['public'] is True
     resource.set_sharing_status(public=False)
     assert resource.system_metadata()['public'] is False
+
+def test_instantiate_hydroshare_object_without_args():
+    HydroShare()
