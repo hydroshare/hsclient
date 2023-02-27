@@ -3,6 +3,10 @@ pytest == 6.0.2
 requests == 2.24.0
 email-validator
 pandas
+netCDF4
+xarray
+rasterio
+fiona
 isort
 black
 pytest-xdist
