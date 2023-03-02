@@ -6,20 +6,41 @@ import shutil
 import sqlite3
 import tempfile
 import time
+from contextlib import closing
 import urllib.parse
 from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
-from typing import Dict, List, Union
+from typing import Dict, List, Union, TYPE_CHECKING
 from urllib.parse import quote, unquote, urlparse
 from zipfile import ZipFile
 
-import fiona
-import pandas
-import rasterio
+if TYPE_CHECKING:
+    import fiona
+    import pandas
+    import rasterio
+    import xarray
+else:
+    try:
+        import fiona
+    except ImportError:
+        fiona = None
+    try:
+        import pandas
+    except ImportError:
+        pandas = None
+    try:
+        import rasterio
+    except ImportError:
+        rasterio = None
+    try:
+        import xarray
+    except ImportError:
+        xarray = None
+
 import requests
-import xarray
+
 from hsmodels.schemas import load_rdf, rdf_string
 from hsmodels.schemas.base_models import BaseMetadata
 from hsmodels.schemas.enums import AggregationType
@@ -211,6 +232,124 @@ class Aggregation:
             return unzip_to
         return downloaded_zip
 
+    def _get_data_object(self, agg_path, func):
+        if self._data_object is not None and self.metadata.type != AggregationType.TimeSeriesAggregation:
+            return self._data_object
+
+        main_file_ext = pathlib.Path(self.main_file_path).suffix
+        if agg_path is None:
+            td = tempfile.mkdtemp()
+            try:
+                self._download(unzip_to=td)
+                # zip extracted to folder with main file name
+                file_name = self.file(extension=main_file_ext).name
+                file_path = urljoin(td, file_name, file_name)
+                data_object = func(file_path)
+                if self.metadata.type == AggregationType.MultidimensionalAggregation:
+                    data_object.load()
+                    data_object.close()
+            finally:
+                # we can delete the temporary directory for the data object created
+                # for these 2 aggregation types only. For other aggregation types, the generated data object
+                # needs to have access to the aggregation files in the temporary directory - so it's the caller's
+                # responsibility to delete the temporary directory
+                if self.metadata.type in (AggregationType.TimeSeriesAggregation,
+                                          AggregationType.MultidimensionalAggregation):
+                    shutil.rmtree(td)
+        else:
+            file_path = urljoin(agg_path, self.file(extension=main_file_ext).name)
+            data_object = func(file_path)
+            if self.metadata.type == AggregationType.MultidimensionalAggregation:
+                data_object.close()
+
+        # cache the object for the aggregation
+        self._data_object = data_object
+
+        return data_object
+
+    def _save_data_object(self, resource, agg_path: str = "", as_new_aggr=False, destination_path=""):
+        if self._data_object is None:
+            raise Exception("No data object exists for this aggregation.")
+
+        main_file_ext = pathlib.Path(self.main_file_path).suffix
+        temp_dir = None
+        if not agg_path:
+            temp_dir = tempfile.mkdtemp()
+            try:
+                self._download(unzip_to=temp_dir)
+                # zip extracted to folder with main file name
+                file_name = self.file(extension=main_file_ext).name
+                file_path = urljoin(temp_dir, file_name, file_name)
+                if self.metadata.type == AggregationType.MultidimensionalAggregation:
+                    self._data_object.to_netcdf(file_path, format="NETCDF4")
+            except Exception:
+                shutil.rmtree(temp_dir)
+                raise
+        else:
+            file_path = urljoin(agg_path, self.file(extension=main_file_ext).name)
+            if self.metadata.type == AggregationType.MultidimensionalAggregation:
+                self._data_object.to_netcdf(file_path, format="NETCDF4")
+
+        if self.metadata.type == AggregationType.TimeSeriesAggregation:
+            with closing(sqlite3.connect(file_path)) as conn:
+                # write the dataframe to a temp table
+                self._data_object.to_sql('temp', conn, if_exists='replace', index=False)
+                # delete the matching records from the TimeSeriesResultValues table
+                conn.execute("DELETE FROM TimeSeriesResultValues WHERE ResultID IN (SELECT ResultID FROM temp)")
+                conn.execute("INSERT INTO TimeSeriesResultValues SELECT * FROM temp")
+                # delete the temp table
+                conn.execute("DROP TABLE temp")
+                conn.commit()
+
+        aggr_path = self.main_file_path
+        data_object = self._data_object
+        aggr_type = self.metadata.type
+        if not as_new_aggr:
+            # cache some of the metadata fields of the original aggregation to update the metadata of the
+            # updated aggregation
+            # TODO: There may be additional metadata fields that we need to consider to use for the updated aggregation
+            keywords = self.metadata.subjects
+            additional_meta = self.metadata.additional_metadata
+            if aggr_type == AggregationType.TimeSeriesAggregation:
+                title = self.metadata.title
+                abstract = self.metadata.abstract
+
+            # delete this aggregation from Hydroshare
+            # TODO: If the creation of the replacement aggregation fails for some reason, then with the following
+            #  delete action we will lose this aggregation from HydroShare. Need to keep a copy of the
+            #  original aggregation locally so that we can upload that to HydroShare.
+            self.delete()
+
+            # upload the updated data file to the same location as the aggregation it's replacing - this should
+            # create a new aggregation of the same type
+            resource.file_upload(file_path)
+
+            # retrieve the updated aggregation
+            aggr = resource.aggregation(file__path=aggr_path)
+
+            # update metadata
+            for kw in keywords:
+                if kw not in aggr.metadata.subjects:
+                    aggr.metadata.subjects.append(kw)
+            aggr.metadata.additional_metadata = additional_meta
+            if aggr_type == AggregationType.TimeSeriesAggregation:
+                aggr.metadata.title = title
+                aggr.metadata.abstract = abstract
+            aggr.save()
+        else:
+            # upload the data file to the path as specified by 'destination_path' to create a
+            # new aggregation of the same type
+            resource.file_upload(file_path, destination_path=destination_path)
+
+            # retrieve the new aggregation
+            aggr_path = urljoin(destination_path, os.path.basename(aggr_path))
+            aggr = resource.aggregation(file__path=aggr_path)
+
+        aggr._data_object = data_object
+        if temp_dir is not None:
+            shutil.rmtree(temp_dir)
+        return aggr
+
     @property
     def metadata_file(self):
         """The path to the metadata file"""
@@ -239,7 +378,8 @@ class Aggregation:
         return self.files()[0].path
 
     @property
-    def data_object(self) -> Union[pandas.Series, fiona.Collection, rasterio.DatasetReader, xarray.Dataset, None]:
+    def data_object(self) -> \
+            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
         return self._data_object
 
     @refresh
@@ -326,7 +466,19 @@ class Aggregation:
         self._parsed_checksums = None
         self._data_object = None
 
-    def as_series(self, series_id: str, agg_path: str = None) -> pandas.DataFrame:
+    def delete(self) -> None:
+        """Deletes this aggregation from HydroShare"""
+        path = urljoin(
+            self._hsapi_path,
+            "functions",
+            "delete-file-type",
+            self.metadata.type.value + "LogicalFile",
+            self.main_file_path,
+        )
+        self._hs_session.delete(path, status_code=200)
+        self.refresh()
+
+    def as_series(self, series_id: str, agg_path: str = None) -> 'pandas.DataFrame':
         """
         Creates a pandas DataFrame object out of an aggregation of type TimeSeries.
         :param series_id: The series_id of the timeseries result to be converted to a Dataframe object.
@@ -334,6 +486,11 @@ class Aggregation:
         it downloaded locally.
         :return: A pandas.DataFrame object
         """
+        # TODO: if we decide that the user will prefer to use `as_data_object` method rather than this method, then
+        #  make this method as a private method.
+
+        if pandas is None:
+            raise Exception("pandas package not found")
 
         def to_series(timeseries_file: str):
             con = sqlite3.connect(timeseries_file)
@@ -345,19 +502,24 @@ class Aggregation:
 
         return self._get_data_object(agg_path=agg_path, func=to_series)
 
-    def as_multi_dimensional_dataset(self, agg_path: str = None) -> xarray.Dataset:
+    def as_multi_dimensional_dataset(self, agg_path: str = None) -> 'xarray.Dataset':
         """
         Creates a xarray Dataset object out of an aggregation of type NetCDF.
         :param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
         it downloaded locally.
         :return: A xarray.Dataset object
         """
+        # TODO: if we decide that the user will prefer to use `as_data_object` method rather than this method, then
+        #  make this method as a private method.
+
         if self.metadata.type != AggregationType.MultidimensionalAggregation:
             raise Exception("Aggregation is not of type NetCDF")
+        if xarray is None:
+            raise Exception("xarray package not found")
 
         return self._get_data_object(agg_path=agg_path, func=xarray.open_dataset)
 
-    def as_feature_collection(self, agg_path: str = None) -> fiona.Collection:
+    def as_feature_collection(self, agg_path: str = None) -> 'fiona.Collection':
         """
         Creates a fiona Collection object out of an aggregation of type GeoFeature.
         :param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
@@ -366,12 +528,16 @@ class Aggregation:
         Note: The caller is responsible for closing the fiona.Collection object to free up aggregation files used to
         create this object.
         """
+        # TODO: if we decide that the user will prefer to use `as_data_object` method rather than this method, then
+        #  make this method as a private method.
+
         if self.metadata.type != AggregationType.GeographicFeatureAggregation:
             raise Exception("Aggregation is not of type GeoFeature")
-
+        if fiona is None:
+            raise Exception("fiona package not found")
         return self._get_data_object(agg_path=agg_path, func=fiona.open)
 
-    def as_raster_dataset(self, agg_path: str = None) -> rasterio.DatasetReader:
+    def as_raster_dataset(self, agg_path: str = None) -> 'rasterio.DatasetReader':
         """
         Creates a rasterio DatasetReader object out of an aggregation of type GeoRaster
         :param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
@@ -380,14 +546,19 @@ class Aggregation:
         Note: The caller is responsible for closing the rasterio.DatasetReader object to free up aggregation files
         used to create this object.
         """
+        # TODO: if we decide that the user will prefer to use `as_data_object` method rather than this method, then
+        #  make this method as a private method.
+
         if self.metadata.type != AggregationType.GeographicRasterAggregation:
             raise Exception("Aggregation is not of type GeoRaster")
+        if rasterio is None:
+            raise Exception("rasterio package not found")
 
         return self._get_data_object(agg_path=agg_path, func=rasterio.open)
 
     def as_data_object(self, series_id: str = None, agg_path: str = None) -> \
-            Union[pandas.DataFrame, fiona.Collection, rasterio.DatasetReader, xarray.Dataset, None]:
-        """Load aggregation data to a relevant data object tyoe"""
+            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
+        """Load aggregation data to a relevant data object type"""
 
         if self.metadata.type == AggregationType.TimeSeriesAggregation:
             if not series_id:
@@ -402,39 +573,65 @@ class Aggregation:
 
         raise Exception(f"Data object is not supported for '{self.metadata.type}' aggregation type")
 
-    def _get_data_object(self, agg_path, func):
-        if self._data_object is not None and self.metadata.type != AggregationType.TimeSeriesAggregation:
-            return self._data_object
+    def update_netcdf_data(self, resource, agg_path: str = "", as_new_aggr=False, destination_path="") -> 'Aggregation':
+        """
+        Updates the netcdf file associated with this aggregation. Then uploads the updated netcdf file
+        to create a new aggregation that replaces the original aggregation.
+        :param  resource: The resource object to which this aggregation belongs.
+        :param  agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
+        it downloaded locally at aggr_path.
+        :param  as_new_aggr: If True a new aggregation will be created, otherwise this aggregation will be
+        updated/replaced.
+        :param  destination_path: The destination folder path where the new aggregation will be created. This folder
+        path must already exist in resource. This parameter is used only when 'as_new_aggr' is True.
+        :return: The updated netcdf aggregation or a new netcdf aggregation (an instance of Aggregation)
+        """
 
-        main_file_ext = pathlib.Path(self.main_file_path).suffix
-        if agg_path is None:
-            td = tempfile.mkdtemp()
-            try:
-                self._download(unzip_to=td)
-                # zip extracted to folder with main file name
-                file_name = self.file(extension=main_file_ext).name
-                file_path = urljoin(td, file_name, file_name)
-                data_object = func(file_path)
-                if self.metadata.type == AggregationType.MultidimensionalAggregation:
-                    data_object.close()
-            finally:
-                # we can delete the temporary directory for the data object created
-                # for these 2 aggregation types only. For other aggregation types, the generated data object
-                # needs to have access to the aggregation files in the temporary directory - so it's the caller's
-                # responsibility to delete the temporary directory
-                if self.metadata.type in (AggregationType.TimeSeriesAggregation,
-                                          AggregationType.MultidimensionalAggregation):
-                    shutil.rmtree(td)
-        else:
-            file_path = urljoin(agg_path, self.file(extension=main_file_ext).name)
-            data_object = func(file_path)
-            if self.metadata.type == AggregationType.MultidimensionalAggregation:
-                data_object.close()
+        # TODO: if we decide that the user will prefer to use `save_data_object` rather than this method, then
+        #  make this method as a private method.
 
-        # cache the object for the aggregation
-        self._data_object = data_object
+        if self.metadata.type != AggregationType.MultidimensionalAggregation:
+            raise Exception("Not a NetCDF aggregation")
 
-        return data_object
+        return self._save_data_object(resource, agg_path, as_new_aggr, destination_path)
+
+    def update_timeseries_data(self, resource, agg_path: str = "", as_new_aggr=False,
+                               destination_path="") -> 'Aggregation':
+        """
+        Updates the sqlite file associated with this aggregation. Then uploads the updated sqlite file
+        to create a new aggregation that replaces the original aggregation.
+        :param  resource: The resource object to which this aggregation belongs.
+        :param  agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
+        it downloaded locally at aggr_path.
+        :param  as_new_aggr: If True a new aggregation will be created, otherwise this aggregation will be
+        updated/replaced.
+        :param  destination_path: The destination folder path where the new aggregation will be created. This folder
+        path must already exist in resource. This parameter is used only when 'as_new_aggr' is True.
+        :return: The updated timeseries aggregation or a new timeseries aggregation (an instance of Aggregation)
+        """
+
+        # TODO: if we decide that the user will prefer to use `save_data_object` rather than this method, then
+        #  make this method as a private method.
+
+        if self.metadata.type != AggregationType.TimeSeriesAggregation:
+            raise Exception("Not a timeseries aggregation")
+
+        return self._save_data_object(resource, agg_path, as_new_aggr, destination_path)
+
+    def save_data_object(self, resource, agg_path: str = "", as_new_aggr=False, destination_path="") -> 'Aggregation':
+        """
+        Updates the data file(s) of this aggregation using the associated data processing object
+        and either updates this aggregation or creates a new aggregation using the updated data files.
+        """
+        if self.metadata.type != AggregationType.MultidimensionalAggregation:
+            return self.update_netcdf_data(resource, agg_path, as_new_aggr, destination_path)
+
+        if self.metadata.type != AggregationType.TimeSeriesAggregation:
+            return self.update_timeseries_data(resource, agg_path, as_new_aggr, destination_path)
+
+        # TODO: Implement this functionality for Raster and GeoFeature aggregations
+
+        raise Exception("Saving of data object is not supported for this aggregation type")
 
 
 class Resource(Aggregation):
@@ -767,20 +964,12 @@ class Resource(Aggregation):
         :param aggregation: The aggregation object to delete
         :return: None
         """
-        path = urljoin(
-            aggregation._hsapi_path,
-            "functions",
-            "delete-file-type",
-            aggregation.metadata.type.value + "LogicalFile",
-            aggregation.main_file_path,
-        )
-        aggregation._hs_session.delete(path, status_code=200)
-        aggregation.refresh()
+        aggregation.delete()
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
         Download an aggregation from HydroShare
-        :param aggregation: The aggreation to download
+        :param aggregation: The aggregation to download
         :param save_path: The local path to save the aggregation to, defaults to the current directory
         :param unzip_to: If set, the resulting download will be unzipped to the specified path
         :return: None
