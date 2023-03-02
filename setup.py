@@ -12,14 +12,20 @@ setup(
         'hsmodels>=0.5.1',
         'requests',
         'requests_oauthlib',
-        'pandas'
     ],
+    extras_require={
+        "pandas": ["pandas"],
+        "xarray": ["netCDF4", "xarray"],
+        "rasterio": ["rasterio"],
+        "fiona": ["fiona"],
+        "all": ["pandas", "netCDF4", "xarray", "rasterio", "fiona"],
+    },
     url='https://github.com/hydroshare/hsclient',
     license='MIT',
     author='Scott Black',
     author_email='scott.black@usu.edu',
     description='A python client for managing HydroShare resources',
-    python_requires='>=3.6',
+    python_requires='>=3.9',
     long_description=README,
     long_description_content_type="text/markdown",
     classifiers=[
