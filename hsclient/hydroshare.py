@@ -1132,6 +1132,31 @@ class Resource(Aggregation):
         aggregation.refresh()
 
     @refresh
+    def aggregation_move(self, aggregation: Aggregation, dst_path: str = "") -> None:
+        """
+        Moves an aggregation from its current location to another folder in HydroShare.
+        :param aggregation: The aggregation object to move
+        :param  dst_path: The target file path to move the aggregation to
+        :return: None
+        """
+        path = urljoin(
+            aggregation._hsapi_path,
+            aggregation.metadata.type.value + "LogicalFile",
+            aggregation.main_file_path,
+            "functions",
+            "move-file-type",
+            dst_path,
+        )
+        response = aggregation._hs_session.post(path, status_code=200)
+        json_response = response.json()
+        task_id = json_response['id']
+        status = json_response['status']
+        if status in ("Not ready", "progress"):
+            while aggregation._hs_session.check_task(task_id) != 'true':
+                time.sleep(1)
+        aggregation.refresh()
+
+    @refresh
     def aggregation_delete(self, aggregation: Aggregation) -> None:
         """
         Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
