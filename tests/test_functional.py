@@ -8,67 +8,6 @@ from hsmodels.schemas.fields import Creator, Relation
 from hsclient import HydroShare
 
 
-@pytest.fixture(scope="function")
-def change_test_dir(request):
-    os.chdir(request.fspath.dirname)
-    yield
-    os.chdir(request.config.invocation_dir)
-
-
-@pytest.fixture()
-def hydroshare(change_test_dir):
-    hs = HydroShare(os.getenv("HYDRO_USERNAME"), os.getenv("HYDRO_PASSWORD"), host="beta.hydroshare.org")
-    return hs
-
-
-@pytest.fixture()
-def new_resource(hydroshare):
-    new_resource = hydroshare.create()
-    yield new_resource
-    try:
-        new_resource.delete()
-    except:
-        # resource already deleted
-        pass
-
-
-@pytest.fixture()
-def resource(new_resource):
-    new_resource.file_upload("data/georaster_composite.zip", refresh=False)
-    new_resource.file_unzip("georaster_composite.zip", refresh=False)
-    return new_resource
-
-
-@pytest.fixture()
-def timeseries_resource(new_resource):
-    files = [
-        "ODM2_Multi_Site_One_Variable.sqlite",
-        "ODM2_Multi_Site_One_Variable_resmap.xml",
-        "ODM2_Multi_Site_One_Variable_meta.xml",
-    ]
-    root_path = "data/test_resource_metadata_files/"
-    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], refresh=False)
-    return new_resource
-
-
-@pytest.fixture()
-def resource_with_netcdf_aggr(new_resource):
-    files = [
-        "SWE_time.nc",
-        "SWE_time_header_info.txt",
-        "SWE_time_resmap.xml",
-        "SWE_time_meta.xml",
-    ]
-    root_path = "data/test_resource_metadata_files/"
-    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], refresh=False)
-    return new_resource
-
-
-@pytest.fixture()
-def resource_with_raster_aggr(resource):
-    return resource
-
-
 def test_absolute_path_multiple_file_upload(new_resource):
     files = [
         "other.txt",
@@ -319,6 +258,30 @@ def test_aggregation_remove(resource):
     assert len(resource.files()) == 4
 
 
+def test_move_aggregation(resource_with_netcdf_aggr):
+    resource_with_netcdf_aggr.refresh()
+    assert len(resource_with_netcdf_aggr.aggregations()) == 1
+    agg = resource_with_netcdf_aggr.aggregations()[0]
+    main_file = agg.main_file_path
+    # create a folder to move the aggregation to
+    folder = "netcdf-aggregation"
+    resource_with_netcdf_aggr.folder_create(folder)
+    resource_with_netcdf_aggr.aggregation_move(agg, dst_path=folder)
+    assert len(resource_with_netcdf_aggr.aggregations()) == 1
+    file_path = f"{folder}/{main_file}"
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is not None
+    # now move back the aggregation to the root of the resource
+    resource_with_netcdf_aggr.aggregation_move(agg, dst_path="")
+    file_path = main_file
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is not None
+    # check there is no aggregation in the folder
+    file_path = f"{folder}/{main_file}"
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is None
+
+
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 0
     new_resource.file_upload("data/other.txt", refresh=False)
@@ -512,34 +475,6 @@ def test_aggregation_fileset(new_resource, files):
     new_resource.aggregation_delete(agg)
     assert len(new_resource.aggregations()) == 0
     assert len(new_resource.files()) == 0
-
-
-def test_pandas_series(timeseries_resource):
-    timeseries_resource.refresh()
-    timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_result = next(
-        r for r in timeseries.metadata.time_series_results if r.series_id == "2837b7d9-1ebc-11e6-a16e-f45c8999816f"
-    )
-    series = timeseries.as_series(series_result.series_id, "data/test_resource_metadata_files")
-    assert len(series) == 1333
-
-
-def test_raster_as_data_object(resource_with_raster_aggr):
-    resource_with_raster_aggr.refresh()
-    raster_aggr = resource_with_raster_aggr.aggregation(type=AggregationType.GeographicRasterAggregation)
-    dataset = raster_aggr.as_data_object(agg_path="data/test_resource_metadata_files")
-    assert dataset.__class__.__name__ == "DatasetReader"
-    # raster should have 1 band
-    assert dataset.count == 1
-
-
-def test_netcdf_as_data_object(resource_with_netcdf_aggr):
-    resource_with_netcdf_aggr.refresh()
-    nc_aggr = resource_with_netcdf_aggr.aggregation(type=AggregationType.MultidimensionalAggregation)
-    dataset = nc_aggr.as_data_object(agg_path="data/test_resource_metadata_files")
-    assert dataset.__class__.__name__ == "Dataset"
-    # netcdf dimensions
-    assert dataset.dims['time'] == 2184
 
 
 def test_folder_zip(new_resource):
