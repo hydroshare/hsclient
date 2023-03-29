@@ -347,9 +347,18 @@ class Aggregation:
         if not file_path:
             file_path = kwargs.get("files__path", "")
         if file_path:
-            for agg in aggregations:
-                if agg.files(path=file_path):
-                    return [agg]
+            dir_path = os.path.dirname(file_path)
+            file_name = pathlib.Path(file_path).stem
+            if dir_path:
+                aggr_map_path = urljoin(dir_path, file_name)
+            else:
+                aggr_map_path = file_name
+
+            aggr_map_path = f"{aggr_map_path}_resmap.xml"
+            for aggr in self._parsed_aggregations:
+                aggr_map_full_path = f"/{aggr._resource_path}/data/contents/{aggr_map_path}"
+                if aggr._map_path == aggr_map_full_path:
+                    return [aggr]
             return []
 
         for key, value in kwargs.items():
