@@ -416,21 +416,25 @@ def test_empty_creator(new_resource):
 def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2  # exclude rdf/xml file
+    aggr_file_count = file_count
     new_resource.file_upload(*[os.path.join(root_path, file) for file in files])
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
     agg_type = agg.metadata.type
-    assert len(agg.files()) == file_count
+    assert len(agg.files()) == aggr_file_count
     new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
+    if agg_type == "NetCDF":
+        # the txt file of the aggregation gets deleted when the netcdf aggregation is removed.
+        file_count = file_count - 1
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     agg = new_resource.file_aggregate(main_file, agg_type)
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
-    assert len(agg.files()) == file_count
+    assert len(agg.files()) == aggr_file_count
     with tempfile.TemporaryDirectory() as tmp:
         new_resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
