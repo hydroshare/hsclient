@@ -297,7 +297,7 @@ def test_aggregation_remove(resource):
     agg = resource.aggregations()[0]
     resource.aggregation_remove(agg)
     assert len(resource.aggregations()) == 0
-    assert len(resource.files()) == 4
+    assert len(resource.files()) == 3  # exclude .vrt
 
 
 def test_file_upload_and_rename(new_resource):
@@ -424,13 +424,13 @@ def test_aggregations(new_resource, files):
     assert len(agg.files()) == file_count
     new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
-    assert len(new_resource.files()) == file_count
+    assert len(new_resource.files()) == file_count - 1  # exclude .vrt
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     agg = new_resource.file_aggregate(main_file, agg_type)
     assert len(new_resource.aggregations()) == 1
-    assert len(new_resource.files()) == 0
-    assert len(agg.files()) == file_count
+    assert len(new_resource.files()) == 1
+    assert len(agg.files()) == file_count - 1
     with tempfile.TemporaryDirectory() as tmp:
         new_resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
@@ -462,7 +462,7 @@ def test_aggregation_fileset(new_resource, files):
     assert len(agg.files()) == file_count
     new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
-    assert len(new_resource.files()) == file_count
+    assert len(new_resource.files()) == file_count - 1  # exclude .vrt
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     agg = new_resource.file_aggregate(main_file, agg_type=agg_type)
