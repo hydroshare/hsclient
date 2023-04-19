@@ -247,7 +247,6 @@ def test_aggregation_delete(resource):
     assert len(resource.files()) == 1
 
 
-@pytest.mark.skip(reason="this test fails due to a bug (#4995) in hydroshare")
 def test_aggregation_remove(resource):
     resource.refresh()
     assert len(resource.aggregations()) == 1
@@ -370,7 +369,6 @@ def test_empty_creator(new_resource):
         assert "creators list must have at least one creator" in str(e)
 
 
-@pytest.mark.skip(reason="this test fails due to a bug (#4995) in hydroshare")
 @pytest.mark.parametrize(
     "files",
     [
@@ -408,21 +406,10 @@ def test_aggregations(new_resource, files):
     assert len(agg.files()) == aggr_file_count
     new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
-    if agg_type == "GeoRaster":
-        # TODO: Due to a bug (#4995) in hydroshare, the vrt file of the aggregation gets deleted when the aggregation
-        #  is removed
-        file_count = file_count - 1
-    elif agg_type == "NetCDF":
+    if agg_type == "NetCDF":
         # the txt file of the aggregation gets deleted when the netcdf aggregation is removed.
         file_count = file_count - 1
-
     assert len(new_resource.files()) == file_count
-    if agg_type == "GeoRaster":
-        # TODO: Due to a bug (#4995) in hydroshare, the vrt file of the aggregation gets deleted when the aggregation
-        #  is removed -so we need to upload that vrt file again for now
-        new_resource.file_upload(os.path.join(root_path, files[2]))
-        assert len(new_resource.files()) == file_count + 1
-
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     agg = new_resource.file_aggregate(main_file, agg_type)
@@ -438,7 +425,6 @@ def test_aggregations(new_resource, files):
     assert len(new_resource.files()) == 0
 
 
-@pytest.mark.skip(reason="there is a bug (#4998) in hydroshare that causes this test to fail")
 @pytest.mark.parametrize(
     "files",
     [
@@ -524,7 +510,6 @@ def test_folder_download(new_resource):
         assert os.path.basename(downloaded_folder) == "test_folder.zip"
 
 
-# @pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
 def test_filename_spaces(hydroshare):
     res = hydroshare.create()
     res.folder_create("with spaces", refresh=False)
