@@ -185,7 +185,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.title = "resource test"
     new_resource.metadata.additional_metadata = {"key1": "value1", "key2": "value2", "key3": "value3"}
     new_resource.metadata.abstract = "world’s"
-    new_resource.metadata.relations = [Relation(type=RelationType.isVersionOf, value="is version of")]
+    new_resource.metadata.relations = [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
     new_resource.save()
 
@@ -198,7 +198,7 @@ def test_resource_metadata_updating(new_resource):
     assert new_resource.metadata.additional_metadata["key3"] == "value3"
     assert new_resource.metadata.abstract == "world’s"
 
-    assert new_resource.metadata.relations == [Relation(type=RelationType.isVersionOf, value="is version of")]
+    assert new_resource.metadata.relations == [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
 
 
 def test_system_metadata(new_resource):
@@ -218,7 +218,7 @@ def test_resource_delete(hydroshare, new_resource):
 
 
 def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
-    """Verify resource object is present in resource object cache."""
+    """ Verify resource object is present in resource object cache. """
     res_id = new_resource.resource_id
     res = hydroshare.resource(res_id)
 
@@ -586,7 +586,6 @@ def test_resource_public(resource):
     assert resource.system_metadata()['public'] is True
     resource.set_sharing_status(public=False)
     assert resource.system_metadata()['public'] is False
-
 
 def test_instantiate_hydroshare_object_without_args():
     HydroShare()
