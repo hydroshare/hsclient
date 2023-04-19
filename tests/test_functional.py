@@ -185,7 +185,7 @@ def test_resource_metadata_updating(new_resource):
     new_resource.metadata.title = "resource test"
     new_resource.metadata.additional_metadata = {"key1": "value1", "key2": "value2", "key3": "value3"}
     new_resource.metadata.abstract = "world’s"
-    new_resource.metadata.relations = [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
+    new_resource.metadata.relations = [Relation(type=RelationType.isVersionOf, value="is version of")]
 
     new_resource.save()
 
@@ -198,7 +198,7 @@ def test_resource_metadata_updating(new_resource):
     assert new_resource.metadata.additional_metadata["key3"] == "value3"
     assert new_resource.metadata.abstract == "world’s"
 
-    assert new_resource.metadata.relations == [Relation(type=RelationType.isCopiedFrom, value="is hosted by value")]
+    assert new_resource.metadata.relations == [Relation(type=RelationType.isVersionOf, value="is version of")]
 
 
 def test_system_metadata(new_resource):
@@ -218,7 +218,7 @@ def test_resource_delete(hydroshare, new_resource):
 
 
 def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
-    """ Verify resource object is present in resource object cache. """
+    """Verify resource object is present in resource object cache."""
     res_id = new_resource.resource_id
     res = hydroshare.resource(res_id)
 
@@ -416,21 +416,25 @@ def test_empty_creator(new_resource):
 def test_aggregations(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2  # exclude rdf/xml file
+    aggr_file_count = file_count
     new_resource.file_upload(*[os.path.join(root_path, file) for file in files])
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
     agg = new_resource.aggregations()[0]
     agg_type = agg.metadata.type
-    assert len(agg.files()) == file_count
+    assert len(agg.files()) == aggr_file_count
     new_resource.aggregation_remove(agg)
     assert len(new_resource.aggregations()) == 0
+    if agg_type == "NetCDF":
+        # the txt file of the aggregation gets deleted when the netcdf aggregation is removed.
+        file_count = file_count - 1
     assert len(new_resource.files()) == file_count
     main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
     assert main_file
     agg = new_resource.file_aggregate(main_file, agg_type)
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
-    assert len(agg.files()) == file_count
+    assert len(agg.files()) == aggr_file_count
     with tempfile.TemporaryDirectory() as tmp:
         new_resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
@@ -586,6 +590,7 @@ def test_resource_public(resource):
     assert resource.system_metadata()['public'] is True
     resource.set_sharing_status(public=False)
     assert resource.system_metadata()['public'] is False
+
 
 def test_instantiate_hydroshare_object_without_args():
     HydroShare()
