@@ -190,7 +190,7 @@ class Aggregation:
 
     def _download(self, save_path: str = "", unzip_to: str = None) -> str:
         main_file_path = self.main_file_path
-
+        print("_download")
         path = urljoin(self._resource_path, "data", "contents", main_file_path)
         params = {"zipped": "true", "aggregation": "true"}
         path = path.replace('resource', 'django_irods/rest_download', 1)
@@ -689,6 +689,7 @@ class Resource(Aggregation):
         :param unzip_to: If set, the resulting download will be unzipped to the specified path
         :return: None
         """
+        print("Aggregation download")
         return aggregation._download(save_path=save_path, unzip_to=unzip_to)
 
 
@@ -770,6 +771,8 @@ class HydroShareSession:
 
     def check_task(self, task_id):
         response = self.get(f"/hsapi/taskstatus/{task_id}/", status_code=200)
+        print(response)
+        print(response.json())
         return response.json()['status']
 
     def retrieve_zip(self, path, save_path="", params=None):
@@ -781,9 +784,11 @@ class HydroShareSession:
         task_id = json_response['task_id']
         download_path = json_response['download_path']
         zip_status = json_response['zip_status']
+        print(zip_status)
         if zip_status == "Not ready":
             while self.check_task(task_id) != 'true':
                 time.sleep(1)
+                print(task_id)
         return self.retrieve_file(download_path, save_path)
 
     def upload_file(self, path, files, status_code=204):
