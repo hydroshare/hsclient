@@ -473,12 +473,16 @@ class DataObjectSupportingAggregation(Aggregation):
         if aggr is None:
             raise Exception("This aggregation is not part of the specified resource.")
 
+    def _compute_updated_aggregation_path(self, temp_folder, *files) -> str:
+        file_path = os.path.join(temp_folder, os.path.basename(self.main_file_path))
+        return file_path
+
     def _update_aggregation(self, resource, *files):
         temp_folder = uuid4().hex
         resource.folder_create(temp_folder)
         resource.file_upload(*files, destination_path=temp_folder)
         # check aggregation got created in the temp folder
-        file_path = os.path.join(temp_folder, os.path.basename(self.main_file_path))
+        file_path = self._compute_updated_aggregation_path(temp_folder, *files)
         original_aggr_dir_path = dirname(self.main_file_path)
         aggr = resource.aggregation(file__path=file_path)
         if aggr is not None:
@@ -705,6 +709,19 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
+
+    def _compute_updated_aggregation_path(self, temp_folder, *files) -> str:
+        file_path = ""
+        for _file in files:
+            filename = os.path.basename(_file)
+            if filename.endswith(".vrt"):
+                file_path = os.path.join(temp_folder, filename)
+                break
+            else:
+                filename = pathlib.Path(filename).stem + ".vrt"
+                file_path = os.path.join(temp_folder, filename)
+                break
+        return file_path
 
     def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
         if for_save_data:
