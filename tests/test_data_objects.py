@@ -1,4 +1,5 @@
 import os
+import pathlib
 import tempfile
 
 import fiona
@@ -127,7 +128,8 @@ def test_raster_save_data_object(resource_with_raster_aggr, as_new_aggr):
         subset_band = rasterio_reader.read(1, window=subset_window)
         output_raster_dir_path = os.path.join(tmp, "updated_aggr")
         os.makedirs(output_raster_dir_path)
-        output_raster_file_path = os.path.join(output_raster_dir_path, "logan.tif")
+        update_raster_filename = "updated_logan.tif"
+        output_raster_file_path = os.path.join(output_raster_dir_path, update_raster_filename)
         profile = rasterio_reader.profile
         rasterio_reader.close()
         profile['driver'] = "GTiff"
@@ -153,6 +155,7 @@ def test_raster_save_data_object(resource_with_raster_aggr, as_new_aggr):
         # download aggregation
         unzip_to = os.path.join(tmp, "unzipped_aggr")
         os.makedirs(unzip_to)
+        file_path = pathlib.Path(update_raster_filename).stem + ".vrt"
         if as_new_aggr:
             file_path = f"{dst_path}/{file_path}"
 
