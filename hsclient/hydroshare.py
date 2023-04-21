@@ -189,7 +189,7 @@ class Aggregation:
                 if is_aggregation(str(file)):
                     self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, self._checksums))
 
-            # load metadata for all aggregations (metadata is needed to create a typed aggregation)
+            # load metadata for all aggregations (metadata is needed to create any typed aggregation)
             with ThreadPoolExecutor() as executor:
                 executor.map(populate_metadata, self._parsed_aggregations)
 
@@ -339,10 +339,11 @@ class Aggregation:
         aggregations = self._aggregations
 
         # when searching using 'file__path' or files__path' as the key, there can be only one matching aggregation
+        file_path_priority = kwargs.pop("file_path_priority", True)
         file_path = kwargs.get("file__path", "")
         if not file_path:
             file_path = kwargs.get("files__path", "")
-        if file_path:
+        if file_path and file_path_priority:
             dir_path = os.path.dirname(file_path)
             file_name = pathlib.Path(file_path).stem
             if dir_path:
@@ -408,7 +409,7 @@ class Aggregation:
 
 
 class DataObjectSupportingAggregation(Aggregation):
-    """Base class for any aggregation supporting aggregation type specific data analysis object (e.g. pandas)"""
+    """Base class for any aggregation supporting aggregation type specific data manipulation object (e.g. pandas)"""
 
     @staticmethod
     def create(aggr_cls, base_aggr):
@@ -488,7 +489,8 @@ class DataObjectSupportingAggregation(Aggregation):
 
         resource.folder_delete(temp_folder)
         if aggr is None:
-            raise Exception("Failed to update aggregation")
+            err_msg = f"Failed to update aggregation. Aggregation was not found at: {file_path}"
+            raise Exception(err_msg)
 
 
 class NetCDFAggregation(DataObjectSupportingAggregation):
@@ -1081,6 +1083,10 @@ class Resource(Aggregation):
         if refresh:
             # Only return the newly created aggregation if a refresh is requested
             self.refresh()
+            if agg_type == AggregationType.GeographicRasterAggregation and not path.endswith(".vrt") \
+                    or agg_type == AggregationType.FileSetAggregation:
+                # search all files of the aggregation to find a matching aggregation
+                return self.aggregation(file__path=path, file_path_priority=False)
             return self.aggregation(file__path=path)
 
     @refresh
@@ -1132,7 +1138,7 @@ class Resource(Aggregation):
         """
         Moves an aggregation from its current location to another folder in HydroShare.
         :param aggregation: The aggregation object to move
-        :param  dst_path: The target file path to move the aggregation to
+        :param  dst_path: The target file path to move the aggregation to - target folder must exist
         :return: None
         """
         path = urljoin(
