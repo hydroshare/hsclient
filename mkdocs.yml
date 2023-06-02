@@ -25,6 +25,7 @@ nav:
       Aggregation Operations: examples/Aggregation_Operations.ipynb
       File Operations: examples/File_Operations.ipynb
       Metadata Operations: examples/Metadata_Operations.ipynb
+      Aggregation Data Object Operations: examples/Aggregation_Data_Object_Operations.ipynb
   - Developer Documentation:
     - Models:
         Single File: metadata/SingleFile.md
