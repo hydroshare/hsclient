@@ -8,49 +8,6 @@ from hsmodels.schemas.fields import Creator, Relation
 from hsclient import HydroShare
 
 
-@pytest.fixture(scope="function")
-def change_test_dir(request):
-    os.chdir(request.fspath.dirname)
-    yield
-    os.chdir(request.config.invocation_dir)
-
-
-@pytest.fixture()
-def hydroshare(change_test_dir):
-    hs = HydroShare(os.getenv("HYDRO_USERNAME"), os.getenv("HYDRO_PASSWORD"))
-    return hs
-
-
-@pytest.fixture()
-def new_resource(hydroshare):
-    new_resource = hydroshare.create()
-    yield new_resource
-    try:
-        new_resource.delete()
-    except:
-        # resource already deleted
-        pass
-
-
-@pytest.fixture()
-def resource(new_resource):
-    new_resource.file_upload("data/georaster_composite.zip", refresh=False)
-    new_resource.file_unzip("georaster_composite.zip", refresh=False)
-    return new_resource
-
-
-@pytest.fixture()
-def timeseries_resource(new_resource):
-    files = [
-        "ODM2_Multi_Site_One_Variable.sqlite",
-        "ODM2_Multi_Site_One_Variable_resmap.xml",
-        "ODM2_Multi_Site_One_Variable_meta.xml",
-    ]
-    root_path = "data/test_resource_metadata_files/"
-    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], refresh=False)
-    return new_resource
-
-
 def test_absolute_path_multiple_file_upload(new_resource):
     files = [
         "other.txt",
@@ -300,6 +257,30 @@ def test_aggregation_remove(resource):
     assert len(resource.files()) == 4
 
 
+def test_move_aggregation(resource_with_netcdf_aggr):
+    resource_with_netcdf_aggr.refresh()
+    assert len(resource_with_netcdf_aggr.aggregations()) == 1
+    agg = resource_with_netcdf_aggr.aggregations()[0]
+    main_file = agg.main_file_path
+    # create a folder to move the aggregation to
+    folder = "netcdf-aggregation"
+    resource_with_netcdf_aggr.folder_create(folder)
+    resource_with_netcdf_aggr.aggregation_move(agg, dst_path=folder)
+    assert len(resource_with_netcdf_aggr.aggregations()) == 1
+    file_path = f"{folder}/{main_file}"
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is not None
+    # now move back the aggregation to the root of the resource
+    resource_with_netcdf_aggr.aggregation_move(agg, dst_path="")
+    file_path = main_file
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is not None
+    # check there is no aggregation in the folder
+    file_path = f"{folder}/{main_file}"
+    agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
+    assert agg is None
+
+
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 0
     new_resource.file_upload("data/other.txt", refresh=False)
@@ -482,26 +463,6 @@ def test_aggregation_fileset(new_resource, files):
     assert len(new_resource.files()) == 0
 
 
-def test_pandas_series_local(timeseries_resource):
-    timeseries_resource.refresh()
-    timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_result = next(
-        r for r in timeseries.metadata.time_series_results if r.series_id == "2837b7d9-1ebc-11e6-a16e-f45c8999816f"
-    )
-    series = timeseries.as_series(series_result.series_id, "data/test_resource_metadata_files")
-    assert len(series) == 1333
-
-
-def test_pandas_series_remote(timeseries_resource):
-    timeseries_resource.refresh()
-    timeseries = timeseries_resource.aggregation(type=AggregationType.TimeSeriesAggregation)
-    series_result = next(
-        r for r in timeseries.metadata.time_series_results if r.series_id == "3b9037f8-1ebc-11e6-a304-f45c8999816f"
-    )
-    series_map = timeseries.as_series(series_result.series_id)
-    assert len(series_map) == 1440
-
-
 def test_folder_zip(new_resource):
     new_resource.folder_create("test_folder", refresh=False)
     new_resource.file_upload("data/other.txt", destination_path="test_folder", refresh=False)
@@ -549,7 +510,6 @@ def test_folder_download(new_resource):
         assert os.path.basename(downloaded_folder) == "test_folder.zip"
 
 
-# @pytest.mark.skip("Requires hydroshare update to url encode resourcemap urls")
 def test_filename_spaces(hydroshare):
     res = hydroshare.create()
     res.folder_create("with spaces", refresh=False)
@@ -559,6 +519,8 @@ def test_filename_spaces(hydroshare):
     with tempfile.TemporaryDirectory() as td:
         filename = res.file_download(file, save_path=td)
         assert os.path.basename(filename) == "with spaces file.txt"
+
+    res.delete()
 
 
 def test_copy(new_resource):

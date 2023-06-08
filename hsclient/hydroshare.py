@@ -1,20 +1,48 @@
 import getpass
 import os
+import pathlib
 import pickle
+import shutil
 import sqlite3
 import tempfile
 import time
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, TYPE_CHECKING, Union
 from urllib.parse import quote, unquote, urlparse
+from uuid import uuid4
 from zipfile import ZipFile
 
-import pandas
+if TYPE_CHECKING:
+    import fiona
+    import pandas
+    import rasterio
+    import xarray
+else:
+    try:
+        import fiona
+    except ImportError:
+        fiona = None
+    try:
+        import pandas
+    except ImportError:
+        pandas = None
+    try:
+        import rasterio
+    except ImportError:
+        rasterio = None
+    try:
+        import xarray
+    except ImportError:
+        xarray = None
+
 import requests
+
 from hsmodels.schemas import load_rdf, rdf_string
 from hsmodels.schemas.base_models import BaseMetadata
 from hsmodels.schemas.enums import AggregationType
@@ -108,6 +136,7 @@ class Aggregation:
         self._parsed_files = None
         self._parsed_aggregations = None
         self._parsed_checksums = checksums
+        self._main_file_path = None
 
     def __str__(self):
         return self._map_path
@@ -150,11 +179,35 @@ class Aggregation:
 
     @property
     def _aggregations(self):
+
+        def populate_metadata(_aggr):
+            _aggr._metadata
+
         if not self._parsed_aggregations:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
                     self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, self._checksums))
+
+            # load metadata for all aggregations (metadata is needed to create any typed aggregation)
+            with ThreadPoolExecutor() as executor:
+                executor.map(populate_metadata, self._parsed_aggregations)
+
+            # convert aggregations to aggregation type supporting data object
+            aggregations_copy = self._parsed_aggregations[:]
+            typed_aggregation_classes = {AggregationType.MultidimensionalAggregation: NetCDFAggregation,
+                                         AggregationType.TimeSeriesAggregation: TimeseriesAggregation,
+                                         AggregationType.GeographicRasterAggregation: GeoRasterAggregation,
+                                         AggregationType.GeographicFeatureAggregation: GeoFeatureAggregation,
+                                         }
+            for aggr in aggregations_copy:
+                typed_aggr_cls = typed_aggregation_classes.get(aggr.metadata.type, None)
+                if typed_aggr_cls:
+                    typed_aggr = typed_aggr_cls.create(base_aggr=aggr)
+                    # swapping the generic aggregation with the typed aggregation in the aggregation list
+                    self._parsed_aggregations.remove(aggr)
+                    self._parsed_aggregations.append(typed_aggr)
+
         return self._parsed_aggregations
 
     @property
@@ -223,14 +276,19 @@ class Aggregation:
     @property
     def main_file_path(self) -> str:
         """The path to the main file in the aggregation"""
+        if self._main_file_path is not None:
+            return self._main_file_path
         mft = main_file_type(self.metadata.type)
         if mft:
             for file in self.files():
                 if str(file).endswith(mft):
-                    return file.path
+                    self._main_file_path = file.path
+                    return self._main_file_path
         if self.metadata.type == AggregationType.FileSetAggregation:
-            return self.files()[0].folder
-        return self.files()[0].path
+            self._main_file_path = self.files()[0].folder
+            return self._main_file_path
+        self._main_file_path = self.files()[0].path
+        return self._main_file_path
 
     @refresh
     def save(self) -> None:
@@ -279,12 +337,13 @@ class Aggregation:
         :return: a List of Aggregation objects matching the filter parameters
         """
         aggregations = self._aggregations
+
         for key, value in kwargs.items():
             if key.startswith('file__'):
-                file_args = {key[len('file__') :]: value}
+                file_args = {key[len('file__'):]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             elif key.startswith('files__'):
-                file_args = {key[len('files__') :]: value}
+                file_args = {key[len('files__'):]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             else:
                 aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
@@ -314,15 +373,167 @@ class Aggregation:
         self._parsed_files = None
         self._parsed_aggregations = None
         self._parsed_checksums = None
+        self._main_file_path = None
 
-    def as_series(self, series_id: str, agg_path: str = None) -> Dict[int, pandas.Series]:
-        """
-        Creates a pandas Series object out of an aggregation of type TimeSeries.
-        :param series_id: The series_id of the timeseries result to be converted to a Series object.
-        :param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
-        it downloaded locally.
-        :return: A pandas.Series object
-        """
+    def delete(self) -> None:
+        """Deletes this aggregation from HydroShare"""
+        path = urljoin(
+            self._hsapi_path,
+            "functions",
+            "delete-file-type",
+            self.metadata.type.value + "LogicalFile",
+            self.main_file_path,
+        )
+        self._hs_session.delete(path, status_code=200)
+        self.refresh()
+
+
+class DataObjectSupportingAggregation(Aggregation):
+    """Base class for any aggregation supporting aggregation type specific data manipulation object (e.g. pandas)"""
+
+    @staticmethod
+    def create(aggr_cls, base_aggr):
+        """creates a type specific aggregation object from an instance of Aggregation"""
+        aggr = aggr_cls(base_aggr._map_path, base_aggr._hs_session, base_aggr._parsed_checksums)
+        aggr._retrieved_map = base_aggr._retrieved_map
+        aggr._retrieved_metadata = base_aggr._retrieved_metadata
+        aggr._parsed_files = base_aggr._parsed_files
+        aggr._parsed_aggregations = base_aggr._parsed_aggregations
+        aggr._main_file_path = base_aggr._main_file_path
+        aggr._data_object = None
+        return aggr
+
+    def refresh(self) -> None:
+        super().refresh()
+        self._data_object = None
+
+    @property
+    def data_object(self) -> \
+            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
+        return self._data_object
+
+    def _get_file_path(self, agg_path):
+        main_file_ext = pathlib.Path(self.main_file_path).suffix
+        file_name = self.file(extension=main_file_ext).name
+        file_path = urljoin(agg_path, file_name)
+        if not os.path.exists(file_path) or not os.path.isfile(file_path):
+            file_path = urljoin(file_path, file_name)
+            if not os.path.exists(file_path):
+                raise Exception(f"Aggregation was not found at: {agg_path}")
+        return file_path
+
+    def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
+        return self._get_file_path(agg_path)
+
+    def _get_data_object(self, agg_path: str, func: Callable) -> \
+            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset']:
+
+        if self._data_object is not None and self.metadata.type != AggregationType.TimeSeriesAggregation:
+            return self._data_object
+
+        file_path = self._validate_aggregation_path(agg_path)
+        data_object = func(file_path)
+        if self.metadata.type == AggregationType.MultidimensionalAggregation:
+            data_object.load()
+            data_object.close()
+
+        # cache the data object for the aggregation
+        self._data_object = data_object
+        return data_object
+
+    def _validate_aggregation_for_update(self, resource: 'Resource', agg_type: AggregationType) -> None:
+        if self.metadata.type != agg_type:
+            raise Exception(f"Not a {agg_type.value} aggregation")
+
+        if self._data_object is None:
+            raise Exception("No data object exists for this aggregation.")
+
+        # check this aggregation is part of the specified resource
+        aggr = resource.aggregation(file__path=self.main_file_path)
+        if aggr is None:
+            raise Exception("This aggregation is not part of the specified resource.")
+
+    def _compute_updated_aggregation_path(self, temp_folder, *files) -> str:
+        file_path = urljoin(temp_folder, os.path.basename(self.main_file_path))
+        return file_path
+
+    def _update_aggregation(self, resource, *files):
+        temp_folder = uuid4().hex
+        resource.folder_create(temp_folder)
+        resource.file_upload(*files, destination_path=temp_folder)
+        # check aggregation got created in the temp folder
+        file_path = self._compute_updated_aggregation_path(temp_folder, *files)
+        original_aggr_dir_path = dirname(self.main_file_path)
+        aggr = resource.aggregation(file__path=file_path)
+        if aggr is not None:
+            # delete this aggregation which will be replaced with the updated aggregation
+            self.delete()
+            # move the aggregation from the temp folder to the location of the deleted aggregation
+            resource.aggregation_move(aggr, dst_path=original_aggr_dir_path)
+
+        resource.folder_delete(temp_folder)
+        if aggr is None:
+            err_msg = f"Failed to update aggregation. Aggregation was not found at: {file_path}"
+            raise Exception(err_msg)
+
+
+class NetCDFAggregation(DataObjectSupportingAggregation):
+
+    @classmethod
+    def create(cls, base_aggr):
+        return super().create(aggr_cls=cls, base_aggr=base_aggr)
+
+    def as_data_object(self, agg_path: str) -> 'xarray.Dataset':
+        if xarray is None:
+            raise Exception("xarray package was not found")
+        return self._get_data_object(agg_path=agg_path, func=xarray.open_dataset)
+
+    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
+                         destination_path: str = "") -> 'Aggregation':
+
+        self._validate_aggregation_for_update(resource, AggregationType.MultidimensionalAggregation)
+        file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
+        self._data_object.to_netcdf(file_path, format="NETCDF4")
+        aggr_main_file_path = self.main_file_path
+        if not as_new_aggr:
+            # cache some of the metadata fields of the original aggregation to update the metadata of the
+            # updated aggregation
+            keywords = self.metadata.subjects
+            additional_meta = self.metadata.additional_metadata
+
+            # upload the updated aggregation files
+            self._update_aggregation(resource, file_path)
+
+            # retrieve the updated aggregation
+            aggr = resource.aggregation(file__path=aggr_main_file_path)
+
+            # update metadata
+            for kw in keywords:
+                if kw not in aggr.metadata.subjects:
+                    aggr.metadata.subjects.append(kw)
+            aggr.metadata.additional_metadata = additional_meta
+            aggr.save()
+        else:
+            # creating a new aggregation
+            resource.file_upload(file_path, destination_path=destination_path)
+
+            # retrieve the new aggregation
+            agg_path = urljoin(destination_path, os.path.basename(aggr_main_file_path))
+            aggr = resource.aggregation(file__path=agg_path)
+
+        aggr._data_object = None
+        return aggr
+
+
+class TimeseriesAggregation(DataObjectSupportingAggregation):
+
+    @classmethod
+    def create(cls, base_aggr):
+        return super().create(aggr_cls=cls, base_aggr=base_aggr)
+
+    def as_data_object(self, agg_path: str, series_id: str = "") -> 'pandas.DataFrame':
+        if pandas is None:
+            raise Exception("pandas package not found")
 
         def to_series(timeseries_file: str):
             con = sqlite3.connect(timeseries_file)
@@ -332,13 +543,264 @@ class Aggregation:
                 con,
             ).squeeze()
 
-        if agg_path is None:
-            with tempfile.TemporaryDirectory() as td:
-                self._download(unzip_to=td)
-                # zip extracted to folder with main file name
-                file_name = self.file(extension=".sqlite").name
-                return to_series(urljoin(td, file_name, file_name))
-        return to_series(urljoin(agg_path, self.file(extension=".sqlite").name))
+        return self._get_data_object(agg_path=agg_path, func=to_series)
+
+    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
+                         destination_path: str = "") -> 'Aggregation':
+
+        self._validate_aggregation_for_update(resource, AggregationType.TimeSeriesAggregation)
+        file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
+        with closing(sqlite3.connect(file_path)) as conn:
+            # write the dataframe to a temp table
+            self._data_object.to_sql('temp', conn, if_exists='replace', index=False)
+            # delete the matching records from the TimeSeriesResultValues table
+            conn.execute("DELETE FROM TimeSeriesResultValues WHERE ResultID IN (SELECT ResultID FROM temp)")
+            conn.execute("INSERT INTO TimeSeriesResultValues SELECT * FROM temp")
+            # delete the temp table
+            conn.execute("DROP TABLE temp")
+            conn.commit()
+
+        aggr_main_file_path = self.main_file_path
+        data_object = self._data_object
+        if not as_new_aggr:
+            # cache some of the metadata fields of the original aggregation to update the metadata of the
+            # updated aggregation
+            keywords = self.metadata.subjects
+            additional_meta = self.metadata.additional_metadata
+            title = self.metadata.title
+            abstract = self.metadata.abstract
+
+            # upload the updated aggregation files to the temp folder - to create the updated aggregation
+            self._update_aggregation(resource, file_path)
+            # retrieve the updated aggregation
+            aggr = resource.aggregation(file__path=aggr_main_file_path)
+
+            # update metadata
+            for kw in keywords:
+                if kw not in aggr.metadata.subjects:
+                    aggr.metadata.subjects.append(kw)
+            aggr.metadata.additional_metadata = additional_meta
+            aggr.metadata.title = title
+            aggr.metadata.abstract = abstract
+            aggr.save()
+        else:
+            # creating a new aggregation by uploading the updated data files
+            resource.file_upload(file_path, destination_path=destination_path)
+
+            # retrieve the new aggregation
+            agg_path = urljoin(destination_path, os.path.basename(aggr_main_file_path))
+            aggr = resource.aggregation(file__path=agg_path)
+            data_object = None
+
+        aggr._data_object = data_object
+        return aggr
+
+
+class GeoFeatureAggregation(DataObjectSupportingAggregation):
+
+    @classmethod
+    def create(cls, base_aggr):
+        return super().create(aggr_cls=cls, base_aggr=base_aggr)
+
+    def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
+        if for_save_data:
+            for aggr_file in self.files():
+                aggr_file = basename(aggr_file)
+                if aggr_file.endswith(".shp.xml") or aggr_file.endswith(".sbn") or aggr_file.endswith(".sbx"):
+                    # these are optional files for geo feature aggregation
+                    continue
+                if not os.path.exists(os.path.join(agg_path, aggr_file)):
+                    raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
+                                    f"Missing file '{aggr_file}'")
+        file_path = self._get_file_path(agg_path)
+        return file_path
+
+    def as_data_object(self, agg_path: str) -> 'fiona.Collection':
+        if fiona is None:
+            raise Exception("fiona package was not found")
+        return self._get_data_object(agg_path=agg_path, func=fiona.open)
+
+    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
+                         destination_path: str = "") -> 'Aggregation':
+        def upload_shape_files(main_file_path, dst_path=""):
+            shp_file_dir_path = os.path.dirname(main_file_path)
+            filename_starts_with = f"{pathlib.Path(main_file_path).stem}."
+            shape_files = []
+            for item in os.listdir(shp_file_dir_path):
+                if item.startswith(filename_starts_with):
+                    file_full_path = os.path.join(shp_file_dir_path, item)
+                    shape_files.append(file_full_path)
+
+            if not dst_path:
+                self._update_aggregation(resource, *shape_files)
+            else:
+                resource.file_upload(*shape_files, destination_path=dst_path)
+
+        self._validate_aggregation_for_update(resource, AggregationType.GeographicFeatureAggregation)
+        file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
+        aggr_main_file_path = self.main_file_path
+        data_object = self._data_object
+        # need to close the fiona.Collection object to free up access to all the original shape files
+        data_object.close()
+        if not as_new_aggr:
+            # cache some of the metadata fields of the original aggregation to update the metadata of the
+            # updated aggregation
+            keywords = self.metadata.subjects
+            additional_meta = self.metadata.additional_metadata
+
+            # copy the updated shape files to the original shape file location where the user downloaded the
+            # aggregation previously
+            src_shp_file_dir_path = os.path.dirname(file_path)
+            tgt_shp_file_dir_path = os.path.dirname(data_object.path)
+            filename_starts_with = f"{pathlib.Path(file_path).stem}."
+
+            for item in os.listdir(src_shp_file_dir_path):
+                if item.startswith(filename_starts_with):
+                    src_file_full_path = os.path.join(src_shp_file_dir_path, item)
+                    tgt_file_full_path = os.path.join(tgt_shp_file_dir_path, item)
+                    shutil.copyfile(src_file_full_path, tgt_file_full_path)
+
+            # upload the updated shape files to replace this aggregation
+            upload_shape_files(main_file_path=data_object.path)
+
+            # retrieve the updated aggregation
+            aggr = resource.aggregation(file__path=aggr_main_file_path)
+
+            # update aggregation metadata
+            for kw in keywords:
+                if kw not in aggr.metadata.subjects:
+                    aggr.metadata.subjects.append(kw)
+            aggr.metadata.additional_metadata = additional_meta
+            aggr.save()
+        else:
+            # upload the updated shape files to create a new geo feature aggregation
+            upload_shape_files(main_file_path=file_path, dst_path=destination_path)
+
+            # retrieve the new aggregation
+            agg_path = urljoin(destination_path, os.path.basename(aggr_main_file_path))
+            aggr = resource.aggregation(file__path=agg_path)
+
+        aggr._data_object = None
+        return aggr
+
+
+class GeoRasterAggregation(DataObjectSupportingAggregation):
+
+    @classmethod
+    def create(cls, base_aggr):
+        return super().create(aggr_cls=cls, base_aggr=base_aggr)
+
+    def _compute_updated_aggregation_path(self, temp_folder, *files) -> str:
+        file_path = ""
+        for _file in files:
+            filename = os.path.basename(_file)
+            if filename.endswith(".vrt"):
+                file_path = urljoin(temp_folder, filename)
+                break
+            else:
+                filename = pathlib.Path(filename).stem + ".vrt"
+                file_path = urljoin(temp_folder, filename)
+                break
+        return file_path
+
+    def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
+        if for_save_data:
+            tif_file_count = 0
+            vrt_file_count = 0
+            tif_file_path = ""
+            vrt_file_path = ""
+            for item in os.listdir(agg_path):
+                item_full_path = os.path.join(agg_path, item)
+                if os.path.isfile(item_full_path):
+                    file_ext = pathlib.Path(item_full_path).suffix.lower()
+                    if file_ext in (".tif", ".tiff"):
+                        tif_file_count += 1
+                        tif_file_path = item_full_path
+                    elif file_ext == '.vrt':
+                        vrt_file_path = item_full_path
+                        vrt_file_count += 1
+                        if vrt_file_count > 1:
+                            raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
+                                            f"More than one vrt was file found")
+                    else:
+                        raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
+                                        f"There are files that are not of raster file types")
+            if tif_file_count == 0:
+                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
+                                f"No tif file was found")
+            if tif_file_count > 1 and vrt_file_count == 0:
+                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
+                                f"Missing a vrt file")
+            if vrt_file_path:
+                file_path = vrt_file_path
+            else:
+                file_path = tif_file_path
+        else:
+            file_path = self._get_file_path(agg_path)
+
+        return file_path
+
+    def as_data_object(self, agg_path: str) -> 'rasterio.DatasetReader':
+        if rasterio is None:
+            raise Exception("rasterio package was not found")
+        return self._get_data_object(agg_path=agg_path, func=rasterio.open)
+
+    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
+                         destination_path: str = "") -> 'Aggregation':
+        def upload_raster_files(dst_path=""):
+            raster_files = []
+            for item in os.listdir(agg_path):
+                item_full_path = os.path.join(agg_path, item)
+                if os.path.isfile(item_full_path):
+                    raster_files.append(item_full_path)
+
+            if not dst_path:
+                self._update_aggregation(resource, *raster_files)
+            else:
+                resource.file_upload(*raster_files, destination_path=dst_path)
+
+        def get_main_file_path():
+            main_file_name = os.path.basename(file_path)
+            if not main_file_name.lower().endswith('.vrt'):
+                main_file_name = pathlib.Path(main_file_name).stem + ".vrt"
+            if destination_path:
+                aggr_main_file_path = os.path.join(destination_path, main_file_name)
+            else:
+                aggr_main_file_path = main_file_name
+            return aggr_main_file_path
+
+        self._validate_aggregation_for_update(resource, AggregationType.GeographicRasterAggregation)
+        file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
+        if not as_new_aggr:
+            destination_path = dirname(self.main_file_path)
+
+            # cache some of the metadata fields of the original aggregation to update the metadata of the
+            # updated aggregation
+            keywords = self.metadata.subjects
+            additional_meta = self.metadata.additional_metadata
+            upload_raster_files(dst_path=destination_path)
+
+            aggr_main_file_path = get_main_file_path()
+            # retrieve the updated aggregation
+            aggr = resource.aggregation(file__path=aggr_main_file_path)
+
+            # update metadata
+            for kw in keywords:
+                if kw not in aggr.metadata.subjects:
+                    aggr.metadata.subjects.append(kw)
+            aggr.metadata.additional_metadata = additional_meta
+            aggr.save()
+        else:
+            # creating a new aggregation by uploading the updated data files
+            upload_raster_files(dst_path=destination_path)
+
+            # retrieve the new aggregation
+            aggr_main_file_path = get_main_file_path()
+            agg_path = urljoin(destination_path, os.path.basename(aggr_main_file_path))
+            aggr = resource.aggregation(file__path=agg_path)
+
+        aggr._data_object = None
+        return aggr
 
 
 class Resource(Aggregation):
@@ -665,26 +1127,43 @@ class Resource(Aggregation):
         aggregation.refresh()
 
     @refresh
+    def aggregation_move(self, aggregation: Aggregation, dst_path: str = "") -> None:
+        """
+        Moves an aggregation from its current location to another folder in HydroShare.
+        :param aggregation: The aggregation object to move
+        :param  dst_path: The target file path to move the aggregation to - target folder must exist
+        :return: None
+        """
+        path = urljoin(
+            aggregation._hsapi_path,
+            aggregation.metadata.type.value + "LogicalFile",
+            aggregation.main_file_path,
+            "functions",
+            "move-file-type",
+            dst_path,
+        )
+        response = aggregation._hs_session.post(path, status_code=200)
+        json_response = response.json()
+        task_id = json_response['id']
+        status = json_response['status']
+        if status in ("Not ready", "progress"):
+            while aggregation._hs_session.check_task(task_id) != 'true':
+                time.sleep(1)
+        aggregation.refresh()
+
+    @refresh
     def aggregation_delete(self, aggregation: Aggregation) -> None:
         """
         Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
         :param aggregation: The aggregation object to delete
         :return: None
         """
-        path = urljoin(
-            aggregation._hsapi_path,
-            "functions",
-            "delete-file-type",
-            aggregation.metadata.type.value + "LogicalFile",
-            aggregation.main_file_path,
-        )
-        aggregation._hs_session.delete(path, status_code=200)
-        aggregation.refresh()
+        aggregation.delete()
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
         Download an aggregation from HydroShare
-        :param aggregation: The aggreation to download
+        :param aggregation: The aggregation to download
         :param save_path: The local path to save the aggregation to, defaults to the current directory
         :param unzip_to: If set, the resulting download will be unzipped to the specified path
         :return: None
@@ -752,7 +1231,6 @@ class HydroShareSession:
 
     def retrieve_file(self, path, save_path=""):
         file = self.get(path, status_code=200, allow_redirects=True)
-
         cd = file.headers['content-disposition']
         filename = urllib.parse.unquote(cd.split("filename=")[1].strip('"'))
         downloaded_file = os.path.join(save_path, filename)
@@ -776,7 +1254,6 @@ class HydroShareSession:
         if params is None:
             params = {}
         file = self.get(path, status_code=200, allow_redirects=True, params=params)
-
         json_response = file.json()
         task_id = json_response['task_id']
         download_path = json_response['download_path']
