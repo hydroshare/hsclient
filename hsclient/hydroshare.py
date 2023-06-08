@@ -338,26 +338,6 @@ class Aggregation:
         """
         aggregations = self._aggregations
 
-        # when searching using 'file__path' or files__path' as the key, there can be only one matching aggregation
-        file_path_priority = kwargs.pop("file_path_priority", True)
-        file_path = kwargs.get("file__path", "")
-        if not file_path:
-            file_path = kwargs.get("files__path", "")
-        if file_path and file_path_priority:
-            dir_path = os.path.dirname(file_path)
-            file_name = pathlib.Path(file_path).stem
-            if dir_path:
-                aggr_map_path = urljoin(dir_path, file_name)
-            else:
-                aggr_map_path = file_name
-
-            aggr_map_path = f"{aggr_map_path}_resmap.xml"
-            for aggr in self._parsed_aggregations:
-                aggr_map_full_path = f"/{aggr._resource_path}/data/contents/{aggr_map_path}"
-                if aggr._map_path == aggr_map_full_path:
-                    return [aggr]
-            return []
-
         for key, value in kwargs.items():
             if key.startswith('file__'):
                 file_args = {key[len('file__'):]: value}
@@ -474,7 +454,7 @@ class DataObjectSupportingAggregation(Aggregation):
             raise Exception("This aggregation is not part of the specified resource.")
 
     def _compute_updated_aggregation_path(self, temp_folder, *files) -> str:
-        file_path = os.path.join(temp_folder, os.path.basename(self.main_file_path))
+        file_path = urljoin(temp_folder, os.path.basename(self.main_file_path))
         return file_path
 
     def _update_aggregation(self, resource, *files):
@@ -715,11 +695,11 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
         for _file in files:
             filename = os.path.basename(_file)
             if filename.endswith(".vrt"):
-                file_path = os.path.join(temp_folder, filename)
+                file_path = urljoin(temp_folder, filename)
                 break
             else:
                 filename = pathlib.Path(filename).stem + ".vrt"
-                file_path = os.path.join(temp_folder, filename)
+                file_path = urljoin(temp_folder, filename)
                 break
         return file_path
 
@@ -1100,10 +1080,6 @@ class Resource(Aggregation):
         if refresh:
             # Only return the newly created aggregation if a refresh is requested
             self.refresh()
-            if agg_type == AggregationType.GeographicRasterAggregation and not path.endswith(".vrt") \
-                    or agg_type == AggregationType.FileSetAggregation:
-                # search all files of the aggregation to find a matching aggregation
-                return self.aggregation(file__path=path, file_path_priority=False)
             return self.aggregation(file__path=path)
 
     @refresh
