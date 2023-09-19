@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple
 
 from hsmodels.schemas.enums import UserIdentifierType
-from pydantic import AnyUrl, BaseModel, validator
+from pydantic import AnyUrl, BaseModel, HttpUrl, field_validator
 
 
 class User(BaseModel):
@@ -12,13 +12,13 @@ class User(BaseModel):
     phone: str = None
     address: str = None
     organization: str = None
-    website: str = None
-    identifiers: Dict[UserIdentifierType, str] = {}
+    website: HttpUrl = None
+    identifiers: Dict[UserIdentifierType, AnyUrl] = {}
     type: str = None
     subject_areas: List[str] = []
     date_joined: datetime = None
 
-    @validator("subject_areas", pre=True)
+    @field_validator("subject_areas", mode='before')
     def split_subject_areas(cls, value):
         return value.split(", ") if value else []
 
@@ -43,7 +43,7 @@ class ResourcePreview(BaseModel):
     resource_map_url: str = None
     resource_metadata_url: str = None
 
-    @validator("authors", pre=True)
+    @field_validator("authors", mode='before')
     def handle_null_author(cls, v):
         # return empty list when supplied authors field is None.
         if v is None:
