@@ -1,4 +1,4 @@
-hsmodels >= 0.5.5
+hsmodels @ git+https://github.com/hydroshare/hsmodels.git@44-upgrade-to-pydantic-v2
 pytest == 6.0.2
 requests == 2.24.0
 email-validator
