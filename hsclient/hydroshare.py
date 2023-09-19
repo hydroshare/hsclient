@@ -808,7 +808,7 @@ class Resource(Aggregation):
 
     @property
     def _hsapi_path(self):
-        path = urlparse(self.metadata.identifier).path
+        path = urlparse(str(self.metadata.identifier)).path
         return '/hsapi' + path
 
     def _upload(self, file, destination_path):
