@@ -3,6 +3,7 @@ import os
 
 import pytest
 from dateutil import parser
+from hsmodels.schemas.enums import UserIdentifierType
 from hsmodels.schemas.fields import Contributor, Creator
 
 from hsclient.json_models import ResourcePreview, User
@@ -65,16 +66,15 @@ def test_resource_preview_authors_raises_validation_error_on_string_input():
 def test_user_info(user):
     assert user.name == "Castronova, Anthony M."
     assert user.email == "castronova.anthony@gmail.com"
-    assert user.url == "http://beta.hydroshare.org/user/11/"
+    assert str(user.url) == "http://beta.hydroshare.org/user/11/"
     assert user.phone == "3399334127"
     assert user.address == "MA, US"
     assert user.organization == "CUAHSI"
-    assert user.website == "http://anthonycastronova.com"
-    assert user.identifiers == {
-        "ORCID": "https://orcid.org/0000-0002-1341-5681",
-        "ResearchGateID": "https://www.researchgate.net/profile/Anthony_Castronova",
-        "GoogleScholarID": "https://scholar.google.com/citations?user=ScWTFoQAAAAJ&hl=en",
-    }
+    assert str(user.website) == "http://anthonycastronova.com/"
+    assert str(user.identifiers[UserIdentifierType.ORCID]) == "https://orcid.org/0000-0002-1341-5681"
+    assert str(user.identifiers[UserIdentifierType.research_gate_id]) == "https://www.researchgate.net/profile/Anthony_Castronova"
+    assert str(user.identifiers[UserIdentifierType.google_scholar_id]) == "https://scholar.google.com/citations?user=ScWTFoQAAAAJ&hl=en"
+
     assert user.type == "Commercial/Professional"
     assert user.date_joined == parser.parse("2015-06-03T16:09:31.636Z")
     assert user.subject_areas == [
@@ -93,7 +93,7 @@ def test_user_info(user):
     assert creator.email == user.email
     assert creator.homepage == user.website
     assert creator.identifiers == user.identifiers
-    assert creator.hydroshare_user_id == int(user.url.split("/")[-2])
+    assert creator.hydroshare_user_id == int(user.url.path.split("/")[-2])
 
     contributor = Contributor.from_user(user)
     assert contributor.name == user.name
@@ -103,4 +103,4 @@ def test_user_info(user):
     assert contributor.email == user.email
     assert contributor.homepage == user.website
     assert contributor.identifiers == user.identifiers
-    assert contributor.hydroshare_user_id == int(user.url.split("/")[-2])
+    assert contributor.hydroshare_user_id == int(user.url.path.split("/")[-2])
