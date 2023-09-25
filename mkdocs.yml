@@ -42,4 +42,7 @@ nav:
         Resource: api/resource.md
         File: api/file.md
         Aggregation: api/aggregation.md
-
+        Multidimensional Aggregation: api/netcdf_aggregation.md
+        Geographic Feature Aggregation: api/geo_feature_aggregation.md
+        Geographic Raster Aggregation: api/geo_raster_aggregation.md
+        Time Series Aggregation: api/time_series_aggregation.md
