@@ -1364,9 +1364,9 @@ class HydroShareSession:
         of OAuth2 token dropping optional fields that are None."""
         if isinstance(token, dict) or isinstance(token, Token):
             # try to coerce into Token model
-            o = Token.parse_obj(token)
+            o = Token.model_validate(token)
             # drop None fields from output
-            return o.dict(exclude_none=True)
+            return o.model_dump(exclude_none=True)
         else:
             error_message = "token must be hsclient.Token or dictionary following schema:\n" "{}".format(
                 pformat(Token.__annotations__, sort_dicts=False)

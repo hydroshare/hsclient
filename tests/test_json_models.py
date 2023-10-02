@@ -48,7 +48,7 @@ def test_resource_preview_authors_field_handles_none_cases(test_data):
         [None, ""]
     """
 
-    from_json = ResourcePreview.parse_raw(test_data)
+    from_json = ResourcePreview.model_validate_json(test_data)
 
     assert from_json.authors == []
 
@@ -60,7 +60,7 @@ def test_resource_preview_authors_raises_validation_error_on_string_input():
     data = json.dumps({"authors": "should_fail"})
 
     with pytest.raises(ValidationError):
-        ResourcePreview.parse_raw(data)
+        ResourcePreview.model_validate_json(data)
 
 
 def test_user_info(user):
