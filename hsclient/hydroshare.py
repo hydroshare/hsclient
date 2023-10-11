@@ -1455,6 +1455,7 @@ class HydroShare:
                 params["east"] = spatial_coverage.eastlimit
                 params["south"] = spatial_coverage.southlimit
                 params["west"] = spatial_coverage.westlimit
+            # Test
         response = self._hs_session.get("/hsapi/resource/", 200, params=params)
 
         res = response.json()
