@@ -1446,15 +1446,19 @@ class HydroShare:
         if to_date:
             params["to_date"] = to_date.strftime('%Y-%m-%d')
         if spatial_coverage:
-            params["coverage_type"] = spatial_coverage.type
-            if spatial_coverage.type == "point":
-                params["north"] = spatial_coverage.north
-                params["east"] = spatial_coverage.east
-            else:
-                params["north"] = spatial_coverage.northlimit
-                params["east"] = spatial_coverage.eastlimit
-                params["south"] = spatial_coverage.southlimit
-                params["west"] = spatial_coverage.westlimit
+            yield Exception(
+                "Bad Request, status_code 400, spatial_coverage queries are disabled."
+            )
+            # TODO: re-enable after resolution of https://github.com/hydroshare/hydroshare/issues/5240
+            # params["coverage_type"] = spatial_coverage.type
+            # if spatial_coverage.type == "point":
+            #     params["north"] = spatial_coverage.north
+            #     params["east"] = spatial_coverage.east
+            # else:
+            #     params["north"] = spatial_coverage.northlimit
+            #     params["east"] = spatial_coverage.eastlimit
+            #     params["south"] = spatial_coverage.southlimit
+            #     params["west"] = spatial_coverage.westlimit
         response = self._hs_session.get("/hsapi/resource/", 200, params=params)
 
         res = response.json()
