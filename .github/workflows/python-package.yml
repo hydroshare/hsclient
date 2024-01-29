@@ -6,8 +6,8 @@ name: Python package
 on:
   push:
     branches: [ master ]
-  pull_request_target:
-    branches: [ master ]
+  pull_request:
+    branches: [ 57-upgrade-to-pydantic-v2 ]
 
 jobs:
   build:
