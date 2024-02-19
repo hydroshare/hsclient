@@ -393,7 +393,7 @@ class DataObjectSupportingAggregation(Aggregation):
 
     @staticmethod
     def create(aggr_cls, base_aggr):
-        """creates a type specific aggregation object from an instance of Aggregation"""
+        """Creates a type specific aggregation object from an instance of Aggregation"""
         aggr = aggr_cls(base_aggr._map_path, base_aggr._hs_session, base_aggr._parsed_checksums)
         aggr._retrieved_map = base_aggr._retrieved_map
         aggr._retrieved_metadata = base_aggr._retrieved_metadata
@@ -410,6 +410,8 @@ class DataObjectSupportingAggregation(Aggregation):
     @property
     def data_object(self) -> \
             Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
+        """Returns the data object for the aggregation if the aggregation has been loaded as
+        a data object, otherwise None"""
         return self._data_object
 
     def _get_file_path(self, agg_path):
@@ -478,18 +480,32 @@ class DataObjectSupportingAggregation(Aggregation):
 
 
 class NetCDFAggregation(DataObjectSupportingAggregation):
+    """Represents a Multidimensional Aggregation in HydroShare"""
 
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
 
     def as_data_object(self, agg_path: str) -> 'xarray.Dataset':
+        """
+        Loads the Multidimensional aggregation to a xarray Dataset object
+        :param agg_path: the path to the Multidimensional aggregation
+        :return: the Multidimensional aggregation as a xarray Dataset object
+        """
         if xarray is None:
             raise Exception("xarray package was not found")
         return self._get_data_object(agg_path=agg_path, func=xarray.open_dataset)
 
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
+        """
+        Saves the xarray Dataset object to the Multidimensional aggregation
+        :param resource: the resource containing the aggregation
+        :param agg_path: the path to the Multidimensional aggregation
+        :param as_new_aggr: Defaults False, set to True to create a new Multidimensional aggregation
+        :param destination_path: the destination path in Hydroshare to save the new aggregation
+        :return: the updated or new Multidimensional aggregation
+        """
 
         self._validate_aggregation_for_update(resource, AggregationType.MultidimensionalAggregation)
         file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
@@ -526,12 +542,18 @@ class NetCDFAggregation(DataObjectSupportingAggregation):
 
 
 class TimeseriesAggregation(DataObjectSupportingAggregation):
-
+    """Represents a Time Series Aggregation in HydroShare"""
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
 
     def as_data_object(self, agg_path: str, series_id: str = "") -> 'pandas.DataFrame':
+        """
+        Loads the Time Series aggregation to a pandas DataFrame object
+        :param agg_path: the path to the Time Series aggregation
+        :param series_id: the series id of the time series to retrieve
+        :return: the Time Series aggregation as a pandas DataFrame object
+        """
         if pandas is None:
             raise Exception("pandas package not found")
 
@@ -548,6 +570,14 @@ class TimeseriesAggregation(DataObjectSupportingAggregation):
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
 
+        """
+        Saves the pandas DataFrame object to the Time Series aggregation
+        :param resource: the resource containing the aggregation
+        :param agg_path: the path to the Time Series aggregation
+        :param as_new_aggr: Defaults False, set to True to create a new Time Series aggregation
+        :param destination_path: the destination path in Hydroshare to save the new aggregation
+        :return: the updated or new Time Series aggregation
+        """
         self._validate_aggregation_for_update(resource, AggregationType.TimeSeriesAggregation)
         file_path = self._validate_aggregation_path(agg_path, for_save_data=True)
         with closing(sqlite3.connect(file_path)) as conn:
@@ -597,7 +627,7 @@ class TimeseriesAggregation(DataObjectSupportingAggregation):
 
 
 class GeoFeatureAggregation(DataObjectSupportingAggregation):
-
+    """Represents a Geo Feature Aggregation in HydroShare"""
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -616,12 +646,25 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
         return file_path
 
     def as_data_object(self, agg_path: str) -> 'fiona.Collection':
+        """
+        Loads the Geo Feature aggregation to a fiona Collection object
+        :param agg_path: the path to the Geo Feature aggregation
+        :return: the Geo Feature aggregation as a fiona Collection object
+        """
         if fiona is None:
             raise Exception("fiona package was not found")
         return self._get_data_object(agg_path=agg_path, func=fiona.open)
 
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
+        """
+        Saves the fiona Collection object to the Geo Feature aggregation
+        :param resource: the resource containing the aggregation
+        :param agg_path: the path to the Geo Feature aggregation
+        :param as_new_aggr: Defaults False, set to True to create a new Geo Feature aggregation
+        :param destination_path: the destination path in Hydroshare to save the new aggregation
+        :return: the updated or new Geo Feature aggregation
+        """
         def upload_shape_files(main_file_path, dst_path=""):
             shp_file_dir_path = os.path.dirname(main_file_path)
             filename_starts_with = f"{pathlib.Path(main_file_path).stem}."
@@ -685,7 +728,7 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
 
 
 class GeoRasterAggregation(DataObjectSupportingAggregation):
-
+    """Represents a Geo Raster Aggregation in HydroShare"""
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -741,12 +784,25 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
         return file_path
 
     def as_data_object(self, agg_path: str) -> 'rasterio.DatasetReader':
+        """
+        Loads the Geo Raster aggregation to a rasterio DatasetReader object
+        :param agg_path: the path to the Geo Raster aggregation
+        :return: the Geo Raster aggregation as a rasterio DatasetReader object
+        """
         if rasterio is None:
             raise Exception("rasterio package was not found")
         return self._get_data_object(agg_path=agg_path, func=rasterio.open)
 
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
+        """
+        Saves the rasterio DatasetReader object to the Geo Raster aggregation
+        :param resource: the resource containing the aggregation
+        :param agg_path: the path to the Geo Raster aggregation
+        :param as_new_aggr: Defaults False, set to True to create a new Geo Raster aggregation
+        :param destination_path: the destination path in Hydroshare to save the new aggregation
+        :return: the updated or new Geo Raster aggregation
+        """
         def upload_raster_files(dst_path=""):
             raster_files = []
             for item in os.listdir(agg_path):
@@ -808,7 +864,7 @@ class Resource(Aggregation):
 
     @property
     def _hsapi_path(self):
-        path = urlparse(self.metadata.identifier).path
+        path = urlparse(str(self.metadata.identifier)).path
         return '/hsapi' + path
 
     def _upload(self, file, destination_path):
@@ -1308,9 +1364,9 @@ class HydroShareSession:
         of OAuth2 token dropping optional fields that are None."""
         if isinstance(token, dict) or isinstance(token, Token):
             # try to coerce into Token model
-            o = Token.parse_obj(token)
+            o = Token.model_validate(token)
             # drop None fields from output
-            return o.dict(exclude_none=True)
+            return o.model_dump(exclude_none=True)
         else:
             error_message = "token must be hsclient.Token or dictionary following schema:\n" "{}".format(
                 pformat(Token.__annotations__, sort_dicts=False)

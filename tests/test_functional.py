@@ -125,13 +125,21 @@ def test_filtering_files(resource):
 
 def test_creator_order(new_resource):
     res = new_resource  # hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
+    assert len(res.metadata.creators) == 1
     res.metadata.creators.append(Creator(name="Testing"))
     res.save()
+    assert len(res.metadata.creators) == 2
+    for cr in res.metadata.creators:
+        assert cr.creator_order in (1, 2)
+    assert res.metadata.creators[0].creator_order != res.metadata.creators[1].creator_order
     assert res.metadata.creators[1].name == "Testing"
+    assert res.metadata.creators[1].creator_order == 2
     reversed = [res.metadata.creators[1], res.metadata.creators[0]]
     res.metadata.creators = reversed
     res.save()
-    assert res.metadata.creators[0].name == "Testing"
+    # check creator_order does not change
+    assert res.metadata.creators[1].name == "Testing"
+    assert res.metadata.creators[1].creator_order == 2
 
 
 def test_resource_metadata_updating(new_resource):
