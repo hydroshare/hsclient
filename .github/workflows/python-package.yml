@@ -5,7 +5,7 @@ name: Python package
 
 on:
   push:
-    branches: [ master ]
+    branches: [ hs-2.13.2-test ]
   pull_request_target:
     branches: [ master ]
 
