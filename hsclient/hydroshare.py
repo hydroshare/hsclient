@@ -1324,6 +1324,7 @@ class HydroShareSession:
 
     def post(self, path, status_code, data=None, params={}, **kwargs):
         url = encode_resource_url(self._build_url(path))
+        kwargs['verify'] = False
         response = self._session.post(url, params=params, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception(
@@ -1333,6 +1334,7 @@ class HydroShareSession:
 
     def put(self, path, status_code, data=None, **kwargs):
         url = encode_resource_url(self._build_url(path))
+        kwargs['verify'] = False
         response = self._session.put(url, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception(
@@ -1342,6 +1344,7 @@ class HydroShareSession:
 
     def get(self, path, status_code, **kwargs):
         url = encode_resource_url(self._build_url(path))
+        kwargs['verify'] = False
         response = self._session.get(url, **kwargs)
         if response.status_code != status_code:
             raise Exception(
