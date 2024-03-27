@@ -3,3 +3,4 @@ dist/
 site/
 hsclient.egg-info/
 .idea/
+.venv/
