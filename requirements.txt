@@ -1,4 +1,4 @@
-hsmodels @ git+https://github.com/hydroshare/hsmodels.git@47-annotate-optional-fields-as-optional
+hsmodels @ git+https://github.com/hydroshare/hsmodels.git@main
 pytest == 6.0.2
 requests == 2.24.0
 email-validator
