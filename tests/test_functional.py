@@ -92,9 +92,9 @@ def test_filtering_aggregations_by_files(timeseries_resource):
 
 
 def test_filtering_files(resource):
-    resource.folder_create("asdf", refresh=False)
+    resource.folder_create("asdf")
     resource.file_upload("data/test_resource_metadata_files/asdf/testing.xml", destination_path="asdf", refresh=False)
-    resource.folder_create("referenced_time_series", refresh=False)
+    resource.folder_create("referenced_time_series")
     resource.file_upload(
         "data/test_resource_metadata_files/msf_version.refts.json", destination_path="referenced_time_series"
     )
@@ -138,8 +138,11 @@ def test_creator_order(new_resource):
     res.metadata.creators = reversed
     res.save()
     # check creator_order does not change
-    assert res.metadata.creators[1].name == "Testing"
-    assert res.metadata.creators[1].creator_order == 2
+    for cr in res.metadata.creators:
+        if cr.name == "Testing":
+            assert cr.creator_order == 2
+        else:
+            assert cr.creator_order == 1
 
 
 def test_resource_metadata_updating(new_resource):
@@ -176,7 +179,7 @@ def test_resource_delete(hydroshare, new_resource):
     res_id = new_resource.resource_id
     new_resource.delete()
     try:
-        res = hydroshare.resource(res_id, use_cache=False)
+        _ = hydroshare.resource(res_id, use_cache=False)
         assert False
     except Exception as e:
         assert f"No resource was found for resource id:{res_id}" in str(e)
@@ -291,7 +294,7 @@ def test_move_aggregation(resource_with_netcdf_aggr):
 
 def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 0
-    new_resource.file_upload("data/other.txt", refresh=False)
+    new_resource.file_upload("data/other.txt")
     new_resource.file_rename("other.txt", "updated.txt")
     assert len(new_resource.files()) == 1
     assert new_resource.files()[0].name == "updated.txt"
@@ -299,9 +302,12 @@ def test_file_upload_and_rename(new_resource):
 
 def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
-    new_resource.folder_create("folder", refresh=False)
-    new_resource.file_upload("data/other.txt", destination_path="folder", refresh=False)
-    new_resource.file_aggregate("folder/other.txt", agg_type=AggregationType.SingleFileAggregation)
+    assert len(new_resource.aggregations()) == 0
+    new_resource.folder_create("folder")
+    new_resource.file_upload("data/other.txt", destination_path="folder")
+    aggr = new_resource.file_aggregate("folder/other.txt", agg_type=AggregationType.SingleFileAggregation)
+    assert aggr is not None
+    assert aggr.metadata.type == AggregationType.SingleFileAggregation
     assert len(new_resource.files()) == 0
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.aggregations()[0].files()) == 1
@@ -346,12 +352,12 @@ def test_delete_file(new_resource):
 
 
 def test_access_rules(new_resource):
-    ap = new_resource.access_permission
+    _ = new_resource.access_permission
     pass
 
 
 def test_refresh(resource):
-    resource.metadata
+    _ = resource.metadata
     resource.files()
     resource.aggregations()
 
@@ -446,7 +452,7 @@ def test_aggregations(new_resource, files):
 def test_aggregation_fileset(new_resource, files):
     root_path = "data/test_resource_metadata_files/"
     file_count = len(files) - 2  # exclude rdf/xml file
-    new_resource.folder_create("asdf", refresh=False)
+    new_resource.folder_create("asdf")
     new_resource.file_upload(*[os.path.join(root_path, file) for file in files], destination_path="asdf")
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.files()) == 0
@@ -472,7 +478,7 @@ def test_aggregation_fileset(new_resource, files):
 
 
 def test_folder_zip(new_resource):
-    new_resource.folder_create("test_folder", refresh=False)
+    new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder", refresh=False)
     new_resource.file_zip("test_folder")
     assert new_resource.file().path == "test_folder.zip"
@@ -480,7 +486,7 @@ def test_folder_zip(new_resource):
 
 
 def test_folder_zip_specify_name(new_resource):
-    new_resource.folder_create("test_folder", refresh=False)
+    new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder", refresh=False)
     new_resource.file_zip("test_folder", "test.zip", False)
     assert new_resource.file(path="test.zip").path == "test.zip"
@@ -488,14 +494,14 @@ def test_folder_zip_specify_name(new_resource):
 
 
 def test_folder_rename(new_resource):
-    new_resource.folder_create("test_folder", refresh=False)
+    new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder", refresh=False)
     new_resource.folder_rename("test_folder", "renamed_folder")
     assert new_resource.file(path="renamed_folder/other.txt")
 
 
 def test_folder_delete(new_resource):
-    new_resource.folder_create("test_folder", refresh=False)
+    new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
     assert len(new_resource.files()) == 1
     new_resource.folder_delete("test_folder")
@@ -510,7 +516,7 @@ def test_zipped_file_download(resource):
 
 
 def test_folder_download(new_resource):
-    new_resource.folder_create("test_folder", refresh=False)
+    new_resource.folder_create("test_folder")
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
     assert len(new_resource.files()) == 1
     with tempfile.TemporaryDirectory() as td:
@@ -520,9 +526,9 @@ def test_folder_download(new_resource):
 
 def test_filename_spaces(hydroshare):
     res = hydroshare.create()
-    res.folder_create("with spaces", refresh=False)
+    res.folder_create("with spaces")
     res.file_upload("data/other.txt", destination_path="with spaces", refresh=False)
-    res.file_rename("with spaces/other.txt", "with spaces/with spaces file.txt")
+    res.file_rename("with spaces/other.txt", "with spaces/with spaces file.txt", refresh=True)
     file = res.file(path="with spaces/with spaces file.txt")
     with tempfile.TemporaryDirectory() as td:
         filename = res.file_download(file, save_path=td)
