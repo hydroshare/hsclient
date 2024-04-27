@@ -306,7 +306,6 @@ class Aggregation:
         self._main_file_path = self.files()[0].path
         return self._main_file_path
 
-    @refresh
     def save(self) -> None:
         """
         Saves the metadata back to HydroShare
@@ -399,7 +398,7 @@ class Aggregation:
             self.main_file_path,
         )
         self._hs_session.delete(path, status_code=200)
-        self.refresh()
+        self._reset()
 
 
 class DataObjectSupportingAggregation(Aggregation):
@@ -967,7 +966,6 @@ class Resource(Aggregation):
         """
         return self._hs_session.retrieve_bag(self._hsapi_path, save_path=save_path)
 
-    @refresh
     def delete(self) -> None:
         """
         Deletes the resource on HydroShare
@@ -975,8 +973,9 @@ class Resource(Aggregation):
         """
         hsapi_path = self._hsapi_path
         self._hs_session.delete(hsapi_path, status_code=204)
+        # refresh the resource to clear the cache
+        self._reset()
 
-    @refresh
     def save(self) -> None:
         """
         Saves the metadata to HydroShare
@@ -986,6 +985,10 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "ingest_metadata")
         self._hs_session.upload_file(path, files={'file': ('resourcemetadata.xml', metadata_string)})
 
+        # if new creators were added, refresh the resource to get the creator order
+        creators_with_no_order = [cr for cr in self.metadata.creators if cr.creator_order is None]
+        if creators_with_no_order:
+            self.refresh()
     # referenced content operations
 
     @refresh
@@ -1022,7 +1025,6 @@ class Resource(Aggregation):
 
     # file operations
 
-    @refresh
     def folder_create(self, folder: str) -> None:
         """
         Creates a folder on HydroShare
@@ -1086,16 +1088,33 @@ class Resource(Aggregation):
         """
         self._delete_file(path)
 
-    @refresh
-    def file_rename(self, path: str, new_path: str) -> None:
+    def file_rename(self, path: str, new_path: str, refresh=False) -> None:
         """
         Rename a file on HydroShare
         :param path: The path to the file
         :param new_path: the renamed path to the file
+        :param refresh: Defaults to False, set to True to automatically refresh the resource from HydroShare
         :return: None
         """
         rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
         self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
+
+        if refresh:
+            self.refresh()
+            return
+        if self._parsed_files is None:
+            self.refresh()
+            return
+        if path in self._parsed_files:
+            # path is a file path - just refresh checksums from hydroshare and update the cached parsed_files
+            self._parsed_checksums = None
+            # update the checksums
+            _ = self._checksums
+
+            # update the parsed_files
+            checksum_path = urljoin("data", "contents", new_path)
+            new_file = File(new_path, unquote(new_path), self._checksums[checksum_path])
+            self._parsed_files = [new_file if file == path else file for file in self._parsed_files]
 
     @refresh
     def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -> None:
@@ -1194,7 +1213,7 @@ class Resource(Aggregation):
             aggregation.main_file_path,
         )
         aggregation._hs_session.post(path, status_code=200)
-        aggregation.refresh()
+        self._parsed_aggregations = [agg for agg in self._parsed_aggregations if agg != aggregation]
 
     @refresh
     def aggregation_move(self, aggregation: Aggregation, dst_path: str = "") -> None:
@@ -1221,13 +1240,14 @@ class Resource(Aggregation):
                 time.sleep(1)
         aggregation.refresh()
 
-    @refresh
     def aggregation_delete(self, aggregation: Aggregation) -> None:
         """
         Deletes an aggregation from HydroShare.  This deletes the files and metadata in the aggregation.
         :param aggregation: The aggregation object to delete
         :return: None
         """
+        # remove the aggregation from the cache
+        self._parsed_aggregations = [agg for agg in self._parsed_aggregations if agg != aggregation]
         aggregation.delete()
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
