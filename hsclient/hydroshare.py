@@ -1,4 +1,5 @@
 import getpass
+import multiprocessing
 import os
 import pathlib
 import pickle
@@ -258,6 +259,21 @@ class Aggregation:
             return unzip_to
         return downloaded_zip
 
+    def _reset(self):
+        self._retrieved_map = None
+        self._retrieved_metadata = None
+        self._parsed_files = None
+        self._parsed_aggregations = None
+        self._parsed_checksums = None
+        self._main_file_path = None
+
+    def _refetch(self):
+        _ = self._map
+        _ = self._metadata
+        _ = self._checksums
+        _ = self._files
+        _ = self._aggregations
+
     @property
     def metadata_file(self):
         """The path to the metadata file"""
@@ -367,13 +383,11 @@ class Aggregation:
         only retrieve those files again after another call to access them is made.  This will be later updated to be
         eager and retrieve the files asynchronously.
         """
-        # TODO, refresh should destroy the aggregation objects and async fetch everything.
-        self._retrieved_map = None
-        self._retrieved_metadata = None
-        self._parsed_files = None
-        self._parsed_aggregations = None
-        self._parsed_checksums = None
-        self._main_file_path = None
+
+        self._reset()
+        # async re-fetch aggregation/resource map and metadata files form HydroShare
+        with multiprocessing.Pool() as pool:
+            pool.apply_async(self._refetch)
 
     def delete(self) -> None:
         """Deletes this aggregation from HydroShare"""
