@@ -184,7 +184,7 @@ class Aggregation:
         def populate_metadata(_aggr):
             _aggr._metadata
 
-        if not self._parsed_aggregations:
+        if self._parsed_aggregations is None:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
@@ -275,7 +275,7 @@ class Aggregation:
         _ = self._aggregations
 
     @property
-    def metadata_file(self):
+    def metadata_file(self) -> str:
         """The path to the metadata file"""
         return self.metadata_path.split("/data/contents/", 1)[1]
 
@@ -331,7 +331,7 @@ class Aggregation:
                 files = files + list(aggregation.files(search_aggregations=search_aggregations, **kwargs))
         return files
 
-    def file(self, search_aggregations=False, **kwargs) -> File:
+    def file(self, search_aggregations=False, **kwargs) -> Union[File, None]:
         """
         Returns a single file in the resource that matches the filtering parameters
         :param search_aggregations: Defaults False, set to true to search aggregations
@@ -364,7 +364,7 @@ class Aggregation:
                 aggregations = filter(lambda agg: attribute_filter(agg.metadata, key, value), aggregations)
         return list(aggregations)
 
-    def aggregation(self, **kwargs) -> BaseMetadata:
+    def aggregation(self, **kwargs) -> Union[BaseMetadata, None]:
         """
         Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering
         rules described in the aggregations method.
@@ -903,7 +903,7 @@ class Resource(Aggregation):
         return self._map.identifier
 
     @property
-    def metadata_file(self):
+    def metadata_file(self) -> str:
         """The path to the metadata file"""
         return self.metadata_path.split("/data/", 1)[1]
 
@@ -938,7 +938,7 @@ class Resource(Aggregation):
 
     # resource operations
 
-    def new_version(self):
+    def new_version(self) -> 'Resource':
         """
         Creates a new version of the resource on HydroShare
         :return: A Resource object of the newly created resource version
@@ -948,7 +948,7 @@ class Resource(Aggregation):
         resource_id = response.text
         return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
 
-    def copy(self):
+    def copy(self) -> 'Resource':
         """
         Copies this Resource into a new resource on HydroShare
         returns: A Resource object of the newly copied resource
@@ -1053,7 +1053,7 @@ class Resource(Aggregation):
         """
         self._delete_file_folder(path)
 
-    def folder_download(self, path: str, save_path: str = ""):
+    def folder_download(self, path: str, save_path: str = "") -> str:
         """
         Downloads a folder from HydroShare
         :param path: The path to folder
@@ -1064,7 +1064,7 @@ class Resource(Aggregation):
             urljoin(self._resource_path, "data", "contents", path), save_path, params={"zipped": "true"}
         )
 
-    def file_download(self, path: str, save_path: str = "", zipped: bool = False):
+    def file_download(self, path: str, save_path: str = "", zipped: bool = False) -> str:
         """
         Downloads a file from HydroShare
         :param path: The path to the file
@@ -1146,7 +1146,7 @@ class Resource(Aggregation):
             unzip_path, status_code=200, data={"overwrite": overwrite, "ingest_metadata": ingest_metadata}
         )
 
-    def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
+    def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True) -> Union[Aggregation, None]:
         """
         Aggregate a file to a HydroShare aggregation type.  Aggregating files allows you to specify metadata specific
         to the files associated with the aggregation.  To set a FileSet aggregation, include the path to the folder or
@@ -1212,6 +1212,7 @@ class Resource(Aggregation):
             aggregation.metadata.type.value + "LogicalFile",
             aggregation.main_file_path,
         )
+
         aggregation._hs_session.post(path, status_code=200)
         self._parsed_aggregations = [agg for agg in self._parsed_aggregations if agg != aggregation]
 
@@ -1250,13 +1251,14 @@ class Resource(Aggregation):
         self._parsed_aggregations = [agg for agg in self._parsed_aggregations if agg != aggregation]
         aggregation.delete()
 
-    def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
+    @staticmethod
+    def aggregation_download(aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
         Download an aggregation from HydroShare
         :param aggregation: The aggregation to download
         :param save_path: The local path to save the aggregation to, defaults to the current directory
         :param unzip_to: If set, the resulting download will be unzipped to the specified path
-        :return: None
+        :return: The path to the downloaded file
         """
         return aggregation._download(save_path=save_path, unzip_to=unzip_to)
 
@@ -1498,15 +1500,16 @@ class HydroShare:
     ):
         """
         Query the GET /hsapi/resource/ REST end point of the HydroShare server.
-        :param creator: Filter results by the HydroShare username or email
-        :param author: Filter results by the HydroShare username or email
+        :param creator: Filter results by the HydroShare username or email of creator
+        :param contributor: Filter results by the HydroShare username or email of contributor
         :param owner: Filter results by the HydroShare username or email
         :param group_name: Filter results by the HydroShare group name associated with resources
         :param from_date: Filter results to those created after from_date.  Must be datetime.date.
         :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have
             no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get
             resources created up to and including 2015-05-05)
-        :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)
+        :param resource_types: Filter results to particular HydroShare resource types
+                (Deprecated, all types are Composite)
         :param subject: Filter by comma separated list of subjects
         :param full_text_search: Filter by full text search
         :param edit_permission: Filter by boolean edit permission
@@ -1582,7 +1585,7 @@ class HydroShare:
 
         res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
         if validate:
-            res.metadata
+            _ = res.metadata
 
         if use_cache:
             self._resource_object_cache[resource_id] = res
@@ -1609,7 +1612,7 @@ class HydroShare:
         response = self._hs_session.get(f'/hsapi/userDetails/{user_id}/', status_code=200)
         return User(**response.json())
 
-    def my_user_info(self):
+    def my_user_info(self) -> dict:
         """
         Retrieves the user info of the user's credentials provided
         :return: JSON object representing the user info
