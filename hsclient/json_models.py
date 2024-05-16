@@ -20,7 +20,11 @@ class User(BaseModel):
 
     @field_validator("subject_areas", mode='before')
     def split_subject_areas(cls, value):
-        return value.split(", ") if value else []
+        if isinstance(value, str):
+            return value.split(", ")
+        if value is None:
+            return []
+        return value
 
 
 class ResourcePreview(BaseModel):
