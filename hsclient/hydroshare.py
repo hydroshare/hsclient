@@ -63,12 +63,13 @@ class File(str):
     :param checksum: the md5 checksum of the file
     """
 
-    def __new__(cls, value, file_url, checksum):
+    def __new__(cls, value, file_url, checksum, aggregation):
         return super(File, cls).__new__(cls, value)
 
-    def __init__(self, value, file_url, checksum):
+    def __init__(self, value, file_url, checksum, aggregation):
         self._file_url = file_url
         self._checksum = checksum
+        self._aggregation = aggregation
 
     @property
     def path(self) -> str:
@@ -93,6 +94,10 @@ class File(str):
     @property
     def checksum(self):
         """The md5 checksum of the file"""
+        if self._checksum is None:
+            _ = self._aggregation._checksums
+            path = urljoin('data/contents', quote(self.path))
+            self._checksum = self._aggregation._checksums.get(path, "")
         return self._checksum
 
     @property
@@ -174,7 +179,12 @@ class Aggregation:
                                     "data/contents/",
                                 )[1]
                             )
-                            f = File(file_path, unquote(file.path), self._checksums[file_checksum_path])
+                            if self._parsed_checksums is not None:
+                                checksum = self._checksums[file_checksum_path]
+                            else:
+                                checksum = None
+                            f = File(file_path, unquote(file.path), checksum, self)
+
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -182,13 +192,13 @@ class Aggregation:
     def _aggregations(self):
 
         def populate_metadata(_aggr):
-            _aggr._metadata
+            _ = _aggr._metadata
 
         if self._parsed_aggregations is None:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
-                    self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, self._checksums))
+                    self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, None))
 
             # load metadata for all aggregations (metadata is needed to create any typed aggregation)
             with ThreadPoolExecutor() as executor:
@@ -1109,7 +1119,7 @@ class Resource(Aggregation):
 
             # update the parsed_files
             checksum_path = urljoin("data", "contents", new_path)
-            new_file = File(new_path, unquote(new_path), self._checksums[checksum_path])
+            new_file = File(new_path, unquote(new_path), self._checksums[checksum_path], self)
             self._parsed_files = [new_file if file == path else file for file in self._parsed_files]
 
     @refresh
