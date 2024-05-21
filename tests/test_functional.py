@@ -89,6 +89,10 @@ def test_filtering_aggregations_by_files(timeseries_resource):
     assert not timeseries_resource.aggregation(file__path="No_match.sqlite")
     assert len(timeseries_resource.aggregations(files__path="No_match.sqlite")) == 0
     assert not timeseries_resource.aggregation(files__path="No_match.sqlite")
+    # get the first aggregation
+    aggr = timeseries_resource.aggregations()[0]
+    file = aggr.file(path="ODM2_Multi_Site_One_Variable.sqlite")
+    assert file.checksum is not None
 
 
 def test_filtering_files(resource):
