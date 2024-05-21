@@ -1,5 +1,5 @@
 import getpass
-import multiprocessing
+import threading
 import os
 import pathlib
 import pickle
@@ -268,11 +268,10 @@ class Aggregation:
         self._main_file_path = None
 
     def _refetch(self):
+        # not refreshing the checksums here - they will be refreshed when needed
         _ = self._map
         _ = self._metadata
-        _ = self._checksums
         _ = self._files
-        _ = self._aggregations
 
     @property
     def metadata_file(self) -> str:
@@ -378,15 +377,12 @@ class Aggregation:
 
     def refresh(self) -> None:
         """
-        Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will
-        only retrieve those files again after another call to access them is made.  This will be later updated to be
-        eager and retrieve the files asynchronously.
+        Forces the retrieval of the resource map and metadata files.  Files are retrieved asynchronously.
         """
 
         self._reset()
-        # async re-fetch aggregation/resource map and metadata files form HydroShare
-        with multiprocessing.Pool() as pool:
-            pool.apply_async(self._refetch)
+        t = threading.Thread(target=self._refetch, daemon=True)
+        t.start()
 
     def delete(self) -> None:
         """Deletes this aggregation from HydroShare"""
