@@ -1245,7 +1245,6 @@ class Resource(Aggregation):
         if status in ("Not ready", "progress"):
             while aggregation._hs_session.check_task(task_id) != 'true':
                 time.sleep(1)
-        aggregation.refresh()
 
     def aggregation_delete(self, aggregation: Aggregation) -> None:
         """
