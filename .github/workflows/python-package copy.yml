@@ -1,13 +1,10 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package
+name: Test on demand
 
 on:
-  push:
-    branches: [ master ]
-  pull_request_target:
-    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'URL to target tests (default: https://beta.hydroshare.org).'
 
 jobs:
   build:
@@ -30,14 +27,12 @@ jobs:
         python -m pip install --upgrade pip
         make install
         pip install .
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        make format
-    - name: Test with pytest
+    - name: Run Tests against target = ${{ github.event.inputs.target }}
+      if: github.event.inputs.target != ''
       env:
         HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
+        HYDRO_HOST: ${{ github.event.inputs.target }}
       run: |
         make test-cov
     - name: Code Coverage Report
