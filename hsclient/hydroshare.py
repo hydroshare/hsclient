@@ -1194,7 +1194,10 @@ class Resource(Aggregation):
         if agg_type == AggregationType.SingleFileAggregation:
             type_value = 'SingleFile'
         if agg_type == AggregationType.FileSetAggregation:
-            relative_path = dirname(path)
+            if '/' in path:
+                relative_path = dirname(path)
+            else:
+                relative_path = path
             data = {"folder_path": relative_path}
 
         url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
