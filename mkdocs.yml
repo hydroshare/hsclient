@@ -1,7 +1,7 @@
 site_name: hsclient
 repo_name: hydroshare/hsclient
 repo_url: https://github.com/hydroshare/hsclient
-edit_url: edit/master/docs/
+edit_uri: edit/master/docs/
 
 theme: readthedocs
 
@@ -21,28 +21,30 @@ markdown_extensions:
 
 nav:
   - Usage Examples:
-      Basic Operations: examples/Basic_Operations.ipynb
-      Aggregation Operations: examples/Aggregation_Operations.ipynb
-      File Operations: examples/File_Operations.ipynb
-      Metadata Operations: examples/Metadata_Operations.ipynb
-      Aggregation Data Object Operations: examples/Aggregation_Data_Object_Operations.ipynb
+      - Basic Operations: examples/Basic_Operations.ipynb
+      - Aggregation Operations: examples/Aggregation_Operations.ipynb
+      - File Operations: examples/File_Operations.ipynb
+      - Metadata Operations: examples/Metadata_Operations.ipynb
+      - Aggregation Data Object Operations: examples/Aggregation_Data_Object_Operations.ipynb
   - Developer Documentation:
     - Models:
-        Single File: metadata/SingleFile.md
-        File Set: metadata/FileSet.md
-        Geographic Feature: metadata/GeographicFeature.md
-        Geographic Raster: metadata/GeographicRaster.md
-        Multidimensional: metadata/Multidimensional.md
-        Referenced Time Series: metadata/ReferencedTimeSeries.md
-        Time Series: metadata/TimeSeries.md
-        Model Program: metadata/ModelProgram.md
-        Model Instance: metadata/ModelInstance.md
+        - Single File: metadata/SingleFile.md
+        - File Set: metadata/FileSet.md
+        - Geographic Feature: metadata/GeographicFeature.md
+        - Geographic Raster: metadata/GeographicRaster.md
+        - Multidimensional: metadata/Multidimensional.md
+        - Referenced Time Series: metadata/ReferencedTimeSeries.md
+        - Time Series: metadata/TimeSeries.md
+        - Model Program: metadata/ModelProgram.md
+        - Model Instance: metadata/ModelInstance.md
+        - CSV: metadata/CSV.md
     - API:
-        HydroShare: api/hydroshare.md
-        Resource: api/resource.md
-        File: api/file.md
-        Aggregation: api/aggregation.md
-        Multidimensional Aggregation: api/netcdf_aggregation.md
-        Geographic Feature Aggregation: api/geo_feature_aggregation.md
-        Geographic Raster Aggregation: api/geo_raster_aggregation.md
-        Time Series Aggregation: api/time_series_aggregation.md
+        - HydroShare: api/hydroshare.md
+        - Resource: api/resource.md
+        - File: api/file.md
+        - Aggregation: api/aggregation.md
+        - Multidimensional Aggregation: api/netcdf_aggregation.md
+        - Geographic Feature Aggregation: api/geo_feature_aggregation.md
+        - Geographic Raster Aggregation: api/geo_raster_aggregation.md
+        - Time Series Aggregation: api/time_series_aggregation.md
+        - CSV Aggregation: api/csv.md
