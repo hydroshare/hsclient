@@ -428,14 +428,14 @@ class DataObjectSupportingAggregation(Aggregation):
     def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
         return self._get_file_path(agg_path)
 
-    def _get_data_object(self, agg_path: str, func: Callable) -> \
+    def _get_data_object(self, agg_path: str, func: Callable, **func_kwargs) -> \
             Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset']:
 
         if self._data_object is not None and self.metadata.type != AggregationType.TimeSeriesAggregation:
             return self._data_object
 
         file_path = self._validate_aggregation_path(agg_path)
-        data_object = func(file_path)
+        data_object = func(file_path, **func_kwargs)
         if self.metadata.type == AggregationType.MultidimensionalAggregation:
             data_object.load()
             data_object.close()
@@ -875,7 +875,7 @@ class CSVAggregation(DataObjectSupportingAggregation):
         if pandas is None:
             raise Exception("pandas package not found")
 
-        return self._get_data_object(agg_path=agg_path, func=pandas.read_csv)
+        return self._get_data_object(agg_path=agg_path, func=pandas.read_csv, comment="#")
 
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
