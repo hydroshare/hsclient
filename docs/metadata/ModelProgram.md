@@ -1,3 +1,3 @@
 
-:::hsmodels.schemas.aggregations.ModelProgramMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn
+::: hsmodels.schemas.aggregations.ModelProgramMetadata
+::: hsmodels.schemas.aggregations.ModelProgramMetadataIn

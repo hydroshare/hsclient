@@ -1,3 +1,4 @@
 
-:::hsmodels.schemas.aggregations.GeographicRasterMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn
+::: hsmodels.schemas.aggregations.GeographicRasterMetadata
+::: hsmodels.schemas.aggregations.GeographicRasterMetadataIn
+

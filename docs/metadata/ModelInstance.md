@@ -1,3 +1,4 @@
 
-:::hsmodels.schemas.aggregations.ModelInstanceMetadata
-:::hsmodels.schemas.aggregations.BaseAggregationMetadataIn
+::: hsmodels.schemas.aggregations.ModelInstanceMetadata
+::: hsmodels.schemas.aggregations.ModelInstanceMetadataIn
+
