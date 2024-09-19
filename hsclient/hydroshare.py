@@ -875,7 +875,8 @@ class CSVAggregation(DataObjectSupportingAggregation):
         if pandas is None:
             raise Exception("pandas package not found")
 
-        return self._get_data_object(agg_path=agg_path, func=pandas.read_csv, comment="#")
+        return self._get_data_object(agg_path=agg_path, func=pandas.read_csv, comment="#", dtype="string",
+                                     engine="python")
 
     def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
                          destination_path: str = "") -> 'Aggregation':
