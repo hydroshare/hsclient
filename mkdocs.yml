@@ -7,6 +7,8 @@ theme: readthedocs
 
 plugins:
   - search
+  - autorefs:
+      resolve_closest: true
   - mkdocstrings
   - mknotebooks:
       binder: true
