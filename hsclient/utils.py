@@ -1,7 +1,12 @@
+from collections import namedtuple
 from os.path import splitext
 from urllib.request import pathname2url
 
 from hsmodels.schemas.enums import AggregationType
+
+CSVColumnDataType = namedtuple('CSVColumnDataType', ['string', 'number', 'datetime', 'boolean'])(
+    'string', 'number', 'datetime', 'boolean'
+)
 
 
 def is_aggregation(path):
@@ -19,6 +24,8 @@ def main_file_type(type: AggregationType):
         return ".refts.json"
     if type == AggregationType.TimeSeriesAggregation:
         return ".sqlite"
+    if type == AggregationType.CSVFileAggregation:
+        return ".csv"
     return None
 
 

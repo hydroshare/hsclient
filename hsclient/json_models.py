@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from hsmodels.schemas.enums import UserIdentifierType
 from pydantic import AnyUrl, BaseModel, HttpUrl, field_validator
@@ -12,7 +12,7 @@ class User(BaseModel):
     phone: str = None
     address: str = None
     organization: str = None
-    website: HttpUrl = None
+    website: Optional[HttpUrl] = None
     identifiers: Dict[UserIdentifierType, AnyUrl] = {}
     type: str = None
     subject_areas: List[str] = []
@@ -25,6 +25,12 @@ class User(BaseModel):
         if value is None:
             return []
         return value
+
+    @field_validator("website", mode='before')
+    def handle_empty_website(cls, v):
+        if v == "":
+            v = None
+        return v
 
 
 class ResourcePreview(BaseModel):
