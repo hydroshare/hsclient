@@ -78,5 +78,17 @@ def resource_with_geofeature_aggr(new_resource):
 
 
 @pytest.fixture()
+def resource_with_csv_aggr(new_resource):
+    files = [
+        "ecoregions.csv",
+        "ecoregions_resmap.xml",
+        "ecoregions_meta.xml",
+    ]
+    root_path = "data/test_resource_metadata_files/"
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], refresh=False)
+    return new_resource
+
+
+@pytest.fixture()
 def resource_with_raster_aggr(resource):
     return resource

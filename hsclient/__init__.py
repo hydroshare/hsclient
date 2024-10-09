@@ -7,5 +7,6 @@ from hsclient.hydroshare import (
     TimeseriesAggregation,
     GeoRasterAggregation,
     GeoFeatureAggregation,
+    CSVAggregation
 )
 from hsclient.oauth2_model import Token

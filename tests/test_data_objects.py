@@ -9,7 +9,13 @@ from fiona.model import to_dict
 from hsmodels.schemas.enums import AggregationType
 from rasterio.windows import Window
 
-from hsclient import GeoFeatureAggregation, GeoRasterAggregation, NetCDFAggregation, TimeseriesAggregation
+from hsclient import (
+    GeoFeatureAggregation,
+    GeoRasterAggregation,
+    NetCDFAggregation,
+    TimeseriesAggregation,
+    CSVAggregation,
+)
 
 
 @pytest.mark.parametrize("search_by", ["type", "file_path"])
@@ -318,3 +324,75 @@ def test_geofeature_save_data_object(resource_with_geofeature_aggr, as_new_aggr)
             assert ft_dict['properties']['Id'] < 5
         # need to close the data object so that the tmp directory can be cleaned up
         fn_collection.close()
+
+
+@pytest.mark.parametrize("search_by", ["type", "file_path"])
+def test_csv_as_data_object(resource_with_csv_aggr, search_by):
+    resource_with_csv_aggr.refresh()
+    if search_by == "type":
+        aggr = resource_with_csv_aggr.aggregation(type=AggregationType.CSVFileAggregation)
+    else:
+        file_path = "ecoregions.csv"
+        aggr = resource_with_csv_aggr.aggregation(file__path=file_path)
+    assert aggr is not None
+    assert type(aggr) is CSVAggregation
+    with tempfile.TemporaryDirectory() as tmp:
+        # download
+        unzip_to = os.path.join(tmp, "unzipped_aggr")
+        os.makedirs(unzip_to)
+        agg_path = resource_with_csv_aggr.aggregation_download(aggregation=aggr, save_path=tmp, unzip_to=unzip_to)
+        # load csv data to data object as pandas dataframe
+        pd_df = aggr.as_data_object(agg_path=agg_path)
+        # test number of rows in pandas dataframe
+        assert len(pd_df) == 2923
+        # test number of columns
+        assert len(pd_df.columns) == 4
+
+
+@pytest.mark.parametrize("as_new_aggr", [False, True])
+def test_csv_save_data_object(resource_with_csv_aggr, as_new_aggr):
+    resource_with_csv_aggr.refresh()
+    file_path = "ecoregions.csv"
+    aggr = resource_with_csv_aggr.aggregation(file__path=file_path)
+    assert aggr is not None
+    assert type(aggr) is CSVAggregation
+    with tempfile.TemporaryDirectory() as tmp:
+        # download
+        unzip_to = os.path.join(tmp, "unzipped_aggr")
+        os.makedirs(unzip_to)
+        agg_path = resource_with_csv_aggr.aggregation_download(aggregation=aggr, save_path=tmp, unzip_to=unzip_to)
+        # load csv data to data object as pandas dataframe
+        pd_df = aggr.as_data_object(agg_path=agg_path)
+        # test number of rows in pandas dataframe
+        assert len(pd_df) == 2923
+        # test number of columns
+        assert len(pd_df.columns) == 4
+        # edit the dataframe - remove the last column in the dataframe
+        pd_df.drop(pd_df.columns[-1], axis=1, inplace=True)
+        assert len(pd_df.columns) == 3
+        dst_path = ""
+        if as_new_aggr:
+            dst_path = "csv_aggr_folder"
+            resource_with_csv_aggr.folder_create(dst_path)
+        # save the dataframe to a new csv file
+        aggr = aggr.save_data_object(resource=resource_with_csv_aggr, agg_path=agg_path, as_new_aggr=as_new_aggr,
+                                     destination_path=dst_path)
+        assert aggr is not None
+        assert type(aggr) is CSVAggregation
+        if as_new_aggr:
+            assert aggr.data_object is None
+        else:
+            assert aggr.data_object is not None
+
+    # check the updated csv aggregation
+    with tempfile.TemporaryDirectory() as tmp:
+        # download
+        unzip_to = os.path.join(tmp, "unzipped_aggr")
+        os.makedirs(unzip_to)
+        agg_path = resource_with_csv_aggr.aggregation_download(aggregation=aggr, save_path=tmp, unzip_to=unzip_to)
+        # load csv data to data object as pandas dataframe
+        pd_df = aggr.as_data_object(agg_path=agg_path)
+        # test number of rows in pandas dataframe
+        assert len(pd_df) == 2923
+        # test number of columns
+        assert len(pd_df.columns) == 3

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:hsterms="https://www.hydroshare.org/terms/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdf:Description rdf:about="http://localhost:8000/terms/CSVFileAggregation">
+    <rdfs:label>CSV Content: One CSV file with specific metadata</rdfs:label>
+    <rdfs:isDefinedBy rdf:resource="https://www.hydroshare.org/terms/"/>
+  </rdf:Description>
+  <hsterms:CSVFileAggregation rdf:about="http://localhost:8000/resource/ec6b089c7e8949c3afc6de07e9f3b603/data/contents/ecoregions_resmap.xml#aggregation">
+    <dc:type rdf:resource="https://www.hydroshare.org/terms/CSVFileAggregation"/>
+    <dc:rights>
+      <rdf:Description>
+        <hsterms:rightsStatement>This resource is shared under the Creative Commons Attribution CC BY.</hsterms:rightsStatement>
+        <hsterms:URL rdf:resource="http://creativecommons.org/licenses/by/4.0/"/>
+      </rdf:Description>
+    </dc:rights>
+    <dc:language>eng</dc:language>
+    <dc:title>ecoregions</dc:title>
+    <hsterms:tableSchema>
+      <rdf:Description>
+        <hsterms:numberOfDataRows rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2923</hsterms:numberOfDataRows>
+        <hsterms:delimiter>,</hsterms:delimiter>
+        <hsterms:columns>
+          <rdf:Description>
+            <hsterms:column>
+              <rdf:Description>
+                <hsterms:dataType>number</hsterms:dataType>
+                <hsterms:columnNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</hsterms:columnNumber>
+                <dc:title>id</dc:title>
+              </rdf:Description>
+            </hsterms:column>
+            <hsterms:column>
+              <rdf:Description>
+                <dc:title>lon</dc:title>
+                <hsterms:dataType>number</hsterms:dataType>
+                <hsterms:columnNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</hsterms:columnNumber>
+              </rdf:Description>
+            </hsterms:column>
+            <hsterms:column>
+              <rdf:Description>
+                <hsterms:columnNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</hsterms:columnNumber>
+                <dc:title>ecoregion</dc:title>
+                <hsterms:dataType>string</hsterms:dataType>
+              </rdf:Description>
+            </hsterms:column>
+            <hsterms:column>
+              <rdf:Description>
+                <hsterms:dataType>number</hsterms:dataType>
+                <hsterms:columnNumber rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</hsterms:columnNumber>
+                <dc:title>lat</dc:title>
+              </rdf:Description>
+            </hsterms:column>
+          </rdf:Description>
+        </hsterms:columns>
+      </rdf:Description>
+    </hsterms:tableSchema>
+  </hsterms:CSVFileAggregation>
+</rdf:RDF>
