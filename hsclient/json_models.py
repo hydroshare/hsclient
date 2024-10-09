@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union, Any
 
 from hsmodels.schemas.enums import UserIdentifierType
 from pydantic import AnyUrl, BaseModel, HttpUrl, field_validator
@@ -46,7 +46,7 @@ class ResourcePreview(BaseModel):
     public: bool
     discoverable: bool
     shareable: bool
-    coverages: Optional[Dict[str, str]] = None
+    coverages: Union[List[Dict[str, Any]], List] = []
     immutable: bool
     published: bool
     resource_url: str
@@ -64,3 +64,10 @@ class ResourcePreview(BaseModel):
 
         # filter to remove all empty x's in v ("", None, or equivalent)
         return list(filter(lambda x: x, v))
+
+    @field_validator("coverages", mode='before')
+    def handle_null_coverages(cls, v):
+        # return empty list when supplied coverages field is None.
+        if v is None:
+            return []
+        return v
