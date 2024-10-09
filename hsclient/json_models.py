@@ -51,7 +51,7 @@ class ResourcePreview(BaseModel):
     published: bool
     resource_url: str
     resource_map_url: str
-    resource_metadata_url: str
+    science_metadata_url: str
 
     @field_validator("authors", mode='before')
     def handle_null_author(cls, v):
