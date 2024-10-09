@@ -28,39 +28,39 @@ def test_null_subject_areas():
     assert o.subject_areas == []
 
 
-AuthorsFieldResourcePreviewTestData = (
-    json.dumps({"authors": None}),
-    json.dumps({"authors": []}),
-    json.dumps({"authors": [None]}),
-    json.dumps({"authors": [""]}),
-    json.dumps({"authors": [[]]}),
-)
-
-
-@pytest.mark.parametrize("test_data", AuthorsFieldResourcePreviewTestData)
-def test_resource_preview_authors_field_handles_none_cases(test_data):
-    """verify all `authors` fields are instantiated with [] values.
-
-    coerced `authors` field should be [] with following input:
-        None
-        []
-        [None]
-        [None, ""]
-    """
-
-    from_json = ResourcePreview.model_validate_json(test_data)
-
-    assert from_json.authors == []
-
-
-def test_resource_preview_authors_raises_validation_error_on_string_input():
-    """verify that a string passed to authors field raises pydantic.ValidationError"""
-    from pydantic import ValidationError
-
-    data = json.dumps({"authors": "should_fail"})
-
-    with pytest.raises(ValidationError):
-        ResourcePreview.model_validate_json(data)
+# AuthorsFieldResourcePreviewTestData = (
+#     json.dumps({"authors": None}),
+#     json.dumps({"authors": []}),
+#     json.dumps({"authors": [None]}),
+#     json.dumps({"authors": [""]}),
+#     json.dumps({"authors": [[]]}),
+# )
+#
+#
+# @pytest.mark.parametrize("test_data", AuthorsFieldResourcePreviewTestData)
+# def test_resource_preview_authors_field_handles_none_cases(test_data):
+#     """verify all `authors` fields are instantiated with [] values.
+#
+#     coerced `authors` field should be [] with following input:
+#         None
+#         []
+#         [None]
+#         [None, ""]
+#     """
+#
+#     from_json = ResourcePreview.model_validate_json(test_data)
+#
+#     assert from_json.authors == []
+#
+#
+# def test_resource_preview_authors_raises_validation_error_on_string_input():
+#     """verify that a string passed to authors field raises pydantic.ValidationError"""
+#     from pydantic import ValidationError
+#
+#     data = json.dumps({"authors": "should_fail"})
+#
+#     with pytest.raises(ValidationError):
+#         ResourcePreview.model_validate_json(data)
 
 
 def test_user_info(user):

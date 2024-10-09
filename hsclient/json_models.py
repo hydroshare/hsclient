@@ -34,24 +34,24 @@ class User(BaseModel):
 
 
 class ResourcePreview(BaseModel):
-    resource_type: str = None
-    resource_title: str = None
-    resource_id: str = None
-    abstract: str = None
+    resource_type: str
+    resource_title: str
+    resource_id: str
+    abstract: Optional[str] = None
     authors: List[str] = []
-    creator: str = None
-    doi: str = None
-    date_created: str = None
-    date_last_updated: str = None
-    public: bool = None
-    discoverable: bool = None
-    shareable: bool = None
-    coverages: Dict[str, str] = None
-    immutable: bool = None
-    published: bool = None
-    resource_url: str = None
-    resource_map_url: str = None
-    resource_metadata_url: str = None
+    creator: str
+    doi: Optional[str] = None
+    date_created: str
+    date_last_updated: str
+    public: bool
+    discoverable: bool
+    shareable: bool
+    coverages: Optional[Dict[str, str]] = None
+    immutable: bool
+    published: bool
+    resource_url: str
+    resource_map_url: str
+    resource_metadata_url: str
 
     @field_validator("authors", mode='before')
     def handle_null_author(cls, v):
