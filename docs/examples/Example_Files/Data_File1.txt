@@ -1,4 +1,4 @@
-# Campus Meter Data Log for Valley_View_Tower
+"Campus Meter Data Log for Valley_View_Tower"
 "Date","RecordNumber","SensorVoltage","FlowRate","AvgFlowRate","IncrementalVolume","TotalizedVolume"
 "2017-03-02 16:23:23",1,0.806,0.9375,0.9375,0.0156250149012,0.0156250149012
 "2017-03-02 16:23:24",2,0.806,0.9375,0.9375,0.015625,0.0312500149012
