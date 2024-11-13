@@ -53,6 +53,8 @@ from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
+CHECK_TASK_PING_INTERVAL = 10
+
 
 class File(str):
     """
@@ -1274,7 +1276,7 @@ class Resource(Aggregation):
         status = json_response['status']
         if status in ("Not ready", "progress"):
             while aggregation._hs_session.check_task(task_id) != 'true':
-                time.sleep(1)
+                time.sleep(CHECK_TASK_PING_INTERVAL)
         aggregation.refresh()
 
     @refresh
@@ -1368,7 +1370,7 @@ class HydroShareSession:
         file = self.get(path, status_code=200, allow_redirects=True)
 
         if file.headers['Content-Type'] != "application/zip":
-            time.sleep(1)
+            time.sleep(CHECK_TASK_PING_INTERVAL)
             return self.retrieve_bag(path, save_path)
         return self.retrieve_file(path, save_path)
 
@@ -1386,7 +1388,7 @@ class HydroShareSession:
         zip_status = json_response['zip_status']
         if zip_status == "Not ready":
             while self.check_task(task_id) != 'true':
-                time.sleep(1)
+                time.sleep(CHECK_TASK_PING_INTERVAL)
         return self.retrieve_file(download_path, save_path)
 
     def upload_file(self, path, files, status_code=204):
