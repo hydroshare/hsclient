@@ -27,17 +27,6 @@ nav:
       - Metadata Operations: examples/Metadata_Operations.ipynb
       - Aggregation Data Object Operations: examples/Aggregation_Data_Object_Operations.ipynb
   - Developer Documentation:
-    - Models:
-        - Single File: metadata/SingleFile.md
-        - File Set: metadata/FileSet.md
-        - Geographic Feature: metadata/GeographicFeature.md
-        - Geographic Raster: metadata/GeographicRaster.md
-        - Multidimensional: metadata/Multidimensional.md
-        - Referenced Time Series: metadata/ReferencedTimeSeries.md
-        - Time Series: metadata/TimeSeries.md
-        - Model Program: metadata/ModelProgram.md
-        - Model Instance: metadata/ModelInstance.md
-        - CSV: metadata/CSV.md
     - API:
         - HydroShare: api/hydroshare.md
         - Resource: api/resource.md
@@ -48,3 +37,15 @@ nav:
         - Geographic Raster Aggregation: api/geo_raster_aggregation.md
         - Time Series Aggregation: api/time_series_aggregation.md
         - CSV Aggregation: api/csv.md
+    - Models:
+        - Resource: metadata/ResourceMetadata.md
+        - Single File: metadata/SingleFileMetadata.md
+        - File Set: metadata/FileSetMetadata.md
+        - Geographic Feature: metadata/GeographicFeatureMetadata.md
+        - Geographic Raster: metadata/GeographicRasterMetadata.md
+        - Multidimensional: metadata/MultidimensionalMetadata.md
+        - Referenced Time Series: metadata/ReferencedTimeSeriesMetadata.md
+        - Time Series: metadata/TimeSeriesMetadata.md
+        - Model Program: metadata/ModelProgramMetadata.md
+        - Model Instance: metadata/ModelInstanceMetadata.md
+        - CSV: metadata/CSVFileMetadata.md
