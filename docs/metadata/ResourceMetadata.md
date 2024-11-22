@@ -1,0 +1,154 @@
+# Resource Metadata
+
+## Properties
+
+- **`title`** *(string, required)*: A string containing the name given to a resource.
+- **`abstract`** *(string)*: A string containing a summary of a resource. Default: `null`.
+- **`language`** *(string)*: A 3-character string for the language in which the metadata and content of a resource are expressed. Default: `"eng"`.
+- **`subjects`** *(array)*: A list of keyword strings expressing the topic of a resource. Default: `[]`.
+    - **Items** *(string)*
+- **`creators`** *(array)*: A list of Creator objects indicating the entities responsible for creating a resource. Default: `[]`.
+    - **Items**: Refer to *[#/definitions/Creator](#definitions/Creator)*.
+- **`contributors`** *(array)*: A list of Contributor objects indicating the entities that contributed to a resource. Default: `[]`.
+    - **Items**: Refer to *[#/definitions/Contributor](#definitions/Contributor)*.
+- **`relations`** *(array)*: A list of Relation objects representing resources related to a described resource. Default: `[]`.
+    - **Items**: Refer to *[#/definitions/Relation](#definitions/Relation)*.
+- **`additional_metadata`** *(array)*: A dictionary containing key-value pair metadata associated with a resource.
+    - **Items** *(object)*: A key-value pair. Default: `[]`.
+        - **`key`** *(string)*
+        - **`value`** *(string)*
+- **`rights`**: An object containing information about rights held in an over a resource.
+    - **All of**
+        - : Refer to *[#/definitions/Rights](#definitions/Rights)*.
+- **`awards`** *(array)*: A list of objects containing information about the funding agencies and awards associated with a resource. Default: `[]`.
+    - **Items**: Refer to *[#/definitions/AwardInfo](#definitions/AwardInfo)*.
+- **`spatial_coverage`**: An object containing information about the spatial topic of a resource, the spatial applicability of a resource, or jurisdiction under with a resource is relevant. Default: `null`.
+    - **Any of**
+        - : Refer to *[#/definitions/PointCoverage](#definitions/PointCoverage)*.
+        - : Refer to *[#/definitions/BoxCoverage](#definitions/BoxCoverage)*.
+        - *null*
+- **`period_coverage`**: An object containing information about the temporal topic or applicability of a resource. Default: `null`.
+    - **Any of**
+        - : Refer to *[#/definitions/PeriodCoverage](#definitions/PeriodCoverage)*.
+        - *null*
+- **`publisher`**: An object containing information about the publisher of a resource. Default: `null`.
+    - **All of**
+        - : Refer to *[#/definitions/Publisher](#definitions/Publisher)*.
+- **`citation`** *(string)*: A string containing the biblilographic citation for a resource. Default: `null`.
+- **`url`** *(string, format: uri, required)*: An object containing the URL for a resource.
+- **`identifier`** *(string, format: uri, required)*: An object containing the URL-encoded unique identifier for a resource.
+- **`created`** *(string, format: date-time)*: A datetime object containing the instant associated with when a resource was created.
+- **`modified`** *(string, format: date-time)*: A datetime object containing the instant associated with when a resource was last modified.
+- **`review_started`** *(string, format: date-time)*: A datetime object containing the instant associated with when metadata review started on a resource. Default: `null`.
+- **`published`** *(string, format: date-time)*: A datetime object containing the instant associated with when a resource was published. Default: `null`.
+- **`type`** *(string)*: An object containing a URL that points to the HydroShare resource type selected from the hsterms namespace. Must be one of: `["CompositeResource"]`. Must be: `"CompositeResource"`. Default: `"CompositeResource"`.
+## Definitions
+
+- <a id="definitions/AwardInfo"></a>**`AwardInfo`** *(object)*: A class used to represent the metadata associated with funding agency credits for a resource.
+    - **`funding_agency_name`** *(string, required)*: A string containing the name of the funding agency or organization.
+    - **`title`**: A string containing the title of the project or award. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`number`**: A string containing the award number or other identifier. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`funding_agency_url`**: An object containing a URL pointing to a website describing the funding award. Default: `null`.
+        - **Any of**
+            - *string, format: uri*
+            - *null*
+- <a id="definitions/BoxCoverage"></a>**`BoxCoverage`** *(object)*: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+latitude-longitude bounding box.
+    - **`type`** *(string)*: A string containing the type of geographic coverage. Must be one of: `["box"]`. Must be: `"box"`. Default: `"box"`.
+    - **`name`** *(string)*: A string containing a name for the place associated with the geographic coverage. Default: `null`.
+    - **`northlimit`** *(number, required)*: A floating point value containing the constant coordinate for the northernmost face or edge of the bounding box. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`eastlimit`** *(number, required)*: A floating point value containing the constant coordinate for the easternmost face or edge of the bounding box. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`southlimit`** *(number, required)*: A floating point value containing the constant coordinate for the southernmost face or edge of the bounding box. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`westlimit`** *(number, required)*: A floating point value containing the constant coordinate for the westernmost face or edge of the bounding box. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`units`** *(string, required)*: A string containing the units applying to the unlabelled numeric values of northlimit, eastlimit, southlimit, and westlimit.
+    - **`projection`** *(string)*: A string containing the name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc. Default: `null`.
+- <a id="definitions/Contributor"></a>**`Contributor`** *(object)*: A class used to represent the metadata associated with a contributor to a resource.
+    - **`name`** *(string)*: A string containing the name of the contributor. Default: `null`.
+    - **`phone`**: A string containing a phone number for the contributor. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`address`**: A string containing an address for the contributor. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`organization`**: A string containing the name of the organization with which the contributor is affiliated. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`email`**: A string containing an email address for the contributor. Default: `null`.
+        - **Any of**
+            - *string, format: email*
+            - *null*
+    - **`homepage`**: An object containing the URL for website associated with the contributor. Default: `null`.
+        - **Any of**
+            - *string, format: uri*
+            - *null*
+    - **`hydroshare_user_id`**: An integer containing the Hydroshare user ID. Default: `null`.
+        - **Any of**
+            - *integer*
+            - *null*
+    - **`identifiers`** *(object)*: A dictionary containing identifier types and URL links to alternative identiers for the contributor. Can contain additional properties. Default: `{}`.
+        - **Additional properties** *(string, format: uri)*
+- <a id="definitions/Creator"></a>**`Creator`** *(object)*: A class used to represent the metadata associated with a creator of a resource.
+    - **`name`** *(string)*: A string containing the name of the creator. Default: `null`.
+    - **`phone`**: A string containing a phone number for the creator. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`address`**: A string containing an address for the creator. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`organization`**: A string containing the name of the organization with which the creator is affiliated. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`email`**: A string containing an email address for the creator. Default: `null`.
+        - **Any of**
+            - *string, format: email*
+            - *null*
+    - **`homepage`**: An object containing the URL for website associated with the creator. Default: `null`.
+        - **Any of**
+            - *string, format: uri*
+            - *null*
+    - **`creator_order`**: An integer to order creators. Default: `null`.
+        - **Any of**
+            - *integer*
+            - *null*
+    - **`hydroshare_user_id`**: An integer containing the Hydroshare user ID. Default: `null`.
+        - **Any of**
+            - *integer*
+            - *null*
+    - **`identifiers`** *(object)*: A dictionary containing identifier types and URL links to alternative identifiers for the creator. Can contain additional properties. Default: `{}`.
+        - **Additional properties** *(string, format: uri)*
+- <a id="definitions/PeriodCoverage"></a>**`PeriodCoverage`** *(object)*: A class used to represent temporal coverage metadata for a resource or aggregation.
+    - **`name`** *(string)*: A string containing a name for the time interval. Default: `null`.
+    - **`start`** *(string, format: date-time, required)*: A datetime object containing the instant corresponding to the commencement of the time interval.
+    - **`end`** *(string, format: date-time, required)*: A datetime object containing the instant corresponding to the termination of the time interval.
+- <a id="definitions/PointCoverage"></a>**`PointCoverage`** *(object)*: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+point location.
+    - **`type`** *(string)*: A string containing the type of geographic coverage. Must be one of: `["point"]`. Must be: `"point"`. Default: `"point"`.
+    - **`name`** *(string)*: A string containing a name for the place associated with the geographic coverage. Default: `null`.
+    - **`east`** *(number, required)*: The coordinate of the point location measured in the east direction. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`north`** *(number, required)*: The coordinate of the point location measured in the north direction. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`units`** *(string, required)*: The units applying to the unlabelled numeric values of north and east.
+    - **`projection`** *(string, required)*: The name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc.
+- <a id="definitions/Publisher"></a>**`Publisher`** *(object)*: A class used to represent the metadata associated with the publisher of a resource.
+    - **`name`** *(string, required)*: A string containing the name of the publisher.
+    - **`url`** *(string, format: uri, required)*: An object containing a URL that points to the publisher website.
+- <a id="definitions/Relation"></a>**`Relation`** *(object)*: A class used to represent the metadata associated with a resource related to the resource being described.
+    - **`type`**: The type of relationship with the related resource.
+        - **All of**
+            - : Refer to *[#/definitions/RelationType](#definitions/RelationType)*.
+    - **`value`** *(string, required)*: String expressing the Full text citation, URL link for, or description of the related resource.
+- <a id="definitions/RelationType"></a>**`RelationType`** *(string)*: Must be one of: `["The content of this resource is part of", "This resource includes", "The content of this resource can be executed by", "The content of this resource was created by a related App or software program", "This resource updates and replaces a previous version", "This resource has been replaced by a newer version", "This resource is described by", "This resource conforms to established standard described by", "This resource has a related resource in another format", "This resource is a different format of", "This resource is required by", "This resource requires", "This resource is referenced by", "The content of this resource references", "This resource replaces", "The content of this resource is derived from", "The content of this resource is similar to"]`.
+- <a id="definitions/Rights"></a>**`Rights`** *(object)*: A class used to represent the rights statement metadata associated with a resource.
+    - **`statement`** *(string, required)*: A string containing the text of the license or rights statement.
+    - **`url`** *(string, format: uri, required)*: An object containing the URL pointing to a description of the license or rights statement.
