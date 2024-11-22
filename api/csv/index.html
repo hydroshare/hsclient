@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CSV Aggregation - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CSV Aggregation";
+        var mkdocs_page_input_path = "api\\csv.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../aggregation/">Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">CSV Aggregation</a>
+    <ul class="current">
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">CSV Aggregation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/csv.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="doc doc-object doc-class">
+
+
+
+<a id="hsclient.hydroshare.CSVAggregation"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="hsclient.hydroshare.DataObjectSupportingAggregation">DataObjectSupportingAggregation</span></code></p>
+
+
+        <p>Represents a CSV Aggregation in HydroShare</p>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="865 "></span><span class="k">class</span> <span class="nc">CSVAggregation</span><span class="p">(</span><span class="n">DataObjectSupportingAggregation</span><span class="p">):</span>
+<span class="linenos" data-linenos="866 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a CSV Aggregation in HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="867 "></span>    <span class="nd">@classmethod</span>
+<span class="linenos" data-linenos="868 "></span>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="p">):</span>
+<span class="linenos" data-linenos="869 "></span>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">aggr_cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="o">=</span><span class="n">base_aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="870 "></span>
+<span class="linenos" data-linenos="871 "></span>    <span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;pandas.DataFrame&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="872 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="873 "></span><span class="sd">        Loads the CSV aggregation to a pandas DataFrame object</span>
+<span class="linenos" data-linenos="874 "></span><span class="sd">        :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="875 "></span><span class="sd">        :return: the CSV aggregation as a pandas DataFrame object</span>
+<span class="linenos" data-linenos="876 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="877 "></span>        <span class="k">if</span> <span class="n">pandas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="878 "></span>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;pandas package not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="879 "></span>
+<span class="linenos" data-linenos="880 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="881 "></span>                                     <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="882 "></span>
+<span class="linenos" data-linenos="883 "></span>    <span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="884 "></span>                         <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="885 "></span>
+<span class="linenos" data-linenos="886 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="887 "></span><span class="sd">        Saves the pandas DataFrame object to the CSV aggregation</span>
+<span class="linenos" data-linenos="888 "></span><span class="sd">        :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="889 "></span><span class="sd">        :param agg_path: the path to the CSV aggregation</span>
+<span class="linenos" data-linenos="890 "></span><span class="sd">        :param as_new_aggr: Defaults False, set to True to create a new CSV aggregation</span>
+<span class="linenos" data-linenos="891 "></span><span class="sd">        :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="892 "></span><span class="sd">        :return: the updated or new CSV aggregation</span>
+<span class="linenos" data-linenos="893 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="894 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">CSVFileAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="895 "></span>        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="896 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos" data-linenos="897 "></span>        <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="898 "></span>        <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="899 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="900 "></span>            <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="901 "></span>            <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="902 "></span>            <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="903 "></span>            <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="904 "></span>            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span>
+<span class="linenos" data-linenos="905 "></span>
+<span class="linenos" data-linenos="906 "></span>            <span class="c1"># upload the updated aggregation files to the temp folder - to create the updated aggregation</span>
+<span class="linenos" data-linenos="907 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="908 "></span>            <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="909 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="910 "></span>
+<span class="linenos" data-linenos="911 "></span>            <span class="c1"># update metadata</span>
+<span class="linenos" data-linenos="912 "></span>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="913 "></span>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="914 "></span>                    <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="915 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="916 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+<span class="linenos" data-linenos="917 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="918 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="919 "></span>            <span class="c1"># creating a new aggregation by uploading the updated data files</span>
+<span class="linenos" data-linenos="920 "></span>            <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="921 "></span>
+<span class="linenos" data-linenos="922 "></span>            <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="923 "></span>            <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="924 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="925 "></span>            <span class="n">data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="926 "></span>
+<span class="linenos" data-linenos="927 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="n">data_object</span>
+<span class="linenos" data-linenos="928 "></span>        <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.CSVAggregation.as_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">as_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Loads the CSV aggregation to a pandas DataFrame object
+:param agg_path: the path to the Time Series aggregation
+:return: the CSV aggregation as a pandas DataFrame object</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="871 "></span><span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;pandas.DataFrame&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="872 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="873 "></span><span class="sd">    Loads the CSV aggregation to a pandas DataFrame object</span>
+<span class="linenos" data-linenos="874 "></span><span class="sd">    :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="875 "></span><span class="sd">    :return: the CSV aggregation as a pandas DataFrame object</span>
+<span class="linenos" data-linenos="876 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="877 "></span>    <span class="k">if</span> <span class="n">pandas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="878 "></span>        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;pandas package not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="879 "></span>
+<span class="linenos" data-linenos="880 "></span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="881 "></span>                                 <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.CSVAggregation.save_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_data_object</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the pandas DataFrame object to the CSV aggregation
+:param resource: the resource containing the aggregation
+:param agg_path: the path to the CSV aggregation
+:param as_new_aggr: Defaults False, set to True to create a new CSV aggregation
+:param destination_path: the destination path in Hydroshare to save the new aggregation
+:return: the updated or new CSV aggregation</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="883 "></span><span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="884 "></span>                     <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="885 "></span>
+<span class="linenos" data-linenos="886 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="887 "></span><span class="sd">    Saves the pandas DataFrame object to the CSV aggregation</span>
+<span class="linenos" data-linenos="888 "></span><span class="sd">    :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="889 "></span><span class="sd">    :param agg_path: the path to the CSV aggregation</span>
+<span class="linenos" data-linenos="890 "></span><span class="sd">    :param as_new_aggr: Defaults False, set to True to create a new CSV aggregation</span>
+<span class="linenos" data-linenos="891 "></span><span class="sd">    :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="892 "></span><span class="sd">    :return: the updated or new CSV aggregation</span>
+<span class="linenos" data-linenos="893 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="894 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">CSVFileAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="895 "></span>    <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="896 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos" data-linenos="897 "></span>    <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="898 "></span>    <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="899 "></span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="900 "></span>        <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="901 "></span>        <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="902 "></span>        <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="903 "></span>        <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="904 "></span>        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span>
+<span class="linenos" data-linenos="905 "></span>
+<span class="linenos" data-linenos="906 "></span>        <span class="c1"># upload the updated aggregation files to the temp folder - to create the updated aggregation</span>
+<span class="linenos" data-linenos="907 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="908 "></span>        <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="909 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="910 "></span>
+<span class="linenos" data-linenos="911 "></span>        <span class="c1"># update metadata</span>
+<span class="linenos" data-linenos="912 "></span>        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="913 "></span>            <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="914 "></span>                <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="915 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="916 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+<span class="linenos" data-linenos="917 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="918 "></span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="919 "></span>        <span class="c1"># creating a new aggregation by uploading the updated data files</span>
+<span class="linenos" data-linenos="920 "></span>        <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="921 "></span>
+<span class="linenos" data-linenos="922 "></span>        <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="923 "></span>        <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="924 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="925 "></span>        <span class="n">data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="926 "></span>
+<span class="linenos" data-linenos="927 "></span>    <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="n">data_object</span>
+<span class="linenos" data-linenos="928 "></span>    <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../time_series_aggregation/" class="btn btn-neutral float-left" title="Time Series Aggregation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../metadata/ResourceMetadata/" class="btn btn-neutral float-right" title="Resource">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../time_series_aggregation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../metadata/ResourceMetadata/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

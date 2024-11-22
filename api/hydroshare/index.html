@@ -1,93 +1,66 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>HydroShare - hsclient</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../../css/theme.css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  <link href="../../css/ansi-colours.css" rel="stylesheet" />
-  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
-  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "HydroShare";
-    var mkdocs_page_input_path = "api/hydroshare.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>HydroShare - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "HydroShare";
+        var mkdocs_page_input_path = "api\\hydroshare.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> hsclient</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <p class="caption"><span class="caption-text">Usage Examples</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="#">Models</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFile/">Single File</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSet/">File Set</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeature/">Geographic Feature</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRaster/">Geographic Raster</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/Multidimensional/">Multidimensional</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeries/">Referenced Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
-                </li>
-    </ul>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
     <ul class="current">
-                <li class="toctree-l2 current"><a class="reference internal current" href="./">HydroShare</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">HydroShare</a>
     <ul class="current">
     </ul>
                 </li>
@@ -97,56 +70,80 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../aggregation/">Aggregation</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../csv/">CSV Aggregation</a>
+                </li>
     </ul>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">hsclient</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>API &raquo;</li>
-        
-      
-        
-          <li>Developer Documentation &raquo;</li>
-        
-      
-    
-    <li>HydroShare</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">HydroShare</li>
     <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/hydroshare.md"> Edit on hydroshare/hsclient</a>
-      
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/hydroshare.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <div class="doc doc-object doc-class">
-<h2 class="hidden-toc" id="hsclient.hydroshare.HydroShare" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>A HydroShare object for querying HydroShare's REST API.  Provide a username and password at initialization or call
+
+
+
+<a id="hsclient.hydroshare.HydroShare"></a>
+    <div class="doc doc-contents first">
+
+
+        <p>A HydroShare object for querying HydroShare's REST API.  Provide a username and password at initialization or call
 the sign_in() method to prompt for the username and password.</p>
 <p>If using OAuth2 is desired, provide the client_id and token to use.  If on CUAHSI JupyterHub or another JupyterHub
 environment that authenticates with Hydroshare, call the hs_juptyerhub() method to read the credentials from
@@ -158,159 +155,405 @@ Jupyterhub.</p>
 :param port: The port to use, defaults to <code>443</code>
 :param client_id: The client id associated with the OAuth2 token
 :param token: The OAuth2 token to use</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.create">
-
-<code class="highlight">create(self, use_cache=True)</code>
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Creates a new resource on HydroShare
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1449 "></span><span class="k">class</span> <span class="nc">HydroShare</span><span class="p">:</span>
+<span class="linenos" data-linenos="1450 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1451 "></span><span class="sd">    A HydroShare object for querying HydroShare&#39;s REST API.  Provide a username and password at initialization or call</span>
+<span class="linenos" data-linenos="1452 "></span><span class="sd">    the sign_in() method to prompt for the username and password.</span>
+<span class="linenos" data-linenos="1453 "></span>
+<span class="linenos" data-linenos="1454 "></span><span class="sd">    If using OAuth2 is desired, provide the client_id and token to use.  If on CUAHSI JupyterHub or another JupyterHub</span>
+<span class="linenos" data-linenos="1455 "></span><span class="sd">    environment that authenticates with Hydroshare, call the hs_juptyerhub() method to read the credentials from</span>
+<span class="linenos" data-linenos="1456 "></span><span class="sd">    Jupyterhub.</span>
+<span class="linenos" data-linenos="1457 "></span>
+<span class="linenos" data-linenos="1458 "></span><span class="sd">    :param username: A HydroShare username</span>
+<span class="linenos" data-linenos="1459 "></span><span class="sd">    :param password: A HydroShare password associated with the username</span>
+<span class="linenos" data-linenos="1460 "></span><span class="sd">    :param host: The host to use, defaults to `www.hydroshare.org`</span>
+<span class="linenos" data-linenos="1461 "></span><span class="sd">    :param protocol: The protocol to use, defaults to `https`</span>
+<span class="linenos" data-linenos="1462 "></span><span class="sd">    :param port: The port to use, defaults to `443`</span>
+<span class="linenos" data-linenos="1463 "></span><span class="sd">    :param client_id: The client id associated with the OAuth2 token</span>
+<span class="linenos" data-linenos="1464 "></span><span class="sd">    :param token: The OAuth2 token to use</span>
+<span class="linenos" data-linenos="1465 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1466 "></span>
+<span class="linenos" data-linenos="1467 "></span>    <span class="n">default_host</span> <span class="o">=</span> <span class="s1">&#39;www.hydroshare.org&#39;</span>
+<span class="linenos" data-linenos="1468 "></span>    <span class="n">default_protocol</span> <span class="o">=</span> <span class="s2">&quot;https&quot;</span>
+<span class="linenos" data-linenos="1469 "></span>    <span class="n">default_port</span> <span class="o">=</span> <span class="mi">443</span>
+<span class="linenos" data-linenos="1470 "></span>
+<span class="linenos" data-linenos="1471 "></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="linenos" data-linenos="1472 "></span>        <span class="bp">self</span><span class="p">,</span>
+<span class="linenos" data-linenos="1473 "></span>        <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1474 "></span>        <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1475 "></span>        <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">default_host</span><span class="p">,</span>
+<span class="linenos" data-linenos="1476 "></span>        <span class="n">protocol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">default_protocol</span><span class="p">,</span>
+<span class="linenos" data-linenos="1477 "></span>        <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">default_port</span><span class="p">,</span>
+<span class="linenos" data-linenos="1478 "></span>        <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1479 "></span>        <span class="n">token</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Token</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1480 "></span>    <span class="p">):</span>
+<span class="linenos" data-linenos="1481 "></span>        <span class="k">if</span> <span class="n">client_id</span> <span class="ow">or</span> <span class="n">token</span><span class="p">:</span>
+<span class="linenos" data-linenos="1482 "></span>            <span class="k">if</span> <span class="ow">not</span> <span class="n">client_id</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+<span class="linenos" data-linenos="1483 "></span>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Oauth2 requires a client_id to be paired with a token&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1484 "></span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="1485 "></span>                <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span> <span class="o">=</span> <span class="n">HydroShareSession</span><span class="p">(</span>
+<span class="linenos" data-linenos="1486 "></span>                    <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span>
+<span class="linenos" data-linenos="1487 "></span>                <span class="p">)</span>
+<span class="linenos" data-linenos="1488 "></span>                <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+<span class="linenos" data-linenos="1489 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="1490 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span> <span class="o">=</span> <span class="n">HydroShareSession</span><span class="p">(</span>
+<span class="linenos" data-linenos="1491 "></span>                <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span>
+<span class="linenos" data-linenos="1492 "></span>            <span class="p">)</span>
+<span class="linenos" data-linenos="1493 "></span>            <span class="k">if</span> <span class="n">username</span> <span class="ow">or</span> <span class="n">password</span><span class="p">:</span>
+<span class="linenos" data-linenos="1494 "></span>                <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+<span class="linenos" data-linenos="1495 "></span>
+<span class="linenos" data-linenos="1496 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="linenos" data-linenos="1497 "></span>
+<span class="linenos" data-linenos="1498 "></span>    <span class="k">def</span> <span class="nf">sign_in</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="1499 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1500 "></span>        <span class="n">username</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Username: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="linenos" data-linenos="1501 "></span>        <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Password for </span><span class="si">{}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">username</span><span class="p">))</span>
+<span class="linenos" data-linenos="1502 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">set_auth</span><span class="p">((</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+<span class="linenos" data-linenos="1503 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+<span class="linenos" data-linenos="1504 "></span>
+<span class="linenos" data-linenos="1505 "></span>    <span class="nd">@classmethod</span>
+<span class="linenos" data-linenos="1506 "></span>    <span class="k">def</span> <span class="nf">hs_juptyerhub</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
+<span class="linenos" data-linenos="1507 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1508 "></span><span class="sd">        Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI</span>
+<span class="linenos" data-linenos="1509 "></span><span class="sd">        Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</span>
+<span class="linenos" data-linenos="1510 "></span>
+<span class="linenos" data-linenos="1511 "></span><span class="sd">        Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with</span>
+<span class="linenos" data-linenos="1512 "></span><span class="sd">        :param hs_auth_path:.</span>
+<span class="linenos" data-linenos="1513 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1514 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="1515 "></span>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hs_auth_path </span><span class="si">{</span><span class="n">hs_auth_path</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1516 "></span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos" data-linenos="1517 "></span>            <span class="n">token</span><span class="p">,</span> <span class="n">client_id</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos" data-linenos="1518 "></span>        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+<span class="linenos" data-linenos="1519 "></span>        <span class="n">instance</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+<span class="linenos" data-linenos="1520 "></span>        <span class="k">return</span> <span class="n">instance</span>
+<span class="linenos" data-linenos="1521 "></span>
+<span class="linenos" data-linenos="1522 "></span>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
+<span class="linenos" data-linenos="1523 "></span>        <span class="bp">self</span><span class="p">,</span>
+<span class="linenos" data-linenos="1524 "></span>        <span class="n">creator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1525 "></span>        <span class="n">contributor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1526 "></span>        <span class="n">owner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1527 "></span>        <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1528 "></span>        <span class="n">from_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1529 "></span>        <span class="n">to_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1530 "></span>        <span class="n">edit_permission</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="1531 "></span>        <span class="n">resource_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+<span class="linenos" data-linenos="1532 "></span>        <span class="n">subject</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+<span class="linenos" data-linenos="1533 "></span>        <span class="n">full_text_search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1534 "></span>        <span class="n">published</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="1535 "></span>        <span class="n">spatial_coverage</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoxCoverage</span><span class="p">,</span> <span class="n">PointCoverage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1536 "></span>    <span class="p">):</span>
+<span class="linenos" data-linenos="1537 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1538 "></span><span class="sd">        Query the GET /hsapi/resource/ REST end point of the HydroShare server.</span>
+<span class="linenos" data-linenos="1539 "></span><span class="sd">        :param creator: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1540 "></span><span class="sd">        :param author: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1541 "></span><span class="sd">        :param owner: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1542 "></span><span class="sd">        :param group_name: Filter results by the HydroShare group name associated with resources</span>
+<span class="linenos" data-linenos="1543 "></span><span class="sd">        :param from_date: Filter results to those created after from_date.  Must be datetime.date.</span>
+<span class="linenos" data-linenos="1544 "></span><span class="sd">        :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have</span>
+<span class="linenos" data-linenos="1545 "></span><span class="sd">            no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get</span>
+<span class="linenos" data-linenos="1546 "></span><span class="sd">            resources created up to and including 2015-05-05)</span>
+<span class="linenos" data-linenos="1547 "></span><span class="sd">        :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)</span>
+<span class="linenos" data-linenos="1548 "></span><span class="sd">        :param subject: Filter by comma separated list of subjects</span>
+<span class="linenos" data-linenos="1549 "></span><span class="sd">        :param full_text_search: Filter by full text search</span>
+<span class="linenos" data-linenos="1550 "></span><span class="sd">        :param edit_permission: Filter by boolean edit permission</span>
+<span class="linenos" data-linenos="1551 "></span><span class="sd">        :param published: Filter by boolean published status</span>
+<span class="linenos" data-linenos="1552 "></span><span class="sd">        :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</span>
+<span class="linenos" data-linenos="1553 "></span>
+<span class="linenos" data-linenos="1554 "></span><span class="sd">        :return: A generator to iterate over a ResourcePreview object</span>
+<span class="linenos" data-linenos="1555 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1556 "></span>
+<span class="linenos" data-linenos="1557 "></span>        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;edit_permission&quot;</span><span class="p">:</span> <span class="n">edit_permission</span><span class="p">,</span> <span class="s2">&quot;published&quot;</span><span class="p">:</span> <span class="n">published</span><span class="p">}</span>
+<span class="linenos" data-linenos="1558 "></span>        <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
+<span class="linenos" data-linenos="1559 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;creator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">creator</span>
+<span class="linenos" data-linenos="1560 "></span>        <span class="k">if</span> <span class="n">contributor</span><span class="p">:</span>
+<span class="linenos" data-linenos="1561 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contributor</span>
+<span class="linenos" data-linenos="1562 "></span>        <span class="k">if</span> <span class="n">owner</span><span class="p">:</span>
+<span class="linenos" data-linenos="1563 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">owner</span>
+<span class="linenos" data-linenos="1564 "></span>        <span class="k">if</span> <span class="n">group_name</span><span class="p">:</span>
+<span class="linenos" data-linenos="1565 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_name</span>
+<span class="linenos" data-linenos="1566 "></span>        <span class="k">if</span> <span class="n">resource_types</span><span class="p">:</span>
+<span class="linenos" data-linenos="1567 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;type[]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_types</span>
+<span class="linenos" data-linenos="1568 "></span>        <span class="k">if</span> <span class="n">subject</span><span class="p">:</span>
+<span class="linenos" data-linenos="1569 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+<span class="linenos" data-linenos="1570 "></span>        <span class="k">if</span> <span class="n">full_text_search</span><span class="p">:</span>
+<span class="linenos" data-linenos="1571 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;full_text_search&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_text_search</span>
+<span class="linenos" data-linenos="1572 "></span>        <span class="k">if</span> <span class="n">from_date</span><span class="p">:</span>
+<span class="linenos" data-linenos="1573 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;from_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">from_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1574 "></span>        <span class="k">if</span> <span class="n">to_date</span><span class="p">:</span>
+<span class="linenos" data-linenos="1575 "></span>            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;to_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1576 "></span>        <span class="k">if</span> <span class="n">spatial_coverage</span><span class="p">:</span>
+<span class="linenos" data-linenos="1577 "></span>            <span class="k">yield</span> <span class="ne">Exception</span><span class="p">(</span>
+<span class="linenos" data-linenos="1578 "></span>                <span class="s2">&quot;Bad Request, status_code 400, spatial_coverage queries are disabled.&quot;</span>
+<span class="linenos" data-linenos="1579 "></span>            <span class="p">)</span>
+<span class="linenos" data-linenos="1580 "></span>            <span class="c1"># TODO: re-enable after resolution of https://github.com/hydroshare/hydroshare/issues/5240</span>
+<span class="linenos" data-linenos="1581 "></span>            <span class="c1"># params[&quot;coverage_type&quot;] = spatial_coverage.type</span>
+<span class="linenos" data-linenos="1582 "></span>            <span class="c1"># if spatial_coverage.type == &quot;point&quot;:</span>
+<span class="linenos" data-linenos="1583 "></span>            <span class="c1">#     params[&quot;north&quot;] = spatial_coverage.north</span>
+<span class="linenos" data-linenos="1584 "></span>            <span class="c1">#     params[&quot;east&quot;] = spatial_coverage.east</span>
+<span class="linenos" data-linenos="1585 "></span>            <span class="c1"># else:</span>
+<span class="linenos" data-linenos="1586 "></span>            <span class="c1">#     params[&quot;north&quot;] = spatial_coverage.northlimit</span>
+<span class="linenos" data-linenos="1587 "></span>            <span class="c1">#     params[&quot;east&quot;] = spatial_coverage.eastlimit</span>
+<span class="linenos" data-linenos="1588 "></span>            <span class="c1">#     params[&quot;south&quot;] = spatial_coverage.southlimit</span>
+<span class="linenos" data-linenos="1589 "></span>            <span class="c1">#     params[&quot;west&quot;] = spatial_coverage.westlimit</span>
+<span class="linenos" data-linenos="1590 "></span>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/hsapi/resource/&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="linenos" data-linenos="1591 "></span>
+<span class="linenos" data-linenos="1592 "></span>        <span class="n">res</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="linenos" data-linenos="1593 "></span>        <span class="n">results</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1594 "></span>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<span class="linenos" data-linenos="1595 "></span>            <span class="k">yield</span> <span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="1596 "></span>
+<span class="linenos" data-linenos="1597 "></span>        <span class="k">while</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]:</span>
+<span class="linenos" data-linenos="1598 "></span>            <span class="n">next_url</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1599 "></span>            <span class="n">next_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">next_url</span><span class="p">)</span>
+<span class="linenos" data-linenos="1600 "></span>            <span class="n">path</span> <span class="o">=</span> <span class="n">next_url</span><span class="o">.</span><span class="n">path</span>
+<span class="linenos" data-linenos="1601 "></span>            <span class="n">params</span> <span class="o">=</span> <span class="n">next_url</span><span class="o">.</span><span class="n">query</span>
+<span class="linenos" data-linenos="1602 "></span>            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="linenos" data-linenos="1603 "></span>            <span class="n">res</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="linenos" data-linenos="1604 "></span>            <span class="n">results</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1605 "></span>            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<span class="linenos" data-linenos="1606 "></span>                <span class="k">yield</span> <span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="1607 "></span>
+<span class="linenos" data-linenos="1608 "></span>    <span class="k">def</span> <span class="nf">resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Resource</span><span class="p">:</span>
+<span class="linenos" data-linenos="1609 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1610 "></span><span class="sd">        Creates a resource object from HydroShare with the provided resource_id</span>
+<span class="linenos" data-linenos="1611 "></span><span class="sd">        :param resource_id: The resource id of the resource to retrieve</span>
+<span class="linenos" data-linenos="1612 "></span><span class="sd">        :param validate: Defaults to True, set to False to not validate the resource exists</span>
+<span class="linenos" data-linenos="1613 "></span><span class="sd">        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="linenos" data-linenos="1614 "></span><span class="sd">            resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="linenos" data-linenos="1615 "></span><span class="sd">            object.</span>
+<span class="linenos" data-linenos="1616 "></span><span class="sd">        :return: A Resource object representing a resource on HydroShare</span>
+<span class="linenos" data-linenos="1617 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1618 "></span>        <span class="k">if</span> <span class="n">resource_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span> <span class="ow">and</span> <span class="n">use_cache</span><span class="p">:</span>
+<span class="linenos" data-linenos="1619 "></span>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span><span class="p">[</span><span class="n">resource_id</span><span class="p">]</span>
+<span class="linenos" data-linenos="1620 "></span>
+<span class="linenos" data-linenos="1621 "></span>        <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="s2">&quot;/resource/</span><span class="si">{}</span><span class="s2">/data/resourcemap.xml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resource_id</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="p">)</span>
+<span class="linenos" data-linenos="1622 "></span>        <span class="k">if</span> <span class="n">validate</span><span class="p">:</span>
+<span class="linenos" data-linenos="1623 "></span>            <span class="n">res</span><span class="o">.</span><span class="n">metadata</span>
+<span class="linenos" data-linenos="1624 "></span>
+<span class="linenos" data-linenos="1625 "></span>        <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+<span class="linenos" data-linenos="1626 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span><span class="p">[</span><span class="n">resource_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+<span class="linenos" data-linenos="1627 "></span>        <span class="k">return</span> <span class="n">res</span>
+<span class="linenos" data-linenos="1628 "></span>
+<span class="linenos" data-linenos="1629 "></span>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Resource</span><span class="p">:</span>
+<span class="linenos" data-linenos="1630 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1631 "></span><span class="sd">        Creates a new resource on HydroShare</span>
+<span class="linenos" data-linenos="1632 "></span><span class="sd">        :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="linenos" data-linenos="1633 "></span><span class="sd">            resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="linenos" data-linenos="1634 "></span><span class="sd">            object.</span>
+<span class="linenos" data-linenos="1635 "></span><span class="sd">        :return: A Resource object representing a resource on HydroShare</span>
+<span class="linenos" data-linenos="1636 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1637 "></span>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/hsapi/resource/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span>
+<span class="linenos" data-linenos="1638 "></span>        <span class="n">resource_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;resource_id&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1639 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">resource_id</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
+<span class="linenos" data-linenos="1640 "></span>
+<span class="linenos" data-linenos="1641 "></span>    <span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span><span class="p">:</span>
+<span class="linenos" data-linenos="1642 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1643 "></span><span class="sd">        Retrieves the user details of a Hydroshare user</span>
+<span class="linenos" data-linenos="1644 "></span><span class="sd">        :param user_id: The user id of the user details to retrieve</span>
+<span class="linenos" data-linenos="1645 "></span><span class="sd">        :return: User object representing the user details</span>
+<span class="linenos" data-linenos="1646 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1647 "></span>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;/hsapi/userDetails/</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="1648 "></span>        <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+<span class="linenos" data-linenos="1649 "></span>
+<span class="linenos" data-linenos="1650 "></span>    <span class="k">def</span> <span class="nf">my_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="1651 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1652 "></span><span class="sd">        Retrieves the user info of the user&#39;s credentials provided</span>
+<span class="linenos" data-linenos="1653 "></span><span class="sd">        :return: JSON object representing the user info</span>
+<span class="linenos" data-linenos="1654 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1655 "></span>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/hsapi/userInfo/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="1656 "></span>        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.HydroShare.create" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a new resource on HydroShare
 :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
     resource from HydroShare. This parameter also does not cache the retrieved Resource
     object.
 :return: A Resource object representing a resource on HydroShare</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def create(self, use_cache: bool = True) -&gt; Resource:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Creates a new resource on HydroShare</span>
-<span class="err">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
-<span class="err">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
-<span class="err">        object.</span>
-<span class="err">    :return: A Resource object representing a resource on HydroShare</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    response = self._hs_session.post(&#39;/hsapi/resource/&#39;, status_code=201)</span>
-<span class="err">    resource_id = response.json()[&#39;resource_id&#39;]</span>
-<span class="err">    return self.resource(resource_id, use_cache=use_cache)</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1629 "></span><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Resource</span><span class="p">:</span>
+<span class="linenos" data-linenos="1630 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1631 "></span><span class="sd">    Creates a new resource on HydroShare</span>
+<span class="linenos" data-linenos="1632 "></span><span class="sd">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="linenos" data-linenos="1633 "></span><span class="sd">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="linenos" data-linenos="1634 "></span><span class="sd">        object.</span>
+<span class="linenos" data-linenos="1635 "></span><span class="sd">    :return: A Resource object representing a resource on HydroShare</span>
+<span class="linenos" data-linenos="1636 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1637 "></span>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/hsapi/resource/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span>
+<span class="linenos" data-linenos="1638 "></span>    <span class="n">resource_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;resource_id&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1639 "></span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="n">resource_id</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">)</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.hs_juptyerhub">
 
-<code class="highlight">hs_juptyerhub(hs_auth_path='/home/jovyan/data/.hs_auth')</code>
+<div class="doc doc-object doc-function">
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+
+<h2 id="hsclient.hydroshare.HydroShare.hs_juptyerhub" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">hs_juptyerhub</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="o">=</span><span class="s1">&#39;/home/jovyan/data/.hs_auth&#39;</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI
 Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</p>
 <p>Provide a non-default (default: <code>/home/jovyan/data/.hs_auth</code>) path to the hs_auth file with
 :param hs_auth_path:.</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">classmethod</span>
-<span class="n">def</span> <span class="n">hs_juptyerhub</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI</span>
-<span class="sd">    Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</span>
 
-<span class="sd">    Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with</span>
-<span class="sd">    :param hs_auth_path:.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">):</span>
-        <span class="n">raise</span> <span class="n">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;hs_auth_path {hs_auth_path} does not exist.&quot;</span><span class="p">)</span>
-    <span class="n">with</span> <span class="n">open</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">token</span><span class="p">,</span> <span class="n">client_id</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
-    <span class="n">instance</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
-    <span class="k">return</span> <span class="n">instance</span>
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1505 "></span><span class="nd">@classmethod</span>
+<span class="linenos" data-linenos="1506 "></span><span class="k">def</span> <span class="nf">hs_juptyerhub</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">hs_auth_path</span><span class="o">=</span><span class="s2">&quot;/home/jovyan/data/.hs_auth&quot;</span><span class="p">):</span>
+<span class="linenos" data-linenos="1507 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1508 "></span><span class="sd">    Create a new HydroShare object using OAuth2 credentials stored in a canonical CUAHSI</span>
+<span class="linenos" data-linenos="1509 "></span><span class="sd">    Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</span>
+<span class="linenos" data-linenos="1510 "></span>
+<span class="linenos" data-linenos="1511 "></span><span class="sd">    Provide a non-default (default: `/home/jovyan/data/.hs_auth`) path to the hs_auth file with</span>
+<span class="linenos" data-linenos="1512 "></span><span class="sd">    :param hs_auth_path:.</span>
+<span class="linenos" data-linenos="1513 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1514 "></span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="1515 "></span>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hs_auth_path </span><span class="si">{</span><span class="n">hs_auth_path</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1516 "></span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hs_auth_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos" data-linenos="1517 "></span>        <span class="n">token</span><span class="p">,</span> <span class="n">client_id</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos" data-linenos="1518 "></span>    <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+<span class="linenos" data-linenos="1519 "></span>    <span class="n">instance</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
+<span class="linenos" data-linenos="1520 "></span>    <span class="k">return</span> <span class="n">instance</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.my_user_info">
 
-<code class="highlight">my_user_info(self)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Retrieves the user info of the user's credentials provided
+<h2 id="hsclient.hydroshare.HydroShare.my_user_info" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">my_user_info</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieves the user info of the user's credentials provided
 :return: JSON object representing the user info</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def my_user_info(self):</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Retrieves the user info of the user&#39;s credentials provided</span>
-<span class="err">    :return: JSON object representing the user info</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    response = self._hs_session.get(&#39;/hsapi/userInfo/&#39;, status_code=200)</span>
-<span class="err">    return response.json()</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1650 "></span><span class="k">def</span> <span class="nf">my_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="1651 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1652 "></span><span class="sd">    Retrieves the user info of the user&#39;s credentials provided</span>
+<span class="linenos" data-linenos="1653 "></span><span class="sd">    :return: JSON object representing the user info</span>
+<span class="linenos" data-linenos="1654 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1655 "></span>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/hsapi/userInfo/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="1656 "></span>    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.resource">
 
-<code class="highlight">resource(self, resource_id, validate=True, use_cache=True)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Creates a resource object from HydroShare with the provided resource_id
+<h2 id="hsclient.hydroshare.HydroShare.resource" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">resource</span><span class="p">(</span><span class="n">resource_id</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a resource object from HydroShare with the provided resource_id
 :param resource_id: The resource id of the resource to retrieve
 :param validate: Defaults to True, set to False to not validate the resource exists
 :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the
     resource from HydroShare. This parameter also does not cache the retrieved Resource
     object.
 :return: A Resource object representing a resource on HydroShare</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">resource</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nl">resource_id</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="p">,</span><span class="w"> </span><span class="nl">validate</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">True</span><span class="p">,</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">True</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nl">Resource</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
-<span class="ss">    Creates a resource object from HydroShare with the provided resource_id</span>
-<span class="ss">    :param resource_id: The resource id of the resource to retrieve</span>
-<span class="ss">    :param validate: Defaults to True, set to False to not validate the resource exists</span>
-<span class="ss">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
-<span class="ss">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
-<span class="ss">        object.</span>
-<span class="ss">    :return: A Resource object representing a resource on HydroShare</span>
-<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">resource_id</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="o">[</span><span class="n">resource_id</span><span class="o">]</span><span class="w"></span>
 
-<span class="w">    </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Resource</span><span class="p">(</span><span class="ss">&quot;/resource/{}/data/resourcemap.xml&quot;</span><span class="p">.</span><span class="nf">format</span><span class="p">(</span><span class="n">resource_id</span><span class="p">),</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">validate</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">res</span><span class="p">.</span><span class="n">metadata</span><span class="w"></span>
-
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">use_cache</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">self</span><span class="p">.</span><span class="n">_resource_object_cache</span><span class="o">[</span><span class="n">resource_id</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="w"></span>
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1608 "></span><span class="k">def</span> <span class="nf">resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Resource</span><span class="p">:</span>
+<span class="linenos" data-linenos="1609 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1610 "></span><span class="sd">    Creates a resource object from HydroShare with the provided resource_id</span>
+<span class="linenos" data-linenos="1611 "></span><span class="sd">    :param resource_id: The resource id of the resource to retrieve</span>
+<span class="linenos" data-linenos="1612 "></span><span class="sd">    :param validate: Defaults to True, set to False to not validate the resource exists</span>
+<span class="linenos" data-linenos="1613 "></span><span class="sd">    :param use_cache: Defaults to True, set to False to skip the cache, and always retrieve the</span>
+<span class="linenos" data-linenos="1614 "></span><span class="sd">        resource from HydroShare. This parameter also does not cache the retrieved Resource</span>
+<span class="linenos" data-linenos="1615 "></span><span class="sd">        object.</span>
+<span class="linenos" data-linenos="1616 "></span><span class="sd">    :return: A Resource object representing a resource on HydroShare</span>
+<span class="linenos" data-linenos="1617 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1618 "></span>    <span class="k">if</span> <span class="n">resource_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span> <span class="ow">and</span> <span class="n">use_cache</span><span class="p">:</span>
+<span class="linenos" data-linenos="1619 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span><span class="p">[</span><span class="n">resource_id</span><span class="p">]</span>
+<span class="linenos" data-linenos="1620 "></span>
+<span class="linenos" data-linenos="1621 "></span>    <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="s2">&quot;/resource/</span><span class="si">{}</span><span class="s2">/data/resourcemap.xml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resource_id</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="p">)</span>
+<span class="linenos" data-linenos="1622 "></span>    <span class="k">if</span> <span class="n">validate</span><span class="p">:</span>
+<span class="linenos" data-linenos="1623 "></span>        <span class="n">res</span><span class="o">.</span><span class="n">metadata</span>
+<span class="linenos" data-linenos="1624 "></span>
+<span class="linenos" data-linenos="1625 "></span>    <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+<span class="linenos" data-linenos="1626 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_resource_object_cache</span><span class="p">[</span><span class="n">resource_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+<span class="linenos" data-linenos="1627 "></span>    <span class="k">return</span> <span class="n">res</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.search">
 
-<code class="highlight">search(self, creator=None, contributor=None, owner=None, group_name=None, from_date=None, to_date=None, edit_permission=False, resource_types=[], subject=[], full_text_search=None, published=False, spatial_coverage=None)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Query the GET /hsapi/resource/ REST end point of the HydroShare server.
+<h2 id="hsclient.hydroshare.HydroShare.search" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">search</span><span class="p">(</span><span class="n">creator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contributor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">from_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edit_permission</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resource_types</span><span class="o">=</span><span class="p">[],</span> <span class="n">subject</span><span class="o">=</span><span class="p">[],</span> <span class="n">full_text_search</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">published</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spatial_coverage</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Query the GET /hsapi/resource/ REST end point of the HydroShare server.
 :param creator: Filter results by the HydroShare username or email
 :param author: Filter results by the HydroShare username or email
 :param owner: Filter results by the HydroShare username or email
@@ -326,176 +569,182 @@ Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</p>
 :param published: Filter by boolean published status
 :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</p>
 <p>:return: A generator to iterate over a ResourcePreview object</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="k">search</span><span class="p">(</span><span class="w"></span>
-<span class="w">    </span><span class="n">self</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">creator</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">contributor</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">owner</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">group_name</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">from_date</span><span class="p">:</span><span class="w"> </span><span class="nc">datetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">to_date</span><span class="p">:</span><span class="w"> </span><span class="nc">datetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">edit_permission</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">False</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">resource_types</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">str</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">subject</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">str</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">full_text_search</span><span class="p">:</span><span class="w"> </span><span class="nf">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">published</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">False</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nl">spatial_coverage</span><span class="p">:</span><span class="w"> </span><span class="ow">Union</span><span class="o">[</span><span class="n">BoxCoverage, PointCoverage</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">None</span><span class="p">,</span><span class="w"></span>
-<span class="p">)</span><span class="err">:</span><span class="w"></span>
-<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
-<span class="ss">    Query the GET /hsapi/resource/ REST end point of the HydroShare server.</span>
-<span class="ss">    :param creator: Filter results by the HydroShare username or email</span>
-<span class="ss">    :param author: Filter results by the HydroShare username or email</span>
-<span class="ss">    :param owner: Filter results by the HydroShare username or email</span>
-<span class="ss">    :param group_name: Filter results by the HydroShare group name associated with resources</span>
-<span class="ss">    :param from_date: Filter results to those created after from_date.  Must be datetime.date.</span>
-<span class="ss">    :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have</span>
-<span class="ss">        no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get</span>
-<span class="ss">        resources created up to and including 2015-05-05)</span>
-<span class="ss">    :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)</span>
-<span class="ss">    :param subject: Filter by comma separated list of subjects</span>
-<span class="ss">    :param full_text_search: Filter by full text search</span>
-<span class="ss">    :param edit_permission: Filter by boolean edit permission</span>
-<span class="ss">    :param published: Filter by boolean published status</span>
-<span class="ss">    :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</span>
 
-<span class="ss">    :return: A generator to iterate over a ResourcePreview object</span>
-<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
-
-<span class="w">    </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="ss">&quot;edit_permission&quot;</span><span class="err">:</span><span class="w"> </span><span class="n">edit_permission</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;published&quot;</span><span class="err">:</span><span class="w"> </span><span class="n">published</span><span class="err">}</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">creator</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;creator&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">creator</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">contributor</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;author&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">contributor</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">owner</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;owner&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">owner</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">group_name</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;group&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">group_name</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">resource_types</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="o">[</span><span class="n">&quot;type[</span><span class="o">]</span><span class="ss">&quot;] = resource_types</span>
-<span class="ss">    if subject:</span>
-<span class="ss">        params[&quot;</span><span class="n">subject</span><span class="ss">&quot;] = &quot;</span><span class="p">,</span><span class="ss">&quot;.join(subject)</span>
-<span class="ss">    if full_text_search:</span>
-<span class="ss">        params[&quot;</span><span class="n">full_text_search</span><span class="ss">&quot;] = full_text_search</span>
-<span class="ss">    if from_date:</span>
-<span class="ss">        params[&quot;</span><span class="n">from_date</span><span class="ss">&quot;] = from_date.strftime(&#39;%Y-%m-%d&#39;)</span>
-<span class="ss">    if to_date:</span>
-<span class="ss">        params[&quot;</span><span class="n">to_date</span><span class="ss">&quot;] = to_date.strftime(&#39;%Y-%m-%d&#39;)</span>
-<span class="ss">    if spatial_coverage:</span>
-<span class="ss">        params[&quot;</span><span class="n">coverage_type</span><span class="ss">&quot;] = spatial_coverage.type</span>
-<span class="ss">        if spatial_coverage.type == &quot;</span><span class="n">point</span><span class="ss">&quot;:</span>
-<span class="ss">            params[&quot;</span><span class="n">north</span><span class="ss">&quot;] = spatial_coverage.north</span>
-<span class="ss">            params[&quot;</span><span class="n">east</span><span class="ss">&quot;] = spatial_coverage.east</span>
-<span class="ss">        else:</span>
-<span class="ss">            params[&quot;</span><span class="n">north</span><span class="ss">&quot;] = spatial_coverage.northlimit</span>
-<span class="ss">            params[&quot;</span><span class="n">east</span><span class="ss">&quot;] = spatial_coverage.eastlimit</span>
-<span class="ss">            params[&quot;</span><span class="n">south</span><span class="ss">&quot;] = spatial_coverage.southlimit</span>
-<span class="ss">            params[&quot;</span><span class="n">west</span><span class="ss">&quot;] = spatial_coverage.westlimit</span>
-<span class="ss">    response = self._hs_session.get(&quot;</span><span class="o">/</span><span class="n">hsapi</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="err">&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="w"></span>
-
-<span class="w">    </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;results&#39;</span><span class="o">]</span><span class="w"></span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">results</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">yield</span><span class="w"> </span><span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span><span class="w"></span>
-
-<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;next&#39;</span><span class="o">]</span><span class="err">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">next_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;next&#39;</span><span class="o">]</span><span class="w"></span>
-<span class="w">        </span><span class="n">next_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">urlparse</span><span class="p">(</span><span class="n">next_url</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="k">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_url</span><span class="p">.</span><span class="k">path</span><span class="w"></span>
-<span class="w">        </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next_url</span><span class="p">.</span><span class="n">query</span><span class="w"></span>
-<span class="w">        </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_hs_session</span><span class="p">.</span><span class="k">get</span><span class="p">(</span><span class="k">path</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span><span class="w"></span>
-<span class="w">        </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">[</span><span class="n">&#39;results&#39;</span><span class="o">]</span><span class="w"></span>
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">results</span><span class="p">:</span><span class="w"></span>
-<span class="w">            </span><span class="n">yield</span><span class="w"> </span><span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span><span class="w"></span>
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1522 "></span><span class="k">def</span> <span class="nf">search</span><span class="p">(</span>
+<span class="linenos" data-linenos="1523 "></span>    <span class="bp">self</span><span class="p">,</span>
+<span class="linenos" data-linenos="1524 "></span>    <span class="n">creator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1525 "></span>    <span class="n">contributor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1526 "></span>    <span class="n">owner</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1527 "></span>    <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1528 "></span>    <span class="n">from_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1529 "></span>    <span class="n">to_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1530 "></span>    <span class="n">edit_permission</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="1531 "></span>    <span class="n">resource_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+<span class="linenos" data-linenos="1532 "></span>    <span class="n">subject</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+<span class="linenos" data-linenos="1533 "></span>    <span class="n">full_text_search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1534 "></span>    <span class="n">published</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="1535 "></span>    <span class="n">spatial_coverage</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoxCoverage</span><span class="p">,</span> <span class="n">PointCoverage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="linenos" data-linenos="1536 "></span><span class="p">):</span>
+<span class="linenos" data-linenos="1537 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1538 "></span><span class="sd">    Query the GET /hsapi/resource/ REST end point of the HydroShare server.</span>
+<span class="linenos" data-linenos="1539 "></span><span class="sd">    :param creator: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1540 "></span><span class="sd">    :param author: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1541 "></span><span class="sd">    :param owner: Filter results by the HydroShare username or email</span>
+<span class="linenos" data-linenos="1542 "></span><span class="sd">    :param group_name: Filter results by the HydroShare group name associated with resources</span>
+<span class="linenos" data-linenos="1543 "></span><span class="sd">    :param from_date: Filter results to those created after from_date.  Must be datetime.date.</span>
+<span class="linenos" data-linenos="1544 "></span><span class="sd">    :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have</span>
+<span class="linenos" data-linenos="1545 "></span><span class="sd">        no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get</span>
+<span class="linenos" data-linenos="1546 "></span><span class="sd">        resources created up to and including 2015-05-05)</span>
+<span class="linenos" data-linenos="1547 "></span><span class="sd">    :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)</span>
+<span class="linenos" data-linenos="1548 "></span><span class="sd">    :param subject: Filter by comma separated list of subjects</span>
+<span class="linenos" data-linenos="1549 "></span><span class="sd">    :param full_text_search: Filter by full text search</span>
+<span class="linenos" data-linenos="1550 "></span><span class="sd">    :param edit_permission: Filter by boolean edit permission</span>
+<span class="linenos" data-linenos="1551 "></span><span class="sd">    :param published: Filter by boolean published status</span>
+<span class="linenos" data-linenos="1552 "></span><span class="sd">    :param spatial_coverage: Filtering by spatial coverage raises a 500, do not use</span>
+<span class="linenos" data-linenos="1553 "></span>
+<span class="linenos" data-linenos="1554 "></span><span class="sd">    :return: A generator to iterate over a ResourcePreview object</span>
+<span class="linenos" data-linenos="1555 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1556 "></span>
+<span class="linenos" data-linenos="1557 "></span>    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;edit_permission&quot;</span><span class="p">:</span> <span class="n">edit_permission</span><span class="p">,</span> <span class="s2">&quot;published&quot;</span><span class="p">:</span> <span class="n">published</span><span class="p">}</span>
+<span class="linenos" data-linenos="1558 "></span>    <span class="k">if</span> <span class="n">creator</span><span class="p">:</span>
+<span class="linenos" data-linenos="1559 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;creator&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">creator</span>
+<span class="linenos" data-linenos="1560 "></span>    <span class="k">if</span> <span class="n">contributor</span><span class="p">:</span>
+<span class="linenos" data-linenos="1561 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">contributor</span>
+<span class="linenos" data-linenos="1562 "></span>    <span class="k">if</span> <span class="n">owner</span><span class="p">:</span>
+<span class="linenos" data-linenos="1563 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">owner</span>
+<span class="linenos" data-linenos="1564 "></span>    <span class="k">if</span> <span class="n">group_name</span><span class="p">:</span>
+<span class="linenos" data-linenos="1565 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_name</span>
+<span class="linenos" data-linenos="1566 "></span>    <span class="k">if</span> <span class="n">resource_types</span><span class="p">:</span>
+<span class="linenos" data-linenos="1567 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;type[]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource_types</span>
+<span class="linenos" data-linenos="1568 "></span>    <span class="k">if</span> <span class="n">subject</span><span class="p">:</span>
+<span class="linenos" data-linenos="1569 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+<span class="linenos" data-linenos="1570 "></span>    <span class="k">if</span> <span class="n">full_text_search</span><span class="p">:</span>
+<span class="linenos" data-linenos="1571 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;full_text_search&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_text_search</span>
+<span class="linenos" data-linenos="1572 "></span>    <span class="k">if</span> <span class="n">from_date</span><span class="p">:</span>
+<span class="linenos" data-linenos="1573 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;from_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">from_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1574 "></span>    <span class="k">if</span> <span class="n">to_date</span><span class="p">:</span>
+<span class="linenos" data-linenos="1575 "></span>        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;to_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos" data-linenos="1576 "></span>    <span class="k">if</span> <span class="n">spatial_coverage</span><span class="p">:</span>
+<span class="linenos" data-linenos="1577 "></span>        <span class="k">yield</span> <span class="ne">Exception</span><span class="p">(</span>
+<span class="linenos" data-linenos="1578 "></span>            <span class="s2">&quot;Bad Request, status_code 400, spatial_coverage queries are disabled.&quot;</span>
+<span class="linenos" data-linenos="1579 "></span>        <span class="p">)</span>
+<span class="linenos" data-linenos="1580 "></span>        <span class="c1"># TODO: re-enable after resolution of https://github.com/hydroshare/hydroshare/issues/5240</span>
+<span class="linenos" data-linenos="1581 "></span>        <span class="c1"># params[&quot;coverage_type&quot;] = spatial_coverage.type</span>
+<span class="linenos" data-linenos="1582 "></span>        <span class="c1"># if spatial_coverage.type == &quot;point&quot;:</span>
+<span class="linenos" data-linenos="1583 "></span>        <span class="c1">#     params[&quot;north&quot;] = spatial_coverage.north</span>
+<span class="linenos" data-linenos="1584 "></span>        <span class="c1">#     params[&quot;east&quot;] = spatial_coverage.east</span>
+<span class="linenos" data-linenos="1585 "></span>        <span class="c1"># else:</span>
+<span class="linenos" data-linenos="1586 "></span>        <span class="c1">#     params[&quot;north&quot;] = spatial_coverage.northlimit</span>
+<span class="linenos" data-linenos="1587 "></span>        <span class="c1">#     params[&quot;east&quot;] = spatial_coverage.eastlimit</span>
+<span class="linenos" data-linenos="1588 "></span>        <span class="c1">#     params[&quot;south&quot;] = spatial_coverage.southlimit</span>
+<span class="linenos" data-linenos="1589 "></span>        <span class="c1">#     params[&quot;west&quot;] = spatial_coverage.westlimit</span>
+<span class="linenos" data-linenos="1590 "></span>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/hsapi/resource/&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="linenos" data-linenos="1591 "></span>
+<span class="linenos" data-linenos="1592 "></span>    <span class="n">res</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="linenos" data-linenos="1593 "></span>    <span class="n">results</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1594 "></span>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<span class="linenos" data-linenos="1595 "></span>        <span class="k">yield</span> <span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="1596 "></span>
+<span class="linenos" data-linenos="1597 "></span>    <span class="k">while</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]:</span>
+<span class="linenos" data-linenos="1598 "></span>        <span class="n">next_url</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1599 "></span>        <span class="n">next_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">next_url</span><span class="p">)</span>
+<span class="linenos" data-linenos="1600 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="n">next_url</span><span class="o">.</span><span class="n">path</span>
+<span class="linenos" data-linenos="1601 "></span>        <span class="n">params</span> <span class="o">=</span> <span class="n">next_url</span><span class="o">.</span><span class="n">query</span>
+<span class="linenos" data-linenos="1602 "></span>        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="linenos" data-linenos="1603 "></span>        <span class="n">res</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="linenos" data-linenos="1604 "></span>        <span class="n">results</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+<span class="linenos" data-linenos="1605 "></span>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<span class="linenos" data-linenos="1606 "></span>            <span class="k">yield</span> <span class="n">ResourcePreview</span><span class="p">(</span><span class="o">**</span><span class="n">item</span><span class="p">)</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.sign_in">
 
-<code class="highlight">sign_in(self)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def sign_in(self) -&gt; None:</span>
-<span class="err">    &quot;&quot;&quot;Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook&quot;&quot;&quot;</span>
-<span class="err">    username = input(&quot;Username: &quot;).strip()</span>
-<span class="err">    password = getpass.getpass(&quot;Password for {}: &quot;.format(username))</span>
-<span class="err">    self._hs_session.set_auth((username, password))</span>
-<span class="err">    self.my_user_info()  # validate credentials</span>
+<h2 id="hsclient.hydroshare.HydroShare.sign_in" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">sign_in</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1498 "></span><span class="k">def</span> <span class="nf">sign_in</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="1499 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Prompts for username/password.  Useful for avoiding saving your HydroShare credentials to a notebook&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1500 "></span>    <span class="n">username</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Username: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="linenos" data-linenos="1501 "></span>    <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Password for </span><span class="si">{}</span><span class="s2">: &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">username</span><span class="p">))</span>
+<span class="linenos" data-linenos="1502 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">set_auth</span><span class="p">((</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+<span class="linenos" data-linenos="1503 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">my_user_info</span><span class="p">()</span>  <span class="c1"># validate credentials</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.HydroShare.user">
 
-<code class="highlight">user(self, user_id)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Retrieves the user details of a Hydroshare user
+<h2 id="hsclient.hydroshare.HydroShare.user" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">user</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieves the user details of a Hydroshare user
 :param user_id: The user id of the user details to retrieve
 :return: User object representing the user details</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def user(self, user_id: int) -&gt; User:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Retrieves the user details of a Hydroshare user</span>
-<span class="err">    :param user_id: The user id of the user details to retrieve</span>
-<span class="err">    :return: User object representing the user details</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    response = self._hs_session.get(f&#39;/hsapi/userDetails/{user_id}/&#39;, status_code=200)</span>
-<span class="err">    return User(**response.json())</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="1641 "></span><span class="k">def</span> <span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">User</span><span class="p">:</span>
+<span class="linenos" data-linenos="1642 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1643 "></span><span class="sd">    Retrieves the user details of a Hydroshare user</span>
+<span class="linenos" data-linenos="1644 "></span><span class="sd">    :param user_id: The user id of the user details to retrieve</span>
+<span class="linenos" data-linenos="1645 "></span><span class="sd">    :return: User object representing the user details</span>
+<span class="linenos" data-linenos="1646 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="1647 "></span>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;/hsapi/userDetails/</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="1648 "></span>    <span class="k">return</span> <span class="n">User</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-</div>
-</div>
+
+
+
+  </div>
+
+    </div>
+
 </div>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../examples/Aggregation_Data_Object_Operations/" class="btn btn-neutral float-left" title="Aggregation Data Object Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../resource/" class="btn btn-neutral float-right" title="Resource">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../../metadata/ModelInstance/" class="btn btn-neutral" title="Model Instance"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -503,24 +752,30 @@ Jupyterhub OAuth2 pickle file (stored at :param hs_auth_path:).</p>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../../metadata/ModelInstance/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../resource/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../examples/Aggregation_Data_Object_Operations/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../resource/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>

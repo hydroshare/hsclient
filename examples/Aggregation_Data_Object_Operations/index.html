@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Aggregation Data Object Operations - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Aggregation Data Object Operations";
+        var mkdocs_page_input_path = "examples\\Aggregation_Data_Object_Operations.ipynb";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Aggregation Data Object Operations</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-the-hsclient-python-client">Install the hsclient Python Client</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#authenticating-with-hydroshare">Authenticating with HydroShare</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#loading-resource-aggregation-data-to-relevant-python-data-analysis-modules">Loading Resource Aggregation Data to Relevant Python Data Analysis Modules</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#loading-time-series-data-to-pandasdataframe">Loading Time Series Data to pandas.DataFrame</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loading-geographic-feature-data-to-fionacollection">Loading Geographic Feature Data to fiona.Collection</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loading-multidimensional-data-to-xarraydataset">Loading Multidimensional Data to xarray.Dataset</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loading-geo-raster-data-to-rasteriodatasetreader">Loading Geo Raster Data to rasterio.DatasetReader</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#loading-csv-data-to-pandasdataframe">Loading CSV Data to pandas.DataFrame</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >API</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/csv/">CSV Aggregation</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Usage Examples</li>
+      <li class="breadcrumb-item active">Aggregation Data Object Operations</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/examples/Aggregation_Data_Object_Operations.ipynb" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var requireJsScript = document.createElement('script');
+    requireJsScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js';
+
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var jupyterWidgetsScript = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    jupyterWidgetsScript.src = widgetRendererSrc;
+
+    document.body.appendChild(requireJsScript);
+    document.body.appendChild(jupyterWidgetsScript);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://mybinder.org/v2/gh/GitHub/master?urlpath=lab%2Ftree%2Fdocs\examples\Aggregation_Data_Object_Operations.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="hsclient-hydroshare-python-client-resource-aggregation-data-object-operation-examples">hsclient HydroShare Python Client Resource Aggregation Data Object Operation Examples</h1>
+<hr />
+<p>The following code snippets show examples for how to use the hsclient HydroShare Python Client to load certain aggregation data types to relevant data processing objects to view data properties as well as be able to modify the data. The aggregation data object feature is available for the following HydroShare's content type aggregations:</p>
+<ul>
+<li>Time series</li>
+<li>Geographic feature</li>
+<li>Geographic raster</li>
+<li>Multidimensional NetCDF</li>
+<li>CSV</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="install-the-hsclient-python-client">Install the hsclient Python Client</h2>
+<p>The hsclient Python Client for HydroShare may not be installed by default in your Python environment, so it has to be installed first before you can work with it. Use the following command to install hsclient via the Python Package Index (PyPi). This will install the hsclient as well as all the python packages to work with aggregation data as data processing objects. The following packages will be installed in addition to hsclient:</p>
+<ul>
+<li>pandas</li>
+<li>fiona</li>
+<li>rasterio</li>
+<li>xarray</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python">!pip install hsclient[all]
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="authenticating-with-hydroshare">Authenticating with HydroShare</h2>
+<p>Before you start interacting with resources in HydroShare you will need to authenticate.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python">import os
+from hsclient import HydroShare
+
+hs = HydroShare()
+hs.sign_in()
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="loading-resource-aggregation-data-to-relevant-python-data-analysis-modules">Loading Resource Aggregation Data to Relevant Python Data Analysis Modules</h2>
+<p>The python data analysis module used for each of the supported aggregation types is shown below:</p>
+<ul>
+<li>Time series : pandas.DataFrame</li>
+<li>Geographic feature : fiona.Collection</li>
+<li>Geographic raster : rasterio.DatasetReader</li>
+<li>Multidimensional NetCDF : xarray.Dataset</li>
+<li>CSV : pandas.DataFrame</li>
+</ul>
+<p>In the following code examples, we are assuming that we have a resource in HydroShare that contains the above five aggregation types. All these aggregations are at the root of the resource. The resource id used in the following code examples is "a0e0c2e2e5e84e1e9b6b2b2b2b2b2b2b". You will need to change this resource id to the id of your resource in HydroShare.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># first we need to get the resource object from HydroShare using id of the resource
+resource_id = 'a0e0c2e2e5e84e1e9b6b2b2b2b2b2b2b'
+resource = hs.resource(resource_id)
+# show resource identifier
+print(f&quot;Resource ID:{resource.resource_id}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="loading-time-series-data-to-pandasdataframe">Loading Time Series Data to pandas.DataFrame</h3>
+<p>Here we are assuming the time series aggregation contains a sqlite file with name "sample.sqlite"</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the time series aggregation
+file_path = &quot;sample.sqlite&quot;
+ts_aggr = resource.aggregation(file__path=file_path)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show the aggregation type
+print(f&quot;Aggregation Type:{ts_aggr.metadata.type}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># display the time series results metadata to see the all available series
+# later we will use one of the series ids to retrieve the time series data
+print(ts_aggr.metadata.time_series_results)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># download the time series aggregation - these directory paths must exist for hsclient to download and unzip the aggregation zip file
+# Note: These directory paths need to be changed based on where you want to download the aggregation
+
+base_working_dir = &quot;aggr_objects&quot;
+download_to = os.path.join(base_working_dir, &quot;timeseries_testing&quot;)
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=ts_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># load a given time series of the aggregation as pandas.DataFrame from the downloaded location (aggr_path)
+
+# Note: Here we are assuming the series id used below is one of the ids we found when we printed the
+# time series results in the earlier coding step
+
+series_id = '51e31687-1ebc-11e6-aa6c-f45c8999816f'
+pd_dataframe = ts_aggr.as_data_object(series_id=series_id, agg_path=aggr_path)
+print(f&quot;Type of data processing object:{type(pd_dataframe)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># now we can use the pandas.DataFrame to do some data analysis
+
+# show time series column headings
+print(pd_dataframe.columns)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show time series data summary
+print(pd_dataframe.info)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show number of data points in time series
+print(pd_dataframe.size)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show first 5 records in time series
+print(pd_dataframe.head(5))
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># editing time series aggregation data using the pandas.DataFrame
+print(f&quot;Data frame size before edit:{pd_dataframe.size}&quot;)
+rows, columns = pd_dataframe.shape
+print(f&quot;Number of rows:{rows}&quot;)
+print(f&quot;Number of columns:{columns}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># delete 10 rows from the dataframe. This will result in deleting 10 records from the 'TimeSeriesResultValues' table when we save the dataframe.
+pd_dataframe.drop(pd_dataframe.index[0:10], axis=0, inplace=True)
+rows, columns = pd_dataframe.shape
+print(f&quot;Number of rows in dataframe after delete:{rows}&quot;)
+print(f&quot;Number of columns in dataframe after delete:{columns}&quot;)
+print(f&quot;Data frame size after delete:{pd_dataframe.size}&quot;)
+expected_row_count = rows
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># save the updated dataframe object to the time series aggregation in HydroShare
+# Note this will update the data for the existing time series aggregation in HydroShare - this operation may take a while 
+ts_aggr = ts_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=False)
+print(f&quot;Updated time series aggregation ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new time series aggregation in HydroShare using the updated dataframe object
+# we will first create a new folder in which the new aggregation will be created
+aggr_folder = &quot;ts_folder&quot;
+resource.folder_create(folder=aggr_folder)
+# this operation may take a while  
+ts_aggr = ts_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=True,
+                                   destination_path=aggr_folder)
+print(f&quot;Created a new time series aggregation ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the updated time series aggregation to verify the data was updated
+# reload the new timeseries as pandas.DataFrame
+# need to first download this new aggregation
+
+aggr_path = resource.aggregation_download(aggregation=ts_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+pd_dataframe = ts_aggr.as_data_object(series_id=series_id, agg_path=aggr_path)
+rows, columns = pd_dataframe.shape
+print(f&quot;Number of rows in the updated timeseries:{rows}&quot;)
+print(f&quot;Number of columns in the updated timeseries:{columns}&quot;)
+assert rows == expected_row_count
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="loading-geographic-feature-data-to-fionacollection">Loading Geographic Feature Data to fiona.Collection</h3>
+<p>Here we are assuming the geographic feature aggregation contains a shapefile with name "sample.shp"</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the geographic feature aggregation
+file_path = &quot;sample.shp&quot;
+gf_aggr = resource.aggregation(file__path=file_path)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show the aggregation type
+print(f&quot;Aggregation Type:{gf_aggr.metadata.type}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># download the geographic feature aggregation - these directory paths must exist for hsclient to download and unzip the aggregation zip file
+# Note: These directory paths need to be changed based on where you want to download the aggregation
+download_to = os.path.join(base_working_dir, &quot;geofeature_testing&quot;)
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=gf_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># load the downloaded geo-feature aggregation as a fiona Collection object
+fiona_coll = gf_aggr.as_data_object(agg_path=aggr_path)
+print(f&quot;Type of data processing object:{type(fiona_coll)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># now we can use the fiona.Collection object to do some data analysis
+
+# show driver used to open the vector file
+print(fiona_coll.driver)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show feature collection coordinate reference system
+print(fiona_coll.crs)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show feature collection spatial coverage
+print(fiona_coll.bounds)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show number of features/bands
+print(len(list(fiona_coll)))
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show feature field information
+print(fiona_coll.schema)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show data for a single feature in feature collection
+from fiona.model import to_dict
+
+feature = fiona_coll[1]
+to_dict(feature)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># editing geographic feature aggregation data using the fiona.Collection object
+import fiona
+
+# location of the new output shp file
+# Note: The output shapefile directory path must exist.
+output_shp_file_dir_path = os.path.join(download_to, &quot;updated_aggr&quot;)
+
+# name the output shape file same as the original shape file
+orig_shp_file_name = os.path.basename(gf_aggr.main_file_path)
+output_shp_file_path = os.path.join(output_shp_file_dir_path, orig_shp_file_name)
+
+# here we will remove one of the bands (where the state name is Alaska) and then write the updated data to a new shp file
+# Note: You have to use a different criteria for selecting bands depending on your feature dataset
+with fiona.open(output_shp_file_path, 'w', schema=fiona_coll.schema, driver=fiona_coll.driver,
+                crs=fiona_coll.crs) as out_shp_file:
+    for feature in fiona_coll:
+        ft_dict = to_dict(feature)
+        if ft_dict['properties']['STATE_NAME'] != &quot;Alaska&quot;:
+            out_shp_file.write(feature)
+        else:
+            print(&quot;&amp;gt;&amp;gt; Skipping feature for Alaska&quot;)
+
+print(&quot;Done updating the shp file ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can now update the geographic feature aggregation in HydroShare using the updated shp file - this operation may take a while 
+gf_aggr = gf_aggr.save_data_object(resource=resource, agg_path=output_shp_file_dir_path, as_new_aggr=False)
+print(&quot;Aggregation updated ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new geographic feature aggregation in HydroShare using the updated shp file
+
+# we will first create a new folder in which the new aggregation will be created in HydroShare
+aggr_folder = &quot;gf_folder&quot;
+resource.folder_create(folder=aggr_folder)
+# first retrieve the data object from the updated shp file - this step is not needed if your have not saved the object previously
+fiona_coll = gf_aggr.as_data_object(agg_path=output_shp_file_dir_path)
+# this operation may take a while
+gf_aggr = gf_aggr.save_data_object(resource=resource, agg_path=output_shp_file_dir_path, as_new_aggr=True,
+                                 destination_path=aggr_folder)
+print(&quot;New aggregation created ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the updated geographic feature aggregation to verify the data was updated
+# need to first download this updated/new aggregation
+aggr_path = resource.aggregation_download(aggregation=gf_aggr, save_path=download_to, unzip_to=unzip_to)
+fiona_coll = gf_aggr.as_data_object(agg_path=aggr_path)
+# check the number of bands in the updated aggregation
+print(len(list(fiona_coll)))
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="loading-multidimensional-data-to-xarraydataset">Loading Multidimensional Data to xarray.Dataset</h3>
+<p>Here we are assuming the multidimensional aggregation contains a netcdf file with name "sample.nc"</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the multidimensional aggregation
+file_path = &quot;sample.nc&quot;
+md_aggr = resource.aggregation(file__path=file_path)
+print(f&quot;Aggregation Type:{md_aggr.metadata.type}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># download the multidimensional aggregation - these directory paths must exist for hsclient to download and unzip the aggregation zip file
+# Note: These directory paths need to be changed based on where you want to download the aggregation
+download_to = os.path.join(base_working_dir, &quot;netcdf_testing&quot;)
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=md_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># load the downloaded multidimensional aggregation as a xarray.Dataset object
+xarray_ds = md_aggr.as_data_object(agg_path=aggr_path)
+print(f&quot;Type of data processing object:{type(xarray_ds)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># now we can use the xarray.Dataset object to do some data analysis
+
+# show netcdf global attributes
+print(xarray_ds.attrs)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show netcdf dimensions
+print(xarray_ds.dims)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show coordinate variables of the netcdf dataset
+print(xarray_ds.coords)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># editing multidimensional aggregation data using the xarray.Dataset object
+
+# here we will only change the title attribute of the dataset
+aggr_title = &quot;This is a modified title for this aggregation modified using hsclient&quot;
+xarray_ds.attrs[&quot;title&quot;] = aggr_title
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can update the multidimensional aggregation in HydroShare using the updated xarray.Dataset object - this operation may take a while
+md_aggr = md_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=False)
+print(&quot;Aggregation updated ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new multidimensional aggregation in HydroShare using the updated xarray.Dataset object
+
+# we will first create a new folder in which the new aggregation will be created
+aggr_folder = &quot;md_folder&quot;
+resource.folder_create(folder=aggr_folder)
+# first retrieve the data object from the updated netcdf file - this step is not needed if your have not saved the object previously
+xarray_ds = md_aggr.as_data_object(agg_path=aggr_path)
+# this operation may take a while
+md_aggr = md_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=True,
+                                 destination_path=aggr_folder)
+print(&quot;New aggregation created ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the updated multidimensional aggregation to verify the data was updated
+
+# need to first download this updated/new aggregation
+aggr_path = resource.aggregation_download(aggregation=md_aggr, save_path=download_to, unzip_to=unzip_to)
+xarray_ds = md_aggr.as_data_object(agg_path=aggr_path)
+# check the title attribute of the updated aggregation
+assert xarray_ds.attrs[&quot;title&quot;] == aggr_title
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="loading-geo-raster-data-to-rasteriodatasetreader">Loading Geo Raster Data to rasterio.DatasetReader</h3>
+<p>Here we are assuming the georaster aggregation contains a geotiff file with name "sample.tif"</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the georaster aggregation
+file_path = &quot;sample.tif&quot;
+gr_aggr = resource.aggregation(file__path=file_path)
+print(f&quot;Aggregation Type:{gr_aggr.metadata.type}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># download the georaster aggregation - these directory paths must exist for hsclient to download and unzip the aggregation zip file
+# Note: These directory paths need to be changed based on where you want to download the aggregation
+download_to = os.path.join(base_working_dir, &quot;georaster_testing&quot;)
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=gr_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># load the downloaded georaster aggregation as a rasterio.DatasetReader object
+rasterio_ds = gr_aggr.as_data_object(agg_path=aggr_path)
+print(f&quot;Type of data processing object:{type(rasterio_ds)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># now we can use the rasterio.DatasetReader object to do some data analysis
+
+# show raster band count
+print(rasterio_ds.count)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show raster band dimensions
+print(rasterio_ds.width, rasterio_ds.height)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show raster coordinate reference system
+print(rasterio_ds.crs)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show raster bounds
+print(rasterio_ds.bounds)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show raster data
+data = rasterio_ds.read()
+print(data)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># editing georaster aggregation data using the rasterio.DatasetReader object
+from rasterio.windows import Window
+import rasterio
+
+# here we will subset the raster data to a smaller extent
+print(&quot;raster dimensions before editing:&quot;)
+print(f&quot;raster width :{rasterio_ds.width}&quot;)
+print(f&quot;raster height:{rasterio_ds.height}&quot;)
+new_width = rasterio_ds.width - 9
+new_height = rasterio_ds.height - 10
+subset_window = Window(0, 0, new_width, new_height)
+subset_band = rasterio_ds.read(1, window=subset_window)
+print(subset_band)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># write the subset data to a new tif file - note the target directory must be empty
+# Note: The original raster aggregation may have more than one tif files. The following update will always result in an updated or new aggregation
+# with a single tif file.
+
+output_raster_dir_path = os.path.join(base_working_dir, &quot;georaster_testing&quot;, &quot;updated_aggr&quot;)
+output_raster_filename = &quot;out_sample.tif&quot;
+output_raster_file_path = os.path.join(output_raster_dir_path, output_raster_filename)
+profile = rasterio_ds.profile
+rasterio_ds.close()
+profile['driver'] = &quot;GTiff&quot;
+profile['width'] = new_width
+profile['height'] = new_height
+
+with rasterio.open(output_raster_file_path, &quot;w&quot;, **profile) as dst:
+    dst.write(subset_band, 1)
+
+print(f&quot;Saved subset raster to:{output_raster_file_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can update the georaster aggregation in HydroShare using the updated rasterio.DatasetReader object - this operation may take a while
+gr_aggr = gr_aggr.save_data_object(resource=resource, agg_path=output_raster_dir_path, as_new_aggr=False)
+print(&quot;Aggregation updated ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new georaster aggregation in HydroShare using the updated rasterio.DatasetReader object
+
+# If you have already updated the aggregation as described in the previous cell, then you have to first download the updated aggregation and load the
+# rasterio.DatasetReader object from the downloaded location before you can save the updated raster to a new aggregation in HydroShare as shown below. Otherwise, you can execute the code in the next cell.
+
+download_to = os.path.join(base_working_dir, &quot;georaster_testing&quot;)
+# note the unzip_to directory must exist and be empty
+unzip_to = os.path.join(download_to, &quot;updated_aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=gr_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+
+# reload the updated raster as rasterio.DatasetReader
+rasterio_ds = gr_aggr.as_data_object(agg_path=aggr_path)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new georaster aggregation in HydroShare using the updated rasterio.DatasetReader object
+
+# we will first create a new folder in which the new aggregation will be created
+aggr_folder = &quot;gr_folder&quot;
+resource.folder_create(folder=aggr_folder)
+# this operation may take a while
+gr_aggr = gr_aggr.save_data_object(resource=resource, agg_path=output_raster_dir_path, as_new_aggr=True,
+                                 destination_path=aggr_folder)
+print(&quot;New aggregation created ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the updated georaster aggregation to verify the data was updated
+
+# need to first download this updated/new aggregation
+download_to = os.path.join(base_working_dir, &quot;georaster_testing&quot;)
+# note the unzip_to directory must exist and be empty
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=gr_aggr, save_path=download_to, unzip_to=unzip_to)
+rasterio_ds = gr_aggr.as_data_object(agg_path=aggr_path)
+# check the raster dimensions of the updated aggregation
+print(&quot;raster dimensions after editing:&quot;)
+print(f&quot;raster width :{rasterio_ds.width}&quot;)
+print(f&quot;raster height:{rasterio_ds.height}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="loading-csv-data-to-pandasdataframe">Loading CSV Data to pandas.DataFrame</h3>
+<p>Here we are assuming the CSV aggregation contains a CSV file with name "sample.csv" </p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the CSV aggregation
+file_path = &quot;sample.csv&quot;
+csv_aggr = resource.aggregation(file__path=file_path)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show the aggregation type
+print(f&quot;Aggregation Type:{csv_aggr.metadata.type}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># download the CSV aggregation - these directory paths must exist for hsclient to download and unzip the aggregation zip file
+# Note: These directory paths need to be changed based on where you want to download the aggregation
+download_to = os.path.join(base_working_dir, &quot;csv_testing&quot;)
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=csv_aggr, save_path=download_to, unzip_to=unzip_to)
+print(f&quot;Downloaded aggregation to:{aggr_path}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># load the CSV aggregation as pandas.DataFrame
+csv_df = csv_aggr.as_data_object(agg_path=aggr_path)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show number of rows and columns
+print(f&quot;Number of data rows:{len(csv_df)}&quot;)
+print(f&quot;Number of data columns:{len(csv_df.columns)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show the first 5 data rows
+print(csv_df.head(5))
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># show the extracted CSV aggregation metadata (table schema)
+table_schema = csv_aggr.metadata.tableSchema
+table = table_schema.table
+print(f&quot;Number of data rows:{table_schema.rows}&quot;)
+print(f&quot;Number of data columns:{len(table.columns)}&quot;)
+print(f&quot;Delimiter:{table_schema.delimiter}&quot;)
+
+# show data column properties
+for col in table.columns:
+    print(f&quot;Column number:{col.column_number}&quot;)
+    print(f&quot;Column title:{col.title}&quot;)
+    print(f&quot;Column description:{col.description}&quot;)
+    print(f&quot;Column data type:{col.datatype}&quot;)
+    print(&quot;-&quot;*50) 
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong><em>Editing CSV aggregation using pandas.DataFrame</em></strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># drop the last data column - note all editing needs to be in 'inplace' mode
+csv_df.drop(csv_df.columns[-1], axis=1, inplace=True)
+# show the number of data columns after the edit
+print(f&quot;Number of data columns after edit:{len(csv_df.columns)}&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># save the updated CSV aggregation in Hydroshare
+# Note this will overwrite the original aggregation - this operation may take a while
+csv_aggr = csv_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=False)
+print(&quot;Aggregation updated ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># we can also create a new CSV aggregation in HydroShare using the updated pandas.DataFrame object
+# we first create a new folder in which the new aggregation will be created
+aggr_folder = &quot;csv_folder&quot;
+resource.folder_create(folder=aggr_folder)
+
+# this operation may take a while
+csv_aggr = csv_aggr.save_data_object(resource=resource, agg_path=aggr_path, as_new_aggr=True, destination_path=aggr_folder)
+print(&quot;New CSV aggregation was created ...&quot;)
+</code></pre>
+
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># retrieve the updated CSV aggregation to verify the data got updated
+download_to = os.path.join(base_working_dir, &quot;csv_testing&quot;)
+
+# note the unzip_to directory must exist and be empty
+unzip_to = os.path.join(download_to, &quot;aggr_unzipped&quot;)
+aggr_path = resource.aggregation_download(aggregation=csv_aggr, save_path=download_to, unzip_to=unzip_to)
+csv_df = csv_aggr.as_data_object(agg_path=aggr_path)
+
+# show the number of data rows and columns
+print(f&quot;Number of data rows:{len(csv_df)}&quot;)
+print(f&quot;Number of data columns:{len(csv_df.columns)}&quot;)
+# show the first 5 data rows
+print(csv_df.head(5))
+</code></pre>
+
+
+</div>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Metadata_Operations/" class="btn btn-neutral float-left" title="Metadata Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../api/hydroshare/" class="btn btn-neutral float-right" title="HydroShare">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../Metadata_Operations/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../api/hydroshare/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

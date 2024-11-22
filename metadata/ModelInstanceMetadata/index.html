@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Model Instance - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Model Instance";
+        var mkdocs_page_input_path = "metadata\\ModelInstanceMetadata.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" >API</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/csv/">CSV Aggregation</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Models</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Model Instance</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#properties">Properties</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#definitions">Definitions</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">Models</li>
+      <li class="breadcrumb-item active">Model Instance</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/metadata/ModelInstanceMetadata.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="model-instance-aggregation-metadata">Model Instance Aggregation Metadata</h1>
+<h2 id="properties">Properties</h2>
+<ul>
+<li><strong><code>title</code></strong> <em>(string)</em>: A string containing a descriptive title for the aggregation. Default: <code>null</code>.</li>
+<li><strong><code>subjects</code></strong> <em>(array)</em>: A list of keyword strings expressing the topic of the aggregation. Default: <code>[]</code>.<ul>
+<li><strong>Items</strong> <em>(string)</em></li>
+</ul>
+</li>
+<li><strong><code>language</code></strong> <em>(string)</em>: The 3-character string for the language in which the metadata and content are expressed. Default: <code>"eng"</code>.</li>
+<li><strong><code>additional_metadata</code></strong> <em>(array)</em>: A dictionary of additional metadata elements expressed as key-value pairs.<ul>
+<li><strong>Items</strong> <em>(object)</em>: A key-value pair. Default: <code>[]</code>.<ul>
+<li><strong><code>key</code></strong> <em>(string)</em></li>
+<li><strong><code>value</code></strong> <em>(string)</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>spatial_coverage</code></strong>: An object containing the geospatial coverage for the aggregation expressed as either a bounding box or point. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li>: Refer to <em><a href="#definitions/PointCoverage">#/definitions/PointCoverage</a></em>.</li>
+<li>: Refer to <em><a href="#definitions/BoxCoverage">#/definitions/BoxCoverage</a></em>.</li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>period_coverage</code></strong>: An object containing the temporal coverage for a aggregation expressed as a date range. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li>: Refer to <em><a href="#definitions/PeriodCoverage">#/definitions/PeriodCoverage</a></em>.</li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>includes_model_output</code></strong> <em>(boolean, required)</em>: Indicates whether model output files are included in the aggregation.</li>
+<li><strong><code>executed_by</code></strong>: A URL to the Model Program that can be used to execute this model instance. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li><em>string, format: uri</em></li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>program_schema_json</code></strong>: A URL to the JSON metadata schema for the related model program. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li><em>string, format: uri</em></li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>program_schema_json_values</code></strong>: A URL to a JSON file containing the metadata values conforming to the JSON metadata schema for the related model program. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li><em>string, format: uri</em></li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>type</code></strong>: A string expressing the aggregation type from the list of HydroShare aggregation types. Default: <code>"ModelInstance"</code>.<ul>
+<li><strong>All of</strong><ul>
+<li>: Refer to <em><a href="#definitions/AggregationType">#/definitions/AggregationType</a></em>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><code>url</code></strong> <em>(string, format: uri, required)</em>: An object containing the URL of the aggregation.</li>
+<li><strong><code>rights</code></strong>: An object containing information about the rights held in and over the aggregation and the license under which a aggregation is shared. Default: <code>null</code>.<ul>
+<li><strong>Any of</strong><ul>
+<li>: Refer to <em><a href="#definitions/Rights">#/definitions/Rights</a></em>.</li>
+<li><em>null</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="definitions">Definitions</h2>
+<ul>
+<li><a id="definitions/AggregationType"></a><strong><code>AggregationType</code></strong> <em>(string)</em>: Must be one of: <code>["Generic", "FileSet", "GeoRaster", "NetCDF", "GeoFeature", "RefTimeseries", "TimeSeries", "ModelProgram", "ModelInstance", "CSV"]</code>.</li>
+<li><a id="definitions/BoxCoverage"></a><strong><code>BoxCoverage</code></strong> <em>(object)</em>: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+latitude-longitude bounding box.<ul>
+<li><strong><code>type</code></strong> <em>(string)</em>: A string containing the type of geographic coverage. Must be one of: <code>["box"]</code>. Must be: <code>"box"</code>. Default: <code>"box"</code>.</li>
+<li><strong><code>name</code></strong> <em>(string)</em>: A string containing a name for the place associated with the geographic coverage. Default: <code>null</code>.</li>
+<li><strong><code>northlimit</code></strong> <em>(number, required)</em>: A floating point value containing the constant coordinate for the northernmost face or edge of the bounding box. Exclusive minimum: <code>-90.0</code>. Exclusive maximum: <code>90.0</code>.</li>
+<li><strong><code>eastlimit</code></strong> <em>(number, required)</em>: A floating point value containing the constant coordinate for the easternmost face or edge of the bounding box. Exclusive minimum: <code>-180.0</code>. Exclusive maximum: <code>180.0</code>.</li>
+<li><strong><code>southlimit</code></strong> <em>(number, required)</em>: A floating point value containing the constant coordinate for the southernmost face or edge of the bounding box. Exclusive minimum: <code>-90.0</code>. Exclusive maximum: <code>90.0</code>.</li>
+<li><strong><code>westlimit</code></strong> <em>(number, required)</em>: A floating point value containing the constant coordinate for the westernmost face or edge of the bounding box. Exclusive minimum: <code>-180.0</code>. Exclusive maximum: <code>180.0</code>.</li>
+<li><strong><code>units</code></strong> <em>(string, required)</em>: A string containing the units applying to the unlabelled numeric values of northlimit, eastlimit, southlimit, and westlimit.</li>
+<li><strong><code>projection</code></strong> <em>(string)</em>: A string containing the name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc. Default: <code>null</code>.</li>
+</ul>
+</li>
+<li><a id="definitions/PeriodCoverage"></a><strong><code>PeriodCoverage</code></strong> <em>(object)</em>: A class used to represent temporal coverage metadata for a resource or aggregation.<ul>
+<li><strong><code>name</code></strong> <em>(string)</em>: A string containing a name for the time interval. Default: <code>null</code>.</li>
+<li><strong><code>start</code></strong> <em>(string, format: date-time, required)</em>: A datetime object containing the instant corresponding to the commencement of the time interval.</li>
+<li><strong><code>end</code></strong> <em>(string, format: date-time, required)</em>: A datetime object containing the instant corresponding to the termination of the time interval.</li>
+</ul>
+</li>
+<li><a id="definitions/PointCoverage"></a><strong><code>PointCoverage</code></strong> <em>(object)</em>: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+point location.<ul>
+<li><strong><code>type</code></strong> <em>(string)</em>: A string containing the type of geographic coverage. Must be one of: <code>["point"]</code>. Must be: <code>"point"</code>. Default: <code>"point"</code>.</li>
+<li><strong><code>name</code></strong> <em>(string)</em>: A string containing a name for the place associated with the geographic coverage. Default: <code>null</code>.</li>
+<li><strong><code>east</code></strong> <em>(number, required)</em>: The coordinate of the point location measured in the east direction. Exclusive minimum: <code>-180.0</code>. Exclusive maximum: <code>180.0</code>.</li>
+<li><strong><code>north</code></strong> <em>(number, required)</em>: The coordinate of the point location measured in the north direction. Exclusive minimum: <code>-90.0</code>. Exclusive maximum: <code>90.0</code>.</li>
+<li><strong><code>units</code></strong> <em>(string, required)</em>: The units applying to the unlabelled numeric values of north and east.</li>
+<li><strong><code>projection</code></strong> <em>(string, required)</em>: The name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc.</li>
+</ul>
+</li>
+<li><a id="definitions/Rights"></a><strong><code>Rights</code></strong> <em>(object)</em>: A class used to represent the rights statement metadata associated with a resource.<ul>
+<li><strong><code>statement</code></strong> <em>(string, required)</em>: A string containing the text of the license or rights statement.</li>
+<li><strong><code>url</code></strong> <em>(string, format: uri, required)</em>: An object containing the URL pointing to a description of the license or rights statement.</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ModelProgramMetadata/" class="btn btn-neutral float-left" title="Model Program"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../CSVFileMetadata/" class="btn btn-neutral float-right" title="CSV">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../ModelProgramMetadata/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../CSVFileMetadata/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

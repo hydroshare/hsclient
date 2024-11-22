@@ -1,91 +1,64 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Aggregation - hsclient</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../../css/theme.css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  <link href="../../css/ansi-colours.css" rel="stylesheet" />
-  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
-  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Aggregation";
-    var mkdocs_page_input_path = "api/aggregation.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Aggregation - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Aggregation";
+        var mkdocs_page_input_path = "api\\aggregation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> hsclient</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <p class="caption"><span class="caption-text">Usage Examples</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="#">Models</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFile/">Single File</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSet/">File Set</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeature/">Geographic Feature</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRaster/">Geographic Raster</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/Multidimensional/">Multidimensional</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeries/">Referenced Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
-                </li>
-    </ul>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
     <ul class="current">
                 <li class="toctree-l2"><a class="reference internal" href="../hydroshare/">HydroShare</a>
                 </li>
@@ -93,394 +66,730 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../file/">File</a>
                 </li>
-                <li class="toctree-l2 current"><a class="reference internal current" href="./">Aggregation</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Aggregation</a>
     <ul class="current">
     </ul>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../csv/">CSV Aggregation</a>
+                </li>
     </ul>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">hsclient</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>API &raquo;</li>
-        
-      
-        
-          <li>Developer Documentation &raquo;</li>
-        
-      
-    
-    <li>Aggregation</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">Aggregation</li>
     <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/aggregation.md"> Edit on hydroshare/hsclient</a>
-      
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/aggregation.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <div class="doc doc-object doc-class">
-<h2 class="hidden-toc" id="hsclient.hydroshare.Aggregation" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>Represents an Aggregation in HydroShare</p>
-<div class="doc doc-children">
+
+
+
+<a id="hsclient.hydroshare.Aggregation"></a>
+    <div class="doc doc-contents first">
+
+
+        <p>Represents an Aggregation in HydroShare</p>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="130 "></span><span class="k">class</span> <span class="nc">Aggregation</span><span class="p">:</span>
+<span class="linenos" data-linenos="131 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents an Aggregation in HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="132 "></span>
+<span class="linenos" data-linenos="133 "></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">map_path</span><span class="p">,</span> <span class="n">hs_session</span><span class="p">,</span> <span class="n">checksums</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="linenos" data-linenos="134 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_map_path</span> <span class="o">=</span> <span class="n">map_path</span>
+<span class="linenos" data-linenos="135 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span> <span class="o">=</span> <span class="n">hs_session</span>
+<span class="linenos" data-linenos="136 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="137 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="138 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="139 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="140 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span> <span class="o">=</span> <span class="n">checksums</span>
+<span class="linenos" data-linenos="141 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="142 "></span>
+<span class="linenos" data-linenos="143 "></span>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="144 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_path</span>
+<span class="linenos" data-linenos="145 "></span>
+<span class="linenos" data-linenos="146 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="147 "></span>    <span class="k">def</span> <span class="nf">_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="148 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span><span class="p">:</span>
+<span class="linenos" data-linenos="149 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_and_parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_map_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="150 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span>
+<span class="linenos" data-linenos="151 "></span>
+<span class="linenos" data-linenos="152 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="153 "></span>    <span class="k">def</span> <span class="nf">_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="154 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">:</span>
+<span class="linenos" data-linenos="155 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_and_parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="156 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span>
+<span class="linenos" data-linenos="157 "></span>
+<span class="linenos" data-linenos="158 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="159 "></span>    <span class="k">def</span> <span class="nf">_checksums</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="160 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span><span class="p">:</span>
+<span class="linenos" data-linenos="161 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_checksums</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checksums_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="162 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span>
+<span class="linenos" data-linenos="163 "></span>
+<span class="linenos" data-linenos="164 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="165 "></span>    <span class="k">def</span> <span class="nf">_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="166 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span><span class="p">:</span>
+<span class="linenos" data-linenos="167 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos" data-linenos="168 "></span>            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">describes</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+<span class="linenos" data-linenos="169 "></span>                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_aggregation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">)):</span>
+<span class="linenos" data-linenos="170 "></span>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_path</span><span class="p">:</span>
+<span class="linenos" data-linenos="171 "></span>                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>  <span class="c1"># checking for folders, shouldn&#39;t have to do this</span>
+<span class="linenos" data-linenos="172 "></span>                            <span class="n">file_checksum_path</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="173 "></span>                            <span class="n">file_path</span> <span class="o">=</span> <span class="n">unquote</span><span class="p">(</span>
+<span class="linenos" data-linenos="174 "></span>                                <span class="n">file_checksum_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+<span class="linenos" data-linenos="175 "></span>                                    <span class="s2">&quot;data/contents/&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="176 "></span>                                <span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos" data-linenos="177 "></span>                            <span class="p">)</span>
+<span class="linenos" data-linenos="178 "></span>                            <span class="n">f</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">unquote</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checksums</span><span class="p">[</span><span class="n">file_checksum_path</span><span class="p">])</span>
+<span class="linenos" data-linenos="179 "></span>                            <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="linenos" data-linenos="180 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span>
+<span class="linenos" data-linenos="181 "></span>
+<span class="linenos" data-linenos="182 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="183 "></span>    <span class="k">def</span> <span class="nf">_aggregations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="184 "></span>
+<span class="linenos" data-linenos="185 "></span>        <span class="k">def</span> <span class="nf">populate_metadata</span><span class="p">(</span><span class="n">_aggr</span><span class="p">):</span>
+<span class="linenos" data-linenos="186 "></span>            <span class="n">_aggr</span><span class="o">.</span><span class="n">_metadata</span>
+<span class="linenos" data-linenos="187 "></span>
+<span class="linenos" data-linenos="188 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="p">:</span>
+<span class="linenos" data-linenos="189 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos" data-linenos="190 "></span>            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">describes</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+<span class="linenos" data-linenos="191 "></span>                <span class="k">if</span> <span class="n">is_aggregation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">)):</span>
+<span class="linenos" data-linenos="192 "></span>                    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Aggregation</span><span class="p">(</span><span class="n">unquote</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checksums</span><span class="p">))</span>
+<span class="linenos" data-linenos="193 "></span>
+<span class="linenos" data-linenos="194 "></span>            <span class="c1"># load metadata for all aggregations (metadata is needed to create any typed aggregation)</span>
+<span class="linenos" data-linenos="195 "></span>            <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+<span class="linenos" data-linenos="196 "></span>                <span class="n">executor</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">populate_metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="p">)</span>
+<span class="linenos" data-linenos="197 "></span>
+<span class="linenos" data-linenos="198 "></span>            <span class="c1"># convert aggregations to aggregation type supporting data object</span>
+<span class="linenos" data-linenos="199 "></span>            <span class="n">aggregations_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="p">[:]</span>
+<span class="linenos" data-linenos="200 "></span>            <span class="n">typed_aggregation_classes</span> <span class="o">=</span> <span class="p">{</span><span class="n">AggregationType</span><span class="o">.</span><span class="n">MultidimensionalAggregation</span><span class="p">:</span> <span class="n">NetCDFAggregation</span><span class="p">,</span>
+<span class="linenos" data-linenos="201 "></span>                                         <span class="n">AggregationType</span><span class="o">.</span><span class="n">TimeSeriesAggregation</span><span class="p">:</span> <span class="n">TimeseriesAggregation</span><span class="p">,</span>
+<span class="linenos" data-linenos="202 "></span>                                         <span class="n">AggregationType</span><span class="o">.</span><span class="n">GeographicRasterAggregation</span><span class="p">:</span> <span class="n">GeoRasterAggregation</span><span class="p">,</span>
+<span class="linenos" data-linenos="203 "></span>                                         <span class="n">AggregationType</span><span class="o">.</span><span class="n">GeographicFeatureAggregation</span><span class="p">:</span> <span class="n">GeoFeatureAggregation</span><span class="p">,</span>
+<span class="linenos" data-linenos="204 "></span>                                         <span class="n">AggregationType</span><span class="o">.</span><span class="n">CSVFileAggregation</span><span class="p">:</span> <span class="n">CSVAggregation</span>
+<span class="linenos" data-linenos="205 "></span>                                         <span class="p">}</span>
+<span class="linenos" data-linenos="206 "></span>            <span class="k">for</span> <span class="n">aggr</span> <span class="ow">in</span> <span class="n">aggregations_copy</span><span class="p">:</span>
+<span class="linenos" data-linenos="207 "></span>                <span class="n">typed_aggr_cls</span> <span class="o">=</span> <span class="n">typed_aggregation_classes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="linenos" data-linenos="208 "></span>                <span class="k">if</span> <span class="n">typed_aggr_cls</span><span class="p">:</span>
+<span class="linenos" data-linenos="209 "></span>                    <span class="n">typed_aggr</span> <span class="o">=</span> <span class="n">typed_aggr_cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">base_aggr</span><span class="o">=</span><span class="n">aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="210 "></span>                    <span class="c1"># swapping the generic aggregation with the typed aggregation in the aggregation list</span>
+<span class="linenos" data-linenos="211 "></span>                    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="212 "></span>                    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">typed_aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="213 "></span>
+<span class="linenos" data-linenos="214 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span>
+<span class="linenos" data-linenos="215 "></span>
+<span class="linenos" data-linenos="216 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="217 "></span>    <span class="k">def</span> <span class="nf">_checksums_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="218 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/data/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos" data-linenos="219 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;manifest-md5.txt&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="220 "></span>        <span class="k">return</span> <span class="n">path</span>
+<span class="linenos" data-linenos="221 "></span>
+<span class="linenos" data-linenos="222 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="223 "></span>    <span class="k">def</span> <span class="nf">_hsapi_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="224 "></span>        <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span>
+<span class="linenos" data-linenos="225 "></span>        <span class="n">hsapi_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="s2">&quot;hsapi&quot;</span><span class="p">,</span> <span class="n">resource_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="226 "></span>        <span class="k">return</span> <span class="n">hsapi_path</span>
+<span class="linenos" data-linenos="227 "></span>
+<span class="linenos" data-linenos="228 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="229 "></span>    <span class="k">def</span> <span class="nf">_resource_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="230 "></span>        <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_path</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;/resource/b4ce17c17c654a5c8004af73f2df87ab/&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="231 "></span>        <span class="k">return</span> <span class="n">resource_path</span>
+<span class="linenos" data-linenos="232 "></span>
+<span class="linenos" data-linenos="233 "></span>    <span class="k">def</span> <span class="nf">_retrieve_and_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="linenos" data-linenos="234 "></span>        <span class="n">file_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_string</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="235 "></span>        <span class="n">instance</span> <span class="o">=</span> <span class="n">load_rdf</span><span class="p">(</span><span class="n">file_str</span><span class="p">)</span>
+<span class="linenos" data-linenos="236 "></span>        <span class="k">return</span> <span class="n">instance</span>
+<span class="linenos" data-linenos="237 "></span>
+<span class="linenos" data-linenos="238 "></span>    <span class="k">def</span> <span class="nf">_retrieve_checksums</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="linenos" data-linenos="239 "></span>        <span class="n">file_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_string</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="240 "></span>        <span class="c1"># split string by lines, then split line by delimiter into a dict</span>
+<span class="linenos" data-linenos="241 "></span>        <span class="n">delimiter</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
+<span class="linenos" data-linenos="242 "></span>        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos" data-linenos="243 "></span>            <span class="n">quote</span><span class="p">(</span><span class="n">path</span><span class="p">):</span> <span class="n">checksum</span> <span class="k">for</span> <span class="n">checksum</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="p">]</span>
+<span class="linenos" data-linenos="244 "></span>        <span class="p">}</span>
+<span class="linenos" data-linenos="245 "></span>        <span class="k">return</span> <span class="n">data</span>
+<span class="linenos" data-linenos="246 "></span>
+<span class="linenos" data-linenos="247 "></span>    <span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">unzip_to</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos="248 "></span>        <span class="n">main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="249 "></span>
+<span class="linenos" data-linenos="250 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;contents&quot;</span><span class="p">,</span> <span class="n">main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="251 "></span>        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;zipped&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;aggregation&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}</span>
+<span class="linenos" data-linenos="252 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;resource&#39;</span><span class="p">,</span> <span class="s1">&#39;django_irods/rest_download&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="linenos" data-linenos="253 "></span>        <span class="n">downloaded_zip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">retrieve_zip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="linenos" data-linenos="254 "></span>
+<span class="linenos" data-linenos="255 "></span>        <span class="k">if</span> <span class="n">unzip_to</span><span class="p">:</span>
+<span class="linenos" data-linenos="256 "></span>            <span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="linenos" data-linenos="257 "></span>
+<span class="linenos" data-linenos="258 "></span>            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">downloaded_zip</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+<span class="linenos" data-linenos="259 "></span>                <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">unzip_to</span><span class="p">)</span>
+<span class="linenos" data-linenos="260 "></span>            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">downloaded_zip</span><span class="p">)</span>
+<span class="linenos" data-linenos="261 "></span>            <span class="k">return</span> <span class="n">unzip_to</span>
+<span class="linenos" data-linenos="262 "></span>        <span class="k">return</span> <span class="n">downloaded_zip</span>
+<span class="linenos" data-linenos="263 "></span>
+<span class="linenos" data-linenos="264 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="265 "></span>    <span class="k">def</span> <span class="nf">metadata_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="266 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The path to the metadata file&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="267 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/data/contents/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos" data-linenos="268 "></span>
+<span class="linenos" data-linenos="269 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="270 "></span>    <span class="k">def</span> <span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseMetadata</span><span class="p">:</span>
+<span class="linenos" data-linenos="271 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;A metadata object for reading and updating metadata values&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="272 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
+<span class="linenos" data-linenos="273 "></span>
+<span class="linenos" data-linenos="274 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="275 "></span>    <span class="k">def</span> <span class="nf">metadata_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos="276 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The path to the metadata file&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="277 "></span>        <span class="k">return</span> <span class="n">urlparse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">describes</span><span class="o">.</span><span class="n">is_documented_by</span><span class="p">))</span><span class="o">.</span><span class="n">path</span>
+<span class="linenos" data-linenos="278 "></span>
+<span class="linenos" data-linenos="279 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="280 "></span>    <span class="k">def</span> <span class="nf">main_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos="281 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The path to the main file in the aggregation&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="282 "></span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="283 "></span>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span>
+<span class="linenos" data-linenos="284 "></span>        <span class="n">mft</span> <span class="o">=</span> <span class="n">main_file_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+<span class="linenos" data-linenos="285 "></span>        <span class="k">if</span> <span class="n">mft</span><span class="p">:</span>
+<span class="linenos" data-linenos="286 "></span>            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">():</span>
+<span class="linenos" data-linenos="287 "></span>                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">mft</span><span class="p">):</span>
+<span class="linenos" data-linenos="288 "></span>                    <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">path</span>
+<span class="linenos" data-linenos="289 "></span>                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span>
+<span class="linenos" data-linenos="290 "></span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">FileSetAggregation</span><span class="p">:</span>
+<span class="linenos" data-linenos="291 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">folder</span>
+<span class="linenos" data-linenos="292 "></span>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span>
+<span class="linenos" data-linenos="293 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">path</span>
+<span class="linenos" data-linenos="294 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span>
+<span class="linenos" data-linenos="295 "></span>
+<span class="linenos" data-linenos="296 "></span>    <span class="nd">@refresh</span>
+<span class="linenos" data-linenos="297 "></span>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="298 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="299 "></span><span class="sd">        Saves the metadata back to HydroShare</span>
+<span class="linenos" data-linenos="300 "></span><span class="sd">        :return: None</span>
+<span class="linenos" data-linenos="301 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="302 "></span>        <span class="n">metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span>
+<span class="linenos" data-linenos="303 "></span>        <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="304 "></span>        <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="305 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
+<span class="linenos" data-linenos="306 "></span>
+<span class="linenos" data-linenos="307 "></span>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_aggregations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">File</span><span class="p">]:</span>
+<span class="linenos" data-linenos="308 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="309 "></span><span class="sd">        List files and filter by properties on the file object using kwargs (i.e. extension=&#39;.txt&#39;)</span>
+<span class="linenos" data-linenos="310 "></span><span class="sd">        :param search_aggregations: Defaults False, set to true to search aggregations</span>
+<span class="linenos" data-linenos="311 "></span><span class="sd">        :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
+<span class="linenos" data-linenos="312 "></span><span class="sd">        :return: a List of File objects matching the filter parameters</span>
+<span class="linenos" data-linenos="313 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="314 "></span>        <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+<span class="linenos" data-linenos="315 "></span>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos" data-linenos="316 "></span>            <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">file</span><span class="p">:</span> <span class="n">attribute_filter</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">files</span><span class="p">))</span>
+<span class="linenos" data-linenos="317 "></span>        <span class="k">if</span> <span class="n">search_aggregations</span><span class="p">:</span>
+<span class="linenos" data-linenos="318 "></span>            <span class="k">for</span> <span class="n">aggregation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregations</span><span class="p">():</span>
+<span class="linenos" data-linenos="319 "></span>                <span class="n">files</span> <span class="o">=</span> <span class="n">files</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">aggregation</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="n">search_aggregations</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<span class="linenos" data-linenos="320 "></span>        <span class="k">return</span> <span class="n">files</span>
+<span class="linenos" data-linenos="321 "></span>
+<span class="linenos" data-linenos="322 "></span>    <span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_aggregations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">File</span><span class="p">:</span>
+<span class="linenos" data-linenos="323 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="324 "></span><span class="sd">        Returns a single file in the resource that matches the filtering parameters</span>
+<span class="linenos" data-linenos="325 "></span><span class="sd">        :param search_aggregations: Defaults False, set to true to search aggregations</span>
+<span class="linenos" data-linenos="326 "></span><span class="sd">        :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
+<span class="linenos" data-linenos="327 "></span><span class="sd">        :return: A File object matching the filter parameters or None if no matching File was found</span>
+<span class="linenos" data-linenos="328 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="329 "></span>        <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="n">search_aggregations</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos" data-linenos="330 "></span>        <span class="k">if</span> <span class="n">files</span><span class="p">:</span>
+<span class="linenos" data-linenos="331 "></span>            <span class="k">return</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos" data-linenos="332 "></span>        <span class="k">return</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="333 "></span>
+<span class="linenos" data-linenos="334 "></span>    <span class="k">def</span> <span class="nf">aggregations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseMetadata</span><span class="p">]:</span>
+<span class="linenos" data-linenos="335 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="336 "></span><span class="sd">        List the aggregations in the resource.  Filter by properties on the metadata object using kwargs.  If you need</span>
+<span class="linenos" data-linenos="337 "></span><span class="sd">        to filter on nested properties, use __ (double underscore) to separate the properties.  For example, to filter</span>
+<span class="linenos" data-linenos="338 "></span><span class="sd">        by the BandInformation name, call this method like aggregations(band_information__name=&quot;the name to search&quot;).</span>
+<span class="linenos" data-linenos="339 "></span><span class="sd">        :params **kwargs: Search by properties on the metadata object</span>
+<span class="linenos" data-linenos="340 "></span><span class="sd">        :return: a List of Aggregation objects matching the filter parameters</span>
+<span class="linenos" data-linenos="341 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="342 "></span>        <span class="n">aggregations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregations</span>
+<span class="linenos" data-linenos="343 "></span>
+<span class="linenos" data-linenos="344 "></span>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos" data-linenos="345 "></span>            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file__&#39;</span><span class="p">):</span>
+<span class="linenos" data-linenos="346 "></span>                <span class="n">file_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;file__&#39;</span><span class="p">):]:</span> <span class="n">value</span><span class="p">}</span>
+<span class="linenos" data-linenos="347 "></span>                <span class="n">aggregations</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg</span> <span class="k">for</span> <span class="n">agg</span> <span class="ow">in</span> <span class="n">aggregations</span> <span class="k">if</span> <span class="n">agg</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="o">**</span><span class="n">file_args</span><span class="p">)]</span>
+<span class="linenos" data-linenos="348 "></span>            <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;files__&#39;</span><span class="p">):</span>
+<span class="linenos" data-linenos="349 "></span>                <span class="n">file_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;files__&#39;</span><span class="p">):]:</span> <span class="n">value</span><span class="p">}</span>
+<span class="linenos" data-linenos="350 "></span>                <span class="n">aggregations</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg</span> <span class="k">for</span> <span class="n">agg</span> <span class="ow">in</span> <span class="n">aggregations</span> <span class="k">if</span> <span class="n">agg</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="o">**</span><span class="n">file_args</span><span class="p">)]</span>
+<span class="linenos" data-linenos="351 "></span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="352 "></span>                <span class="n">aggregations</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">agg</span><span class="p">:</span> <span class="n">attribute_filter</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">aggregations</span><span class="p">)</span>
+<span class="linenos" data-linenos="353 "></span>        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">aggregations</span><span class="p">)</span>
+<span class="linenos" data-linenos="354 "></span>
+<span class="linenos" data-linenos="355 "></span>    <span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseMetadata</span><span class="p">:</span>
+<span class="linenos" data-linenos="356 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="357 "></span><span class="sd">        Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering</span>
+<span class="linenos" data-linenos="358 "></span><span class="sd">        rules described in the aggregations method.</span>
+<span class="linenos" data-linenos="359 "></span><span class="sd">        :params **kwargs: Search by properties on the metadata object</span>
+<span class="linenos" data-linenos="360 "></span><span class="sd">        :return: An Aggregation object matching the filter parameters or None if no matching Aggregation was found.</span>
+<span class="linenos" data-linenos="361 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="362 "></span>        <span class="n">aggregations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos" data-linenos="363 "></span>        <span class="k">if</span> <span class="n">aggregations</span><span class="p">:</span>
+<span class="linenos" data-linenos="364 "></span>            <span class="k">return</span> <span class="n">aggregations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos" data-linenos="365 "></span>        <span class="k">return</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="366 "></span>
+<span class="linenos" data-linenos="367 "></span>    <span class="k">def</span> <span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="368 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="369 "></span><span class="sd">        Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will</span>
+<span class="linenos" data-linenos="370 "></span><span class="sd">        only retrieve those files again after another call to access them is made.  This will be later updated to be</span>
+<span class="linenos" data-linenos="371 "></span><span class="sd">        eager and retrieve the files asynchronously.</span>
+<span class="linenos" data-linenos="372 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="373 "></span>        <span class="c1"># TODO, refresh should destroy the aggregation objects and async fetch everything.</span>
+<span class="linenos" data-linenos="374 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="375 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="376 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="377 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="378 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="379 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="380 "></span>
+<span class="linenos" data-linenos="381 "></span>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="382 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes this aggregation from HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="383 "></span>        <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span>
+<span class="linenos" data-linenos="384 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span>
+<span class="linenos" data-linenos="385 "></span>            <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="386 "></span>            <span class="s2">&quot;delete-file-type&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="387 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s2">&quot;LogicalFile&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="388 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span><span class="p">,</span>
+<span class="linenos" data-linenos="389 "></span>        <span class="p">)</span>
+<span class="linenos" data-linenos="390 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="391 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.main_file_path">
 
-<code class="highlight">main_file_path: str</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+
+<h2 id="hsclient.hydroshare.Aggregation.main_file_path" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">main_file_path</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>The path to the main file in the aggregation</p>
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The path to the main file in the aggregation</p>
+    </div>
+
 </div>
-</div>
+
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.metadata">
 
-<code class="highlight">metadata: BaseMetadata</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+
+<h2 id="hsclient.hydroshare.Aggregation.metadata" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">metadata</span><span class="p">:</span> <span class="n">BaseMetadata</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>A metadata object for reading and updating metadata values</p>
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>A metadata object for reading and updating metadata values</p>
+    </div>
+
 </div>
-</div>
+
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.metadata_file">
 
-<code class="highlight">metadata_file</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+
+<h2 id="hsclient.hydroshare.Aggregation.metadata_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">metadata_file</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>The path to the metadata file</p>
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The path to the metadata file</p>
+    </div>
+
 </div>
-</div>
+
 <div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.metadata_path">
 
-<code class="highlight">metadata_path: str</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
+
+<h2 id="hsclient.hydroshare.Aggregation.metadata_path" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">metadata_path</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>The path to the metadata file</p>
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The path to the metadata file</p>
+    </div>
+
 </div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.aggregation">
-
-<code class="highlight">aggregation(self, **kwargs)</code>
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.Aggregation.aggregation" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">aggregation</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering
 rules described in the aggregations method.
 :params **kwargs: Search by properties on the metadata object
 :return: An Aggregation object matching the filter parameters or None if no matching Aggregation was found.</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def aggregation(self, **kwargs) -&gt; BaseMetadata:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering</span>
-<span class="err">    rules described in the aggregations method.</span>
-<span class="err">    :params **kwargs: Search by properties on the metadata object</span>
-<span class="err">    :return: An Aggregation object matching the filter parameters or None if no matching Aggregation was found.</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    aggregations = self.aggregations(**kwargs)</span>
-<span class="err">    if aggregations:</span>
-<span class="err">        return aggregations[0]</span>
-<span class="err">    return None</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="355 "></span><span class="k">def</span> <span class="nf">aggregation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseMetadata</span><span class="p">:</span>
+<span class="linenos" data-linenos="356 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="357 "></span><span class="sd">    Returns a single Aggregation in the resource that matches the filtering parameters.  Uses the same filtering</span>
+<span class="linenos" data-linenos="358 "></span><span class="sd">    rules described in the aggregations method.</span>
+<span class="linenos" data-linenos="359 "></span><span class="sd">    :params **kwargs: Search by properties on the metadata object</span>
+<span class="linenos" data-linenos="360 "></span><span class="sd">    :return: An Aggregation object matching the filter parameters or None if no matching Aggregation was found.</span>
+<span class="linenos" data-linenos="361 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="362 "></span>    <span class="n">aggregations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregations</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos" data-linenos="363 "></span>    <span class="k">if</span> <span class="n">aggregations</span><span class="p">:</span>
+<span class="linenos" data-linenos="364 "></span>        <span class="k">return</span> <span class="n">aggregations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos" data-linenos="365 "></span>    <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.aggregations">
 
-<code class="highlight">aggregations(self, **kwargs)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>List the aggregations in the resource.  Filter by properties on the metadata object using kwargs.  If you need
+<h2 id="hsclient.hydroshare.Aggregation.aggregations" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">aggregations</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>List the aggregations in the resource.  Filter by properties on the metadata object using kwargs.  If you need
 to filter on nested properties, use __ (double underscore) to separate the properties.  For example, to filter
 by the BandInformation name, call this method like aggregations(band_information__name="the name to search").
 :params **kwargs: Search by properties on the metadata object
 :return: a List of Aggregation objects matching the filter parameters</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">aggregations</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">BaseMetadata</span><span class="o">]</span><span class="err">:</span><span class="w"></span>
-<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
-<span class="ss">    List the aggregations in the resource.  Filter by properties on the metadata object using kwargs.  If you need</span>
-<span class="ss">    to filter on nested properties, use __ (double underscore) to separate the properties.  For example, to filter</span>
-<span class="ss">    by the BandInformation name, call this method like aggregations(band_information__name=&quot;</span><span class="n">the</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">search</span><span class="ss">&quot;).</span>
-<span class="ss">    :params **kwargs: Search by properties on the metadata object</span>
-<span class="ss">    :return: a List of Aggregation objects matching the filter parameters</span>
-<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="n">aggregations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_aggregations</span><span class="w"></span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">kwargs</span><span class="p">.</span><span class="n">items</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="k">key</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file__&#39;</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
-<span class="w">            </span><span class="n">file_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="k">key</span><span class="o">[</span><span class="n">len(&#39;file__&#39;) :</span><span class="o">]</span><span class="err">:</span><span class="w"> </span><span class="k">value</span><span class="err">}</span><span class="w"></span>
-<span class="w">            </span><span class="n">aggregations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">agg for agg in aggregations if agg.files(**file_args)</span><span class="o">]</span><span class="w"></span>
-<span class="w">        </span><span class="n">elif</span><span class="w"> </span><span class="k">key</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;files__&#39;</span><span class="p">)</span><span class="err">:</span><span class="w"></span>
-<span class="w">            </span><span class="n">file_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="k">key</span><span class="o">[</span><span class="n">len(&#39;files__&#39;) :</span><span class="o">]</span><span class="err">:</span><span class="w"> </span><span class="k">value</span><span class="err">}</span><span class="w"></span>
-<span class="w">            </span><span class="n">aggregations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">agg for agg in aggregations if agg.files(**file_args)</span><span class="o">]</span><span class="w"></span>
-<span class="w">        </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
-<span class="w">            </span><span class="n">aggregations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">filter</span><span class="p">(</span><span class="n">lambda</span><span class="w"> </span><span class="nl">agg</span><span class="p">:</span><span class="w"> </span><span class="n">attribute_filter</span><span class="p">(</span><span class="n">agg</span><span class="p">.</span><span class="n">metadata</span><span class="p">,</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">),</span><span class="w"> </span><span class="n">aggregations</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">list</span><span class="p">(</span><span class="n">aggregations</span><span class="p">)</span><span class="w"></span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="334 "></span><span class="k">def</span> <span class="nf">aggregations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseMetadata</span><span class="p">]:</span>
+<span class="linenos" data-linenos="335 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="336 "></span><span class="sd">    List the aggregations in the resource.  Filter by properties on the metadata object using kwargs.  If you need</span>
+<span class="linenos" data-linenos="337 "></span><span class="sd">    to filter on nested properties, use __ (double underscore) to separate the properties.  For example, to filter</span>
+<span class="linenos" data-linenos="338 "></span><span class="sd">    by the BandInformation name, call this method like aggregations(band_information__name=&quot;the name to search&quot;).</span>
+<span class="linenos" data-linenos="339 "></span><span class="sd">    :params **kwargs: Search by properties on the metadata object</span>
+<span class="linenos" data-linenos="340 "></span><span class="sd">    :return: a List of Aggregation objects matching the filter parameters</span>
+<span class="linenos" data-linenos="341 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="342 "></span>    <span class="n">aggregations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregations</span>
+<span class="linenos" data-linenos="343 "></span>
+<span class="linenos" data-linenos="344 "></span>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos" data-linenos="345 "></span>        <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file__&#39;</span><span class="p">):</span>
+<span class="linenos" data-linenos="346 "></span>            <span class="n">file_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;file__&#39;</span><span class="p">):]:</span> <span class="n">value</span><span class="p">}</span>
+<span class="linenos" data-linenos="347 "></span>            <span class="n">aggregations</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg</span> <span class="k">for</span> <span class="n">agg</span> <span class="ow">in</span> <span class="n">aggregations</span> <span class="k">if</span> <span class="n">agg</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="o">**</span><span class="n">file_args</span><span class="p">)]</span>
+<span class="linenos" data-linenos="348 "></span>        <span class="k">elif</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;files__&#39;</span><span class="p">):</span>
+<span class="linenos" data-linenos="349 "></span>            <span class="n">file_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;files__&#39;</span><span class="p">):]:</span> <span class="n">value</span><span class="p">}</span>
+<span class="linenos" data-linenos="350 "></span>            <span class="n">aggregations</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg</span> <span class="k">for</span> <span class="n">agg</span> <span class="ow">in</span> <span class="n">aggregations</span> <span class="k">if</span> <span class="n">agg</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="o">**</span><span class="n">file_args</span><span class="p">)]</span>
+<span class="linenos" data-linenos="351 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="352 "></span>            <span class="n">aggregations</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">agg</span><span class="p">:</span> <span class="n">attribute_filter</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">aggregations</span><span class="p">)</span>
+<span class="linenos" data-linenos="353 "></span>    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">aggregations</span><span class="p">)</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.as_series">
 
-<code class="highlight">as_series(self, series_id, agg_path=None)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Creates a pandas Series object out of an aggregation of type TimeSeries.
-:param series_id: The series_id of the timeseries result to be converted to a Series object.
-:param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have
-it downloaded locally.
-:return: A pandas.Series object</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span> <span class="n">as_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb nb-Type">int</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a pandas Series object out of an aggregation of type TimeSeries.</span>
-<span class="sd">    :param series_id: The series_id of the timeseries result to be converted to a Series object.</span>
-<span class="sd">    :param agg_path: Not required.  Include this parameter to avoid downloading the aggregation if you already have</span>
-<span class="sd">    it downloaded locally.</span>
-<span class="sd">    :return: A pandas.Series object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<h2 id="hsclient.hydroshare.Aggregation.delete" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">delete</span><span class="p">()</span></code>
 
-    <span class="n">def</span> <span class="n">to_series</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
-            <span class="n">f</span><span class="s1">&#39;SELECT * FROM TimeSeriesResultValues WHERE ResultID IN &#39;</span>
-            <span class="n">f</span><span class="s1">&#39;(SELECT ResultID FROM Results WHERE ResultUUID = &quot;{series_id}&quot;);&#39;</span><span class="p">,</span>
-            <span class="n">con</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+</h2>
 
-    <span class="k">if</span> <span class="n">agg_path</span> <span class="k">is</span> <span class="n">None</span><span class="p">:</span>
-        <span class="n">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">td</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_download</span><span class="p">(</span><span class="n">unzip_to</span><span class="o">=</span><span class="n">td</span><span class="p">)</span>
-            <span class="c1"># zip extracted to folder with main file name</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.sqlite&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">return</span> <span class="n">to_series</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">td</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">to_series</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.sqlite&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+    <div class="doc doc-contents ">
+
+        <p>Deletes this aggregation from HydroShare</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="381 "></span><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="382 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes this aggregation from HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="383 "></span>    <span class="n">path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span>
+<span class="linenos" data-linenos="384 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span>
+<span class="linenos" data-linenos="385 "></span>        <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="386 "></span>        <span class="s2">&quot;delete-file-type&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="387 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s2">&quot;LogicalFile&quot;</span><span class="p">,</span>
+<span class="linenos" data-linenos="388 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span><span class="p">,</span>
+<span class="linenos" data-linenos="389 "></span>    <span class="p">)</span>
+<span class="linenos" data-linenos="390 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="linenos" data-linenos="391 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.file">
 
-<code class="highlight">file(self, search_aggregations=False, **kwargs)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Returns a single file in the resource that matches the filtering parameters
+<h2 id="hsclient.hydroshare.Aggregation.file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">file</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns a single file in the resource that matches the filtering parameters
 :param search_aggregations: Defaults False, set to true to search aggregations
 :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)
 :return: A File object matching the filter parameters or None if no matching File was found</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def file(self, search_aggregations=False, **kwargs) -&gt; File:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Returns a single file in the resource that matches the filtering parameters</span>
-<span class="err">    :param search_aggregations: Defaults False, set to true to search aggregations</span>
-<span class="err">    :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
-<span class="err">    :return: A File object matching the filter parameters or None if no matching File was found</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    files = self.files(search_aggregations=search_aggregations, **kwargs)</span>
-<span class="err">    if files:</span>
-<span class="err">        return files[0]</span>
-<span class="err">    return None</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="322 "></span><span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_aggregations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">File</span><span class="p">:</span>
+<span class="linenos" data-linenos="323 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="324 "></span><span class="sd">    Returns a single file in the resource that matches the filtering parameters</span>
+<span class="linenos" data-linenos="325 "></span><span class="sd">    :param search_aggregations: Defaults False, set to true to search aggregations</span>
+<span class="linenos" data-linenos="326 "></span><span class="sd">    :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
+<span class="linenos" data-linenos="327 "></span><span class="sd">    :return: A File object matching the filter parameters or None if no matching File was found</span>
+<span class="linenos" data-linenos="328 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="329 "></span>    <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="n">search_aggregations</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos" data-linenos="330 "></span>    <span class="k">if</span> <span class="n">files</span><span class="p">:</span>
+<span class="linenos" data-linenos="331 "></span>        <span class="k">return</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos" data-linenos="332 "></span>    <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.files">
 
-<code class="highlight">files(self, search_aggregations=False, **kwargs)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>List files and filter by properties on the file object using kwargs (i.e. extension='.txt')
+<h2 id="hsclient.hydroshare.Aggregation.files" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>List files and filter by properties on the file object using kwargs (i.e. extension='.txt')
 :param search_aggregations: Defaults False, set to true to search aggregations
 :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)
 :return: a List of File objects matching the filter parameters</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">files</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="nl">search_aggregations</span><span class="p">:</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">False</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">List</span><span class="o">[</span><span class="n">File</span><span class="o">]</span><span class="err">:</span><span class="w"></span>
-<span class="w">    </span><span class="ss">&quot;&quot;&quot;</span>
-<span class="ss">    List files and filter by properties on the file object using kwargs (i.e. extension=&#39;.txt&#39;)</span>
-<span class="ss">    :param search_aggregations: Defaults False, set to true to search aggregations</span>
-<span class="ss">    :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
-<span class="ss">    :return: a List of File objects matching the filter parameters</span>
-<span class="ss">    &quot;&quot;&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">_files</span><span class="w"></span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">kwargs</span><span class="p">.</span><span class="n">items</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
-<span class="w">        </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">(</span><span class="k">filter</span><span class="p">(</span><span class="n">lambda</span><span class="w"> </span><span class="k">file</span><span class="err">:</span><span class="w"> </span><span class="n">attribute_filter</span><span class="p">(</span><span class="k">file</span><span class="p">,</span><span class="w"> </span><span class="k">key</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">),</span><span class="w"> </span><span class="n">files</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nl">search_aggregations</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">aggregation</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">aggregations</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
-<span class="w">            </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">list</span><span class="p">(</span><span class="n">aggregation</span><span class="p">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="n">search_aggregations</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="307 "></span><span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_aggregations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">File</span><span class="p">]:</span>
+<span class="linenos" data-linenos="308 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="309 "></span><span class="sd">    List files and filter by properties on the file object using kwargs (i.e. extension=&#39;.txt&#39;)</span>
+<span class="linenos" data-linenos="310 "></span><span class="sd">    :param search_aggregations: Defaults False, set to true to search aggregations</span>
+<span class="linenos" data-linenos="311 "></span><span class="sd">    :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)</span>
+<span class="linenos" data-linenos="312 "></span><span class="sd">    :return: a List of File objects matching the filter parameters</span>
+<span class="linenos" data-linenos="313 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="314 "></span>    <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+<span class="linenos" data-linenos="315 "></span>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos" data-linenos="316 "></span>        <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">file</span><span class="p">:</span> <span class="n">attribute_filter</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">files</span><span class="p">))</span>
+<span class="linenos" data-linenos="317 "></span>    <span class="k">if</span> <span class="n">search_aggregations</span><span class="p">:</span>
+<span class="linenos" data-linenos="318 "></span>        <span class="k">for</span> <span class="n">aggregation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregations</span><span class="p">():</span>
+<span class="linenos" data-linenos="319 "></span>            <span class="n">files</span> <span class="o">=</span> <span class="n">files</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">aggregation</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">search_aggregations</span><span class="o">=</span><span class="n">search_aggregations</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<span class="linenos" data-linenos="320 "></span>    <span class="k">return</span> <span class="n">files</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.refresh">
 
-<code class="highlight">refresh(self)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will
+<h2 id="hsclient.hydroshare.Aggregation.refresh" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">refresh</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will
 only retrieve those files again after another call to access them is made.  This will be later updated to be
 eager and retrieve the files asynchronously.</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def refresh(self) -&gt; None:</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will</span>
-<span class="err">    only retrieve those files again after another call to access them is made.  This will be later updated to be</span>
-<span class="err">    eager and retrieve the files asynchronously.</span>
-<span class="err">    &quot;&quot;&quot;</span>
-<span class="err">    # TODO, refresh should destroy the aggregation objects and async fetch everything.</span>
-<span class="err">    self._retrieved_map = None</span>
-<span class="err">    self._retrieved_metadata = None</span>
-<span class="err">    self._parsed_files = None</span>
-<span class="err">    self._parsed_aggregations = None</span>
-<span class="err">    self._parsed_checksums = None</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="367 "></span><span class="k">def</span> <span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="368 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="369 "></span><span class="sd">    Forces the retrieval of the resource map and metadata files.  Currently this is implemented to be lazy and will</span>
+<span class="linenos" data-linenos="370 "></span><span class="sd">    only retrieve those files again after another call to access them is made.  This will be later updated to be</span>
+<span class="linenos" data-linenos="371 "></span><span class="sd">    eager and retrieve the files asynchronously.</span>
+<span class="linenos" data-linenos="372 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="373 "></span>    <span class="c1"># TODO, refresh should destroy the aggregation objects and async fetch everything.</span>
+<span class="linenos" data-linenos="374 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_map</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="375 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="376 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_files</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="377 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_aggregations</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="378 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_checksums</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="379 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_main_file_path</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.Aggregation.save">
 
-<code class="highlight">save(self)</code>
+<div class="doc doc-object doc-function">
 
 
-      </h2>
-<div class="doc doc-contents ">
-<p>Saves the metadata back to HydroShare
+<h2 id="hsclient.hydroshare.Aggregation.save" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the metadata back to HydroShare
 :return: None</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="n">refresh</span>
-<span class="n">def</span> <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves the metadata back to HydroShare</span>
-<span class="sd">    :return: None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span>
-    <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="296 "></span><span class="nd">@refresh</span>
+<span class="linenos" data-linenos="297 "></span><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="298 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="299 "></span><span class="sd">    Saves the metadata back to HydroShare</span>
+<span class="linenos" data-linenos="300 "></span><span class="sd">    :return: None</span>
+<span class="linenos" data-linenos="301 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="302 "></span>    <span class="n">metadata_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_file</span>
+<span class="linenos" data-linenos="303 "></span>    <span class="n">metadata_string</span> <span class="o">=</span> <span class="n">rdf_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieved_metadata</span><span class="p">,</span> <span class="n">rdf_format</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="304 "></span>    <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hsapi_path</span><span class="p">,</span> <span class="s2">&quot;ingest_metadata&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="305 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_hs_session</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">metadata_file</span><span class="p">,</span> <span class="n">metadata_string</span><span class="p">)})</span>
 </code></pre></div>
+            </details>
+    </div>
 
 </div>
-</details>
-</div>
-</div>
-</div>
-</div>
+
+
+
+  </div>
+
+    </div>
+
 </div>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="../file/" class="btn btn-neutral" title="File"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../file/" class="btn btn-neutral float-left" title="File"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../netcdf_aggregation/" class="btn btn-neutral float-right" title="Multidimensional Aggregation">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -488,22 +797,30 @@ eager and retrieve the files asynchronously.</p>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../file/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../file/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../netcdf_aggregation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>

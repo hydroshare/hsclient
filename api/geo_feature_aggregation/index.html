@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Geographic Feature Aggregation - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Geographic Feature Aggregation";
+        var mkdocs_page_input_path = "api\\geo_feature_aggregation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../aggregation/">Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Geographic Feature Aggregation</a>
+    <ul class="current">
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../csv/">CSV Aggregation</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">Geographic Feature Aggregation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/geo_feature_aggregation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="doc doc-object doc-class">
+
+
+
+<a id="hsclient.hydroshare.GeoFeatureAggregation"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="hsclient.hydroshare.DataObjectSupportingAggregation">DataObjectSupportingAggregation</span></code></p>
+
+
+        <p>Represents a Geo Feature Aggregation in HydroShare</p>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="632 "></span><span class="k">class</span> <span class="nc">GeoFeatureAggregation</span><span class="p">(</span><span class="n">DataObjectSupportingAggregation</span><span class="p">):</span>
+<span class="linenos" data-linenos="633 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a Geo Feature Aggregation in HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="634 "></span>    <span class="nd">@classmethod</span>
+<span class="linenos" data-linenos="635 "></span>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="p">):</span>
+<span class="linenos" data-linenos="636 "></span>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">aggr_cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="o">=</span><span class="n">base_aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="637 "></span>
+<span class="linenos" data-linenos="638 "></span>    <span class="k">def</span> <span class="nf">_validate_aggregation_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">for_save_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos="639 "></span>        <span class="k">if</span> <span class="n">for_save_data</span><span class="p">:</span>
+<span class="linenos" data-linenos="640 "></span>            <span class="k">for</span> <span class="n">aggr_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">():</span>
+<span class="linenos" data-linenos="641 "></span>                <span class="n">aggr_file</span> <span class="o">=</span> <span class="n">basename</span><span class="p">(</span><span class="n">aggr_file</span><span class="p">)</span>
+<span class="linenos" data-linenos="642 "></span>                <span class="k">if</span> <span class="n">aggr_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.shp.xml&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">aggr_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.sbn&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">aggr_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.sbx&quot;</span><span class="p">):</span>
+<span class="linenos" data-linenos="643 "></span>                    <span class="c1"># these are optional files for geo feature aggregation</span>
+<span class="linenos" data-linenos="644 "></span>                    <span class="k">continue</span>
+<span class="linenos" data-linenos="645 "></span>                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">aggr_file</span><span class="p">)):</span>
+<span class="linenos" data-linenos="646 "></span>                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Aggregation path &#39;</span><span class="si">{</span><span class="n">agg_path</span><span class="si">}</span><span class="s2">&#39; is not a valid path. &quot;</span>
+<span class="linenos" data-linenos="647 "></span>                                    <span class="sa">f</span><span class="s2">&quot;Missing file &#39;</span><span class="si">{</span><span class="n">aggr_file</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="648 "></span>        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="649 "></span>        <span class="k">return</span> <span class="n">file_path</span>
+<span class="linenos" data-linenos="650 "></span>
+<span class="linenos" data-linenos="651 "></span>    <span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;fiona.Collection&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="652 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="653 "></span><span class="sd">        Loads the Geo Feature aggregation to a fiona Collection object</span>
+<span class="linenos" data-linenos="654 "></span><span class="sd">        :param agg_path: the path to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="655 "></span><span class="sd">        :return: the Geo Feature aggregation as a fiona Collection object</span>
+<span class="linenos" data-linenos="656 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="657 "></span>        <span class="k">if</span> <span class="n">fiona</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="658 "></span>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;fiona package was not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="659 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">)</span>
+<span class="linenos" data-linenos="660 "></span>
+<span class="linenos" data-linenos="661 "></span>    <span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="662 "></span>                         <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="663 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="664 "></span><span class="sd">        Saves the fiona Collection object to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="665 "></span><span class="sd">        :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="666 "></span><span class="sd">        :param agg_path: the path to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="667 "></span><span class="sd">        :param as_new_aggr: Defaults False, set to True to create a new Geo Feature aggregation</span>
+<span class="linenos" data-linenos="668 "></span><span class="sd">        :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="669 "></span><span class="sd">        :return: the updated or new Geo Feature aggregation</span>
+<span class="linenos" data-linenos="670 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="671 "></span>        <span class="k">def</span> <span class="nf">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="linenos" data-linenos="672 "></span>            <span class="n">shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="673 "></span>            <span class="n">filename_starts_with</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="linenos" data-linenos="674 "></span>            <span class="n">shape_files</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos" data-linenos="675 "></span>            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">shp_file_dir_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="676 "></span>                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">filename_starts_with</span><span class="p">):</span>
+<span class="linenos" data-linenos="677 "></span>                    <span class="n">file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="678 "></span>                    <span class="n">shape_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_full_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="679 "></span>
+<span class="linenos" data-linenos="680 "></span>            <span class="k">if</span> <span class="ow">not</span> <span class="n">dst_path</span><span class="p">:</span>
+<span class="linenos" data-linenos="681 "></span>                <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="o">*</span><span class="n">shape_files</span><span class="p">)</span>
+<span class="linenos" data-linenos="682 "></span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="683 "></span>                <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="o">*</span><span class="n">shape_files</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="684 "></span>
+<span class="linenos" data-linenos="685 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">GeographicFeatureAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="686 "></span>        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="687 "></span>        <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="688 "></span>        <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="689 "></span>        <span class="c1"># need to close the fiona.Collection object to free up access to all the original shape files</span>
+<span class="linenos" data-linenos="690 "></span>        <span class="n">data_object</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos" data-linenos="691 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="692 "></span>            <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="693 "></span>            <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="694 "></span>            <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="695 "></span>            <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="696 "></span>
+<span class="linenos" data-linenos="697 "></span>            <span class="c1"># copy the updated shape files to the original shape file location where the user downloaded the</span>
+<span class="linenos" data-linenos="698 "></span>            <span class="c1"># aggregation previously</span>
+<span class="linenos" data-linenos="699 "></span>            <span class="n">src_shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="700 "></span>            <span class="n">tgt_shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">data_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="701 "></span>            <span class="n">filename_starts_with</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="linenos" data-linenos="702 "></span>
+<span class="linenos" data-linenos="703 "></span>            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">src_shp_file_dir_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="704 "></span>                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">filename_starts_with</span><span class="p">):</span>
+<span class="linenos" data-linenos="705 "></span>                    <span class="n">src_file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="706 "></span>                    <span class="n">tgt_file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="707 "></span>                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_full_path</span><span class="p">,</span> <span class="n">tgt_file_full_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="708 "></span>
+<span class="linenos" data-linenos="709 "></span>            <span class="c1"># upload the updated shape files to replace this aggregation</span>
+<span class="linenos" data-linenos="710 "></span>            <span class="n">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="o">=</span><span class="n">data_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="711 "></span>
+<span class="linenos" data-linenos="712 "></span>            <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="713 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="714 "></span>
+<span class="linenos" data-linenos="715 "></span>            <span class="c1"># update aggregation metadata</span>
+<span class="linenos" data-linenos="716 "></span>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="717 "></span>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="718 "></span>                    <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="719 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="720 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="721 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="722 "></span>            <span class="c1"># upload the updated shape files to create a new geo feature aggregation</span>
+<span class="linenos" data-linenos="723 "></span>            <span class="n">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="724 "></span>
+<span class="linenos" data-linenos="725 "></span>            <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="726 "></span>            <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="727 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="728 "></span>
+<span class="linenos" data-linenos="729 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="730 "></span>        <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.GeoFeatureAggregation.as_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">as_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Loads the Geo Feature aggregation to a fiona Collection object
+:param agg_path: the path to the Geo Feature aggregation
+:return: the Geo Feature aggregation as a fiona Collection object</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="651 "></span><span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;fiona.Collection&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="652 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="653 "></span><span class="sd">    Loads the Geo Feature aggregation to a fiona Collection object</span>
+<span class="linenos" data-linenos="654 "></span><span class="sd">    :param agg_path: the path to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="655 "></span><span class="sd">    :return: the Geo Feature aggregation as a fiona Collection object</span>
+<span class="linenos" data-linenos="656 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="657 "></span>    <span class="k">if</span> <span class="n">fiona</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="658 "></span>        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;fiona package was not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="659 "></span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">)</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.GeoFeatureAggregation.save_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_data_object</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the fiona Collection object to the Geo Feature aggregation
+:param resource: the resource containing the aggregation
+:param agg_path: the path to the Geo Feature aggregation
+:param as_new_aggr: Defaults False, set to True to create a new Geo Feature aggregation
+:param destination_path: the destination path in Hydroshare to save the new aggregation
+:return: the updated or new Geo Feature aggregation</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="661 "></span><span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="662 "></span>                     <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="663 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="664 "></span><span class="sd">    Saves the fiona Collection object to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="665 "></span><span class="sd">    :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="666 "></span><span class="sd">    :param agg_path: the path to the Geo Feature aggregation</span>
+<span class="linenos" data-linenos="667 "></span><span class="sd">    :param as_new_aggr: Defaults False, set to True to create a new Geo Feature aggregation</span>
+<span class="linenos" data-linenos="668 "></span><span class="sd">    :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="669 "></span><span class="sd">    :return: the updated or new Geo Feature aggregation</span>
+<span class="linenos" data-linenos="670 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="671 "></span>    <span class="k">def</span> <span class="nf">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="linenos" data-linenos="672 "></span>        <span class="n">shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="673 "></span>        <span class="n">filename_starts_with</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">main_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="linenos" data-linenos="674 "></span>        <span class="n">shape_files</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos" data-linenos="675 "></span>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">shp_file_dir_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="676 "></span>            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">filename_starts_with</span><span class="p">):</span>
+<span class="linenos" data-linenos="677 "></span>                <span class="n">file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="678 "></span>                <span class="n">shape_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_full_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="679 "></span>
+<span class="linenos" data-linenos="680 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">dst_path</span><span class="p">:</span>
+<span class="linenos" data-linenos="681 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="o">*</span><span class="n">shape_files</span><span class="p">)</span>
+<span class="linenos" data-linenos="682 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="683 "></span>            <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="o">*</span><span class="n">shape_files</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">dst_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="684 "></span>
+<span class="linenos" data-linenos="685 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">GeographicFeatureAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="686 "></span>    <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="687 "></span>    <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="688 "></span>    <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="689 "></span>    <span class="c1"># need to close the fiona.Collection object to free up access to all the original shape files</span>
+<span class="linenos" data-linenos="690 "></span>    <span class="n">data_object</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos" data-linenos="691 "></span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="692 "></span>        <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="693 "></span>        <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="694 "></span>        <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="695 "></span>        <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="696 "></span>
+<span class="linenos" data-linenos="697 "></span>        <span class="c1"># copy the updated shape files to the original shape file location where the user downloaded the</span>
+<span class="linenos" data-linenos="698 "></span>        <span class="c1"># aggregation previously</span>
+<span class="linenos" data-linenos="699 "></span>        <span class="n">src_shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="700 "></span>        <span class="n">tgt_shp_file_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">data_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="701 "></span>        <span class="n">filename_starts_with</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="linenos" data-linenos="702 "></span>
+<span class="linenos" data-linenos="703 "></span>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">src_shp_file_dir_path</span><span class="p">):</span>
+<span class="linenos" data-linenos="704 "></span>            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">filename_starts_with</span><span class="p">):</span>
+<span class="linenos" data-linenos="705 "></span>                <span class="n">src_file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="706 "></span>                <span class="n">tgt_file_full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_shp_file_dir_path</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+<span class="linenos" data-linenos="707 "></span>                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file_full_path</span><span class="p">,</span> <span class="n">tgt_file_full_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="708 "></span>
+<span class="linenos" data-linenos="709 "></span>        <span class="c1"># upload the updated shape files to replace this aggregation</span>
+<span class="linenos" data-linenos="710 "></span>        <span class="n">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="o">=</span><span class="n">data_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<span class="linenos" data-linenos="711 "></span>
+<span class="linenos" data-linenos="712 "></span>        <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="713 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="714 "></span>
+<span class="linenos" data-linenos="715 "></span>        <span class="c1"># update aggregation metadata</span>
+<span class="linenos" data-linenos="716 "></span>        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="717 "></span>            <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="718 "></span>                <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="719 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="720 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="721 "></span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="722 "></span>        <span class="c1"># upload the updated shape files to create a new geo feature aggregation</span>
+<span class="linenos" data-linenos="723 "></span>        <span class="n">upload_shape_files</span><span class="p">(</span><span class="n">main_file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="724 "></span>
+<span class="linenos" data-linenos="725 "></span>        <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="726 "></span>        <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="727 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="728 "></span>
+<span class="linenos" data-linenos="729 "></span>    <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="730 "></span>    <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../netcdf_aggregation/" class="btn btn-neutral float-left" title="Multidimensional Aggregation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../geo_raster_aggregation/" class="btn btn-neutral float-right" title="Geographic Raster Aggregation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../netcdf_aggregation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../geo_raster_aggregation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,66 +1,59 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Metadata Operations - hsclient</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../../css/theme.css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  <link href="../../css/ansi-colours.css" rel="stylesheet" />
-  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
-  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Metadata Operations";
-    var mkdocs_page_input_path = "examples/Metadata_Operations.ipynb";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Metadata Operations - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Metadata Operations";
+        var mkdocs_page_input_path = "examples\\Metadata_Operations.ipynb";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> hsclient</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <p class="caption"><span class="caption-text">Usage Examples</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../Basic_Operations/">Basic Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../Aggregation_Operations/">Aggregation Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../File_Operations/">File Operations</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Metadata Operations</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Metadata Operations</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#install-the-hs-rdf-hydroshare-python-client">Install the HS RDF HydroShare Python Client</a>
+    <li class="toctree-l2"><a class="reference internal" href="#install-the-hsclient-hydroshare-python-client">Install the hsclient HydroShare Python Client</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#authenticate-with-hydroshare">Authenticate with HydroShare</a>
     </li>
@@ -76,8 +69,6 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#additionalextended-metadata">Additional/Extended Metadata</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#sources">Sources</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#related-resources">Related Resources</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#funding-agency-credits">Funding Agency Credits</a>
@@ -91,33 +82,13 @@
         </ul>
     </li>
     </ul>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="#">Models</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFile/">Single File</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSet/">File Set</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeature/">Geographic Feature</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRaster/">Geographic Raster</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/Multidimensional/">Multidimensional</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeries/">Referenced Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
-                </li>
-    </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="#">API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >API</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../../api/hydroshare/">HydroShare</a>
                 </li>
@@ -127,54 +98,79 @@
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../../api/aggregation/">Aggregation</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/csv/">CSV Aggregation</a>
+                </li>
     </ul>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">hsclient</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Usage Examples &raquo;</li>
-        
-      
-    
-    <li>Metadata Operations</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Usage Examples</li>
+      <li class="breadcrumb-item active">Metadata Operations</li>
     <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/hydroshare/hsclient/edit/master/docs/examples/Metadata_Operations.ipynb"> Edit on hydroshare/hsclient</a>
-      
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/examples/Metadata_Operations.ipynb" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 (function() {
   function addWidgetsRenderer() {
+    var requireJsScript = document.createElement('script');
+    requireJsScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js';
+
     var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
-    var scriptElement = document.createElement('script');
+    var jupyterWidgetsScript = document.createElement('script');
     var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
     var widgetState;
 
@@ -187,35 +183,36 @@
       }
     } catch(e) {}
 
-    scriptElement.src = widgetRendererSrc;
-    document.body.appendChild(scriptElement);
+    jupyterWidgetsScript.src = widgetRendererSrc;
+
+    document.body.appendChild(requireJsScript);
+    document.body.appendChild(jupyterWidgetsScript);
   }
 
   document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
 }());
 </script>
-
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><a href="https://mybinder.org/v2/gh/hydroshare/hsclient/master?urlpath=lab%2Ftree%2Fdocs%2Fexamples%2FMetadata_Operations.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
+<p><a href="https://mybinder.org/v2/gh/GitHub/master?urlpath=lab%2Ftree%2Fdocs\examples\Metadata_Operations.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="hs-rdf-hydroshare-python-client-resource-metadata-editing-examples">HS RDF HydroShare Python Client Resource Metadata Editing Examples</h1>
+<h1 id="hsclient-hydroshare-python-client-resource-metadata-editing-examples">hsclient HydroShare Python Client Resource Metadata Editing Examples</h1>
 <hr />
-<p>The following code snippets show examples for how to use the HS RDF HydroShare Python Client for creating and editing resource level metadata for a HydroShare resource. </p>
+<p>The following code snippets show examples for how to use the hsclient HydroShare Python Client for creating and editing resource level metadata for a HydroShare resource.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="install-the-hs-rdf-hydroshare-python-client">Install the HS RDF HydroShare Python Client</h2>
-<p>The HS RDF Python Client for HydroShare won't be installed by default, so it has to be installed first before you can work with it. Use the following command to install the Python Client from the GitHub repository. Eventually we will distribute this package via the Python Package Index (PyPi) so that it can be installed via pip from PyPi.</p>
+<h2 id="install-the-hsclient-hydroshare-python-client">Install the hsclient HydroShare Python Client</h2>
+<p>The hsclient Python Client for HydroShare may not be installed by default in your Python environment, so it has to be installed first before you can work with it. Use the following command to install hsclient via the Python Package Index (PyPi).</p>
 </div>
 </div>
 </div>
@@ -223,9 +220,8 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">hsclient</span>
-</code></pre></div>
-
+<pre><code class="language-python">!pip install hsclient
+</code></pre>
 
 
 </div>
@@ -242,12 +238,11 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">hsclient</span> <span class="kn">import</span> <span class="n">HydroShare</span>
+<pre><code class="language-python">from hsclient import HydroShare
 
-<span class="n">hs</span> <span class="o">=</span> <span class="n">HydroShare</span><span class="p">()</span>
-<span class="n">hs</span><span class="o">.</span><span class="n">sign_in</span><span class="p">()</span>
-</code></pre></div>
-
+hs = HydroShare()
+hs.sign_in()
+</code></pre>
 
 
 </div>
@@ -265,17 +260,16 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Create the new, empty resource</span>
-<span class="n">new_resource</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+<pre><code class="language-python"># Create the new, empty resource
+new_resource = hs.create()
 
-<span class="c1"># Get the HydroShare identifier for the new resource</span>
-<span class="n">resIdentifier</span> <span class="o">=</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">resource_id</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The HydroShare Identifier for your new resource is: &#39;</span> <span class="o">+</span> <span class="n">resIdentifier</span><span class="p">)</span>
+# Get the HydroShare identifier for the new resource
+res_identifier = new_resource.resource_id
+print(f'The HydroShare Identifier for your new resource is: {res_identifier}')
 
-<span class="c1"># Construct a hyperlink for the new resource</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your new resource is available at: &#39;</span> <span class="o">+</span>  <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-</code></pre></div>
-
+# Construct a hyperlink to access the HydroShare landing page for the new resource
+print(f'Your new resource is available at: {new_resource.metadata.url}')
+</code></pre>
 
 
 </div>
@@ -301,25 +295,24 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Set the Title for the resource</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Resource for Testing the HS RDF HydroShare Python Client&#39;</span>
+<pre><code class="language-python"># Set the Title for the resource
+new_resource.metadata.title = 'Resource for Testing the hsclient HydroShare Python Client'
 
-<span class="c1"># Set the Abstract text for the resource</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;This resource was created as a demonstration of using the HS RDF &#39;</span> 
-    <span class="s1">&#39;Python Client for HydroShare. Once you have completed all of the &#39;</span>
-    <span class="s1">&#39;steps in this notebook, you will have a fully populated HydroShare &#39;</span>
-    <span class="s1">&#39;Resource.&#39;</span>
-<span class="p">)</span>
+# Set the Abstract text for the resource
+new_resource.metadata.abstract = (
+    'This resource was created as a demonstration of using the hsclient '
+    'Python Client for HydroShare. Once you have completed all of the '
+    'steps in this notebook, you will have a fully populated HydroShare '
+    'Resource.'
+)
 
-<span class="c1"># Call the save function to save the metadata edits to HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Call the save function to save the metadata edits to HydroShare
+new_resource.save()
 
-<span class="c1"># Print the title just added to the resource</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Title: &#39;</span> <span class="o">+</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Abstract: &#39;</span> <span class="o">+</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the title just added to the resource
+print(f'Title: {new_resource.metadata.title}')
+print(f'Abstract: {new_resource.metadata.abstract}')
+</code></pre>
 
 
 </div>
@@ -336,24 +329,23 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Create subject keywords for the resource using a list of strings</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;HS RDF&#39;</span><span class="p">,</span> <span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="s1">&#39;HydroShare&#39;</span><span class="p">,</span> <span class="s1">&#39;Another Keyword&#39;</span><span class="p">]</span>
+<pre><code class="language-python"># Create subject keywords for the resource using a list of strings
+new_resource.metadata.subjects = ['hsclient', 'Python', 'HydroShare', 'Another Keyword']
 
-<span class="c1"># New keywords can be appended to the existing list</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Hydroinformatics&#39;</span><span class="p">)</span>
+# New keywords can be appended to the existing list
+new_resource.metadata.subjects.append('Hydroinformatics')
 
-<span class="c1"># Keywords can be removed by removing them from the list</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;Another Keyword&#39;</span><span class="p">)</span>
+# Keywords can be removed by removing them from the list
+new_resource.metadata.subjects.remove('Another Keyword')
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the keywords for the resource</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of keywords for the resource includes:&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the keywords for the resource
+print('The list of keywords for the resource includes:')
+for keyword in new_resource.metadata.subjects:
+    print(keyword)
+</code></pre>
 
 
 </div>
@@ -370,51 +362,50 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata classes for coverage objects</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">BoxCoverage</span><span class="p">,</span> <span class="n">PointCoverage</span><span class="p">,</span> <span class="n">PeriodCoverage</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<pre><code class="language-python"># Import the required metadata classes for coverage objects
+from hsmodels.schemas.fields import BoxCoverage, PointCoverage, PeriodCoverage
+from datetime import datetime
 
-<span class="c1"># Set the spatial coverage to a BoxCoverage object</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="n">BoxCoverage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Logan, Utah&#39;</span><span class="p">,</span>
-                                                     <span class="n">northlimit</span><span class="o">=</span><span class="mf">41.7910</span><span class="p">,</span>
-                                                     <span class="n">eastlimit</span><span class="o">=-</span><span class="mf">111.7664</span><span class="p">,</span>
-                                                     <span class="n">southlimit</span><span class="o">=</span><span class="mf">41.6732</span><span class="p">,</span>
-                                                     <span class="n">westlimit</span><span class="o">=-</span><span class="mf">111.9079</span><span class="p">,</span>
-                                                     <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;WGS 84 EPSG:4326&#39;</span><span class="p">,</span>
-                                                     <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span>
-                                                     <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Decimal degrees&#39;</span><span class="p">)</span>
+# Set the spatial coverage to a BoxCoverage object
+new_resource.metadata.spatial_coverage = BoxCoverage(name='Logan, Utah',
+                                                     northlimit=41.7910,
+                                                     eastlimit=-111.7664,
+                                                     southlimit=41.6732,
+                                                     westlimit=-111.9079,
+                                                     projection='WGS 84 EPSG:4326',
+                                                     type='box',
+                                                     units='Decimal degrees')
 
-<span class="c1"># You can remove the spatial coverage element by setting it to None</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="kc">None</span>
+# You can remove the spatial coverage element by setting it to None
+new_resource.metadata.spatial_coverage = None
 
-<span class="c1"># If you want to set the spatial coverage to a PointCoverage instead</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span> <span class="o">=</span> <span class="n">PointCoverage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Logan, Utah&#39;</span><span class="p">,</span>
-                                                       <span class="n">north</span><span class="o">=</span><span class="mf">41.7371</span><span class="p">,</span>
-                                                       <span class="n">east</span><span class="o">=-</span><span class="mf">111.8351</span><span class="p">,</span>
-                                                       <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;WGS 84 EPSG:4326&#39;</span><span class="p">,</span>
-                                                       <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;point&#39;</span><span class="p">,</span>
-                                                       <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Decimal degrees&#39;</span><span class="p">)</span>
+# If you want to set the spatial coverage to a PointCoverage instead
+new_resource.metadata.spatial_coverage = PointCoverage(name='Logan, Utah',
+                                                       north=41.7371,
+                                                       east=-111.8351,
+                                                       projection='WGS 84 EPSG:4326',
+                                                       type='point',
+                                                       units='Decimal degrees')
 
-<span class="c1"># Create a beginning and ending date for a time period</span>
-<span class="n">beginDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s1">&#39;2020-12-01T00:00:00Z&#39;</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S</span><span class="si">%f</span><span class="s1">Z&#39;</span><span class="p">)</span>
-<span class="n">endDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s1">&#39;2020-12-31T00:00:00Z&#39;</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S</span><span class="si">%f</span><span class="s1">Z&#39;</span><span class="p">)</span>
+# Create a beginning and ending date for a time period
+beginDate = datetime.strptime('2020-12-01T00:00:00Z', '%Y-%m-%dT%H:%M:%S%fZ')
+endDate = datetime.strptime('2020-12-31T00:00:00Z', '%Y-%m-%dT%H:%M:%S%fZ')
 
-<span class="c1"># Set the temporal coverage of the resource to a PeriodCoverage object</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">period_coverage</span> <span class="o">=</span> <span class="n">PeriodCoverage</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">beginDate</span><span class="p">,</span>
-                                                       <span class="n">end</span><span class="o">=</span><span class="n">endDate</span><span class="p">)</span>
+# Set the temporal coverage of the resource to a PeriodCoverage object
+new_resource.metadata.period_coverage = PeriodCoverage(start=beginDate,
+                                                       end=endDate)
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the temporal coverage information</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Temporal Coverage&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">period_coverage</span><span class="p">)</span>
+# Print the temporal coverage information
+print('Temporal Coverage:')
+print(new_resource.metadata.period_coverage)
 
-<span class="c1"># Print the spatial coverage information</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Spatial Coverage&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">spatial_coverage</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the spatial coverage information
+print('\nSpatial Coverage:')
+print(new_resource.metadata.spatial_coverage)
+</code></pre>
 
 
 </div>
@@ -431,70 +422,30 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Add an extended metadata element as a key-value pair</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="p">[</span><span class="s1">&#39;New Element Key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Text value of new element key.&#39;</span>
+<pre><code class="language-python"># Add an extended metadata element as a key-value pair
+new_resource.metadata.additional_metadata['New Element Key'] = 'Text value of new element key.'
 
-<span class="c1"># Remove an individual key-value pair using its key</span>
-<span class="k">del</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="p">[</span><span class="s1">&#39;New Element Key&#39;</span><span class="p">]</span>
+# Remove an individual key-value pair using its key
+del new_resource.metadata.additional_metadata['New Element Key']
 
-<span class="c1"># Or, you can clear out all of the additional metadata elements that might exist</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+# Or, you can clear out all additional metadata elements that might exist
+new_resource.metadata.additional_metadata.clear()
 
-<span class="c1"># Add multiple key-value pairs at once using a Python dictionary</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;Observed Variable&#39;</span><span class="p">:</span> <span class="s1">&#39;Oxygen, dissolved&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Site Location&#39;</span><span class="p">:</span> <span class="s1">&#39;Located on downstream side of river bridge&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Observation Depth&#39;</span><span class="p">:</span> <span class="s1">&#39;1 meter&#39;</span>
-<span class="p">}</span>
+# Add multiple key-value pairs at once using a Python dictionary
+new_resource.metadata.additional_metadata = {
+    'Observed Variable': 'Oxygen, dissolved',
+    'Site Location': 'Located on downstream side of river bridge',
+    'Observation Depth': '1 meter'
+}
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the extended metadata elements for the resource</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The extended metadata elements for the resource include:&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span> <span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</code></pre></div>
-
-
-
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="sources">Sources</h3>
-<p>Sources are stored as a list of strings. Sources can be added or removed by adding or removing source strings from the list.</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-
-<div class="codehilite"><pre><span></span><code><span class="c1"># If you have existing Sources in your resource, you can remove all of them</span>
-<span class="c1"># by clearing the local list and then saving the resource </span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
-<span class="c1"># Add a Source to the resource</span>
-<span class="n">sourceString</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;Mihalevich, B. A., Horsburgh, J. S., Melcher, A. A. (2017). High-frequency &#39;</span>
-    <span class="s1">&#39;measurements reveal spatial and temporal patterns of dissolved organic &#39;</span>
-    <span class="s1">&#39;matter in an urban water conveyance, Environmental Monitoring and &#39;</span>
-    <span class="s1">&#39;Assessment, http://dx.doi.org/10.1007/s10661-017-6310-y.&#39;</span>
-<span class="p">)</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sourceString</span><span class="p">)</span>
-
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
-<span class="c1"># Print the Source metadata</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of Sources includes:&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the extended metadata elements for the resource
+print('The extended metadata elements for the resource include:')
+for key, value in new_resource.metadata.additional_metadata.items():
+    print(f'{key}: {value}')
+</code></pre>
 
 
 </div>
@@ -511,36 +462,44 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata class for a Relation object</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">Relation</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.enums</span> <span class="kn">import</span> <span class="n">RelationType</span>
+<pre><code class="language-python"># Import the required metadata class for a Relation object
+from hsmodels.schemas.fields import Relation
+from hsmodels.schemas.enums import RelationType
 
-<span class="c1"># If you have existing Related Resources, you can remove all of them</span>
-<span class="c1"># by clearing the local list and then saving the resource</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# If you have existing Related Resources, you can remove all of them
+# by clearing the local list and then saving the resource
+new_resource.metadata.relations.clear()
+new_resource.save()
 
-<span class="c1"># Create a new relation object</span>
-<span class="n">newRelation</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">RelationType</span><span class="o">.</span><span class="n">isDataFor</span><span class="p">,</span> 
-                       <span class="n">value</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Bastidas Pacheco, C. J., Horsburgh, J. S., Tracy, &#39;</span> 
-                              <span class="s1">&#39;R. J. (2020). A low-cost, open source monitoring &#39;</span> 
-                              <span class="s1">&#39;system for collecting high-resolution water use &#39;</span>
-                              <span class="s1">&#39;data on magnetically-driven residential water &#39;</span> 
-                              <span class="s1">&#39;meters, Sensors, 20(13), 3655, &#39;</span>
-                              <span class="s1">&#39;https://doi.org/10.3390/s20133655.&#39;</span><span class="p">))</span>
+# Create a new relation object
+new_relation = Relation(type=RelationType.isReferencedBy,
+                        value=('Bastidas Pacheco, C. J., Horsburgh, J. S., Tracy, '
+                               'R. J. (2020). A low-cost, open source monitoring '
+                               'system for collecting high-resolution water use '
+                               'data on magnetically-driven residential water '
+                               'meters, Sensors, 20(13), 3655, '
+                               'https://doi.org/10.3390/s20133655.'))
 
-<span class="c1"># Append the new Related Resource to the list of Related Resources</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newRelation</span><span class="p">)</span>
+# Append the new Related Resource to the list of Related Resources
+new_resource.metadata.relations.append(new_relation)
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Add another related resource with a different relationship type
+new_relation = Relation(type=RelationType.references,
+                        value=('Mihalevich, B. A., Horsburgh, J. S., Melcher, A. A. (2017). '
+                               'High-frequency measurements reveal spatial and temporal patterns '
+                               'of dissolved organic matter in an urban water conveyance, '
+                               'Environmental Monitoring and Assessment, '
+                               'https://doi.org/10.1007/s10661-017-6310-y.'))
+new_resource.metadata.relations.append(new_relation)
 
-<span class="c1"># Print the list of Related Resources</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of Related Resources includes:&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">relatedResource</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">relatedResource</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">relatedResource</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-</code></pre></div>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
+# Print the list of Related Resources
+print('The list of Related Resources includes:')
+for relatedResource in new_resource.metadata.relations:
+    print(f'{relatedResource.type.value}: {relatedResource.value}')
+</code></pre>
 
 
 </div>
@@ -557,33 +516,32 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata class for an AwardInfo object</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">AwardInfo</span>
+<pre><code class="language-python"># Import the required metadata class for an AwardInfo object
+from hsmodels.schemas.fields import AwardInfo
 
-<span class="c1"># If you have existing funding agency information, you can remove all of them</span>
-<span class="c1"># by clearing the local list and then saving the resource</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">awards</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# If you have existing funding agency information, you can remove all of them
+# by clearing the local list and then saving the resource
+new_resource.metadata.awards.clear()
+new_resource.save()
 
-<span class="c1"># Create a new AwardInfo object</span>
-<span class="n">newAwardInfo</span> <span class="o">=</span> <span class="n">AwardInfo</span><span class="p">(</span><span class="n">funding_agency_name</span><span class="o">=</span><span class="s1">&#39;National Science Foundation&#39;</span><span class="p">,</span>
-                         <span class="n">title</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Collaborative Research: Elements: Advancing Data Science &#39;</span> 
-                                <span class="s1">&#39;and Analytics for Water (DSAW)&#39;</span><span class="p">),</span>
-                         <span class="n">number</span><span class="o">=</span><span class="s1">&#39;OAC 1931297&#39;</span><span class="p">,</span>
-                         <span class="n">funding_agency_url</span><span class="o">=</span><span class="s1">&#39;https://www.nsf.gov/awardsearch/showAward?AWD_ID=1931297&#39;</span><span class="p">)</span>
+# Create a new AwardInfo object
+newAwardInfo = AwardInfo(funding_agency_name='National Science Foundation',
+                         title=('Collaborative Research: Elements: Advancing Data Science ' 
+                                'and Analytics for Water (DSAW)'),
+                         number='OAC 1931297',
+                         funding_agency_url='https://www.nsf.gov/awardsearch/showAward?AWD_ID=1931297')
 
-<span class="c1"># Append the new AwardInfo object to the list of funding agencies</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">awards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newAwardInfo</span><span class="p">)</span>
+# Append the new AwardInfo object to the list of funding agencies
+new_resource.metadata.awards.append(newAwardInfo)
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the AwardInfo</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Funding sources added: &#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">award</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">awards</span><span class="p">:</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Award Title: &#39;</span> <span class="o">+</span> <span class="n">award</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the AwardInfo
+print('Funding sources added: ')
+for award in new_resource.metadata.awards:
+    print(f'Award Title: {award.title}')
+</code></pre>
 
 
 </div>
@@ -600,59 +558,58 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata class for a Creator object</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">Creator</span>
+<pre><code class="language-python"># Import the required metadata class for a Creator object
+from hsmodels.schemas.fields import Creator
 
-<span class="c1"># Instantiate a new Creator object for a Creator that is a HydroShare user</span>
-<span class="n">newCreator1</span> <span class="o">=</span> <span class="n">Creator</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Jones, Amber Spackman&#39;</span><span class="p">,</span>
-                      <span class="n">organization</span><span class="o">=</span><span class="s1">&#39;Utah State University&#39;</span><span class="p">,</span>
-                      <span class="n">email</span><span class="o">=</span><span class="s1">&#39;amber.jones@usu.edu&#39;</span><span class="p">,</span>
-                      <span class="n">description</span><span class="o">=</span><span class="s1">&#39;/user/510/&#39;</span><span class="p">)</span>
+# Instantiate a new Creator object for a Creator that is a HydroShare user
+newCreator1 = Creator(name='Jones, Amber Spackman',
+                      organization='Utah State University',
+                      email='amber.jones@usu.edu',
+                      hydroshare_user_id=510)
 
-<span class="c1"># Append the new Creator to the resource&#39;s list of Creators</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newCreator1</span><span class="p">)</span>
+# Append the new Creator to the resource's list of Creators
+new_resource.metadata.creators.append(newCreator1)
 
-<span class="c1"># Instantiate a new Creator object for a Creator that is not a HydroShare user</span>
-<span class="n">newCreator2</span> <span class="o">=</span> <span class="n">Creator</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Doe, John A.&#39;</span><span class="p">,</span>
-                     <span class="n">organization</span><span class="o">=</span><span class="s1">&#39;Utah Water Research Laboratory&#39;</span><span class="p">,</span>
-                     <span class="n">email</span><span class="o">=</span><span class="s1">&#39;john.doe@usu.edu&#39;</span><span class="p">,</span>
-                     <span class="n">address</span><span class="o">=</span><span class="s1">&#39;8200 Old Main Hill, Logan, UT 84322-8200&#39;</span><span class="p">,</span>
-                     <span class="n">phone</span><span class="o">=</span><span class="s1">&#39;123-456-7890&#39;</span><span class="p">)</span>
+# Instantiate a new Creator object for a Creator that is not a HydroShare user
+newCreator2 = Creator(name='Doe, John A.',
+                      organization='Utah Water Research Laboratory',
+                      email='john.doe@usu.edu',
+                      address='8200 Old Main Hill, Logan, UT 84322-8200',
+                      phone='123-456-7890')
 
-<span class="c1"># Append the new Creator to the resource&#39;s list of Creators</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newCreator2</span><span class="p">)</span>
+# Append the new Creator to the resource's list of Creators
+new_resource.metadata.creators.append(newCreator2)
 
-<span class="c1"># Instantiate a new Creator object for a Creator that is an organization</span>
-<span class="n">newCreator3</span> <span class="o">=</span> <span class="n">Creator</span><span class="p">(</span><span class="n">organization</span><span class="o">=</span><span class="s1">&#39;Utah Water Research Laboratory&#39;</span><span class="p">,</span>
-                      <span class="n">email</span><span class="o">=</span><span class="s1">&#39;uwrl.receptionist@usu.edu&#39;</span><span class="p">,</span>
-                      <span class="n">address</span><span class="o">=</span><span class="s1">&#39;8200 Old Main Hill, Logan, UT 84322-8200&#39;</span><span class="p">,</span>
-                      <span class="n">homepage</span><span class="o">=</span><span class="s1">&#39;http://uwrl.usu.edu&#39;</span><span class="p">,</span>
-                      <span class="n">phone</span><span class="o">=</span><span class="s1">&#39;435-797-3168 &#39;</span><span class="p">)</span>
+# Instantiate a new Creator object for a Creator that is an organization
+newCreator3 = Creator(organization='Utah Water Research Laboratory',
+                      email='uwrl.receptionist@usu.edu',
+                      address='8200 Old Main Hill, Logan, UT 84322-8200',
+                      homepage='http://uwrl.usu.edu',
+                      phone='435-797-3168 ')
 
-<span class="c1"># Append the new Creator to the resource&#39;s list of Creators</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newCreator3</span><span class="p">)</span>
+# Append the new Creator to the resource's list of Creators
+new_resource.metadata.creators.append(newCreator3)
 
-<span class="c1"># Instantiate a new Creator object using a HydroShare user object</span>
-<span class="c1"># First, retrieve HydroShare user object</span>
-<span class="n">tony</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+# Instantiate a new Creator object using a HydroShare user object
+# First, retrieve HydroShare user object
+tony = hs.user(11)
 
-<span class="c1"># Generate a Creator object from a HydroShare user object and append</span>
-<span class="c1"># the new Creator to the resource&#39;s list of Creators</span>
-<span class="n">newCreator4</span> <span class="o">=</span> <span class="n">Creator</span><span class="o">.</span><span class="n">from_user</span><span class="p">(</span><span class="n">tony</span><span class="p">)</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newCreator4</span><span class="p">)</span>
+# Generate a Creator object from a HydroShare user object and append
+# the new Creator to the resource's list of Creators
+newCreator4 = Creator.from_user(tony)
+new_resource.metadata.creators.append(newCreator4)
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the Creator names</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of Creators includes: &#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">creator</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="p">:</span>
-  <span class="k">if</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">creator</span><span class="o">.</span><span class="n">organization</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the Creator names
+print('The list of Creators includes: ')
+for creator in new_resource.metadata.creators:
+    if creator.name is None:
+        print(creator.organization)
+    else:
+        print(creator.name)
+</code></pre>
 
 
 </div>
@@ -668,22 +625,21 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Change the order of the Creators in the list</span>
-<span class="n">creatorOrder</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">creatorOrder</span><span class="p">]</span>
+<pre><code class="language-python"># Change the order of the Creators in the list
+creatorOrder = [3, 2, 0, 1, 4]
+new_resource.metadata.creators = [new_resource.metadata.creators[i] for i in creatorOrder]
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the modified order of the Creator names</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of Creators includes: &#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">creator</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="p">:</span>
-  <span class="k">if</span> <span class="n">creator</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">creator</span><span class="o">.</span><span class="n">organization</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">creator</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the modified order of the Creator names
+print('The list of Creators includes: ')
+for creator in new_resource.metadata.creators:
+    if creator.name is None:
+        print(creator.organization)
+    else:
+        print(creator.name)
+</code></pre>
 
 
 </div>
@@ -699,13 +655,12 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Example of removing all but the first creator</span>
-<span class="k">del</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<pre><code class="language-python"># Example of removing all but the first creator
+del new_resource.metadata.creators[1:]
+new_resource.save()
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of remaining creators: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">creators</span><span class="p">)))</span>
-</code></pre></div>
-
+print(f'Number of remaining creators: {len(new_resource.metadata.creators)}')
+</code></pre>
 
 
 </div>
@@ -722,49 +677,48 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata class for a Contributor object</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">Contributor</span>
+<pre><code class="language-python"># Import the required metadata class for a Contributor object
+from hsmodels.schemas.fields import Contributor
 
-<span class="c1"># Instantiate a new Contributor object for a Contributor that is not a HydroShare user</span>
-<span class="n">newContributor1</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Horsburgh, Jeffery S.&#39;</span><span class="p">,</span>
-                              <span class="n">organization</span><span class="o">=</span><span class="s1">&#39;Utah State University&#39;</span><span class="p">,</span>
-                              <span class="n">email</span><span class="o">=</span><span class="s1">&#39;jeff.horsburgh@usu.edu&#39;</span><span class="p">,</span>
-                              <span class="n">phone</span><span class="o">=</span><span class="s1">&#39;(435) 797-2946&#39;</span><span class="p">,</span>
-                              <span class="n">ORCID</span><span class="o">=</span><span class="s1">&#39;https://orcid.org/0000-0002-0768-3196&#39;</span><span class="p">,</span>
-                              <span class="n">address</span><span class="o">=</span><span class="s1">&#39;Utah, US&#39;</span><span class="p">,</span>
-                              <span class="n">google_scholar_id</span><span class="o">=</span><span class="s1">&#39;https://scholar.google.com/citations?user=mu4k534AAAAJ&amp;hl=en&#39;</span><span class="p">,</span>
-                              <span class="n">homepage</span><span class="o">=</span><span class="s1">&#39;http://jeffh.usu.edu&#39;</span><span class="p">,</span>
-                              <span class="n">research_gate_id</span><span class="o">=</span><span class="s1">&#39;https://www.researchgate.net/profile/Jeffery_Horsburgh&#39;</span><span class="p">)</span>
+# Instantiate a new Contributor object for a Contributor that is not a HydroShare user
+newContributor1 = Contributor(name='Horsburgh, Jeffery S.',
+                              organization='Utah State University',
+                              email='jeff.horsburgh@usu.edu',
+                              phone='(435) 797-2946',
+                              ORCID='https://orcid.org/0000-0002-0768-3196',
+                              address='Utah, US',
+                              google_scholar_id='https://scholar.google.com/citations?user=mu4k534AAAAJ&amp;amp;hl=en',
+                              homepage='http://jeffh.usu.edu',
+                              research_gate_id='https://www.researchgate.net/profile/Jeffery_Horsburgh')
 
-<span class="c1"># Append the new Contributor to the resource&#39;s list of Contributors</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContributor1</span><span class="p">)</span>
+# Append the new Contributor to the resource's list of Contributors
+new_resource.metadata.contributors.append(newContributor1)
 
-<span class="c1"># Instantiate a new Contributor object for a Contributor that is not a HydroShare user</span>
-<span class="c1"># Not all of the available metadata for a contributor have to be filled out</span>
-<span class="n">newContributor2</span> <span class="o">=</span> <span class="n">Contributor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Doe, John A.&#39;</span><span class="p">,</span>
-                              <span class="n">organization</span><span class="o">=</span><span class="s1">&#39;Utah State University&#39;</span><span class="p">,</span>
-                              <span class="n">email</span><span class="o">=</span><span class="s1">&#39;john.doe@usu.edu&#39;</span><span class="p">)</span>
+# Instantiate a new Contributor object for a Contributor that is not a HydroShare user
+# Not all of the available metadata for a contributor have to be filled out
+newContributor2 = Contributor(name='Doe, John A.',
+                              organization='Utah State University',
+                              email='john.doe@usu.edu')
 
-<span class="c1"># Append the new Contributor to the resource&#39;s list of Contributors</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContributor2</span><span class="p">)</span>
+# Append the new Contributor to the resource's list of Contributors
+new_resource.metadata.contributors.append(newContributor2)
 
-<span class="c1"># Instantiate a new Contributor object using a HydroShare user object</span>
-<span class="c1"># First, retrieve HydroShare user object</span>
-<span class="n">tony</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+# Instantiate a new Contributor object using a HydroShare user object
+# First, retrieve HydroShare user object
+tony = hs.user(11)
 
-<span class="c1"># Generate a Contributor object from the HydroShare user object</span>
-<span class="n">newContributor3</span> <span class="o">=</span> <span class="n">Contributor</span><span class="o">.</span><span class="n">from_user</span><span class="p">(</span><span class="n">tony</span><span class="p">)</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newContributor3</span><span class="p">)</span>
+# Generate a Contributor object from the HydroShare user object
+newContributor3 = Contributor.from_user(tony)
+new_resource.metadata.contributors.append(newContributor3)
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the Contributor names</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The list of Contributors includes: &#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">Contributor</span> <span class="ow">in</span> <span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="p">:</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">Contributor</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</code></pre></div>
-
+# Print the Contributor names
+print('The list of Contributors includes: ')
+for Contributor in new_resource.metadata.contributors:
+    print(Contributor.name)
+</code></pre>
 
 
 </div>
@@ -780,13 +734,12 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Clear the list of Contributors and save to HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<pre><code class="language-python"># Clear the list of Contributors and save to HydroShare
+new_resource.metadata.contributors.clear()
+new_resource.save()
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of remaining Contributors: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">contributors</span><span class="p">)))</span>
-</code></pre></div>
-
+print(f'Number of remaining Contributors: {len(new_resource.metadata.contributors)}')
+</code></pre>
 
 
 </div>
@@ -803,62 +756,64 @@
 <div class="input">
 
 
-<div class="codehilite"><pre><span></span><code><span class="c1"># Import the required metadata class for a Rights object</span>
-<span class="kn">from</span> <span class="nn">hsmodels.schemas.fields</span> <span class="kn">import</span> <span class="n">Rights</span>
+<pre><code class="language-python"># Import the required metadata class for a Rights object
+from hsmodels.schemas.fields import Rights
 
-<span class="c1"># Set the rights statement and the URL that points to its description</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">statement</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;This resource is shared under the Creative Commons &#39;</span>
-    <span class="s1">&#39;Attribution-NoCommercial-NoDerivs CC BY-NC-ND.&#39;</span>
-<span class="p">)</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://creativecommons.org/licenses/by-nc-nd/4.0/&#39;</span>
+# Set the rights statement and the URL that points to its description
+new_resource.metadata.rights.statement = (
+    'This resource is shared under the Creative Commons '
+    'Attribution-NonCommercial-NoDerivatives 4.0 International'
+    '(CC BY-NC-ND 4.0).'
+)
+new_resource.metadata.rights.url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 
-<span class="c1"># Save the changes to the resource in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# Save the changes to the resource in HydroShare
+new_resource.save()
 
-<span class="c1"># Print the rights statement:</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">statement</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+# Print the rights statement:
+print(new_resource.metadata.rights.statement)
+print(new_resource.metadata.rights.url)
 
-<span class="c1"># You can also use one of the available, pre-generated Rights Statements </span>
-<span class="c1"># available in HydroShare</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span> <span class="o">=</span> <span class="n">Rights</span><span class="o">.</span><span class="n">Creative_Commons_Attribution_CC_BY</span><span class="p">()</span>
-<span class="n">new_resource</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+# You can also use one of the available, pre-generated Rights Statements
+# available in HydroShare
+new_resource.metadata.rights = Rights.Creative_Commons_Attribution_CC_BY()
+new_resource.save()
 
-<span class="c1"># Print the rights statement:</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">statement</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">new_resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">rights</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-</code></pre></div>
+# Print the rights statement:
+print(new_resource.metadata.rights.statement)
+print(new_resource.metadata.rights.url)
+</code></pre>
 
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+
+<pre><code class="language-python"># TODO: Related geospatial features is not implemented yet
+</code></pre>
 
 
 </div>
 </div>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../../metadata/SingleFile/" class="btn btn-neutral float-right" title="Single File">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../File_Operations/" class="btn btn-neutral" title="File Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../File_Operations/" class="btn btn-neutral float-left" title="File Operations"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Aggregation_Data_Object_Operations/" class="btn btn-neutral float-right" title="Aggregation Data Object Operations">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -866,24 +821,30 @@
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../File_Operations/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../../metadata/SingleFile/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../File_Operations/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Aggregation_Data_Object_Operations/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>

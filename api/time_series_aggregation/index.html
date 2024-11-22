@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Time Series Aggregation - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Time Series Aggregation";
+        var mkdocs_page_input_path = "api\\time_series_aggregation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../hydroshare/">HydroShare</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../resource/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../file/">File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../aggregation/">Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Time Series Aggregation</a>
+    <ul class="current">
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../csv/">CSV Aggregation</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">Time Series Aggregation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/time_series_aggregation.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="doc doc-object doc-class">
+
+
+
+<a id="hsclient.hydroshare.TimeseriesAggregation"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="hsclient.hydroshare.DataObjectSupportingAggregation">DataObjectSupportingAggregation</span></code></p>
+
+
+        <p>Represents a Time Series Aggregation in HydroShare</p>
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="547 "></span><span class="k">class</span> <span class="nc">TimeseriesAggregation</span><span class="p">(</span><span class="n">DataObjectSupportingAggregation</span><span class="p">):</span>
+<span class="linenos" data-linenos="548 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a Time Series Aggregation in HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="549 "></span>    <span class="nd">@classmethod</span>
+<span class="linenos" data-linenos="550 "></span>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="p">):</span>
+<span class="linenos" data-linenos="551 "></span>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">aggr_cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_aggr</span><span class="o">=</span><span class="n">base_aggr</span><span class="p">)</span>
+<span class="linenos" data-linenos="552 "></span>
+<span class="linenos" data-linenos="553 "></span>    <span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;pandas.DataFrame&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="554 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="555 "></span><span class="sd">        Loads the Time Series aggregation to a pandas DataFrame object</span>
+<span class="linenos" data-linenos="556 "></span><span class="sd">        :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="557 "></span><span class="sd">        :param series_id: the series id of the time series to retrieve</span>
+<span class="linenos" data-linenos="558 "></span><span class="sd">        :return: the Time Series aggregation as a pandas DataFrame object</span>
+<span class="linenos" data-linenos="559 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="560 "></span>        <span class="k">if</span> <span class="n">pandas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="561 "></span>            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;pandas package not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="562 "></span>
+<span class="linenos" data-linenos="563 "></span>        <span class="k">def</span> <span class="nf">to_series</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos" data-linenos="564 "></span>            <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">)</span>
+<span class="linenos" data-linenos="565 "></span>            <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+<span class="linenos" data-linenos="566 "></span>                <span class="sa">f</span><span class="s1">&#39;SELECT * FROM TimeSeriesResultValues WHERE ResultID IN &#39;</span>
+<span class="linenos" data-linenos="567 "></span>                <span class="sa">f</span><span class="s1">&#39;(SELECT ResultID FROM Results WHERE ResultUUID = &quot;</span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">&quot;);&#39;</span><span class="p">,</span>
+<span class="linenos" data-linenos="568 "></span>                <span class="n">con</span><span class="p">,</span>
+<span class="linenos" data-linenos="569 "></span>            <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="linenos" data-linenos="570 "></span>
+<span class="linenos" data-linenos="571 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">to_series</span><span class="p">)</span>
+<span class="linenos" data-linenos="572 "></span>
+<span class="linenos" data-linenos="573 "></span>    <span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="574 "></span>                         <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="575 "></span>
+<span class="linenos" data-linenos="576 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="577 "></span><span class="sd">        Saves the pandas DataFrame object to the Time Series aggregation</span>
+<span class="linenos" data-linenos="578 "></span><span class="sd">        :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="579 "></span><span class="sd">        :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="580 "></span><span class="sd">        :param as_new_aggr: Defaults False, set to True to create a new Time Series aggregation</span>
+<span class="linenos" data-linenos="581 "></span><span class="sd">        :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="582 "></span><span class="sd">        :return: the updated or new Time Series aggregation</span>
+<span class="linenos" data-linenos="583 "></span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="584 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">TimeSeriesAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="585 "></span>        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="586 "></span>        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<span class="linenos" data-linenos="587 "></span>            <span class="c1"># write the dataframe to a temp table</span>
+<span class="linenos" data-linenos="588 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos" data-linenos="589 "></span>            <span class="c1"># delete the matching records from the TimeSeriesResultValues table</span>
+<span class="linenos" data-linenos="590 "></span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DELETE FROM TimeSeriesResultValues WHERE ResultID IN (SELECT ResultID FROM temp)&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="591 "></span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO TimeSeriesResultValues SELECT * FROM temp&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="592 "></span>            <span class="c1"># delete the temp table</span>
+<span class="linenos" data-linenos="593 "></span>            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE temp&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="594 "></span>            <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos" data-linenos="595 "></span>
+<span class="linenos" data-linenos="596 "></span>        <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="597 "></span>        <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="598 "></span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="599 "></span>            <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="600 "></span>            <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="601 "></span>            <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="602 "></span>            <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="603 "></span>            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span>
+<span class="linenos" data-linenos="604 "></span>            <span class="n">abstract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span>
+<span class="linenos" data-linenos="605 "></span>
+<span class="linenos" data-linenos="606 "></span>            <span class="c1"># upload the updated aggregation files to the temp folder - to create the updated aggregation</span>
+<span class="linenos" data-linenos="607 "></span>            <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="608 "></span>            <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="609 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="610 "></span>
+<span class="linenos" data-linenos="611 "></span>            <span class="c1"># update metadata</span>
+<span class="linenos" data-linenos="612 "></span>            <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="613 "></span>                <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="614 "></span>                    <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="615 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="616 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+<span class="linenos" data-linenos="617 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span>
+<span class="linenos" data-linenos="618 "></span>            <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="619 "></span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="620 "></span>            <span class="c1"># creating a new aggregation by uploading the updated data files</span>
+<span class="linenos" data-linenos="621 "></span>            <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="622 "></span>
+<span class="linenos" data-linenos="623 "></span>            <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="624 "></span>            <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="625 "></span>            <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="626 "></span>            <span class="n">data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="627 "></span>
+<span class="linenos" data-linenos="628 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="n">data_object</span>
+<span class="linenos" data-linenos="629 "></span>        <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.TimeseriesAggregation.as_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">as_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">series_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Loads the Time Series aggregation to a pandas DataFrame object
+:param agg_path: the path to the Time Series aggregation
+:param series_id: the series id of the time series to retrieve
+:return: the Time Series aggregation as a pandas DataFrame object</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="553 "></span><span class="k">def</span> <span class="nf">as_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;pandas.DataFrame&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="554 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="555 "></span><span class="sd">    Loads the Time Series aggregation to a pandas DataFrame object</span>
+<span class="linenos" data-linenos="556 "></span><span class="sd">    :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="557 "></span><span class="sd">    :param series_id: the series id of the time series to retrieve</span>
+<span class="linenos" data-linenos="558 "></span><span class="sd">    :return: the Time Series aggregation as a pandas DataFrame object</span>
+<span class="linenos" data-linenos="559 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="560 "></span>    <span class="k">if</span> <span class="n">pandas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos" data-linenos="561 "></span>        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;pandas package not found&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="562 "></span>
+<span class="linenos" data-linenos="563 "></span>    <span class="k">def</span> <span class="nf">to_series</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos" data-linenos="564 "></span>        <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">)</span>
+<span class="linenos" data-linenos="565 "></span>        <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+<span class="linenos" data-linenos="566 "></span>            <span class="sa">f</span><span class="s1">&#39;SELECT * FROM TimeSeriesResultValues WHERE ResultID IN &#39;</span>
+<span class="linenos" data-linenos="567 "></span>            <span class="sa">f</span><span class="s1">&#39;(SELECT ResultID FROM Results WHERE ResultUUID = &quot;</span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">&quot;);&#39;</span><span class="p">,</span>
+<span class="linenos" data-linenos="568 "></span>            <span class="n">con</span><span class="p">,</span>
+<span class="linenos" data-linenos="569 "></span>        <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="linenos" data-linenos="570 "></span>
+<span class="linenos" data-linenos="571 "></span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_object</span><span class="p">(</span><span class="n">agg_path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">to_series</span><span class="p">)</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="hsclient.hydroshare.TimeseriesAggregation.save_data_object" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_data_object</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the pandas DataFrame object to the Time Series aggregation
+:param resource: the resource containing the aggregation
+:param agg_path: the path to the Time Series aggregation
+:param as_new_aggr: Defaults False, set to True to create a new Time Series aggregation
+:param destination_path: the destination path in Hydroshare to save the new aggregation
+:return: the updated or new Time Series aggregation</p>
+
+            <details class="quote">
+              <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+              <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos="573 "></span><span class="k">def</span> <span class="nf">save_data_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="s1">&#39;Resource&#39;</span><span class="p">,</span> <span class="n">agg_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">as_new_aggr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="linenos" data-linenos="574 "></span>                     <span class="n">destination_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Aggregation&#39;</span><span class="p">:</span>
+<span class="linenos" data-linenos="575 "></span>
+<span class="linenos" data-linenos="576 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="577 "></span><span class="sd">    Saves the pandas DataFrame object to the Time Series aggregation</span>
+<span class="linenos" data-linenos="578 "></span><span class="sd">    :param resource: the resource containing the aggregation</span>
+<span class="linenos" data-linenos="579 "></span><span class="sd">    :param agg_path: the path to the Time Series aggregation</span>
+<span class="linenos" data-linenos="580 "></span><span class="sd">    :param as_new_aggr: Defaults False, set to True to create a new Time Series aggregation</span>
+<span class="linenos" data-linenos="581 "></span><span class="sd">    :param destination_path: the destination path in Hydroshare to save the new aggregation</span>
+<span class="linenos" data-linenos="582 "></span><span class="sd">    :return: the updated or new Time Series aggregation</span>
+<span class="linenos" data-linenos="583 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="584 "></span>    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_for_update</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">AggregationType</span><span class="o">.</span><span class="n">TimeSeriesAggregation</span><span class="p">)</span>
+<span class="linenos" data-linenos="585 "></span>    <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_aggregation_path</span><span class="p">(</span><span class="n">agg_path</span><span class="p">,</span> <span class="n">for_save_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos" data-linenos="586 "></span>    <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+<span class="linenos" data-linenos="587 "></span>        <span class="c1"># write the dataframe to a temp table</span>
+<span class="linenos" data-linenos="588 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="linenos" data-linenos="589 "></span>        <span class="c1"># delete the matching records from the TimeSeriesResultValues table</span>
+<span class="linenos" data-linenos="590 "></span>        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DELETE FROM TimeSeriesResultValues WHERE ResultID IN (SELECT ResultID FROM temp)&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="591 "></span>        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO TimeSeriesResultValues SELECT * FROM temp&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="592 "></span>        <span class="c1"># delete the temp table</span>
+<span class="linenos" data-linenos="593 "></span>        <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE temp&quot;</span><span class="p">)</span>
+<span class="linenos" data-linenos="594 "></span>        <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos" data-linenos="595 "></span>
+<span class="linenos" data-linenos="596 "></span>    <span class="n">aggr_main_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_file_path</span>
+<span class="linenos" data-linenos="597 "></span>    <span class="n">data_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_object</span>
+<span class="linenos" data-linenos="598 "></span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_new_aggr</span><span class="p">:</span>
+<span class="linenos" data-linenos="599 "></span>        <span class="c1"># cache some of the metadata fields of the original aggregation to update the metadata of the</span>
+<span class="linenos" data-linenos="600 "></span>        <span class="c1"># updated aggregation</span>
+<span class="linenos" data-linenos="601 "></span>        <span class="n">keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span>
+<span class="linenos" data-linenos="602 "></span>        <span class="n">additional_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span>
+<span class="linenos" data-linenos="603 "></span>        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span>
+<span class="linenos" data-linenos="604 "></span>        <span class="n">abstract</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span>
+<span class="linenos" data-linenos="605 "></span>
+<span class="linenos" data-linenos="606 "></span>        <span class="c1"># upload the updated aggregation files to the temp folder - to create the updated aggregation</span>
+<span class="linenos" data-linenos="607 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_update_aggregation</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="608 "></span>        <span class="c1"># retrieve the updated aggregation</span>
+<span class="linenos" data-linenos="609 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">aggr_main_file_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="610 "></span>
+<span class="linenos" data-linenos="611 "></span>        <span class="c1"># update metadata</span>
+<span class="linenos" data-linenos="612 "></span>        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+<span class="linenos" data-linenos="613 "></span>            <span class="k">if</span> <span class="n">kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="p">:</span>
+<span class="linenos" data-linenos="614 "></span>                <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+<span class="linenos" data-linenos="615 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">additional_metadata</span> <span class="o">=</span> <span class="n">additional_meta</span>
+<span class="linenos" data-linenos="616 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+<span class="linenos" data-linenos="617 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">abstract</span> <span class="o">=</span> <span class="n">abstract</span>
+<span class="linenos" data-linenos="618 "></span>        <span class="n">aggr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="linenos" data-linenos="619 "></span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos" data-linenos="620 "></span>        <span class="c1"># creating a new aggregation by uploading the updated data files</span>
+<span class="linenos" data-linenos="621 "></span>        <span class="n">resource</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">destination_path</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="622 "></span>
+<span class="linenos" data-linenos="623 "></span>        <span class="c1"># retrieve the new aggregation</span>
+<span class="linenos" data-linenos="624 "></span>        <span class="n">agg_path</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">destination_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">aggr_main_file_path</span><span class="p">))</span>
+<span class="linenos" data-linenos="625 "></span>        <span class="n">aggr</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">aggregation</span><span class="p">(</span><span class="n">file__path</span><span class="o">=</span><span class="n">agg_path</span><span class="p">)</span>
+<span class="linenos" data-linenos="626 "></span>        <span class="n">data_object</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="linenos" data-linenos="627 "></span>
+<span class="linenos" data-linenos="628 "></span>    <span class="n">aggr</span><span class="o">.</span><span class="n">_data_object</span> <span class="o">=</span> <span class="n">data_object</span>
+<span class="linenos" data-linenos="629 "></span>    <span class="k">return</span> <span class="n">aggr</span>
+</code></pre></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../geo_raster_aggregation/" class="btn btn-neutral float-left" title="Geographic Raster Aggregation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../csv/" class="btn btn-neutral float-right" title="CSV Aggregation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../geo_raster_aggregation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../csv/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

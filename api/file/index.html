@@ -1,298 +1,371 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>File - hsclient</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../../css/theme.css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  <link href="../../css/ansi-colours.css" rel="stylesheet" />
-  <link href="../../css/jupyter-cells.css" rel="stylesheet" />
-  <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "File";
-    var mkdocs_page_input_path = "api/file.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>File - hsclient</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../css/ansi-colours.css" rel="stylesheet" />
+        <link href="../../css/jupyter-cells.css" rel="stylesheet" />
+        <link href="../../css/pandas-dataframe.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "File";
+        var mkdocs_page_input_path = "api\\file.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> hsclient</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> hsclient
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <p class="caption"><span class="caption-text">Usage Examples</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="#">Models</a>
-    <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFile/">Single File</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSet/">File Set</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeature/">Geographic Feature</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRaster/">Geographic Raster</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/Multidimensional/">Multidimensional</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeries/">Referenced Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeries/">Time Series</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgram/">Model Program</a>
-                </li>
-                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstance/">Model Instance</a>
-                </li>
-    </ul>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="#">API</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Usage Examples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Basic_Operations/">Basic Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Operations/">Aggregation Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/File_Operations/">File Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Metadata_Operations/">Metadata Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/Aggregation_Data_Object_Operations/">Aggregation Data Object Operations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer Documentation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" >API</a>
     <ul class="current">
                 <li class="toctree-l2"><a class="reference internal" href="../hydroshare/">HydroShare</a>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../resource/">Resource</a>
                 </li>
-                <li class="toctree-l2 current"><a class="reference internal current" href="./">File</a>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">File</a>
     <ul class="current">
     </ul>
                 </li>
                 <li class="toctree-l2"><a class="reference internal" href="../aggregation/">Aggregation</a>
                 </li>
+                <li class="toctree-l2"><a class="reference internal" href="../netcdf_aggregation/">Multidimensional Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_feature_aggregation/">Geographic Feature Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../geo_raster_aggregation/">Geographic Raster Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../time_series_aggregation/">Time Series Aggregation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../csv/">CSV Aggregation</a>
+                </li>
     </ul>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Models</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ResourceMetadata/">Resource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/SingleFileMetadata/">Single File</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/FileSetMetadata/">File Set</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicFeatureMetadata/">Geographic Feature</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/GeographicRasterMetadata/">Geographic Raster</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/MultidimensionalMetadata/">Multidimensional</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ReferencedTimeSeriesMetadata/">Referenced Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/TimeSeriesMetadata/">Time Series</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelProgramMetadata/">Model Program</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/ModelInstanceMetadata/">Model Instance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../metadata/CSVFileMetadata/">CSV</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">hsclient</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">hsclient</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>API &raquo;</li>
-        
-      
-        
-          <li>Developer Documentation &raquo;</li>
-        
-      
-    
-    <li>File</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer Documentation</li>
+          <li class="breadcrumb-item">API</li>
+      <li class="breadcrumb-item active">File</li>
     <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/file.md"> Edit on hydroshare/hsclient</a>
-      
+          <a href="https://github.com/hydroshare/hsclient/edit/master/docs/api/file.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <div class="doc doc-object doc-class">
-<h2 class="hidden-toc" id="hsclient.hydroshare.File" style="visibility: hidden; position: absolute;">
-        </h2>
-<div class="doc doc-contents first">
-<p>A File path string representing the path to a file within a resource.
+
+
+
+<a id="hsclient.hydroshare.File"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code>str</code></p>
+
+
+        <p>A File path string representing the path to a file within a resource.
 :param value: the string path value
 :param file_url: the fully qualified url to the file on hydroshare.org
 :param checksum: the md5 checksum of the file</p>
-<div class="doc doc-children">
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.checksum">
 
-<code class="highlight">checksum</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>The md5 checksum of the file</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.extension">
 
-<code class="highlight">extension: str</code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
 
-      </h2>
-<div class="doc doc-contents ">
-<p>The extension of the file</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.folder">
-
-<code class="highlight">folder: str</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>The folder the file is in</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.name">
-
-<code class="highlight">name: str</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>The filename</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.path">
-
-<code class="highlight">path: str</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>The path of the file</p>
-</div>
-</div>
-<div class="doc doc-object doc-attribute">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.url">
-
-<code class="highlight">url</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-property"><code>property</code></small>
-      <small class="doc doc-property doc-property-readonly"><code>readonly</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>The url to the file on HydroShare</p>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h2 class="doc doc-heading" id="hsclient.hydroshare.File.__new__">
-
-<code class="highlight">__new__(cls, value, file_url, checksum)</code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
-      <small class="doc doc-property doc-property-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-      </h2>
-<div class="doc doc-contents ">
-<p>Create and return a new object.  See help(type) for accurate signature.</p>
-<details class="quote">
-          <summary>Source code in <code>hsclient/hydroshare.py</code></summary>
-          <div class="highlight python">
-<div class="codehilite"><pre><span></span><code><span class="err">def __new__(cls, value, file_url, checksum):</span>
-<span class="err">    return super(File, cls).__new__(cls, value)</span>
+              <details class="quote">
+                <summary>Source code in <code>hsclient\hydroshare.py</code></summary>
+                <div class="highlight"><pre><span></span><code><span class="linenos" data-linenos=" 59 "></span><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+<span class="linenos" data-linenos=" 60 "></span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 61 "></span><span class="sd">    A File path string representing the path to a file within a resource.</span>
+<span class="linenos" data-linenos=" 62 "></span><span class="sd">    :param value: the string path value</span>
+<span class="linenos" data-linenos=" 63 "></span><span class="sd">    :param file_url: the fully qualified url to the file on hydroshare.org</span>
+<span class="linenos" data-linenos=" 64 "></span><span class="sd">    :param checksum: the md5 checksum of the file</span>
+<span class="linenos" data-linenos=" 65 "></span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 66 "></span>
+<span class="linenos" data-linenos=" 67 "></span>    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">checksum</span><span class="p">):</span>
+<span class="linenos" data-linenos=" 68 "></span>        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="linenos" data-linenos=" 69 "></span>
+<span class="linenos" data-linenos=" 70 "></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">checksum</span><span class="p">):</span>
+<span class="linenos" data-linenos=" 71 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_file_url</span> <span class="o">=</span> <span class="n">file_url</span>
+<span class="linenos" data-linenos=" 72 "></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_checksum</span> <span class="o">=</span> <span class="n">checksum</span>
+<span class="linenos" data-linenos=" 73 "></span>
+<span class="linenos" data-linenos=" 74 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos=" 75 "></span>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos=" 76 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The path of the file&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 77 "></span>        <span class="k">return</span> <span class="bp">self</span>
+<span class="linenos" data-linenos=" 78 "></span>
+<span class="linenos" data-linenos=" 79 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos=" 80 "></span>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos=" 81 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The filename&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 82 "></span>        <span class="k">return</span> <span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="linenos" data-linenos=" 83 "></span>
+<span class="linenos" data-linenos=" 84 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos=" 85 "></span>    <span class="k">def</span> <span class="nf">extension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos=" 86 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The extension of the file&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 87 "></span>        <span class="k">return</span> <span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos" data-linenos=" 88 "></span>
+<span class="linenos" data-linenos=" 89 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos=" 90 "></span>    <span class="k">def</span> <span class="nf">folder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="linenos" data-linenos=" 91 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The folder the file is in&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 92 "></span>        <span class="k">return</span> <span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="linenos" data-linenos=" 93 "></span>
+<span class="linenos" data-linenos=" 94 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos=" 95 "></span>    <span class="k">def</span> <span class="nf">checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos=" 96 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The md5 checksum of the file&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos=" 97 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checksum</span>
+<span class="linenos" data-linenos=" 98 "></span>
+<span class="linenos" data-linenos=" 99 "></span>    <span class="nd">@property</span>
+<span class="linenos" data-linenos="100 "></span>    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos" data-linenos="101 "></span><span class="w">        </span><span class="sd">&quot;&quot;&quot;The url to the file on HydroShare&quot;&quot;&quot;</span>
+<span class="linenos" data-linenos="102 "></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_url</span>
 </code></pre></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.checksum" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">checksum</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The md5 checksum of the file</p>
+    </div>
 
 </div>
-</details>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.extension" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">extension</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The extension of the file</p>
+    </div>
+
 </div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.folder" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">folder</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The folder the file is in</p>
+    </div>
+
 </div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.name" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">name</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The filename</p>
+    </div>
+
 </div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.path" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">path</span><span class="p">:</span> <span class="nb">str</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The path of the file</p>
+    </div>
+
 </div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="hsclient.hydroshare.File.url" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">url</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The url to the file on HydroShare</p>
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
 </div>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../resource/" class="btn btn-neutral float-left" title="Resource"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../aggregation/" class="btn btn-neutral float-right" title="Aggregation">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../resource/" class="btn btn-neutral" title="Resource"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -300,24 +373,30 @@
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../resource/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../aggregation/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/hydroshare/hsclient" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../resource/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../aggregation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
