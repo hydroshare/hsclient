@@ -1,0 +1,156 @@
+# Time Series Aggregation Metadata
+
+## Properties
+
+- **`title`** *(string)*: A string containing a descriptive title for the aggregation. Default: `null`.
+- **`subjects`** *(array)*: A list of keyword strings expressing the topic of the aggregation. Default: `[]`.
+    - **Items** *(string)*
+- **`language`** *(string)*: The 3-character string for the language in which the metadata and content are expressed. Default: `"eng"`.
+- **`additional_metadata`** *(array)*: A dictionary of additional metadata elements expressed as key-value pairs.
+    - **Items** *(object)*: A key-value pair. Default: `[]`.
+        - **`key`** *(string)*
+        - **`value`** *(string)*
+- **`spatial_coverage`**: An object containing the geospatial coverage for the aggregation expressed as either a bounding box or point. Default: `null`.
+    - **Any of**
+        - : Refer to *[#/definitions/PointCoverage](#definitions/PointCoverage)*.
+        - : Refer to *[#/definitions/BoxCoverage](#definitions/BoxCoverage)*.
+- **`period_coverage`**: An object containing the temporal coverage for a aggregation expressed as a date range. Default: `null`.
+    - **All of**
+        - : Refer to *[#/definitions/PeriodCoverage](#definitions/PeriodCoverage)*.
+- **`time_series_results`** *(array)*: A list of time series results contained within the time series aggregation. Default: `[]`.
+    - **Items**: Refer to *[#/definitions/TimeSeriesResult](#definitions/TimeSeriesResult)*.
+- **`abstract`**: A string containing a summary of a aggregation. Default: `null`.
+    - **Any of**
+        - *string*
+        - *null*
+- **`type`**: A string expressing the aggregation type from the list of HydroShare aggregation types. Default: `"TimeSeries"`.
+    - **All of**
+        - : Refer to *[#/definitions/AggregationType](#definitions/AggregationType)*.
+- **`url`** *(string, format: uri, required)*: An object containing the URL of the aggregation.
+- **`rights`**: An object containing information about the rights held in and over the aggregation and the license under which a aggregation is shared. Default: `null`.
+    - **Any of**
+        - : Refer to *[#/definitions/Rights](#definitions/Rights)*.
+        - *null*
+## Definitions
+
+- <a id="definitions/AggregationType"></a>**`AggregationType`** *(string)*: Must be one of: `["Generic", "FileSet", "GeoRaster", "NetCDF", "GeoFeature", "RefTimeseries", "TimeSeries", "ModelProgram", "ModelInstance", "CSV"]`.
+- <a id="definitions/BoxCoverage"></a>**`BoxCoverage`** *(object)*: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+latitude-longitude bounding box.
+    - **`type`** *(string)*: A string containing the type of geographic coverage. Must be one of: `["box"]`. Must be: `"box"`. Default: `"box"`.
+    - **`name`** *(string)*: A string containing a name for the place associated with the geographic coverage. Default: `null`.
+    - **`northlimit`** *(number, required)*: A floating point value containing the constant coordinate for the northernmost face or edge of the bounding box. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`eastlimit`** *(number, required)*: A floating point value containing the constant coordinate for the easternmost face or edge of the bounding box. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`southlimit`** *(number, required)*: A floating point value containing the constant coordinate for the southernmost face or edge of the bounding box. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`westlimit`** *(number, required)*: A floating point value containing the constant coordinate for the westernmost face or edge of the bounding box. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`units`** *(string, required)*: A string containing the units applying to the unlabelled numeric values of northlimit, eastlimit, southlimit, and westlimit.
+    - **`projection`** *(string)*: A string containing the name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc. Default: `null`.
+- <a id="definitions/PeriodCoverage"></a>**`PeriodCoverage`** *(object)*: A class used to represent temporal coverage metadata for a resource or aggregation.
+    - **`name`** *(string)*: A string containing a name for the time interval. Default: `null`.
+    - **`start`** *(string, format: date-time, required)*: A datetime object containing the instant corresponding to the commencement of the time interval.
+    - **`end`** *(string, format: date-time, required)*: A datetime object containing the instant corresponding to the termination of the time interval.
+- <a id="definitions/PointCoverage"></a>**`PointCoverage`** *(object)*: A class used to represent geographic coverage metadata for a resource or aggregation expressed as a
+point location.
+    - **`type`** *(string)*: A string containing the type of geographic coverage. Must be one of: `["point"]`. Must be: `"point"`. Default: `"point"`.
+    - **`name`** *(string)*: A string containing a name for the place associated with the geographic coverage. Default: `null`.
+    - **`east`** *(number, required)*: The coordinate of the point location measured in the east direction. Exclusive minimum: `-180.0`. Exclusive maximum: `180.0`.
+    - **`north`** *(number, required)*: The coordinate of the point location measured in the north direction. Exclusive minimum: `-90.0`. Exclusive maximum: `90.0`.
+    - **`units`** *(string, required)*: The units applying to the unlabelled numeric values of north and east.
+    - **`projection`** *(string, required)*: The name of the projection used with any parameters required, such as ellipsoid parameters, datum, standard parallels and meridians, zone, etc.
+- <a id="definitions/ProcessingLevel"></a>**`ProcessingLevel`** *(object)*: A class used to represent the metadata associated with a processing level contained within a time series
+aggregation.
+    - **`processing_level_code`** *(string, required)*: A string containing a short but meaningful code identifying the processing level.
+    - **`definition`**: A string containing a description of the processing level. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`explanation`**: A string containing a more extensive explanation of the meaning of the processing level. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+- <a id="definitions/Rights"></a>**`Rights`** *(object)*: A class used to represent the rights statement metadata associated with a resource.
+    - **`statement`** *(string, required)*: A string containing the text of the license or rights statement.
+    - **`url`** *(string, format: uri, required)*: An object containing the URL pointing to a description of the license or rights statement.
+- <a id="definitions/TimeSeriesMethod"></a>**`TimeSeriesMethod`** *(object)*: A class used to represent the metadata associated with a method contained within a time series aggregation.
+    - **`method_code`** *(string, required)*: A string containing a short but meaningful code identifying the method.
+    - **`method_name`** *(string, required)*: A string containing the name of the method.
+    - **`method_type`** *(string, required)*: A string containing the method type from the ODM2 Method Type controlled vocabulary.
+    - **`method_description`**: A string containing a detailed description of the method. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`method_link`**: An object containing a URL that points to a website having a detailed description of the method. Default: `null`.
+        - **Any of**
+            - *string, format: uri*
+            - *null*
+- <a id="definitions/TimeSeriesResult"></a>**`TimeSeriesResult`** *(object)*: A class used to represent the metadata associated with a time series result within a time series aggregation.
+    - **`series_id`** *(string, required)*: A string containing a unique identifier for the time series result.
+    - **`unit`**: An object containing the units in which the values of the time series are expressed. Default: `null`.
+        - **All of**
+            - : Refer to *[#/definitions/Unit](#definitions/Unit)*.
+    - **`status`**: A string containing the status of the time series result chosen from the ODM2 Status controlled vocabulary. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`sample_medium`** *(string, required)*: A string containing the sample medium in which the time series result was measured chosen from the ODM2 Medium controlled vocabulary.
+    - **`value_count`** *(integer, required)*: An integer value containing the number of data values contained within the time series result.
+    - **`aggregation_statistic`** *(string, required)*: A string containing the aggregation statistic associated with the values of the time series result chosen from the ODM2 Aggregation Statistic controlled vocabulary.
+    - **`series_label`** *(string)*: A string containing a label for the time series result. Default: `null`.
+    - **`site`**: An object containing metadata about the site at which the time series result was created.
+        - **All of**
+            - : Refer to *[#/definitions/TimeSeriesSite](#definitions/TimeSeriesSite)*.
+    - **`variable`**: An object containing metadata about the observed variable associated with the time series result values.
+        - **All of**
+            - : Refer to *[#/definitions/TimeSeriesVariable](#definitions/TimeSeriesVariable)*.
+    - **`method`**: An object containing metadata about the method used to produce the time series result values.
+        - **All of**
+            - : Refer to *[#/definitions/TimeSeriesMethod](#definitions/TimeSeriesMethod)*.
+    - **`processing_level`**: An object containing metadata about the processing level or level of quality control to which the time series result values have been subjected.
+        - **All of**
+            - : Refer to *[#/definitions/ProcessingLevel](#definitions/ProcessingLevel)*.
+    - **`utc_offset`**: A floating point value that represents the time offset from UTC time in hours associated with the time series result value timestamps. Default: `null`.
+        - **Any of**
+            - *number*
+            - *null*
+- <a id="definitions/TimeSeriesSite"></a>**`TimeSeriesSite`** *(object)*: A class used to represent the metadata associated with a site contained within a time series aggregation.
+    - **`site_code`** *(string, required)*: A string containing a short but meaningful code identifying the site.
+    - **`site_name`**: A string containing the name of the site. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`elevation_m`**: A floating point number expressing the elevation of the site in meters. Default: `null`.
+        - **Any of**
+            - *number*
+            - *null*
+    - **`elevation_datum`**: A string expressing the elevation datum used from the ODM2 Elevation Datum controlled vocabulary. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`site_type`**: A string containing the type of site from the ODM2 Sampling Feature Type controlled vocabulary . Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`latitude`**: A floating point value expressing the latitude coordinate of the site. Default: `null`.
+        - **Any of**
+            - *number*
+            - *null*
+    - **`longitude`**: A floating point value expressing the longitude coordinate of the site. Default: `null`.
+        - **Any of**
+            - *number*
+            - *null*
+- <a id="definitions/TimeSeriesVariable"></a>**`TimeSeriesVariable`** *(object)*: A class used to represent the metadata associated with a variable contained within a time series aggregation.
+    - **`variable_code`** *(string, required)*: A string containing a short but meaningful code that identifies a variable.
+    - **`variable_name`** *(string, required)*: A string containing the name of the variable.
+    - **`variable_type`** *(string, required)*: A string containing the type of variable from the ODM2 VariableType controlled vocabulary.
+    - **`no_data_value`** *(integer, required)*: The NoData value for the variable.
+    - **`variable_definition`**: A string containing a detailed description of the variable. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+    - **`speciation`**: A string containing the speciation for the variable from the ODM2 Speciation control vocabulary. Default: `null`.
+        - **Any of**
+            - *string*
+            - *null*
+- <a id="definitions/Unit"></a>**`Unit`** *(object)*: A class used to represent the metadata associated with a dimensional unit within a time series aggregation.
+    - **`type`** *(string, required)*: A string containing the type of unit from the ODM2 Units Type controlled vocabulary.
+    - **`name`** *(string, required)*: A string containing the name of the unit from the ODM2 units list.
+    - **`abbreviation`** *(string, required)*: A string containing an abbreviation for the unit from the ODM2 units list.

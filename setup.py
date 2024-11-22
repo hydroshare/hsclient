@@ -3,6 +3,9 @@ from setuptools import setup, find_packages
 
 README = (pathlib.Path(__file__).parent / "README.md").read_text()
 
+extra_deps = ["pandas", "netCDF4", "xarray", "rasterio", "fiona"]
+dev_deps = ["pytest", "pytest-xdist", "pytest-cov", "mkdocs", "mknotebooks", "mkdocstrings", "mkdocstrings-python"]
+
 setup(
     name='hsclient',
     version='1.0.4',
@@ -18,7 +21,8 @@ setup(
         "xarray": ["netCDF4", "xarray"],
         "rasterio": ["rasterio"],
         "fiona": ["fiona"],
-        "all": ["pandas", "netCDF4", "xarray", "rasterio", "fiona"],
+        "all": extra_deps,
+        "dev": extra_deps + dev_deps,
     },
     url='https://github.com/hydroshare/hsclient',
     license='MIT',
