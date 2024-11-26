@@ -8,10 +8,10 @@ from pydantic import BaseModel
 class Token(BaseModel):
     access_token: str
     token_type: str
-    scope: Optional[str]
-    state: Optional[str]
-    expires_in: Optional[int]
-    refresh_token: Optional[str]
+    scope: Optional[str] = None
+    state: Optional[str] = None
+    expires_in: Optional[int] = None
+    refresh_token: Optional[str] = None
 
     class Config:
         # do not allow extra fields

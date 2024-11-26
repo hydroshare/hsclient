@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union, Any
 
 from hsmodels.schemas.enums import UserIdentifierType
 from pydantic import AnyUrl, BaseModel, HttpUrl, field_validator
@@ -34,24 +34,24 @@ class User(BaseModel):
 
 
 class ResourcePreview(BaseModel):
-    resource_type: str = None
-    resource_title: str = None
-    resource_id: str = None
-    abstract: str = None
+    resource_type: str
+    resource_title: str
+    resource_id: str
+    abstract: Optional[str] = None
     authors: List[str] = []
-    creator: str = None
-    doi: str = None
-    date_created: str = None
-    date_last_updated: str = None
-    public: bool = None
-    discoverable: bool = None
-    shareable: bool = None
-    coverages: Dict[str, str] = None
-    immutable: bool = None
-    published: bool = None
-    resource_url: str = None
-    resource_map_url: str = None
-    resource_metadata_url: str = None
+    creator: str
+    doi: Optional[str] = None
+    date_created: str
+    date_last_updated: str
+    public: bool
+    discoverable: bool
+    shareable: bool
+    coverages: Union[List[Dict[str, Any]], List] = []
+    immutable: bool
+    published: bool
+    resource_url: str
+    resource_map_url: str
+    science_metadata_url: str
 
     @field_validator("authors", mode='before')
     def handle_null_author(cls, v):
@@ -64,3 +64,10 @@ class ResourcePreview(BaseModel):
 
         # filter to remove all empty x's in v ("", None, or equivalent)
         return list(filter(lambda x: x, v))
+
+    @field_validator("coverages", mode='before')
+    def handle_null_coverages(cls, v):
+        # return empty list when supplied coverages field is None.
+        if v is None:
+            return []
+        return v
