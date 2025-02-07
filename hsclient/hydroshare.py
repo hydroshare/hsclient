@@ -1273,9 +1273,9 @@ class Resource(Aggregation):
         response = aggregation._hs_session.post(path, status_code=200)
         json_response = response.json()
         task_id = json_response['id']
-        status, _ = self.check_task(task_id)
+        status, _ = self._hs_session.check_task(task_id)
         while status != 'true':
-            status, _ = self.check_task(task_id)
+            status, _ = self._hs_session.check_task(task_id)
             time.sleep(CHECK_TASK_PING_INTERVAL)
         aggregation.refresh()
 
@@ -1395,7 +1395,6 @@ class HydroShareSession:
                 "Failed GET {}, status_code {}, message {}".format(url, response.status_code, response.content)
             )
         filename = path.split("/")[-1]
-        filename += ".zip" if not filename.endswith(".zip") else ""
         downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(response.content)
