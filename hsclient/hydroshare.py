@@ -1359,8 +1359,7 @@ class HydroShareSession:
 
     def retrieve_file(self, path, save_path=""):
         file = self.get(path, status_code=200, allow_redirects=True)
-        cd = file.headers['content-disposition']
-        filename = urllib.parse.unquote(cd.split("filename=")[1].strip('"'))
+        filename = path.split("/")[-1]
         downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(file.content)
