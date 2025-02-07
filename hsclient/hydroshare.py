@@ -1395,6 +1395,7 @@ class HydroShareSession:
                 "Failed GET {}, status_code {}, message {}".format(url, response.status_code, response.content)
             )
         filename = path.split("/")[-1]
+        filename += ".zip" if not filename.endswith(".zip") else ""
         downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
             f.write(response.content)
