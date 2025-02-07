@@ -1273,10 +1273,10 @@ class Resource(Aggregation):
         response = aggregation._hs_session.post(path, status_code=200)
         json_response = response.json()
         task_id = json_response['id']
-        status = json_response['status']
-        if status in ("Not ready", "progress"):
-            while aggregation._hs_session.check_task(task_id) != 'true':
-                time.sleep(CHECK_TASK_PING_INTERVAL)
+        status, _ = self.check_task(task_id)
+        while status != 'true':
+            status, _ = self.check_task(task_id)
+            time.sleep(CHECK_TASK_PING_INTERVAL)
         aggregation.refresh()
 
     @refresh
@@ -1375,20 +1375,30 @@ class HydroShareSession:
 
     def check_task(self, task_id):
         response = self.get(f"/hsapi/taskstatus/{task_id}/", status_code=200)
-        return response.json()['status']
+        json_response = response.json()
+        return json_response['status'], json_response['payload'] if 'payload' in json_response else None
 
     def retrieve_zip(self, path, save_path="", params=None):
         if params is None:
             params = {}
-        file = self.get(path, status_code=200, allow_redirects=True, params=params)
-        json_response = file.json()
+        response = self.get(path, status_code=200, allow_redirects=True, params=params)
+        json_response = response.json()
         task_id = json_response['task_id']
-        download_path = json_response['download_path']
-        zip_status = json_response['zip_status']
-        if zip_status == "Not ready":
-            while self.check_task(task_id) != 'true':
-                time.sleep(CHECK_TASK_PING_INTERVAL)
-        return self.retrieve_file(download_path, save_path)
+        status, url = self.check_task(task_id)
+        while status != 'true':
+            status, url = self.check_task(task_id)
+            time.sleep(CHECK_TASK_PING_INTERVAL)
+
+        response = self._session.get(url)
+        if response.status_code != 200:
+            raise Exception(
+                "Failed GET {}, status_code {}, message {}".format(url, response.status_code, response.content)
+            )
+        filename = path.split("/")[-1]
+        downloaded_file = os.path.join(save_path, filename)
+        with open(downloaded_file, 'wb') as f:
+            f.write(response.content)
+        return downloaded_file
 
     def upload_file(self, path, files, status_code=204):
         return self.post(path, files=files, status_code=status_code)
