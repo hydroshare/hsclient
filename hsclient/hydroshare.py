@@ -53,6 +53,9 @@ from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
+import pkg_resources  # part of setuptools
+VERSION = pkg_resources.get_distribution(__package__).version
+
 CHECK_TASK_PING_INTERVAL = 10
 
 
@@ -1326,6 +1329,10 @@ class HydroShareSession:
             self._session = requests.Session()
             default_agent = self._session.headers['User-Agent']
             self._session.headers['User-Agent'] = default_agent + ' (hsclient)'
+
+            # include the hsclient version
+            self._session.headers['hsclient-version'] = VERSION
+            print(f"hsclient version: {VERSION}")
 
             if username is None or password is None:
                 return
