@@ -1359,19 +1359,38 @@ class HydroShareSession:
 
     def retrieve_file(self, path, save_path=""):
         file = self.get(path, status_code=200, allow_redirects=True)
+        self.write_file(path, file.content, save_path)
+
+    def retrieve_bag(self, path, save_path=""):
+        print(f"Retrieving {path}")
+        response = self.get(path, status_code=200, allow_redirects=True)
+
+        file_is_ready = False
+        content_type = response.headers['Content-Type']
+
+        if content_type == "application/zip":
+            # if the path doesn't end with .zip, add it
+            if not path.endswith(".zip"):
+                path += ".zip"
+            file_is_ready = True
+        if content_type == "binary/octet-stream":
+            # here we assume that the stream is a zip file
+            if not path.endswith(".zip"):
+                path += ".zip"
+            file_is_ready = True
+
+        if not file_is_ready:
+            time.sleep(CHECK_TASK_PING_INTERVAL)
+            return self.retrieve_bag(path, save_path)
+
+        self.write_file(path, response.content, save_path)
+
+    def write_file(self, path, content, save_path=""):
         filename = path.split("/")[-1]
         downloaded_file = os.path.join(save_path, filename)
         with open(downloaded_file, 'wb') as f:
-            f.write(file.content)
+            f.write(content)
         return downloaded_file
-
-    def retrieve_bag(self, path, save_path=""):
-        file = self.get(path, status_code=200, allow_redirects=True)
-
-        if file.headers['Content-Type'] != "application/zip":
-            time.sleep(CHECK_TASK_PING_INTERVAL)
-            return self.retrieve_bag(path, save_path)
-        return self.retrieve_file(path, save_path)
 
     def check_task(self, task_id):
         response = self.get(f"/hsapi/taskstatus/{task_id}/", status_code=200)
