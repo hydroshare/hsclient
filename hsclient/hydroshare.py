@@ -1390,7 +1390,7 @@ class HydroShareSession:
             time.sleep(CHECK_TASK_PING_INTERVAL)
             return self.retrieve_bag(path, save_path)
 
-        self.write_file(path, response.content, save_path)
+        return self.write_file(path, response.content, save_path)
 
     def write_file(self, path, content, save_path=""):
         filename = path.split("/")[-1]
