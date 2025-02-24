@@ -8,7 +8,7 @@ dev_deps = ["pytest", "pytest-xdist", "pytest-cov", "mkdocs", "mknotebooks", "mk
 
 setup(
     name='hsclient',
-    version='1.1.3',
+    version='1.1.4',
     packages=find_packages(include=['hsclient', 'hsclient.*'],
                            exclude=("tests",)),
     install_requires=[
