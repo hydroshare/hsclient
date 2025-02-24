@@ -1362,7 +1362,7 @@ class HydroShareSession:
 
     def retrieve_file(self, path, save_path=""):
         file = self.get(path, status_code=200, allow_redirects=True)
-        self.write_file(path, file.content, save_path)
+        return self.write_file(path, file.content, save_path)
 
     def retrieve_bag(self, path, save_path=""):
         print(f"Retrieving {path}")
