@@ -1328,7 +1328,7 @@ class HydroShareSession:
         else:
             self._session = requests.Session()
             default_agent = self._session.headers['User-Agent']
-            self._session.headers['User-Agent'] = default_agent + ' (hsclient {VERSION})'
+            self._session.headers['User-Agent'] = f'{default_agent} (hsclient {VERSION})'
 
             if username is None or password is None:
                 return
