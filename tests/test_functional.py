@@ -239,11 +239,10 @@ def test_aggregation_download(resource):
     assert len(resource.aggregations()) == 1
     agg = resource.aggregations()[0]
     with tempfile.TemporaryDirectory() as tmp:
-        # we provide the "unzip_to" parameter to unzip the downloaded aggregation
         resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
-        assert files[0] == "logan.vrt"
+        assert files[0] == "logan.vrt.zip"
 
 
 def test_aggregation_delete(resource):
