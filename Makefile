@@ -25,4 +25,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	pytest --cov=hsclient --cov-report html
+	pytest --exitfirst --cov=hsclient --cov-report html

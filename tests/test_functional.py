@@ -8,6 +8,10 @@ from hsmodels.schemas.fields import Creator, Relation
 from hsclient import HydroShare
 
 
+def test_that_fails():
+    assert False, "This test should fail"
+
+
 def test_absolute_path_multiple_file_upload(new_resource):
     files = [
         "other.txt",
