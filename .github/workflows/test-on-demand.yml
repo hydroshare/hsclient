@@ -1,9 +1,6 @@
 name: Test on demand
 
 on:  
-  pull_request:
-    branches: 
-      - '**'
   workflow_dispatch:
     inputs:
       target:
