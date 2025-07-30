@@ -30,7 +30,7 @@ setup(
     author='Scott Black',
     author_email='scott.black@usu.edu',
     description='A python client for managing HydroShare resources',
-    python_requires='>=3.9',
+    python_requires='>=3.12',
     long_description=README,
     long_description_content_type="text/markdown",
     classifiers=[
