@@ -5,6 +5,7 @@ on:
     inputs:
       target:
         description: 'HOST to target tests (default: beta.hydroshare.org).'
+        default: 'beta.hydroshare.org'
 
 jobs:
   build:
@@ -28,7 +29,6 @@ jobs:
         make install
         pip install .
     - name: Run Tests against target = ${{ github.event.inputs.target }}
-      if: github.event.inputs.target != ''
       env:
         HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
