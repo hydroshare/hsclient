@@ -1,5 +1,5 @@
 # hsclient
-A python client for interacting with HydroShare in an object oriented way. The hsclient Python package can be use to create, modify, and interact with HydroShare resources. It was designed to allow you to write code to do pretty much everything you can do through HydroShare's web user interface.
+!A python client for interacting with HydroShare in an object oriented way. The hsclient Python package can be use to create, modify, and interact with HydroShare resources. It was designed to allow you to write code to do pretty much everything you can do through HydroShare's web user interface.
 
 ## Jupyter Notebooks
 HydroShare has a resource with example Jupyter notebooks for using hsclient.  Click [here](https://www.hydroshare.org/resource/7561aa12fd824ebb8edbee05af19b910/) then click the blue `Open with...` dropdown at the top of the page and select `Cuahsi Jupyterhub` to launch the notebooks into HydroShare's linked Jupyter Environment. [Click here](https://help.hydroshare.org/apps/CUAHSI-JupyterHub/) for information on how to access the HydroShare linked JupyterHub environment.
