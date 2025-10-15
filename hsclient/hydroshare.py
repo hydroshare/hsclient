@@ -14,7 +14,7 @@ from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
 from typing import Callable, Dict, List, TYPE_CHECKING, Union
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -173,8 +173,12 @@ class Aggregation:
                     if not file.path == self.metadata_path:
                         if not str(file.path).endswith('/'):  # checking for folders, shouldn't have to do this
                             file_checksum_path = file.path.split(self._resource_path, 1)[1].strip("/")
-                            file_path = file_checksum_path.split("data/contents/")[1]
-                            f = File(file_path, file.path, self._checksums[file_checksum_path])
+                            file_path = unquote(
+                                file_checksum_path.split(
+                                    "data/contents/",
+                                )[1]
+                            )
+                            f = File(file_path, unquote(file.path), self._checksums[file_checksum_path])
                             self._parsed_files.append(f)
         return self._parsed_files
 
@@ -188,7 +192,7 @@ class Aggregation:
             self._parsed_aggregations = []
             for file in self._map.describes.files:
                 if is_aggregation(str(file)):
-                    self._parsed_aggregations.append(Aggregation(file.path, self._hs_session, self._checksums))
+                    self._parsed_aggregations.append(Aggregation(unquote(file.path), self._hs_session, self._checksums))
 
             # load metadata for all aggregations (metadata is needed to create any typed aggregation)
             with ThreadPoolExecutor() as executor:
