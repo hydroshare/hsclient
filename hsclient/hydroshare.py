@@ -14,7 +14,7 @@ from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
 from typing import Callable, Dict, List, TYPE_CHECKING, Union
-from urllib.parse import quote, unquote, urlparse
+from urllib.parse import unquote, urlparse
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -243,7 +243,7 @@ class Aggregation:
         # split string by lines, then split line by delimiter into a dict
         delimiter = "    "
         data = {
-            quote(path): checksum for checksum, path in [line.split(delimiter) for line in file_str.split("\n") if line]
+            path: checksum for checksum, path in [line.split(delimiter) for line in file_str.split("\n") if line]
         }
         return data
 
