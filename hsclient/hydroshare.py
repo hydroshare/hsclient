@@ -51,7 +51,7 @@ from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
-from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
+from hsclient.utils import attribute_filter, is_aggregation, main_file_type
 
 import pkg_resources  # part of setuptools
 VERSION = pkg_resources.get_distribution(__package__).version
@@ -1429,7 +1429,7 @@ class HydroShareSession:
         return self.post(path, files=files, status_code=status_code)
 
     def post(self, path, status_code, data=None, params={}, **kwargs):
-        url = encode_resource_url(self._build_url(path))
+        url = self._build_url(path)
         response = self._session.post(url, params=params, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception(
@@ -1438,7 +1438,7 @@ class HydroShareSession:
         return response
 
     def put(self, path, status_code, data=None, **kwargs):
-        url = encode_resource_url(self._build_url(path))
+        url = self._build_url(path)
         response = self._session.put(url, data=data, **kwargs)
         if response.status_code != status_code:
             raise Exception(
@@ -1447,7 +1447,7 @@ class HydroShareSession:
         return response
 
     def get(self, path, status_code, **kwargs):
-        url = encode_resource_url(self._build_url(path))
+        url = self._build_url(path)
         response = self._session.get(url, **kwargs)
         if response.status_code != status_code:
             raise Exception(
@@ -1456,7 +1456,7 @@ class HydroShareSession:
         return response
 
     def delete(self, path, status_code, **kwargs):
-        url = encode_resource_url(self._build_url(path))
+        url = self._build_url(path)
         response = self._session.delete(url, **kwargs)
         if response.status_code != status_code:
             raise Exception(
