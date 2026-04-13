@@ -51,15 +51,18 @@ import requests
 from hsmodels.schemas.base_models import BaseMetadata
 from hsmodels.schemas.enums import AggregationType
 from hsmodels.schemas.fields import BoxCoverage, PointCoverage
+from pydantic import TypeAdapter
 from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
+from hsclient.schema.base import MediaType
 from hsclient.utils import attribute_filter, encode_resource_url, main_file_type
 
 from hsclient import __version__ as VERSION
 
 CHECK_TASK_PING_INTERVAL = 10
+MEDIA_ITEMS_ADAPTER = TypeAdapter(List[MediaType])
 
 
 class File(str):
@@ -149,10 +152,10 @@ class Aggregation:
     }
 
     def __init__(self, map_path, hs_session, s3_client, checksums=None):
-        self._map_path = map_path   # PK:should change it to jsonld_path
+        self._map_path = map_path   # TODO: should change it to jsonld_path
         self._hs_session = hs_session
         self._s3_client = s3_client
-        self._retrieved_map = None  # PK:probably not needed anymore
+        self._retrieved_map = None  # TODO: probably not needed anymore
         self._retrieved_metadata = None
         self._parsed_files = None
         self._parsed_aggregations = None
@@ -162,6 +165,7 @@ class Aggregation:
     def __str__(self):
         return self._map_path
 
+    # TODO: This is not needed anymore - delete it
     @property
     def _map(self):
         if not self._retrieved_map:
@@ -231,6 +235,7 @@ class Aggregation:
             if file_based_aggregations:
                 self._parsed_aggregations.extend(file_based_aggregations)
             self._prefetch_aggregation_metadata(self._parsed_aggregations)
+            # TODO: Need to uncomment this after content type metadata mapping is implemented
             # self._convert_typed_aggregations()
 
         return self._parsed_aggregations
@@ -274,23 +279,14 @@ class Aggregation:
 
     @property
     def _aggregations_file_based(self):
-        if self._s3_client is None:
-            return []
-        if not hasattr(self, "_s3_bucket_name"):
-            return []
-
-        try:
-            resource_id = self.resource_id
-        except AttributeError:
-            return []
-
-        jsonld_prefix = f"{self._s3_bucket_name}/{resource_id}/.hsjsonld/"
+        jsonld_prefix = f"{self.bucket_path}/.hsjsonld/"
         existing_paths = {aggr.jsonld_metadata_path for aggr in self._parsed_aggregations}
         file_based_aggregations = []
-        for file_path in sorted(self._s3_client.find(jsonld_prefix)):
+        resource_jsonld_file_path = self.jsonld_metadata_path
+        for file_path in self._s3_client.find(jsonld_prefix):
             if not file_path.endswith(".json"):
                 continue
-            if file_path.endswith("dataset_metadata.json"):
+            if file_path == resource_jsonld_file_path:
                 continue
             if file_path in existing_paths:
                 continue
@@ -304,7 +300,6 @@ class Aggregation:
 
     @property
     def _checksums_path(self):
-        # path = self.metadata_path.split("/data/", 1)[0]
         path = self._resource_path
         path = urljoin(path, "manifest-md5.txt")
         return path
@@ -317,8 +312,7 @@ class Aggregation:
 
     @property
     def _resource_path(self):
-        resource_path = self.metadata_path.split("/.hsjsonld/", 1)[0]
-        # resource_path = self.metadata_path[: len("/resource/b4ce17c17c654a5c8004af73f2df87ab/")].strip("/")
+        resource_path = f"/resource/{self.resource_id}"
         return resource_path
 
     def _retrieve_and_parse(self, path, as_pydantic: bool = True):
@@ -356,6 +350,7 @@ class Aggregation:
             return unzip_to
         return downloaded_zip
 
+    # TODO: Remove this property
     @property
     def metadata_file(self):
         """The path to the metadata file"""
@@ -379,12 +374,24 @@ class Aggregation:
     @property
     def user_metadata_path(self) -> str:
         """The path to the user entered metadata file for the aggregation"""
-        return f"{self.main_file_path}.user_metadata.json"
-        # return urlparse(str(self._map.describes.is_documented_by)).path
+        # Full file path to the user metadata file starting with {bucket_name}/{resource_id}/.hsmetadata/
+        base_meta_path = f"{self.bucket_path}/.hsmetadata"
+        if self._aggregation_type == AggregationType.FileSetAggregation:
+            return f"{base_meta_path}/{self.main_file_path}/user_metadata.json"
+        return f"{base_meta_path}/{self.main_file_path}.user_metadata.json"
+
+    @property
+    def extracted_metadata_path(self) -> str | None:
+        """The path to the extracted metadata file for the aggregation"""
+        base_meta_path = f"{self.bucket_path}/.hsmetadata"
+        if self._aggregation_type in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
+            return None
+        return f"{base_meta_path}/{self.main_file_path}.json"
 
     @property
     def main_file_path(self) -> str:
         """The path to the main file in the aggregation"""
+        # This path is relative to the data/contents/ directory in the resource
         if self._main_file_path is not None:
             return self._main_file_path
         aggregation_type = self._aggregation_type
@@ -407,7 +414,8 @@ class Aggregation:
         :return: None
         """
         metadata_json = self.metadata.model_dump_json()
-        # TODO: PK: This 'metadata_json' needs to be updated to use the new schema.org metadata before writing to hydroshare        
+        # TODO: This 'metadata_json' needs to be updated to use the new schema.org metadata
+        # for the aggregation before writing to s3
         self._s3_client.write_text(self.user_metadata_path, metadata_json)
 
     def files(self, search_aggregations: bool = False, **kwargs) -> List[File]:
@@ -486,6 +494,8 @@ class Aggregation:
         self._parsed_checksums = None
         self._main_file_path = None
 
+    #TODO: This delete method needs to be removed - the Resource class aggregation_delete()
+    # method implements aggregation delete using s3 protocol
     def delete(self) -> None:
         """Deletes this aggregation from HydroShare"""
         aggregation_type = self._aggregation_type
@@ -1043,9 +1053,32 @@ class Resource(Aggregation):
     """Represents a Resource in HydroShare"""
 
     @property
+    def _file_manifest_path(self) -> str:
+        return f"{dirname(self.jsonld_metadata_path)}/file_manifest.json"
+
+    def _associated_media_items(self):
+        try:
+            manifest = self._retrieve_and_parse(self._file_manifest_path, as_pydantic=False)
+        except Exception:
+            return super()._associated_media_items()
+
+        if isinstance(manifest, dict):
+            manifest = manifest.get("associatedMedia", manifest)
+
+        if not manifest:
+            return []
+
+        try:
+            if isinstance(manifest, list):
+                return MEDIA_ITEMS_ADAPTER.validate_python(manifest)
+            return [MEDIA_ITEMS_ADAPTER.validate_python([manifest])[0]]
+        except Exception:
+            return super()._associated_media_items()
+
+    @property
     def user_metadata_path(self) -> str:
-        """The path to the user entered metadata file for the resource"""
-        return f"{self._s3_bucket_name}/{self.resource_id}/.hsmetadata/user_metadata.json"
+        """The path to the user entered metadata json file for the resource"""
+        return f"{self.bucket_path}/.hsmetadata/user_metadata.json"
 
     @property
     def _hsapi_path(self):
@@ -1056,13 +1089,18 @@ class Resource(Aggregation):
         if self._s3_client is None:
             raise ValueError("S3 client is not configured for this resource")
 
-        if not hasattr(self, "_s3_bucket_name") or not hasattr(self, "_s3_prefix"):
+        if not hasattr(self, "bucket_path") or not self.bucket_path:
             raise ValueError("Resource S3 path information is not available")
 
-        remote_path_parts = [self._s3_bucket_name, self._s3_prefix.strip("/")]
+        remote_path_parts = [self.bucket_path.strip("/")]
         normalized_path = path.strip("/") if path else ""
         if normalized_path:
-            remote_path_parts.append(normalized_path)
+            if normalized_path.startswith(".hsmetadata"):
+                remote_path_parts.append(normalized_path)
+            else:
+                remote_path_parts.append("data")
+                remote_path_parts.append('contents')
+                remote_path_parts.append(normalized_path)
         return "/".join(remote_path_parts)
 
     def _upload(self, file, destination_path):
@@ -1075,15 +1113,36 @@ class Resource(Aggregation):
         remote_path = self._build_s3_path(path)
         self._s3_client.rm(remote_path)
 
+    def _move_file(self, src_path: str, dst_path: str) -> None:
+        src_remote_path = self._build_s3_path(src_path)
+        dst_remote_path = self._build_s3_path(dst_path)
+        self._s3_client.mv(src_remote_path, dst_remote_path)
+
+    def _move_folder(self, src_path: str, dst_path: str) -> None:
+        src_remote_path = self._build_s3_path(src_path)
+        dst_remote_path = self._build_s3_path(dst_path)
+        self._s3_client.mv(src_remote_path, dst_remote_path, recursive=True)
+
     def _download_file_folder(self, path: str, save_path: str) -> None:
         # We don't need to use the S3 client for this as s3 signed 
         # URLs are used by the rest api endpoint
         return self._hs_session.retrieve_zip(path, save_path)
 
     def _delete_file_folder(self, path: str) -> None:
-        remote_path = self._build_s3_path(path)
-        self._s3_client.rm(remote_path, recursive=True)
+        if self._file_exists(path):
+            # path is not an empty folder, so we can delete it from s3 directly
+            remote_path = self._build_s3_path(path)
+            self._s3_client.rm(remote_path, recursive=True)
+            return
+        # path probably points to an empty folder that would not exist in s3,
+        # so we need to call the hs api to delete it from database
+        folder_path = urljoin(self._hsapi_path, "folders", path)
+        self._hs_session.delete(folder_path, status_code=200)
 
+    def _file_exists(self, path: str) -> bool:
+        remote_path = self._build_s3_path(path)
+        return self._s3_client.exists(remote_path)
+    
     # system information
 
     @property
@@ -1091,22 +1150,25 @@ class Resource(Aggregation):
         """The resource id (guid) of the HydroShare resource"""
         # get the resource id from the jsonld_metadata_path
         return self.jsonld_metadata_path.split("/")[1]
-        # return self._map.identifier
 
+    # TODO: remove this property
     @property
     def metadata_file(self):
         """The path to the metadata file"""
         return self.metadata_path.split("/data/", 1)[1]
+
+    @property
+    def bucket_path(self):
+        """The bucket path for the resource in the S3 bucket"""
+        return self.jsonld_metadata_path.split("/.hsjsonld/", 1)[0]
 
     def system_metadata(self):
         """
         The system metadata associated with the HydroShare resource
         returns: JSON object
         """
-        system_metadata_path = f"{self._s3_bucket_name}/{self.resource_id}/.hsmetadata/system_metadata.json"
+        system_metadata_path = f"{self.bucket_path}/.hsmetadata/system_metadata.json"
         return self._retrieve_and_parse(system_metadata_path, as_pydantic=False)
-        # hsapi_path = urljoin(self._hsapi_path, 'sysmeta')
-        # return self._hs_session.get(hsapi_path, status_code=200).json()
 
     # access operations
 
@@ -1131,7 +1193,7 @@ class Resource(Aggregation):
 
     # resource operations
 
-    def new_version(self):
+    def new_version(self) -> 'Resource':
         """
         Creates a new version of the resource on HydroShare
         :return: A Resource object of the newly created resource version
@@ -1139,19 +1201,19 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "version")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
-        jsonld_metadata_path = f"{self._s3_bucket_name}/{resource_id}/.hsjsonld/dataset_metadata.json"
-        return Resource(jsonld_metadata_path, self._hs_session, self._s3_client)
+        new_res_jsonld_metadata_path = self.jsonld_metadata_path.replace(self.resource_id, resource_id, 1)
+        return Resource(new_res_jsonld_metadata_path, self._hs_session, self._s3_client)
 
-    def copy(self):
+    def copy(self) -> 'Resource':
         """
         Copies this Resource into a new resource on HydroShare
-        returns: A Resource object of the newly copied resource
+        :return: A Resource object of the newly copied resource
         """
         path = urljoin(self._hsapi_path, "copy")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
-        jsonld_metadata_path = f"{self._s3_bucket_name}/{resource_id}/.hsjsonld/dataset_metadata.json"
-        return Resource(jsonld_metadata_path, self._hs_session, self._s3_client)
+        copy_res_jsonld_metadata_path = self.jsonld_metadata_path.replace(self.resource_id, resource_id, 1)
+        return Resource(copy_res_jsonld_metadata_path, self._hs_session, self._s3_client)
 
     def download(self, save_path: str = "") -> str:
         """
@@ -1173,7 +1235,7 @@ class Resource(Aggregation):
     @refresh
     def save(self) -> None:
         """
-        Saves the metadata to HydroShare as user_metadata.json in the .hsmetadata folder
+        Saves the user provided metadata to HydroShare as user_metadata.json in the .hsmetadata folder
         :return: None
         """
         metadata_json = to_core_metadata(self.metadata).model_dump_json(by_alias=True, exclude_none=True)
@@ -1233,6 +1295,8 @@ class Resource(Aggregation):
         :param new_path: the new path folder name
         :return: None
         """
+        # Note: Folder operations are handled through rest endpoints instead of S3 client
+        # because the folder can be an empty folder and S3 storage doesn't support empty folder concept.
         self.file_rename(path=path, new_path=new_path)
 
     @refresh
@@ -1287,8 +1351,7 @@ class Resource(Aggregation):
         :param new_path: the renamed path to the file
         :return: None
         """
-        rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
-        self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
+        self._move_file(src_path=path, dst_path=new_path)
 
     @refresh
     def file_zip(self, path: str, zip_name: str = None, remove_file: bool = True) -> None:
@@ -1319,7 +1382,7 @@ class Resource(Aggregation):
         self._hs_session.post(
             unzip_path, status_code=200, data={"overwrite": overwrite, "ingest_metadata": ingest_metadata}
         )
-
+    # TODO: This function needs to be updated to use s3 protocol
     def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
         """
         Aggregate a file to a HydroShare aggregation type.  Aggregating files allows you to specify metadata specific
@@ -1330,6 +1393,10 @@ class Resource(Aggregation):
         :param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
         :return: The newly created Aggregation object if refresh is True
         """
+        # TODO: For creating a singlefile or fileset aggregation, we just need to write a user_metadata.json
+        # file as {file_path}.user_metadata.json or {folder_path}/user_metadata.json
+        # For other aggregation types, I think we need to write the {file_path}.user_metadata.json file
+        # and we need to update the hsextract application code to extract metadata from that file if the {file_path}.json doesn't exist
         type_value = agg_type.value
         data = {}
         if agg_type == AggregationType.SingleFileAggregation:
@@ -1356,43 +1423,34 @@ class Resource(Aggregation):
         :param destination_path: The path on HydroShare to upload the files to, defaults to the root contents directory
         :return: None
         """
-        if len(files) == 1:
-            self._upload(files[0], destination_path=destination_path)
-        else:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zipped_file = os.path.join(tmpdir, 'files.zip')
-                with ZipFile(zipped_file, 'w') as zipped:
-                    for file in files:
-                        zipped.write(file, os.path.basename(file))
-                self._upload(zipped_file, destination_path=destination_path)
-                unzip_path = urljoin(
-                    self._hsapi_path, "functions", "unzip", "data", "contents", destination_path, 'files.zip'
-                )
-                self._hs_session.post(
-                    unzip_path, status_code=200, data={"overwrite": "true", "ingest_metadata": "true"}
-                )
-        # TODO, return those files?
+        for _file in files:
+            if not os.path.isfile(_file):
+                raise Exception(f"File '{_file}' does not exist or is not a file")
+        for _file in files:
+            self._upload(_file, destination_path=destination_path)
 
     # aggregation operations
 
     @refresh
     def aggregation_remove(self, aggregation: Aggregation) -> None:
         """
-        Removes an aggregation from HydroShare.  This does not remove the files in the aggregation.
+        Removes an aggregation from HydroShare.  This does not remove the data files in the
+        aggregation - removes only the associated metadata files
         :param aggregation: The aggregation object to remove
         :return: None
         """
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
-        path = urljoin(
-            aggregation._hsapi_path,
-            "functions",
-            "remove-file-type",
-            aggregation_type.value + "LogicalFile",
-            aggregation.main_file_path,
-        )
-        aggregation._hs_session.post(path, status_code=200)
+        # delete the user metadata file for the aggregation if it exists
+        user_meta_file_to_delete = aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
+        if self._file_exists(user_meta_file_to_delete):
+            self._delete_file(user_meta_file_to_delete)
+
+        if aggregation_type not in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
+            extract_meta_file_to_delete = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
+            if self._file_exists(extract_meta_file_to_delete):
+                self._delete_file(extract_meta_file_to_delete)
         aggregation.refresh()
 
     @refresh
@@ -1406,21 +1464,53 @@ class Resource(Aggregation):
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
-        path = urljoin(
-            aggregation._hsapi_path,
-            aggregation_type.value + "LogicalFile",
-            aggregation.main_file_path,
-            "functions",
-            "move-file-type",
-            dst_path,
-        )
-        response = aggregation._hs_session.post(path, status_code=200)
-        json_response = response.json()
-        task_id = json_response['id']
-        status, _ = self._hs_session.check_task(task_id)
-        while status != 'true':
-            status, _ = self._hs_session.check_task(task_id)
-            time.sleep(CHECK_TASK_PING_INTERVAL)
+        aggr_path = aggregation.main_file_path
+        if aggregation_type == AggregationType.FileSetAggregation:
+            dst_path = os.path.join(dst_path, os.path.basename(aggr_path))
+            self._move_folder(aggr_path, dst_path)
+            # move the user metadata file if it exists
+            user_mata_file_path = self.aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
+            dst_path = os.path.join(dst_path, "user_metadata.json")
+            dst_path = f".hsmetadata/{dst_path}"
+            if self._file_exists(user_mata_file_path):
+                self._move_file(user_mata_file_path, dst_path)
+        elif aggregation_type == AggregationType.SingleFileAggregation:
+            data_file_src_path = aggr_path
+            data_file_name = os.path.basename(data_file_src_path)
+            data_file_dst_path = os.path.join(dst_path, data_file_name)
+            self._move_file(data_file_src_path, data_file_dst_path)
+            # move the user metadata file if it exists
+            user_meta_dst_path = os.path.join(dst_path, f"{data_file_name}.user_metadata.json")
+            user_meta_dst_path = f".hsmetadata/{user_meta_dst_path}"
+            user_meta_src_path = self.aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
+            if self._file_exists(user_meta_src_path):
+                self._move_file(user_meta_src_path, user_meta_dst_path)
+        else:
+            # move the data files in the aggregation
+            for associated_media_item in aggregation._associated_media_items():
+                media_item_url_path = associated_media_item["contentUrl"]
+                file_src_path = self._file_path_from_content_url(media_item_url_path)
+                file_dst_path = os.path.join(dst_path, os.path.basename(file_src_path))
+                if self._file_exists(file_src_path):
+                    self._move_file(file_src_path, file_dst_path)
+            # move the extracted metadata file if it exists
+            # TODO: We propbly don't need to move the extracted metadata file as it will be generated
+            # on content file move as part of s3 event processing
+            extract_meta_src_path = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
+            extracted_file_name = os.path.basename(aggr_path) + ".json"
+            extract_meta_dst_path = os.path.join(dst_path, extracted_file_name)
+            extract_meta_dst_path = f".hsmetadata/{extract_meta_dst_path}"
+            if self._file_exists(extract_meta_src_path):
+                self._move_file(extract_meta_src_path, extract_meta_dst_path)
+            
+            # move the user metadata file if it exists
+            data_file_name = os.path.basename(aggr_path)
+            user_meta_dst_path = os.path.join(dst_path, f"{data_file_name}.user_metadata.json")
+            user_meta_dst_path = f".hsmetadata/{user_meta_dst_path}"
+            user_meta_src_path = self.aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
+            if self._file_exists(user_meta_src_path):
+                self._move_file(user_meta_src_path, user_meta_dst_path)
+
         aggregation.refresh()
 
     @refresh
@@ -1430,7 +1520,38 @@ class Resource(Aggregation):
         :param aggregation: The aggregation object to delete
         :return: None
         """
-        aggregation.delete()
+        aggregation_type = aggregation._aggregation_type
+        if aggregation_type is None:
+            raise Exception("Aggregation type could not be determined")
+        
+        # delete the user metadata file for the aggregation if it exists
+        # TODO: We probably don't need to delete the user metadata file as it will be deleted
+        # when the content file is deleted as part of s3 event processing
+        if self._s3_client.exists(aggregation.user_metadata_path):
+            self._s3_client.delete(aggregation.user_metadata_path)
+
+        if aggregation_type == AggregationType.SingleFileAggregation:
+            # for single file aggregations we just need to delete the data file
+            media_item_url_path = aggregation._associated_media_items()[0]["contentUrl"]
+            media_item_path = self._file_path_from_content_url(media_item_url_path)
+            if self._file_exists(media_item_path):
+                self._delete_file(media_item_path)
+        elif aggregation_type == AggregationType.FileSetAggregation:
+            # for file set aggregations we need to delete the entire folder
+            self._delete_file_folder(aggregation.main_file_path)
+        else:
+            # delete the extracted metadata json file for the aggregation
+            # TODO: We probably don't need to delete the extracted metadata file as it will be deleted
+            # when the content file is deleted as part of s3 event processing
+            if self._s3_client.exists(aggregation.extracted_metadata_path):
+                self._s3_client.delete(aggregation.extracted_metadata_path)
+
+            # delete all data files in the aggregation
+            for associated_media_item in aggregation._associated_media_items():
+                media_item_url_path = associated_media_item["contentUrl"]
+                media_item_path = self._file_path_from_content_url(media_item_url_path)
+                if self._file_exists(media_item_path):
+                    self._delete_file(media_item_path)
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
@@ -1642,6 +1763,7 @@ class HydroShare:
     default_host = 'www.hydroshare.org'
     default_protocol = "https"
     default_port = 443
+    default_s3_endpoint_url = "https://s3.hydroshare.org"
 
     def __init__(
         self,
@@ -1651,6 +1773,7 @@ class HydroShare:
         protocol: str = default_protocol,
         port: int = default_port,
         client_id: str = None,
+        s3_endpoint_url: str = default_s3_endpoint_url,
         token: Union[Token, Dict[str, str]] = None,
     ):
         if client_id or token:
@@ -1671,6 +1794,7 @@ class HydroShare:
         self._resource_object_cache: Dict[str, Resource] = dict()
         self._s3_access_key: str = None
         self._s3_secret_key: str = None
+        self._s3_endpoint_url = s3_endpoint_url
         if username and password:
             self._set_user_s3_credentials()
             self._create_s3_client()
@@ -1808,25 +1932,19 @@ class HydroShare:
             response_json = response.json()
             
             if 'bucket' not in response_json:
-                raise Exception(f"❌ ERROR: Resource was not found for resource_id: {resource_id}")
+                raise Exception(f"ERROR: Resource was not found for resource_id: {resource_id}")
             
             bucket_name = response_json['bucket']
             prefix = response_json['prefix']
-            s3_path = f"{bucket_name}/{prefix}"
-            
+            assert resource_id == prefix.split("/")[0]
+
             # Use JSON-LD metadata file instead of XML
             resource_jsonld_metadata_path = f"{bucket_name}/{resource_id}/.hsjsonld/dataset_metadata.json"
         except Exception as e:
-            raise Exception(f"❌ ERROR: Failed to retrieve S3 path for resource_id: {resource_id} - {str(e)}")
+            raise Exception(f"ERROR: Failed to retrieve S3 path for resource_id: {resource_id} - {str(e)}")
         
         res = Resource(map_path=resource_jsonld_metadata_path, hs_session=self._hs_session, s3_client=self._s3_client)
-        
-        # Store S3 information in the resource object if available
-        if 'bucket_name' in locals():
-            res._s3_bucket_name = bucket_name
-            res._s3_prefix = prefix
-            res._s3_path = s3_path
-        
+
         if validate:
             res.metadata
 
@@ -1872,15 +1990,15 @@ class HydroShare:
             response_json = response.json()
             
             if 'access_key' not in response_json:
-                print("❌ ERROR: Invalid username/password")
+                print("ERROR: Invalid username/password")
                 self._s3_access_key = None
                 self._s3_secret_key = None
             else:
                 self._s3_access_key = response_json['access_key']
                 self._s3_secret_key = response_json['secret_key']
-                print("✅ User authentication is successful!")
+                print("User authentication is successful!")
         except Exception as e:
-            print(f"❌ ERROR: Failed to retrieve S3 credentials - {str(e)}")
+            print(f"ERROR: Failed to retrieve S3 credentials - {str(e)}")
             self._s3_access_key = None
             self._s3_secret_key = None
 
@@ -1892,7 +2010,7 @@ class HydroShare:
             self._s3_client = s3fs.S3FileSystem(
                 key=self._s3_access_key,
                 secret=self._s3_secret_key,
-                endpoint_url=self.s3_endpoint_url
+                endpoint_url=self._s3_endpoint_url
             )
         else:
             self._s3_client = None
