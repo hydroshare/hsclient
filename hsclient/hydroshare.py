@@ -5,7 +5,6 @@ import pathlib
 import pickle
 import shutil
 import sqlite3
-import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
@@ -16,10 +15,9 @@ from pprint import pformat
 from typing import Callable, Dict, List, TYPE_CHECKING, Union
 from urllib.parse import quote, unquote, urlparse
 from uuid import uuid4
-from zipfile import ZipFile
 import s3fs
 
-from hsclient.schema.adapter import to_core_metadata
+from hsclient.metadata_adapter.adapter import MetadataAdapter
 from hsclient.schema.utils import load_json
 
 
@@ -493,6 +491,7 @@ class Aggregation:
         self._parsed_aggregations = None
         self._parsed_checksums = None
         self._main_file_path = None
+        time.sleep(1)  # give some time to s3 eventing to regerrate the metadata files
 
     #TODO: This delete method needs to be removed - the Resource class aggregation_delete()
     # method implements aggregation delete using s3 protocol
@@ -1238,7 +1237,8 @@ class Resource(Aggregation):
         Saves the user provided metadata to HydroShare as user_metadata.json in the .hsmetadata folder
         :return: None
         """
-        metadata_json = to_core_metadata(self.metadata).model_dump_json(by_alias=True, exclude_none=True)
+        metadata = MetadataAdapter.to_resource_metadata(self.metadata)
+        metadata_json = metadata.model_dump_json(by_alias=True, exclude_none=True)
         self._s3_client.write_text(self.user_metadata_path, metadata_json)
 
     # referenced content operations
