@@ -40,6 +40,7 @@ def modify_json_schema(schema: dict[str, Any]) -> None:
 
 class SchemaBaseModel(BaseModel):
     model_config = ConfigDict(json_schema_extra=modify_json_schema, extra="ignore")
+    model_config.update(arbitrary_types_allowed=True, json_encoders={HttpUrl: str, AnyUrl: str})
 
 
 class DefinedTerm(SchemaBaseModel):
@@ -49,7 +50,7 @@ class DefinedTerm(SchemaBaseModel):
 
 
 class Published(DefinedTerm):
-    name: str = Field(default="Published")
+    name: Literal["Published"] = Field(default="Published")
     description: str = Field(
         default="The resource has been permanently published and should be considered final and complete",
         readOnly=True,
@@ -58,7 +59,7 @@ class Published(DefinedTerm):
 
 
 class Public(DefinedTerm):
-    name: str = Field(default="Public")
+    name: Literal["Public"] = Field(default="Public")
     description: str = Field(
         default="The resource is publicly accessible and can be viewed or downloaded by anyone",
         readOnly=True,
@@ -67,7 +68,7 @@ class Public(DefinedTerm):
 
 
 class Private(DefinedTerm):
-    name: str = Field(default="Private")
+    name: Literal["Private"] = Field(default="Private")
     description: str = Field(
         default="The resource is private and can only be accessed by authorized users",
         readOnly=True,
@@ -76,7 +77,7 @@ class Private(DefinedTerm):
 
 
 class Discoverable(DefinedTerm):
-    name: str = Field(default="Discoverable")
+    name: Literal["Discoverable"] = Field(default="Discoverable")
     description: str = Field(
         default="The resource is discoverable and can be found through search engines or other discovery mechanisms",
         readOnly=True,
@@ -238,7 +239,7 @@ class DefinedTerm(SchemaBaseModel):
 
 
 class Draft(DefinedTerm):
-    name: str = Field(default="Draft")
+    name: Literal["Draft"] = Field(default="Draft")
     description: str = Field(
         default="The resource is in draft state and should not be considered final. Content and metadata may change",
         description="The description of the item being defined.",
@@ -247,7 +248,7 @@ class Draft(DefinedTerm):
 
 
 class Incomplete(DefinedTerm):
-    name: str = Field(default="Incomplete")
+    name: Literal["Incomplete"] = Field(default="Incomplete")
     description: str = Field(
         default="Data collection is ongoing or the resource is not completed",
         description="The description of the item being defined.",
@@ -256,7 +257,7 @@ class Incomplete(DefinedTerm):
 
 
 class Obsolete(DefinedTerm):
-    name: str = Field(default="Obsolete")
+    name: Literal["Obsolete"] = Field(default="Obsolete")
     description: str = Field(
         default="The resource has been replaced by a newer version, or the resource is no longer considered applicable",
         description="The description of the item being defined.",
