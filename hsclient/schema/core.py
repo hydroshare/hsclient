@@ -186,11 +186,13 @@ class CoreMetadata(SchemaBaseModel):
         "part of - e.g., a related collection.",
         default=None,
     )
+    # 'relation' is not a standard schema.org property, but we include it here to 
+    # capture any other types of relations that don't fit into the above properties 
     relation: Optional[List[Relation]] = Field(
         title="Relation",
         description="All other types of relations",
         default=None,
-    ),
+    )
     additionalProperty: Optional[List[PropertyValue]] = Field(
         title="Additional properties",
         default=None,
