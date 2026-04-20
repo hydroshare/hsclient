@@ -379,7 +379,7 @@ class Aggregation:
         return f"{base_meta_path}/{self.main_file_path}.user_metadata.json"
 
     @property
-    def extracted_metadata_path(self) -> str | None:
+    def extracted_metadata_path(self) -> Union[str, None]:
         """The path to the extracted metadata file for the aggregation"""
         base_meta_path = f"{self.bucket_path}/.hsmetadata"
         if self._aggregation_type in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
