@@ -15,7 +15,6 @@ setup(
         'hsmodels>=1.0.4',
         'requests',
         'requests_oauthlib',
-        'setuptools',
     ],
     extras_require={
         "pandas": ["pandas"],

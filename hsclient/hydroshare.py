@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import datetime
 from functools import wraps
+from importlib.metadata import version
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
 from typing import Callable, Dict, List, TYPE_CHECKING, Union
@@ -53,8 +54,7 @@ from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
-import pkg_resources  # part of setuptools
-VERSION = pkg_resources.get_distribution(__package__).version
+VERSION = version(__package__)
 
 CHECK_TASK_PING_INTERVAL = 10
 
