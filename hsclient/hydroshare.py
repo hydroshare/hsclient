@@ -1578,7 +1578,8 @@ class HydroShare:
         :param to_date: Filter results to those created before to_date.  Must be datetime.date.  Because dates have
             no time information, you must specify date+1 day to get results for date (e.g. use 2015-05-06 to get
             resources created up to and including 2015-05-05)
-        :param types: Filter results to particular HydroShare resource types (Deprecated, all types are Composite)
+        :param resource_types: Filter results to particular HydroShare resource types
+            (Deprecated, all types are Composite)
         :param subject: Filter by comma separated list of subjects
         :param full_text_search: Filter by full text search
         :param edit_permission: Filter by boolean edit permission
