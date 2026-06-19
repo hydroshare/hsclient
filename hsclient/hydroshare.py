@@ -53,8 +53,7 @@ from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
 from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
 
-import pkg_resources  # part of setuptools
-VERSION = pkg_resources.get_distribution(__package__).version
+from hsclient import __version__ as VERSION
 
 CHECK_TASK_PING_INTERVAL = 10
 
