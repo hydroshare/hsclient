@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hsclient"
+dynamic = ["version"]
+description = "A python client for managing HydroShare resources"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    {name = "Scott Black", email = "scott.black@usu.edu"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "hsmodels>=1.0.4",
+    "requests",
+    "requests_oauthlib",
+]
+
+[project.urls]
+Homepage = "https://github.com/hydroshare/hsclient"
+
+[project.optional-dependencies]
+pandas = ["pandas"]
+xarray = ["netCDF4", "xarray"]
+rasterio = ["rasterio"]
+fiona = ["fiona"]
+all = ["pandas", "netCDF4", "xarray", "rasterio", "fiona"]
+dev = [
+    "pandas", "netCDF4", "xarray", "rasterio", "fiona",
+    "pytest", "pytest-xdist", "pytest-cov",
+    "mkdocs", "mknotebooks", "mkdocstrings", "mkdocstrings-python",
+]
+
+[tool.setuptools]
+packages = {find = {include = ["hsclient", "hsclient.*"], exclude = ["tests"]}}
+
+[tool.setuptools.dynamic]
+version = {attr = "hsclient.__version__"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 14
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[tool.isort]
+line_length = 120
+known_first_party = "hsclient"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+
+[tool.coverage.run]
+source = ["hsclient"]
+branch = true
+
+[tool.coverage.report]
+precision = 2
+
+[tool.mypy]
+show_error_codes = true
+follow_imports = "silent"
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+warn_unused_configs = true
+disallow_subclassing_any = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "email_validator"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "dotenv"
+ignore_missing_imports = true
