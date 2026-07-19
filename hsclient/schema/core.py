@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional, Union
 
 
@@ -8,24 +7,7 @@ from pydantic import (
 )
 
 from .base import (
-    CreativeWork,
     SchemaBaseModel,
-    Creator,
-    Contributor,
-    Organization,
-    Provider,
-    PublisherOrganization,
-    SubjectOf,
-    LanguageEnum,
-    InLanguageStr,
-    Draft,
-    Incomplete,
-    Obsolete,
-    Published,
-    Public,
-    Discoverable,
-    Private,
-    Grant,
     TemporalCoverage,
     Place,
     HasPart,
@@ -75,94 +57,15 @@ class CoreMetadata(SchemaBaseModel):
         title="Description or abstract",
         description="A text string containing a description/abstract for the resource.",
     )
-    url: HttpUrl = Field(
-        title="URL",
-        description="A URL for the landing page that describes the resource and where the content "
-        "of the resource can be accessed. If there is no landing page,"
-        " provide the URL of the content.",
-    )
-    identifier: List[str] = Field(
-        title="Identifiers",
-        description="Any kind of identifier for the resource. Identifiers may be DOIs or unique strings "
-        "assigned by a repository. Multiple identifiers can be entered. Where identifiers can be "
-        "encoded as URLs, enter URLs here.",
-    )
-
-    creator: List[Union[Creator, Organization]] = Field(
-        description="Person or Organization that created the resource."
-    )
-    dateCreated: datetime = Field(
-        title="Date created", description="The date on which the resource was created.",
-        frozen=True,
-        json_schema_extra={"readOnly": True},
-    )
-    keywords: List[str] = Field(
+    keywords: Optional[List[str]] = Field(
         min_length=1,
         description="Keywords or tags used to describe the dataset, delimited by commas.",
-    )
-    license: Union[CreativeWork, HttpUrl] = Field(
-        description="A license document that applies to the resource."
-    )
-    provider: Union[Organization, Provider] = Field(
-        description="The repository, service provider, organization, person, or service performer that provides"
-        " access to the resource."
+        default=[],
     )
 
     ###################
     # OPTIONAL FIELDS #
-    ###################
-    contributor: Optional[List[Union[Contributor, Organization]]] = Field(
-        description="Person or Organization that contributed to the resource.",
-        default=None
-    )
-    publisher: Optional[PublisherOrganization] = Field(
-        title="Publisher",
-        description="Where the resource is permanently published, indicated the repository, service provider,"
-        " or organization that published the resource - e.g., CUAHSI HydroShare."
-        " This may be the same as Provider.",
-        default=None,
-    )
-    datePublished: Optional[datetime] = Field(
-        title="Date published",
-        description="Date of first publication for the resource.",
-        default=None,
-        frozen=True,
-        json_schema_extra={"readOnly": True},
-    )
-    subjectOf: Optional[List[SubjectOf]] = Field(
-        title="Subject of",
-        description="Link to or citation for a related resource that is about or describes this resource"
-        " - e.g., a journal paper that describes this resource or a related metadata document "
-        "describing the resource.",
-        default=None,
-    )
-    version: Optional[str] = Field(
-        description="A text string indicating the version of the resource.",
-        default=None,
-    )  # TODO find something better than float for number
-    inLanguage: Optional[Union[LanguageEnum, InLanguageStr]] = Field(
-        title="Language",
-        description="The language of the content of the resource.",
-        default=None,
-    )
-    creativeWorkStatus: Optional[Union[Draft, Incomplete, Obsolete, Published, Public, Discoverable, Private]] = Field(
-        title="Resource status",
-        description="The status of this resource in terms of its stage in a lifecycle. "
-        "Example terms include Incomplete, Draft, Published, and Obsolete.",
-        default=None,
-    )
-    dateModified: Optional[datetime] = Field(
-        title="Date modified",
-        description="The date on which the resource was most recently modified or updated.",
-        default=None,
-        frozen=True,
-        json_schema_extra={"readOnly": True},
-    )
-    funding: Optional[List[Grant]] = Field(
-        description="A Grant or monetary assistance that directly or indirectly provided funding or sponsorship "
-        "for creation of the resource.",
-        default=None,
-    )
+    ###################    
     temporalCoverage: Optional[TemporalCoverage] = Field(
         title="Temporal coverage",
         description="The time period that applies to all of the content within the resource.",
@@ -204,13 +107,6 @@ class CoreMetadata(SchemaBaseModel):
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = Field(
         title="Resource content",
         description="A media object that encodes this CreativeWork. This property is a synonym for encoding.",
-        default=None,
-        frozen=True,
-        json_schema_extra={"readOnly": True},
-    )
-    citation: Optional[List[str]] = Field(
-        title="Citation",
-        description="A bibliographic citation for the resource.",
         default=None,
         frozen=True,
         json_schema_extra={"readOnly": True},
