@@ -1,16 +1,11 @@
-from .core import CoreMetadata
 from enum import Enum
-from typing import Optional, List, Union, Literal
+from typing import List, Literal, Optional, Union
+
 from pydantic import Field, HttpUrl
 
-from .base import (
-    PropertyValue,
-    Organization,
-    DataCatalog,
-    MediaType,
-)
-
-from .datavariable import Dimension, DataVariable
+from .base import DataCatalog, MediaType, Organization, PropertyValue
+from .core import CoreMetadata
+from .datavariable import DataVariable, Dimension
 
 
 class AdditionalType(str, Enum):
@@ -20,6 +15,7 @@ class AdditionalType(str, Enum):
     TABULAR = 'Tabular'
     SINGLE_FILE = 'GenericFile'
     FILE_SET = 'FileSet'
+
 
 class ScientificDataset(CoreMetadata):
     """
@@ -31,9 +27,7 @@ class ScientificDataset(CoreMetadata):
 
     context: HttpUrl = Field(
         alias="@context",  # type: ignore
-        default=HttpUrl(
-            "https://hydroshare.org/schema"
-        ),  # TODO: This is a placeholder for now.
+        default=HttpUrl("https://hydroshare.org/schema"),  # TODO: This is a placeholder for now.
         description="Specifies the vocabulary employed for understanding the structured data markup.",
     )
     type: Literal["ScientificDataset"] = Field(
@@ -46,14 +40,14 @@ class ScientificDataset(CoreMetadata):
     additionalType: AdditionalType = Field(
         title="Additional type",
         description="An additional type for the dataset. This can be used to further specify the type of the"
-                    " dataset (e.g., MultiDimensional).",
+        " dataset (e.g., MultiDimensional).",
         frozen=True,
         json_schema_extra={"readOnly": True},
     )
     variableMeasured: Optional[List[Union[str, PropertyValue, DataVariable]]] = Field(
         title="Variables measured",
         description="Measured variables.",
-        default=[]
+        default=[],
     )
     dimensions: Optional[List[Dimension]] = Field(
         title="Dimensions",
@@ -64,7 +58,7 @@ class ScientificDataset(CoreMetadata):
     associatedMedia: Union[MediaType, List[MediaType]] = Field(
         title="Resource content",
         description="A media object that encodes this CreativeWork. This property is a synonym for encoding.",
-        default=[]
+        default=[],
     )
     coordinates: Optional[List[DataVariable]] = Field(
         default=None,
@@ -76,9 +70,7 @@ class ScientificDataset(CoreMetadata):
         title="DataCatalog",
         description="A data catalog which contains this dataset.",
     )
-    additionalProperty: Optional[
-        Union[str, List[str], PropertyValue, List[PropertyValue]]
-    ] = Field(
+    additionalProperty: Optional[Union[str, List[str], PropertyValue, List[PropertyValue]]] = Field(
         title="Additional properties",
         default=None,
         description="Additional properties of the dataset that don't fit into schema org.",
@@ -87,13 +79,6 @@ class ScientificDataset(CoreMetadata):
         default=None,
         title="Source organization",
         description="The organization that provided the data for this dataset.",
-    )
-    additionalType: Optional[AdditionalType] = Field(
-        default=None,
-        title="Additional Type",
-        description = "Additional descriptive types associated with the ScientificDataset. This is typically used by applications to provide specialized funcationality for categories for content.",
-        frozen=True,
-        json_schema_extra={"readOnly": True},
     )
 
     # ---------------------------------------------
