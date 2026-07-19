@@ -51,13 +51,16 @@ class ScientificDataset(CoreMetadata):
         json_schema_extra={"readOnly": True},
     )
                     
-    variableMeasured: List[Union[str, PropertyValue, DataVariable]] = Field(
-        title="Variables measured", description="Measured variables."
+    variableMeasured: Optional[List[Union[str, PropertyValue, DataVariable]]] = Field(
+        title="Variables measured",
+        description="Measured variables.",
+        default=[]
     )
 
-    dimensions: List[Dimension] = Field(
+    dimensions: Optional[List[Dimension]] = Field(
         title="Dimensions",
-        description="Dimensions defined in the multi-dimensional dataset.",
+        description="Dimensions defined in the time series dataset.",
+        default=[],
     )
     
     # redefine associatedMedia from "Core" as a required field
