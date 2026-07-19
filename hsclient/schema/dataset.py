@@ -26,6 +26,8 @@ class AdditionalType(str, Enum):
     GEOGRAPHIC_RASTER = 'GeographicRaster'
     MULTIDIMENSIONAL = 'MultiDimensional'
     TABULAR = 'Tabular'
+    SINGLE_FILE = 'GenericFile'
+    FILE_SET = 'FileSet'
 
 class ScientificDataset(CoreMetadata):
     """
