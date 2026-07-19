@@ -1512,13 +1512,14 @@ class Resource(Aggregation):
         else:
             # move the data files in the aggregation
             for associated_media_item in aggregation._associated_media_items():
-                media_item_url_path = associated_media_item["contentUrl"]
-                file_src_path = self._file_path_from_content_url(media_item_url_path)
-                file_dst_path = os.path.join(dst_path, os.path.basename(file_src_path))
-                if self._file_exists(file_src_path):
-                    self._move_file(file_src_path, file_dst_path)
+                media_item_url_path = getattr(associated_media_item, "contentUrl", None)
+                if media_item_url_path:
+                    file_src_path = self._file_path_from_content_url(media_item_url_path)
+                    file_dst_path = os.path.join(dst_path, os.path.basename(file_src_path))
+                    if self._file_exists(file_src_path):
+                        self._move_file(file_src_path, file_dst_path)
             # move the extracted metadata file if it exists
-            # TODO: We propbly don't need to move the extracted metadata file as it will be generated
+            # TODO: We probably don't need to move the extracted metadata file as it will be generated
             # on content file move as part of s3 event processing
             extract_meta_src_path = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
             extracted_file_name = os.path.basename(aggr_path) + ".json"
@@ -1531,7 +1532,7 @@ class Resource(Aggregation):
             data_file_name = os.path.basename(aggr_path)
             user_meta_dst_path = os.path.join(dst_path, f"{data_file_name}.user_metadata.json")
             user_meta_dst_path = f".hsmetadata/{user_meta_dst_path}"
-            user_meta_src_path = self.aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
+            user_meta_src_path = aggregation.user_metadata_path.replace(self.bucket_path + "/", "", 1)
             if self._file_exists(user_meta_src_path):
                 self._move_file(user_meta_src_path, user_meta_dst_path)
 
