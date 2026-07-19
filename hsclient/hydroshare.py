@@ -18,7 +18,9 @@ from uuid import uuid4
 import s3fs
 
 from hsclient.metadata_adapter.adapter import MetadataAdapter
+from hsclient.metadata_adapter.aggregation_type_adapter import AggregationTypeAdapter
 from hsclient.schema.utils import load_json
+from hsclient.schema.dataset import AdditionalType
 
 
 if TYPE_CHECKING:
@@ -201,14 +203,14 @@ class Aggregation:
     @property
     def _aggregation_type(self):
         metadata_type = getattr(self.metadata, "type", None)
-        if isinstance(metadata_type, AggregationType):
+        if isinstance(metadata_type, AdditionalType):
             return metadata_type
 
         additional_type = getattr(self.metadata, "additionalType", None)
         if additional_type is None:
             return None
 
-        return self._ADDITIONAL_TYPE_TO_AGGREGATION_TYPE.get(str(additional_type))
+        return AggregationTypeAdapter.to_legacy_aggregation_type(additional_type)
 
     @property
     def _files(self):
