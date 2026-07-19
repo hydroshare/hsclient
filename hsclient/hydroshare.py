@@ -384,6 +384,11 @@ class Aggregation:
         return self._map_path
 
     @property
+    def bucket_path(self):
+        """The bucket path for the resource in the S3 bucket"""
+        return self.jsonld_metadata_path.split("/.hsjsonld/", 1)[0]
+
+    @property
     def user_metadata_path(self) -> str:
         """The path to the user entered metadata file for the aggregation"""
         # Full file path to the user metadata file starting with {bucket_name}/{resource_id}/.hsmetadata/
@@ -1170,10 +1175,6 @@ class Resource(Aggregation):
         """The path to the metadata file"""
         return self.metadata_path.split("/data/", 1)[1]
 
-    @property
-    def bucket_path(self):
-        """The bucket path for the resource in the S3 bucket"""
-        return self.jsonld_metadata_path.split("/.hsjsonld/", 1)[0]
 
     def system_metadata(self):
         """
@@ -1557,10 +1558,13 @@ class Resource(Aggregation):
 
         if aggregation_type == AggregationType.SingleFileAggregation:
             # for single file aggregations we just need to delete the data file
-            media_item_url_path = aggregation._associated_media_items()[0]["contentUrl"]
-            media_item_path = self._file_path_from_content_url(media_item_url_path)
-            if self._file_exists(media_item_path):
-                self._delete_file(media_item_path)
+            if aggregation._associated_media_items():
+                associated_media_item = aggregation._associated_media_items()[0]
+                media_item_url_path = getattr(associated_media_item, "contentUrl", None)
+                if media_item_url_path:
+                    media_item_path = self._file_path_from_content_url(media_item_url_path)
+                    if self._file_exists(media_item_path):
+                        self._delete_file(media_item_path)
         elif aggregation_type == AggregationType.FileSetAggregation:
             # for file set aggregations we need to delete the entire folder
             self._delete_file_folder(aggregation.main_file_path)
@@ -1573,10 +1577,11 @@ class Resource(Aggregation):
 
             # delete all data files in the aggregation
             for associated_media_item in aggregation._associated_media_items():
-                media_item_url_path = associated_media_item["contentUrl"]
-                media_item_path = self._file_path_from_content_url(media_item_url_path)
-                if self._file_exists(media_item_path):
-                    self._delete_file(media_item_path)
+                media_item_url_path = getattr(associated_media_item, "contentUrl", None)
+                if media_item_url_path:
+                    media_item_path = self._file_path_from_content_url(media_item_url_path)
+                    if self._file_exists(media_item_path):
+                        self._delete_file(media_item_path)
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
