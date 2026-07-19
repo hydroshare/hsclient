@@ -1311,7 +1311,8 @@ class Resource(Aggregation):
         """
         # Note: Folder operations are handled through rest endpoints instead of S3 client
         # because the folder can be an empty folder and S3 storage doesn't support empty folder concept.
-        self.file_rename(path=path, new_path=new_path)
+        rename_path = urljoin(self._hsapi_path, "functions", "move-or-rename")
+        self._hs_session.post(rename_path, status_code=200, data={"source_path": path, "target_path": new_path})
 
     @refresh
     def folder_delete(self, path: str = None) -> None:
