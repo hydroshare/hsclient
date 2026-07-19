@@ -294,6 +294,8 @@ class Aggregation:
         file_based_aggregations = []
         resource_jsonld_file_path = self.jsonld_metadata_path
         for file_path in self._s3_client.find(jsonld_prefix):
+            if file_path.endswith("file_manifest.json") or file_path.endswith("has_parts.json"):
+                continue
             if not file_path.endswith(".json"):
                 continue
             if file_path == resource_jsonld_file_path:
