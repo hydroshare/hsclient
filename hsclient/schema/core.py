@@ -24,6 +24,7 @@ from .base import (
     Published,
     Public,
     Discoverable,
+    Private,
     Grant,
     TemporalCoverage,
     Place,
@@ -144,7 +145,7 @@ class CoreMetadata(SchemaBaseModel):
         description="The language of the content of the resource.",
         default=None,
     )
-    creativeWorkStatus: Optional[Union[Draft, Incomplete, Obsolete, Published, Public, Discoverable]] = Field(
+    creativeWorkStatus: Optional[Union[Draft, Incomplete, Obsolete, Published, Public, Discoverable, Private]] = Field(
         title="Resource status",
         description="The status of this resource in terms of its stage in a lifecycle. "
         "Example terms include Incomplete, Draft, Published, and Obsolete.",
