@@ -375,7 +375,6 @@ class IdentifierStr(str):
         return cls(", ".join(value))  # Join the list into a single string for storage
 
 
-# TODO: start here.
 class SpatialReference(SchemaBaseModel):
     type: Literal["SpatialReference"] = Field(
         alias="@type",  # type: ignore
@@ -410,6 +409,8 @@ class SpatialReference(SchemaBaseModel):
             raise ValueError("SRS Type must be either 'geographic' or 'projected'")
         return v
 
+    def is_geographic(self) -> bool:
+        return self.srsType.lower() == "geographic"
 
 class Grant(SchemaBaseModel):
     type: Literal["Grant"] = Field(
@@ -509,40 +510,6 @@ class GeoShape(SchemaBaseModel):
         "southwest and northeast corners of the box."
     )
 
-    @field_validator("box")
-    def validate_box(cls, v, info):
-        # ignoring validation for now
-        if not isinstance(v, str):
-            raise TypeError("string required")
-        v = v.strip()
-        if not v:
-            raise ValueError("empty string")
-
-        # exit if validation is turned off
-        if not info.data.get("validate_bbox", 'Could not find "validate_bbox"'):
-            return v
-
-        v_parts = v.split(" ")
-        if len(v_parts) != 4:
-            raise ValueError("Bounding box must have 4 coordinate points")
-        for index, item in enumerate(v_parts, start=1):
-            try:
-                item = float(item)
-            except ValueError:
-                raise ValueError("Bounding box coordinate value is not a number")
-            item = abs(item)
-            if index % 2 == 0:
-                if item >= 180:
-                    raise ValueError(
-                        f"Bounding box coordinate east/west must be between -180 and 180, got {item}"
-                    )
-            elif item >= 90:
-                raise ValueError(
-                    f"Bounding box coordinate north/south must be between -90 and 90, got {item}"
-                )
-
-        return v
-
 
 class PropertyValue(SchemaBaseModel):
     type: Literal["PropertyValue"] = Field(
@@ -622,6 +589,36 @@ class Place(SchemaBaseModel):
             )
         return self
 
+    @model_validator(mode="after")
+    def validate_bbox_for_geographic_crs(self):
+        if not self.geo or not self.srs:
+            return self
+
+        if not isinstance(self.geo, GeoShape):
+            return self
+
+        # determine if CRS is geographic
+        if not self.srs.is_geographic():
+            return self
+
+        parts = self.geo.box.split()
+        if len(parts) != 4:
+            raise ValueError("Bounding box must have 4 coordinate points")
+
+        south, west, north, east = map(float, parts)
+        if not (-90 <= south <= 90):
+            raise ValueError("south latitude out of range")
+
+        if not (-90 <= north <= 90):
+            raise ValueError("north latitude out of range")
+
+        if not (-180 <= west <= 180):
+            raise ValueError("west longitude out of range")
+
+        if not (-180 <= east <= 180):
+            raise ValueError("east longitude out of range")
+
+        return self
 
 class MediaObject(SchemaBaseModel):
     type: Literal["MediaObject"] = Field(
