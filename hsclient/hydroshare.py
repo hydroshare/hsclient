@@ -1397,7 +1397,7 @@ class Resource(Aggregation):
         self._hs_session.post(
             unzip_path, status_code=200, data={"overwrite": overwrite, "ingest_metadata": ingest_metadata}
         )
-    # TODO: This function needs to be updated to use s3 protocol
+
     def file_aggregate(self, path: str, agg_type: AggregationType, refresh: bool = True):
         """
         Aggregate a file to a HydroShare aggregation type.  Aggregating files allows you to specify metadata specific
@@ -1408,24 +1408,33 @@ class Resource(Aggregation):
         :param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
         :return: The newly created Aggregation object if refresh is True
         """
-        # TODO: For creating a singlefile or fileset aggregation, we just need to write a user_metadata.json
+        # For creating a singlefile or fileset aggregation, we just need to write a user_metadata.json
         # file as {file_path}.user_metadata.json or {folder_path}/user_metadata.json
         # For other aggregation types, I think we need to write the {file_path}.user_metadata.json file
         # and we need to update the hsextract application code to extract metadata from that file if the {file_path}.json doesn't exist
-        type_value = agg_type.value
-        data = {}
-        if agg_type == AggregationType.SingleFileAggregation:
-            type_value = 'SingleFile'
+
         if agg_type == AggregationType.FileSetAggregation:
             if '/' in path:
                 relative_path = dirname(path)
             else:
                 relative_path = path
-            data = {"folder_path": relative_path}
+            user_metadata_path = f"{self.bucket_path}/.hsmetadata/{relative_path}/user_metadata.json"
+        else:
+            user_metadata_path = f"{self.bucket_path}/.hsmetadata/{path}.user_metadata.json"
 
-        url = urljoin(self._hsapi_path, "functions", "set-file-type", path, type_value)
-        self._hs_session.post(url, status_code=201, data=data)
-        if refresh:
+        aggregation_created = False
+        if not self._file_exists(user_metadata_path):
+            additional_type = AggregationTypeAdapter.to_aggregation_type(agg_type)
+            metadata = {"additionalType": additional_type.value}
+            self._s3_client.write_text(user_metadata_path, json.dumps(metadata))
+            aggregation_created = True
+        elif agg_type not in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
+            # fetch the existing user metadata and write it back to s3 to trigger metadata extraction
+            existing_metadata = self._retrieve_and_parse(user_metadata_path, as_pydantic=False)
+            self._s3_client.write_text(user_metadata_path, json.dumps(existing_metadata))
+            aggregation_created = True
+ 
+        if refresh and aggregation_created:
             # Only return the newly created aggregation if a refresh is requested
             self.refresh()
             return self.aggregation(file__path=path)
