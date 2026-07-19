@@ -196,6 +196,16 @@ class Aggregation:
         associated_media = getattr(self.metadata, "associatedMedia", None)
         if associated_media is None:
             return []
+        if self._aggregation_type == AggregationType.FileSetAggregation:
+            # For FileSetAggregation, get the media items from the file_manifest.json file in the .hsjsonld folder.
+            file_manifest_path = f"{dirname(self.jsonld_metadata_path)}/file_manifest.json"
+            if not self._s3_client.exists(file_manifest_path):
+                return []
+            associated_media = self._retrieve_and_parse(file_manifest_path, as_pydantic=False)
+            if isinstance(associated_media, list):
+                return MEDIA_ITEMS_ADAPTER.validate_python(associated_media)
+            return [MEDIA_ITEMS_ADAPTER.validate_python([associated_media])[0]]
+
         if isinstance(associated_media, list):
             return associated_media
         return [associated_media]
