@@ -1,5 +1,7 @@
 venv/
 dist/
 site/
+build/
 hsclient.egg-info/
 .idea/
+__pycache__/
