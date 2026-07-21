@@ -1,4 +1,4 @@
-hsmodels @ git+https://github.com/hydroshare/hsmodels.git@main
+hsmodels>=1.1.2
 pytest
 requests==2.24.0
 email-validator
