@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "hsmodels>=1.0.4",
+    "hsmodels @ git+https://github.com/hydroshare/hsmodels.git@main",
     "requests",
     "requests_oauthlib",
 ]
