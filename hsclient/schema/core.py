@@ -7,6 +7,7 @@ from pydantic import (
 )
 
 from .base import (
+    CreativeWork,
     SchemaBaseModel,
     TemporalCoverage,
     Place,
@@ -57,15 +58,18 @@ class CoreMetadata(SchemaBaseModel):
         title="Description or abstract",
         description="A text string containing a description/abstract for the resource.",
     )
+    url: Optional[HttpUrl] = Field(
+        default=None,
+        title="URL",
+        description="A URL for the landing page that describes the resource and where the content "
+        "of the resource can be accessed. If there is no landing page,"
+        " provide the URL of the content.",
+    )
     keywords: Optional[List[str]] = Field(
         min_length=1,
         description="Keywords or tags used to describe the dataset, delimited by commas.",
         default=[],
     )
-
-    ###################
-    # OPTIONAL FIELDS #
-    ###################    
     temporalCoverage: Optional[TemporalCoverage] = Field(
         title="Temporal coverage",
         description="The time period that applies to all of the content within the resource.",
@@ -102,7 +106,6 @@ class CoreMetadata(SchemaBaseModel):
         default=None,
         description="Additional properties of the place.",
     )
-
     # using MediaType here to allow for MediaObject and its subclasses (e.g., DataDownload, VideoObject)
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = Field(
         title="Resource content",
@@ -110,6 +113,9 @@ class CoreMetadata(SchemaBaseModel):
         default=None,
         frozen=True,
         json_schema_extra={"readOnly": True},
+    )
+    license: Optional[Union[CreativeWork, HttpUrl]] = Field(
+        default=None, description="A license document that applies to the resource."
     )
     model_config = {
         "arbitrary_types_allowed": True,
