@@ -20,7 +20,7 @@ import s3fs
 from hsclient.metadata_adapter.adapter import MetadataAdapter
 from hsclient.metadata_adapter.aggregation_type_adapter import AggregationTypeAdapter
 from hsclient.schema.utils import load_json
-from hsclient.schema.dataset import AdditionalType
+from hsclient.schema.dataset import AdditionalType, ScientificDataset
 
 
 if TYPE_CHECKING:
@@ -48,6 +48,7 @@ else:
 
 import requests
 
+from hsclient.schema.legacy.raster import GeographicRasterMetadata
 from hsmodels.schemas.base_models import BaseMetadata
 from hsmodels.schemas.enums import AggregationType
 from hsmodels.schemas.fields import BoxCoverage, PointCoverage
@@ -430,9 +431,15 @@ class Aggregation:
         Saves the metadata back to HydroShare as user_metadata.json in the .hsmetadata folder
         :return: None
         """
-        metadata_json = self.metadata.model_dump_json()
-        # TODO: This 'metadata_json' needs to be updated to use the new schema.org metadata
-        # for the aggregation before writing to s3
+        metadata = self.metadata
+        if isinstance(metadata, GeographicRasterMetadata):
+            schema_metadata = MetadataAdapter.to_geographic_raster_metadata(metadata)
+            metadata_json = schema_metadata.model_dump_json(by_alias=True, exclude_none=True)
+        elif isinstance(metadata, ScientificDataset):
+            metadata_json = metadata.model_dump_json(by_alias=True, exclude_none=True)
+        else:
+            metadata_json = metadata.model_dump_json()
+
         self._s3_client.write_text(self.user_metadata_path, metadata_json)
 
     def files(self, search_aggregations: bool = False, **kwargs) -> List[File]:

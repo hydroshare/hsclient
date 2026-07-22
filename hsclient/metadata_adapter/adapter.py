@@ -1,9 +1,13 @@
 from typing import Union
 
-from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
-from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
+from hsclient.schema.legacy.raster import GeographicRasterMetadata
+
 from hsclient.metadata_adapter.legacy_resource_adapter import LegacyResourceMetadataAdapter
+from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsclient.metadata_adapter.raster_adapter import RasterMetadataAdapter
 from hsclient.metadata_adapter.resource_adapter import ResourceMetadataAdapter
+from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
+from hsclient.schema.dataset import ScientificDataset
 
 
 class MetadataAdapter:
@@ -22,3 +26,11 @@ class MetadataAdapter:
         else:
             adapter = ResourceMetadataAdapter(**metadata)
         return adapter.to_legacy_resource_metadata()
+
+    @staticmethod
+    def to_legacy_geographic_raster_metadata(metadata: Union[ScientificDataset, dict]) -> GeographicRasterMetadata:
+        return RasterMetadataAdapter.to_legacy_geographic_raster_metadata(metadata)
+
+    @staticmethod
+    def to_geographic_raster_metadata(metadata: Union[GeographicRasterMetadata, dict]) -> ScientificDataset:
+        return RasterMetadataAdapter.to_geographic_raster_metadata(metadata)
