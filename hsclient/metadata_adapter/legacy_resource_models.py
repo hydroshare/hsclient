@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union, Literal
 
 from pydantic import BaseModel, HttpUrl, model_validator, ValidationError, TypeAdapter, AnyUrl
-
+from hsmodels.schemas.enums import RelationType
 import hsclient.schema.base as schema
 from hsclient.schema.core import SchemaBaseModel
 
@@ -55,6 +55,10 @@ class BasePerson(BaseModel):
 
 
 class Creator(BasePerson):
+    # TODO: The field 'creator_order' is not part of the schema.org Creator model
+    # and our implementation of the schema.org Creator model is yet to support it. Until then, 
+    # we cannot map it to this legacy Creator model
+    # creator_order: Optional[int] = None
 
     def to_dataset_creator(self):
         return self.to_dataset_person(schema.Creator)
@@ -159,20 +163,18 @@ class SpatialCoveragePoint(BaseModel):
 
 
 class Relation(BaseModel):
-    type: str
+    type: RelationType
     value: str
 
     def to_dataset_relation(self):
         relation = schema.Relation.model_construct()
         relation.name = self.type
-        self.value = self.value.strip()
-        if is_url(self.value):
-            relation.url = self.value
-        relation.description = self.value
-        return relation
+        return self._to_dataset_relation(relation)
+
 
     def to_dataset_part_relation(self, relation_type: str):
         relation = None
+        self.value = self.value.strip()
         if relation_type not in ["isPartOf", "hasPart"]:
             relation = schema.IsPartOf.model_construct()
         if relation_type == "IsPartOf" and self.type.endswith("is part of"):
@@ -183,18 +185,25 @@ class Relation(BaseModel):
             relation = schema.Relation.model_construct()
             relation.name = self.type
 
-        if ',' in self.value:
-            description, url = self.value.rsplit(',', 1)
-        else:
-            description, url = self.value, ""
-        if not description:
-            description = ""
-        if not url:
-            url = ""
-        relation.description = description.strip()
-        relation.url = url.strip()
-        return relation
+        return self._to_dataset_relation(relation)
 
+
+    def _to_dataset_relation(self, relation):
+        self.value = self.value.strip()
+        if "," in self.value:
+            description, url = self.value.rsplit(",", 1)
+            relation.description = description.strip()
+            url = url.strip()
+            if is_url(url):
+                relation.url = url
+            else:
+                relation.description = self.value
+        else:
+            if is_url(self.value):
+                relation.url = self.value
+            else:
+                relation.description = self.value
+        return relation
 
 class Rights(BaseModel):
     statement: Optional[str] = None
@@ -234,6 +243,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
     isPartOf: Optional[List[schema.IsPartOf]] = []
     hasPart: Optional[List[schema.HasPart]] = []
     provider: Optional[Union[schema.Organization, schema.Provider]] = None
+
     citation: Optional[str] = None
 
     # 'associatedMedia' is not part of the legacy resource metadata model,
