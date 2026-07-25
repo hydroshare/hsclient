@@ -20,7 +20,7 @@ import s3fs
 from hsclient.metadata_adapter.adapter import MetadataAdapter
 from hsclient.metadata_adapter.aggregation_type_adapter import AggregationTypeAdapter
 from hsclient.schema.utils import load_json
-from hsclient.schema.dataset import AdditionalType, ScientificDataset
+from hsclient.schema.dataset import ScientificDataset
 
 
 if TYPE_CHECKING:
@@ -63,6 +63,7 @@ from hsclient.utils import attribute_filter, encode_resource_url, main_file_type
 from hsclient import __version__ as VERSION
 
 CHECK_TASK_PING_INTERVAL = 10
+METADATA_CREATION_WAIT_TIME = 2
 MEDIA_ITEMS_ADAPTER = TypeAdapter(List[MediaType])
 
 
@@ -214,7 +215,8 @@ class Aggregation:
     @property
     def _aggregation_type(self):
         metadata_type = getattr(self.metadata, "type", None)
-        if isinstance(metadata_type, AdditionalType):
+        if isinstance(metadata_type, AggregationType):
+            # legacy aggregation type is already set, return it
             return metadata_type
 
         additional_type = getattr(self.metadata, "additionalType", None)
@@ -290,24 +292,59 @@ class Aggregation:
 
     @property
     def _aggregations_file_based(self):
-        jsonld_prefix = f"{self.bucket_path}/.hsjsonld/"
+        # For now, only Resource discovers aggregations; nested aggregation traversal is disabled.
+        if not isinstance(self, Resource):
+            return []
+
         existing_paths = {aggr.jsonld_metadata_path for aggr in self._parsed_aggregations}
         file_based_aggregations = []
         resource_jsonld_file_path = self.jsonld_metadata_path
-        for file_path in self._s3_client.find(jsonld_prefix):
-            if file_path.endswith("file_manifest.json") or file_path.endswith("has_parts.json"):
-                continue
-            if not file_path.endswith(".json"):
-                continue
-            if file_path == resource_jsonld_file_path:
-                continue
-            if file_path in existing_paths:
+
+        def _parse_bucket_path(url_value: str) -> Union[str, None]:
+            parsed_path = urlparse(str(url_value)).path
+            if not parsed_path:
+                return None
+            return unquote(parsed_path.strip("/"))
+
+        def _append_aggregation_path(candidate_path: str) -> None:
+            if not candidate_path:
+                return
+            if not candidate_path.endswith(".json"):
+                return
+            if candidate_path.endswith("file_manifest.json") or candidate_path.endswith("has_parts.json"):
+                return
+            if candidate_path == resource_jsonld_file_path:
+                return
+            if candidate_path in existing_paths:
+                return
+            file_based_aggregations.append(Aggregation(candidate_path, self._hs_session, self._s3_client))
+            existing_paths.add(candidate_path)
+
+        has_part_items = getattr(self.metadata, "hasPart", None) or []
+        for has_part_item in has_part_items:
+            has_part_url = getattr(has_part_item, "url", None)
+            if not has_part_url:
                 continue
 
-            file_based_aggregations.append(
-                Aggregation(file_path, self._hs_session, self._s3_client)
-            )
-            existing_paths.add(file_path)
+            has_part_path = _parse_bucket_path(has_part_url)
+            if not has_part_path:
+                continue
+
+            # Case 1: hasPart points to an index JSON file that lists aggregation JSON-LD URLs.
+            if has_part_path.endswith(".json") and self._s3_client.exists(has_part_path):
+                has_part_payload = self._retrieve_and_parse(has_part_path, as_pydantic=False)
+                if isinstance(has_part_payload, list):
+                    for entry in has_part_payload:
+                        if not isinstance(entry, dict):
+                            continue
+                        entry_url = entry.get("url")
+                        entry_path = _parse_bucket_path(entry_url) if entry_url else None
+                        if entry_path:
+                            _append_aggregation_path(entry_path)
+                    continue
+
+            # Case 2: hasPart points directly to an aggregation JSON-LD file.
+            _append_aggregation_path(has_part_path)
 
         return file_based_aggregations
 
@@ -325,8 +362,15 @@ class Aggregation:
 
     @property
     def _resource_path(self):
-        resource_path = f"/resource/{self.resource_id}"
+        resource_path = f"/resource/{self._resource_id}"
         return resource_path
+
+    @property
+    def _resource_id(self):
+        # get from the bucket path 'bucket/<resource_id>'
+        bucket_path = self.bucket_path
+        resource_id = bucket_path.split("/", 1)[-1]
+        return resource_id
 
     def _retrieve_and_parse(self, path, as_pydantic: bool = True):
         file_str = self._s3_client.cat(path).decode("utf-8")
@@ -453,8 +497,10 @@ class Aggregation:
         for key, value in kwargs.items():
             files = list(filter(lambda file: attribute_filter(file, key, value), files))
         if search_aggregations:
-            for aggregation in self.aggregations():
-                files = files + list(aggregation.files(search_aggregations=search_aggregations, **kwargs))
+            # we need this only if we are still supporting nested aggregations in file-based metadata structures.
+            if type(self) is Aggregation:
+                for aggregation in self.aggregations():
+                    files = files + list(aggregation.files(search_aggregations=False, **kwargs))
         return files
 
     def file(self, search_aggregations=False, **kwargs) -> File:
@@ -517,7 +563,8 @@ class Aggregation:
         self._parsed_aggregations = None
         self._parsed_checksums = None
         self._main_file_path = None
-        time.sleep(1)  # give some time to s3 eventing to regerrate the metadata files
+        # give some time to s3 eventing to regenerate the metadata files
+        time.sleep(METADATA_CREATION_WAIT_TIME)
 
     #TODO: This delete method needs to be removed - the Resource class aggregation_delete()
     # method implements aggregation delete using s3 protocol
@@ -1357,6 +1404,39 @@ class Resource(Aggregation):
         else:
             return self._hs_session.retrieve_file(urljoin(self._resource_path, "data", "contents", path), save_path)
 
+    def files(self, search_aggregations: bool = False, **kwargs) -> List[File]:
+        """
+        List files for a Resource. Override to exclude files that are part of aggregations when
+        search_aggregations is False. If search_aggregations is True, include aggregation files.
+        :param search_aggregations: Defaults False, set to True to include aggregation files
+        :params **kwargs: Search by properties on the File object (path, name, extension, folder, checksum url)
+        :return: a List of File objects matching the filter parameters
+        """
+        # Get the matching files (may include files that are part of aggregations)
+        files = super().files(search_aggregations=False, **kwargs)
+        if search_aggregations:
+            return files
+
+        # Build a set of file paths that belong to aggregations so we can exclude them
+        agg_file_paths = set()
+        try:
+            for aggr in self.aggregations():
+                try:
+                    for f in aggr.files():
+                        agg_file_paths.add(str(f))
+                except Exception as ex:
+                    # ignore aggregation parsing errors
+                    print(f"Warning: Could not parse files for aggregation {aggr.main_file_path}: {str(ex)}")
+                    continue
+        except Exception as ex:
+            # if aggregations cannot be retrieved, fall back to returning files as-is
+            print(f"Warning: Could not retrieve aggregations for resource {self.resource_id}: {str(ex)}")
+            return files
+
+        # Exclude files that are part of aggregations
+        filtered = [f for f in files if str(f) not in agg_file_paths]
+        return filtered
+
     @refresh
     def file_delete(self, path: str = None) -> None:
         """
@@ -1419,7 +1499,8 @@ class Resource(Aggregation):
         # For creating a singlefile or fileset aggregation, we just need to write a user_metadata.json
         # file as {file_path}.user_metadata.json or {folder_path}/user_metadata.json
         # For other aggregation types, I think we need to write the {file_path}.user_metadata.json file
-        # and we need to update the hsextract application code to extract metadata from that file if the {file_path}.json doesn't exist
+        # and we need to update the hsextract application code to trigger extract metadata from that file (path)
+        # if the {file_path}.json doesn't exist
 
         if agg_type == AggregationType.FileSetAggregation:
             if '/' in path:
@@ -1979,7 +2060,7 @@ class HydroShare:
             resource_jsonld_metadata_path = f"{bucket_name}/{resource_id}/.hsjsonld/dataset_metadata.json"
         except Exception as e:
             raise Exception(f"ERROR: Failed to retrieve S3 path for resource_id: {resource_id} - {str(e)}")
-        
+
         res = Resource(map_path=resource_jsonld_metadata_path, hs_session=self._hs_session, s3_client=self._s3_client)
 
         if validate:
@@ -1999,6 +2080,8 @@ class HydroShare:
         """
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
+        # wait for the resource metadata to be generated in the bucket before retrieving the resource
+        time.sleep(METADATA_CREATION_WAIT_TIME)
         return self.resource(resource_id, use_cache=use_cache)
 
     def user(self, user_id: int) -> User:
