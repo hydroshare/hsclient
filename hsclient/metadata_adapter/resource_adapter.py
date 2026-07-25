@@ -17,6 +17,7 @@ from hsclient.metadata_adapter.legacy_resource_models import (
     Publisher as LegacyPublisher,
     LegacyResourceMetadata,
 )
+from hsmodels.schemas.enums import RelationType
 from hsclient.schema.base import (
     CreativeWork,
     Grant,
@@ -157,7 +158,11 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             if type(relation) in (IsPartOf, HasPart):
                 continue
             legacy_relation = LegacyRelation.model_construct()
-            legacy_relation.type = relation.name
+            relation_type = _to_legacy_relation_type(relation.name)
+            if relation_type is None:
+                print(f"Warning: Could not convert relation name '{relation.name}' to legacy relation type")
+                continue
+            legacy_relation.type = relation_type
             legacy_relation.value = _build_relation_value(relation.description, relation.url)
             legacy_relations.append(legacy_relation)
         return legacy_relations
@@ -241,3 +246,20 @@ def _build_relation_value(description: Optional[str], url: Optional[str]) -> str
     if description and url:
         return f"{description}, {url}"
     return description or url
+
+
+def _to_legacy_relation_type(relation_name: Optional[str]) -> Optional[RelationType]:
+    if not relation_name:
+        return None
+    try:
+        return RelationType[relation_name]
+    except KeyError:
+        pass
+
+    normalized_name = relation_name.replace(" ", "").lower()
+    for relation_type in RelationType:
+        if relation_type.name.lower() == normalized_name:
+            return relation_type
+        if relation_type.value.lower() == relation_name.lower():
+            return relation_type
+    return None

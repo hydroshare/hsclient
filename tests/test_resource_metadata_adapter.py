@@ -2,6 +2,7 @@ from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
 from hsclient.metadata_adapter.adapter import MetadataAdapter
 from hsclient.schema.utils import load_json
+from hsmodels.schemas.enums import RelationType
 
 
 def test_adapter_to_legacy_resource_metadata() -> None:
@@ -72,7 +73,7 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.spatial_coverage.westlimit == -111.5
     assert result.citation == "Citation text"
     assert len(result.relations) == 1
-    assert result.relations[0].type == "References"
+    assert result.relations[0].type == RelationType.references
     assert result.relations[0].value == "Journal article, https://example.com/paper"
     assert result.contributors[0].organization == "Utah State University"
     assert str(result.contributors[0].homepage) == "https://usu.edu/"
@@ -260,7 +261,7 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
     assert result.publisher.name == "HydroShare"
     assert str(result.publisher.url) == "https://www.hydroshare.org/"
     assert len(result.relations) == 1
-    assert result.relations[0].type == "References"
+    assert result.relations[0].type == RelationType.references
     assert result.relations[0].value == "Journal article, https://example.com/paper"
     assert result.isPartOf == []
     assert len(result.hasPart) == 1
