@@ -1544,7 +1544,6 @@ class Resource(Aggregation):
 
     # aggregation operations
 
-    @refresh
     def aggregation_remove(self, aggregation: Aggregation) -> None:
         """
         Removes an aggregation from HydroShare.  This does not remove the data files in the
@@ -1564,7 +1563,14 @@ class Resource(Aggregation):
             extract_meta_file_to_delete = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
             if self._file_exists(extract_meta_file_to_delete):
                 self._delete_file(extract_meta_file_to_delete)
-        aggregation.refresh()
+
+        # Explicitly remove the aggregation from the cached list if it exists
+        if self._parsed_aggregations is not None:
+            try:
+                self._parsed_aggregations.remove(aggregation)
+            except ValueError:
+                # Aggregation not in list, which is fine
+                pass
 
     @refresh
     def aggregation_move(self, aggregation: Aggregation, dst_path: str = "") -> None:
