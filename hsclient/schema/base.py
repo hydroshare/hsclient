@@ -717,8 +717,18 @@ class VideoObject(MediaObject):
     # removing in the future.
 
 
+class LinkedData(SchemaBaseModel):
+    model_config = ConfigDict(
+        **SchemaBaseModel.model_config,
+        populate_by_name=True,
+    )
+    id: Union[str, AnyUrl] = Field(
+        alias="@id",
+        description="The unique identifier for the linked data object.",
+    )
+
 # combine the media objects together to make referencing easier
-MediaType = Union[MediaObject, DataDownload, VideoObject]
+MediaType = Union[MediaObject, DataDownload, VideoObject, LinkedData]
 
 
 class Dataset(CreativeWork):
