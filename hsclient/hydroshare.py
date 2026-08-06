@@ -322,7 +322,7 @@ class Aggregation:
 
         has_part_items = getattr(self.metadata, "hasPart", None) or []
         for has_part_item in has_part_items:
-            has_part_url = getattr(has_part_item, "url", None)
+            has_part_url = getattr(has_part_item, "id", None)
             if not has_part_url:
                 continue
 
