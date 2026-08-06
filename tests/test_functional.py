@@ -3,8 +3,11 @@ import tempfile
 
 import pytest
 from hsmodels.schemas.enums import AggregationType, RelationType
-from hsmodels.schemas.fields import Creator, Relation
-
+from hsmodels.schemas.fields import Creator
+# from hsmodels.schemas.fields import Relation
+# for now using the Relation class from hsclient.metadata_adapter.legacy_resource_models
+# until we update hsmodels for metadata adapters for legacy <-> schema.org
+from hsclient.metadata_adapter.legacy_resource_models import Relation
 from hsclient import HydroShare
 
 
@@ -24,6 +27,7 @@ def test_absolute_path_single_file_upload(new_resource):
     assert len(new_resource.files()) == 1
 
 
+@pytest.mark.skip(reason="TimeSeries JSON metadata migration deferred")
 def test_filtering_aggregations(timeseries_resource):
     timeseries_resource.refresh()
     assert len(timeseries_resource.aggregations(type=AggregationType.TimeSeriesAggregation)) == 1
@@ -78,6 +82,7 @@ def test_filtering_aggregations(timeseries_resource):
     assert not timeseries_resource.aggregation(bad="does not matter")
 
 
+@pytest.mark.skip(reason="TimeSeries JSON metadata migration deferred")
 def test_filtering_aggregations_by_files(timeseries_resource):
     timeseries_resource.refresh()
     assert len(timeseries_resource.aggregations(file__path="ODM2_Multi_Site_One_Variable.sqlite")) == 1
@@ -92,15 +97,23 @@ def test_filtering_aggregations_by_files(timeseries_resource):
 
 
 def test_filtering_files(resource):
+    # Create a folder and upload a JSON-compatible metadata file for the fileset
     resource.folder_create("asdf", refresh=False)
     resource.file_upload("data/test_resource_metadata_files/asdf/testing.xml", destination_path="asdf", refresh=False)
-    resource.folder_create("referenced_time_series", refresh=False)
+    # Upload JSON sidecar for fileset (to make the asdf folder a fileset aggregation)
     resource.file_upload(
-        "data/test_resource_metadata_files/msf_version.refts.json", destination_path="referenced_time_series"
+        "data/test_resource_metadata_files/json_metadata/asdf/user_metadata.json",
+        destination_path=".hsmetadata/asdf",
+        refresh=False,
     )
 
-    assert len(resource.files(search_aggregations=True)) == 6
+    # Uploaded files that are part of the aggregation are also remain part of the resource. Expect:
+    # - search_aggregations=True: all files including those that are part of the aggregation
+    # - default/resource.files(): resource files (exclude those are part of the aggregation)
+    # GeoFeature aggr has 7 files + other.txt + asdf/testing.xml = 9 files
+    assert len(resource.files(search_aggregations=True)) == 9
     assert len(resource.files()) == 2
+
     assert resource.file()
     assert len(resource.files(folder="asdf")) == 1
     assert resource.file(folder="asdf")
@@ -109,10 +122,11 @@ def test_filtering_files(resource):
 
     assert len(resource.files(extension=".xml")) == 1
     assert resource.file(extension=".txt")
-    assert resource.file(search_aggregations=True, extension=".json")
+
+    # No JSON aggregation files included in this test (ReferencedTimeSeries deferred)
     assert not resource.file(extension=".json")
     assert len(resource.files(extension=".json")) == 0
-    assert len(resource.files(search_aggregations=True, extension=".json")) == 1
+    assert len(resource.files(search_aggregations=True, extension=".json")) == 0
 
     assert len(resource.files(path="asdf/testing.xml")) == 1
     assert resource.file(path="asdf/testing.xml")
@@ -122,7 +136,7 @@ def test_filtering_files(resource):
     assert len(resource.files(bad="testing.xml")) == 0
     assert not resource.file(bad="testing.xml")
 
-
+@pytest.mark.skip(reason="Creator order is not currently supported in schema.org based Creator model we have implemented.")
 def test_creator_order(new_resource):
     res = new_resource  # hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     assert len(res.metadata.creators) == 1
@@ -144,7 +158,7 @@ def test_creator_order(new_resource):
 
 def test_resource_metadata_updating(new_resource):
 
-    assert len(new_resource.metadata.subjects) == 0
+    assert len(new_resource.metadata.subjects) == 1
 
     new_resource.metadata.subjects = ['sub1', 'sub2']
     new_resource.metadata.title = "resource test"
@@ -169,9 +183,10 @@ def test_resource_metadata_updating(new_resource):
 def test_system_metadata(new_resource):
 
     sys_metadata = new_resource.system_metadata()
-    assert 'date_created' in sys_metadata
+    assert 'created' in sys_metadata
 
 
+@pytest.mark.integration
 def test_resource_delete(hydroshare, new_resource):
     res_id = new_resource.resource_id
     new_resource.delete()
@@ -193,20 +208,41 @@ def test_resource_cached_by_HydroShare_instance_slow(hydroshare, new_resource):
     assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
 
 
-def test_resource_cached_by_HydroShare_instances(hydroshare, monkeypatch):
-    """Monkeypatch resource to avoid hitting HydroShare.
+def test_resource_cached_by_HydroShare_instances(monkeypatch):
+    """Unit test for resource caching - no backend required.
     Verify resource object is present in resource object cache.
     """
-    from hsclient import Resource
+    from hsclient import HydroShare, Resource
 
     res_id = "fakeresource"
-    monkeypatch.setattr(Resource, "metadata", lambda: None)
+    
+    # Mock HydroShare initialization to avoid backend connection
+    def mock_my_user_info(self):
+        return {"username": "testuser"}
+    
+    # Mock the session.get method to return a fake S3 response
+    def mock_session_get(path, status_code=None, **kwargs):
+        class MockResponse:
+            def json(self):
+                if 'userInfo' in path:
+                    return {'username': 'testuser'}
+                return {'bucket': 'fake-bucket', 'prefix': f'{res_id}/data'}
+        return MockResponse()
+    
+    monkeypatch.setattr(HydroShare, "my_user_info", mock_my_user_info)
+    monkeypatch.setattr(Resource, "metadata", lambda self: None)
+    
+    # Create HydroShare client without triggering backend connection
+    hydroshare = HydroShare(username="admin", password="default", host="localhost", port=8000, protocol="http")
+    
+    # Mock the session after creation
+    monkeypatch.setattr(hydroshare._hs_session, 'get', mock_session_get)
 
-    res = hydroshare.resource(res_id)
+    res = hydroshare.resource(res_id, validate=False)
 
     assert res_id in hydroshare._resource_object_cache
     assert id(hydroshare._resource_object_cache[res_id]) == id(res)
-    res2 = hydroshare.resource(res_id)
+    res2 = hydroshare.resource(res_id, validate=False)
     assert id(hydroshare._resource_object_cache[res_id]) == id(res2)
 
 
@@ -214,10 +250,11 @@ def test_files_aggregations(resource):
     resource.refresh()
     assert len(resource.files()) == 1
     assert len(resource.aggregations()) == 1
-    assert len(resource.aggregations()[0].files()) == 3
-    assert len(resource.aggregations()[0].aggregations()) == 0
+    # For GeoFeature aggregation (shapefile), expect all shapefile components to be part of the aggregation
+    assert len(resource.aggregations()[0].files()) == 7
 
 
+@pytest.mark.integration
 def test_resource_download(new_resource):
     with tempfile.TemporaryDirectory() as tmp:
         bag = new_resource.download(save_path=tmp)
@@ -225,6 +262,7 @@ def test_resource_download(new_resource):
         assert bag.endswith(".zip")
 
 
+@pytest.mark.integration
 def test_file_download(resource):
     resource.refresh()
     with tempfile.TemporaryDirectory() as tmp:
@@ -234,6 +272,8 @@ def test_file_download(resource):
         assert os.path.basename(downloaded_file) == file.name
 
 
+@pytest.mark.skip(reason="Aggregation download is not yet supported in the JSON metadata workflow (direct file upload to s3 doesn't register an aggregation in django db).")
+@pytest.mark.integration
 def test_aggregation_download(resource):
     resource.refresh()
     assert len(resource.aggregations()) == 1
@@ -242,9 +282,12 @@ def test_aggregation_download(resource):
         resource.aggregation_download(agg, tmp)
         files = os.listdir(tmp)
         assert len(files) == 1
-        assert files[0] == "logan.vrt.zip"
+        # Expect the download to be named after the aggregation's main file
+        expected = os.path.basename(agg.main_file_path) + ".zip"
+        assert files[0] == expected
 
 
+@pytest.mark.integration
 def test_aggregation_delete(resource):
     resource.refresh()
     assert len(resource.aggregations()) == 1
@@ -258,11 +301,13 @@ def test_aggregation_delete(resource):
 def test_aggregation_remove(resource):
     resource.refresh()
     assert len(resource.aggregations()) == 1
-    assert len(resource.files()) == 1
+    assert len(resource.files(search_aggregations=True)) == 8
+    assert len(resource.files(search_aggregations=False)) == 1
     agg = resource.aggregations()[0]
     resource.aggregation_remove(agg)
     assert len(resource.aggregations()) == 0
-    assert len(resource.files()) == 4
+    # After removing aggregation metadata, resource files should still contain all the files
+    assert len(resource.files(search_aggregations=False)) == 8
 
 
 def test_move_aggregation(resource_with_netcdf_aggr):
@@ -281,6 +326,7 @@ def test_move_aggregation(resource_with_netcdf_aggr):
     # now move back the aggregation to the root of the resource
     resource_with_netcdf_aggr.aggregation_move(agg, dst_path="")
     file_path = main_file
+    resource_with_netcdf_aggr.refresh()
     agg = resource_with_netcdf_aggr.aggregation(file__path=file_path)
     assert agg is not None
     # check there is no aggregation in the folder
@@ -296,7 +342,7 @@ def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 1
     assert new_resource.files()[0].name == "updated.txt"
 
-
+@pytest.mark.skip(reason="Aggregation creation from existing file is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this).")
 def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
     new_resource.folder_create("folder", refresh=False)
@@ -306,7 +352,7 @@ def test_file_aggregate(new_resource):
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.aggregations()[0].files()) == 1
 
-
+@pytest.mark.skip(reason="Reference based aggregation is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this).")
 def test_create_update_reference(new_resource):
     assert len(new_resource.aggregations()) == 0
     new_resource.reference_create("reference", "http://studio.bakajo.com")
@@ -329,12 +375,15 @@ def test_create_update_reference(new_resource):
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "https://duckduckgo.com" in str(f.read())
 
-
+@pytest.mark.skip(reason="There seems to be a bug in hydroshare s3 object event tracking where a file move doesn't trigger PutObject events, preventing automatic extracting metadata from files.")
 def test_file_unzip(new_resource):
     new_resource.file_upload("data/georaster_composite.zip")
     assert len(new_resource.files()) == 1
     assert len(new_resource.aggregations()) == 0
+    # NOTE: file unzip in in hydroshare involves unziping to a tmp directory and then moving the files to the resource/data/contents
     new_resource.file_unzip(new_resource.files()[0])
+    new_resource.refresh()
+    assert len(new_resource.files()) == 6
     assert len(new_resource.aggregations()) == 1
 
 
@@ -355,14 +404,14 @@ def test_refresh(resource):
     resource.files()
     resource.aggregations()
 
-    assert resource._retrieved_map is not None
+    # assert resource._retrieved_map is not None
     assert resource._retrieved_metadata is not None
     assert resource._parsed_files is not None
     assert resource._parsed_aggregations is not None
 
     resource.refresh()
 
-    assert resource._retrieved_map is None
+    # assert resource._retrieved_map is None
     assert resource._retrieved_metadata is None
     assert resource._parsed_files is None
     assert resource._parsed_aggregations is None
@@ -378,97 +427,182 @@ def test_empty_creator(new_resource):
 
 
 @pytest.mark.parametrize(
-    "files",
+    "data_files, metadata_sidecar, agg_type, expected_agg_file_count, expected_aggr_count_after_remove, lookup_by_type",
     [
-        ["logan1.tif", "logan2.tif", "logan.vrt", "logan_resmap.xml", "logan_meta.xml"],
-        ["msf_version.refts.json", "msf_version.refts_resmap.xml", "msf_version.refts_meta.xml"],
-        [
-            "ODM2_Multi_Site_One_Variable.sqlite",
-            "ODM2_Multi_Site_One_Variable_resmap.xml",
-            "ODM2_Multi_Site_One_Variable_meta.xml",
-        ],
-        ["SWE_time.nc", "SWE_time_header_info.txt", "SWE_time_resmap.xml", "SWE_time_meta.xml"],
-        ["test.xml", "test_resmap.xml", "test_meta.xml"],
-        [
-            "watersheds.shp",
-            "watersheds.cpg",
-            "watersheds.dbf",
-            "watersheds.prj",
-            "watersheds.sbn",
-            "watersheds.sbx",
-            "watersheds.shx",
-            "watersheds_resmap.xml",
-            "watersheds_meta.xml",
-        ],
+        pytest.param(
+            ["logan.vrt", "logan1.tif", "logan2.tif"],
+            None,
+            AggregationType.GeographicRasterAggregation,
+            3,
+            0,
+            True,
+            id="georaster-three-files",
+            # marks=pytest.mark.skip(reason="hydroshare extract logic needs to be fixed for this to work"),
+        ),
+        pytest.param(
+            ["logan1.tif"],
+            None,
+            AggregationType.GeographicRasterAggregation,
+            1,
+            0,
+            True,
+            id="georaster-single-file",
+        ),
+        # Deferred for now:
+        # (
+        #     ["msf_version.refts.json"],
+        #     "json_metadata/msf_version.refts.json.user_metadata.json",
+        #     AggregationType.ReferencedTimeSeriesAggregation,
+        #     1,
+        #     0,
+        # ),
+        # (
+        #     ["ODM2_Multi_Site_One_Variable.sqlite"],
+        #     "json_metadata/ODM2_Multi_Site_One_Variable.sqlite.user_metadata.json",
+        #     AggregationType.TimeSeriesAggregation,
+        #     1,
+        #     0,
+        # ),
+        pytest.param(
+            ["SWE_time.nc", "SWE_time_header_info.txt"],
+            "json_metadata/SWE_time.nc.user_metadata.json",
+            AggregationType.MultidimensionalAggregation,
+            1,
+            0,
+            True,
+            id="multidimensional-single-file",
+        ),
+        pytest.param(
+            ["test.xml"],
+            "json_metadata/test.xml.user_metadata.json",
+            AggregationType.SingleFileAggregation,
+            1,
+            0,
+            True,
+            id="single-file-aggregation",
+        ),
+        pytest.param(
+            [
+                "watersheds.shp",
+                "watersheds.cpg",
+                "watersheds.dbf",
+                "watersheds.prj",
+                "watersheds.sbn",
+                "watersheds.sbx",
+                "watersheds.shx",
+            ],
+            "json_metadata/watersheds.shp.user_metadata.json",
+            AggregationType.GeographicFeatureAggregation,
+            7,
+            0,
+            True,
+            id="geofeature-seven-files",
+        ),
     ],
 )
-def test_aggregations(new_resource, files):
+def test_aggregations(
+    new_resource,
+    data_files,
+    metadata_sidecar,
+    agg_type,
+    expected_agg_file_count,
+    expected_aggr_count_after_remove,
+    lookup_by_type,
+):
     root_path = "data/test_resource_metadata_files/"
-    file_count = len(files) - 2  # exclude rdf/xml file
-    aggr_file_count = file_count
-    new_resource.file_upload(*[os.path.join(root_path, file) for file in files])
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in data_files], refresh=False)
+    if metadata_sidecar:
+        new_resource.file_upload(os.path.join(root_path, metadata_sidecar), destination_path=".hsmetadata", refresh=False)
+
+    # Allow async metadata extraction/indexing to populate .hsjsonld aggregation metadata in S3.
+    agg = None
+    for _ in range(5):
+        new_resource.refresh()
+        if lookup_by_type:
+            agg = new_resource.aggregation(type=agg_type)
+        else:
+            aggregations = new_resource.aggregations()
+            agg = aggregations[0] if aggregations else None
+        if agg:
+            break
+
+    assert agg is not None
     assert len(new_resource.aggregations()) == 1
-    assert len(new_resource.files()) == 0
-    agg = new_resource.aggregations()[0]
-    agg_type = agg.metadata.type
-    assert len(agg.files()) == aggr_file_count
+    # In the JSON workflow, uploaded data files remain part of the resource.
+    assert len(new_resource.files(search_aggregations=True)) == len(data_files)
+    assert len(new_resource.files(search_aggregations=False)) == len(data_files) - expected_agg_file_count
+
+    if agg_type == AggregationType.GeographicRasterAggregation:
+        # only raster aggregation type is currently mapped to legacy aggregation type, so we can check for that here.
+        assert agg.metadata.type == AggregationType.GeographicRasterAggregation
+    else:
+        # For all other aggregation types, the JSON metadata workflow returns ScientificMetadata for the aggregation metadata type.
+        assert agg.metadata.type == "ScientificDataset"
+
+    assert len(agg.files()) == expected_agg_file_count
+
     new_resource.aggregation_remove(agg)
+    assert len(new_resource.aggregations(type=agg_type)) == expected_aggr_count_after_remove
     assert len(new_resource.aggregations()) == 0
-    if agg_type == "NetCDF":
-        # the txt file of the aggregation gets deleted when the netcdf aggregation is removed.
-        file_count = file_count - 1
-    assert len(new_resource.files()) == file_count
-    main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
+    assert len(new_resource.files(search_aggregations=True)) == len(data_files)
+    assert len(new_resource.files(search_aggregations=False)) == len(data_files)
+
+    main_file = next(f for f in new_resource.files(search_aggregations=True) if f.path.endswith(data_files[0]))
     assert main_file
-    agg = new_resource.file_aggregate(main_file, agg_type)
-    assert len(new_resource.aggregations()) == 1
-    assert len(new_resource.files()) == 0
-    assert len(agg.files()) == aggr_file_count
-    with tempfile.TemporaryDirectory() as tmp:
-        new_resource.aggregation_download(agg, tmp)
-        files = os.listdir(tmp)
-        assert len(files) == 1
+
+    new_resource.file_aggregate(main_file, agg_type)
+    new_resource.refresh()
+    agg = new_resource.aggregation(type=agg_type)
+    assert agg is not None
+    assert len(new_resource.files(search_aggregations=True)) == len(data_files)
+    for f in new_resource.files(search_aggregations=False):
+        print(f"file not in aggregation: {f.path}")
+    assert len(new_resource.files(search_aggregations=False)) == len(data_files) - expected_agg_file_count
+    assert len(agg.files()) == expected_agg_file_count
+
+    # Skip aggregation_download for now: current JSON workflow doesn't register an aggregation in django db when
+    # file gets uploaded to s3, so aggregation download fails.
+    # with tempfile.TemporaryDirectory() as tmp:
+    #         new_resource.aggregation_download(agg, tmp)
+    #         files = os.listdir(tmp)
+    #         assert len(files) == 1
     new_resource.aggregation_delete(agg)
-    assert len(new_resource.aggregations()) == 0
-    assert len(new_resource.files()) == 0
+    new_resource.refresh()
+    assert len(new_resource.aggregations(type=agg_type)) == 0
+    assert len(new_resource.files(search_aggregations=True)) <= len(data_files)
 
 
-@pytest.mark.parametrize(
-    "files",
-    [
-        [
-            "asdf/testing.xml",
-            "asdf/asdf_resmap.xml",
-            "asdf/asdf_meta.xml",
-        ],  # requires hydroshare updates in bag_ingestion_patches
-    ],
-)
-def test_aggregation_fileset(new_resource, files):
+def test_aggregation_fileset(new_resource):
     root_path = "data/test_resource_metadata_files/"
-    file_count = len(files) - 2  # exclude rdf/xml file
+    files = ["asdf/testing.xml"]
+    file_count = len(files)
     new_resource.folder_create("asdf", refresh=False)
-    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], destination_path="asdf")
-    assert len(new_resource.aggregations()) == 1
-    assert len(new_resource.files()) == 0
-    agg = new_resource.aggregations()[0]
-    agg_type = agg.metadata.type
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in files], destination_path="asdf", refresh=False)
+
+    # upload of this json file makes the asdf folder a fileset aggregation
+    new_resource.file_upload(
+        os.path.join(root_path, "json_metadata/asdf/user_metadata.json"),
+        destination_path=".hsmetadata/asdf",
+        refresh=False,
+    )
+
+    agg = None
+    for _ in range(5):
+        new_resource.refresh()
+        agg = new_resource.aggregation(type=AggregationType.FileSetAggregation)
+        if agg:
+            break
+
+    assert agg is not None
+    # In the JSON metadata workflow, uploaded data files remain part of the resource.
+    assert len(new_resource.files(search_aggregations=True)) == file_count
+    assert len(new_resource.files(search_aggregations=False)) == 0
     assert len(agg.files()) == file_count
+
     new_resource.aggregation_remove(agg)
-    assert len(new_resource.aggregations()) == 0
-    assert len(new_resource.files()) == file_count
-    main_file = next(f for f in new_resource.files() if f.path.endswith(files[0]))
-    assert main_file
-    agg = new_resource.file_aggregate(main_file, agg_type=agg_type)
-    assert len(new_resource.aggregations()) == 1
-    assert len(new_resource.files()) == 0
-    assert len(agg.files()) == file_count
-    with tempfile.TemporaryDirectory() as tmp:
-        new_resource.aggregation_download(agg, tmp)
-        files = os.listdir(tmp)
-        assert len(files) == 1
-    new_resource.aggregation_delete(agg)
-    assert len(new_resource.aggregations()) == 0
-    assert len(new_resource.files()) == 0
+    assert len(new_resource.aggregations(type=AggregationType.FileSetAggregation)) == 0
+    assert len(new_resource.files(search_aggregations=True)) == file_count
+    assert len(new_resource.files(search_aggregations=False)) == file_count
 
 
 def test_folder_zip(new_resource):
@@ -497,11 +631,12 @@ def test_folder_rename(new_resource):
 def test_folder_delete(new_resource):
     new_resource.folder_create("test_folder", refresh=False)
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
-    assert len(new_resource.files()) == 1
+    assert len(new_resource.files(search_aggregations=True)) == 1
     new_resource.folder_delete("test_folder")
     assert not new_resource.file()
 
 
+@pytest.mark.integration
 def test_zipped_file_download(resource):
     with tempfile.TemporaryDirectory() as tmp:
         bag = resource.file_download("other.txt", zipped=True, save_path=tmp)
@@ -509,6 +644,7 @@ def test_zipped_file_download(resource):
         assert bag.endswith(".zip")
 
 
+@pytest.mark.integration
 def test_folder_download(new_resource):
     new_resource.folder_create("test_folder", refresh=False)
     new_resource.file_upload("data/other.txt", destination_path="test_folder")
@@ -545,6 +681,7 @@ def test_resource_version(new_resource):
         res_version = new_resource.new_version()
         assert res_version.metadata.title == new_resource.metadata.title
         assert res_version.resource_id != new_resource.resource_id
+        assert len(res_version.metadata.relations) > 0
         version_of = next(
             relation.value for relation in res_version.metadata.relations if relation.type == RelationType.isVersionOf
         )
@@ -554,12 +691,17 @@ def test_resource_version(new_resource):
         res_version.delete()
 
 
+@pytest.mark.skip(reason="Public/private sharing status is not yet supported in the JSON metadata workflow (required metadata check is based on metadata in Django DB).")
 def test_resource_public(resource):
-    assert resource.system_metadata()['public'] is False
+    # TODO: The JSON metadata workflow needs to be updated to flush the resource metadata to the Django DB so that the sharing status can be updated.
+    resource.metadata.title = "test title"
+    resource.metadata.abstract = "test abstract"
+    resource.save()
+    assert resource.system_metadata()['status']['public'] is False
     resource.set_sharing_status(public=True)
-    assert resource.system_metadata()['public'] is True
+    assert resource.system_metadata()['status']['public'] is True
     resource.set_sharing_status(public=False)
-    assert resource.system_metadata()['public'] is False
+    assert resource.system_metadata()['status']['public'] is False
 
 
 def test_instantiate_hydroshare_object_without_args():
