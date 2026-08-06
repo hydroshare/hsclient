@@ -1,6 +1,7 @@
 from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
 from hsclient.metadata_adapter.adapter import MetadataAdapter
+from hsclient.schema.base import LinkedData
 from hsclient.schema.utils import load_json
 from hsmodels.schemas.enums import RelationType
 
@@ -46,7 +47,10 @@ def test_adapter_to_legacy_resource_metadata() -> None:
             "geo": {"@type": "GeoShape", "box": "42.0 -111.0 41.5 -111.5"},
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
-        "hasPart": [{"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"}],
+        "hasPart": [
+            {"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"},
+            {"@id": "https://example.com/linked-child"}
+        ],
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],
         # "relations": [{"type": "The content of this resource references", "value": "Journal article https://example.com/paper"}],
         "citation": ["Citation text"],
@@ -83,9 +87,13 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.subjects == ["hydrology", "water"]
     assert result.sharing_status == "public"
     assert result.isPartOf == []
-    assert len(result.hasPart) == 1
+    assert len(result.hasPart) == 2
+    # Check HasPart model format
     assert str(result.hasPart[0].url) == "https://example.com/child"
     assert result.hasPart[0].name == "Child resource"
+    # Check LinkedData format
+    assert isinstance(result.hasPart[1], LinkedData)
+    assert str(result.hasPart[1].id) == "https://example.com/linked-child"
     assert result.rights.statement == "CC-BY-4.0"
     assert str(result.rights.url) == "https://example.com/license"
     assert result.awards[0].title == "Grant Title"
@@ -98,6 +106,26 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.creators[0].identifiers == {"ORCID": "https://orcid.org/0000-0001-2345-6789"}
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
+
+
+def test_adapter_to_legacy_resource_metadata_with_linked_data_associated_media() -> None:
+    """Test that associatedMedia with JSON-LD @id references (LinkedData) is parsed and passed through correctly."""
+    manifest_url = "http://localhost:9000/resource/ef91f0cc664c4d68aa2b58f21567d84b/.hsjsonld/file_manifest.json"
+    metadata = {
+        "@type": "CreativeWork",
+        "name": "Test Resource",
+        "creator": [{"@type": "Person", "name": "Doe, Jane"}],
+        "associatedMedia": [{"@id": manifest_url}],
+    }
+
+    result = MetadataAdapter.to_legacy_resource_metadata(metadata)
+
+    assert isinstance(result, LegacyResourceMetadata)
+    assert result.associatedMedia is not None
+    assert isinstance(result.associatedMedia, list)
+    assert len(result.associatedMedia) == 1
+    assert isinstance(result.associatedMedia[0], LinkedData)
+    assert str(result.associatedMedia[0].id) == manifest_url
 
 
 def test_adapter_to_schema_org_metadata() -> None:
@@ -221,7 +249,10 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],
-        "hasPart": [{"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"}],
+        "hasPart": [
+            {"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"},
+            {"@id": "https://example.com/linked-child"}
+        ],
         "creativeWorkStatus": {"name": "Public"},
         "provider": {"@type": "Organization", "name": "HydroShare", "url": "https://www.hydroshare.org/"},
         "citation": ["Citation text"],
@@ -264,9 +295,13 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
     assert result.relations[0].type == RelationType.references
     assert result.relations[0].value == "Journal article, https://example.com/paper"
     assert result.isPartOf == []
-    assert len(result.hasPart) == 1
+    assert len(result.hasPart) == 2
+    # Check HasPart model format
     assert str(result.hasPart[0].url) == "https://example.com/child"
     assert result.hasPart[0].name == "Child resource"
+    # Check LinkedData format
+    assert isinstance(result.hasPart[1], LinkedData)
+    assert str(result.hasPart[1].id) == "https://example.com/linked-child"
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
     assert result.citation == "Citation text"
