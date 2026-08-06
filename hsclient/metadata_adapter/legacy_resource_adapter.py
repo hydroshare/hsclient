@@ -10,6 +10,8 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     """
     def to_dataset_creators(self):
         creators = []
+        if not self.creators:
+            raise ValueError("creators list must have at least one creator")
         for creator in self.creators:
             creators.append(creator.to_dataset_creator())
         return creators
