@@ -23,6 +23,7 @@ from hsclient.schema.base import (
     Grant,
     IsPartOf,
     HasPart,
+    LinkedData,
     Place,
     PublisherOrganization,
     PropertyValue,
@@ -65,7 +66,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     relation: Optional[List[Relation]] = []
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] =[]
     isPartOf: Optional[List[IsPartOf]] = []
-    hasPart: Optional[List[HasPart]] = []
+    hasPart: Optional[List[Union[LinkedData, HasPart]]] = []
 
     temporalCoverage: Optional[TemporalCoverage] = None
     spatialCoverage: Optional[Place] = None
@@ -234,6 +235,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             "sharing_status",
             "citation",
             'provider',
+            'hasPart',
             "associatedMedia",
         ]:
             legacy_metadata.freeze_field(field)
