@@ -4,6 +4,16 @@ from typing import Any, Dict, List, Optional, Union
 
 from hsmodels.schemas.enums import AggregationType
 
+from hsclient.schema.base import (
+    CreativeWork,
+    GeoCoordinates,
+    GeoShape,
+    Place,
+    PropertyValue,
+    SpatialReference,
+    TemporalCoverage,
+)
+from hsclient.schema.dataset import AdditionalType, DataVariable, Dimension, ScientificDataset
 from hsclient.schema.legacy.raster import (
     BandInformation,
     BoxCoverage,
@@ -16,9 +26,6 @@ from hsclient.schema.legacy.raster import (
     Rights,
 )
 
-from hsclient.schema.base import CreativeWork, GeoCoordinates, GeoShape, Place, PropertyValue, SpatialReference, TemporalCoverage
-from hsclient.schema.dataset import AdditionalType, DataVariable, Dimension, ScientificDataset
-
 
 class RasterMetadataAdapter:
     """Translate raster metadata between schema.org ScientificDataset and legacy hsmodels."""
@@ -29,7 +36,6 @@ class RasterMetadataAdapter:
     def to_legacy_geographic_raster_metadata(
         cls, metadata: Union[ScientificDataset, Dict[str, Any]]
     ) -> GeographicRasterMetadata:
-        data = metadata if isinstance(metadata, dict) else metadata.model_dump(by_alias=True, exclude_none=True)
         dataset = metadata if isinstance(metadata, ScientificDataset) else ScientificDataset.model_validate(metadata)
 
         additional_metadata = cls._additional_property_to_dict(dataset.additionalProperty)
@@ -38,7 +44,7 @@ class RasterMetadataAdapter:
             type=AggregationType.GeographicRasterAggregation,
             title=dataset.name,
             subjects=dataset.keywords or [],
-            language=data.get("inLanguage"),
+            language=dataset.inLanguage,
             description=dataset.description,
             additional_metadata=additional_metadata,
             spatial_coverage=cls._to_legacy_spatial_coverage(dataset.spatialCoverage),
@@ -46,7 +52,7 @@ class RasterMetadataAdapter:
             band_information=cls._to_legacy_band_information(dataset.variableMeasured),
             spatial_reference=cls._to_legacy_spatial_reference(dataset.spatialCoverage),
             cell_information=cls._to_legacy_cell_information(dataset.dimensions, additional_metadata),
-            url=data.get("url"),
+            url=dataset.url,
             rights=cls._to_legacy_rights(dataset.license),
             associatedMedia=dataset.associatedMedia,
         )
@@ -63,9 +69,7 @@ class RasterMetadataAdapter:
         additional_metadata = dict(legacy.additional_metadata or {})
         description = legacy.description
         additional_properties = cls._dict_to_additional_property(additional_metadata)
-        additional_properties.extend(
-            cls._cell_information_to_additional_properties(legacy.cell_information)
-        )
+        additional_properties.extend(cls._cell_information_to_additional_properties(legacy.cell_information))
 
         return ScientificDataset.model_construct(
             additionalType=AdditionalType.GEOGRAPHIC_RASTER,
@@ -294,14 +298,20 @@ class RasterMetadataAdapter:
                 rows = dimension.shape
             elif dim_name == "columns":
                 columns = dimension.shape
-        # NOTE: CellInformation has fields 'cell_size_x_value', 'cell_size_y_value', and 'cell_data_type' that do not 
-        # have dedicated ScientificDataset attributes as part of Dimension. Though hydroshare does not currently populate 
+        # NOTE: CellInformation has fields 'cell_size_x_value', 'cell_size_y_value', and 'cell_data_type' that do not
+        # have dedicated ScientificDataset attributes as part of Dimension. Though hydroshare does not currently populate
         # these fields as additionalProperty, we are retrieving them from additionalProperty in case they are present in the future.
         cell_size_x_value = RasterMetadataAdapter._parse_float(additional_metadata.get("cell_size_x_value"))
         cell_size_y_value = RasterMetadataAdapter._parse_float(additional_metadata.get("cell_size_y_value"))
         cell_data_type = additional_metadata.get("cell_data_type")
 
-        if rows is None and columns is None and cell_size_x_value is None and cell_size_y_value is None and not cell_data_type:
+        if (
+            rows is None
+            and columns is None
+            and cell_size_x_value is None
+            and cell_size_y_value is None
+            and not cell_data_type
+        ):
             return None
 
         if rows is None or columns is None:
