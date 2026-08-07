@@ -48,6 +48,7 @@ class RasterMetadataAdapter:
             cell_information=cls._to_legacy_cell_information(dataset.dimensions, additional_metadata),
             url=data.get("url"),
             rights=cls._to_legacy_rights(dataset.license),
+            associatedMedia=dataset.associatedMedia,
         )
 
     @classmethod
@@ -59,35 +60,36 @@ class RasterMetadataAdapter:
         else:
             legacy = GeographicRasterMetadata.model_validate(metadata)
 
-        additional_metadata = dict(getattr(legacy, "additional_metadata", {}) or {})
-        description = getattr(legacy, "description", None)        
+        additional_metadata = dict(legacy.additional_metadata or {})
+        description = legacy.description
         additional_properties = cls._dict_to_additional_property(additional_metadata)
         additional_properties.extend(
-            cls._cell_information_to_additional_properties(getattr(legacy, "cell_information", None))
+            cls._cell_information_to_additional_properties(legacy.cell_information)
         )
 
         return ScientificDataset.model_construct(
             additionalType=AdditionalType.GEOGRAPHIC_RASTER,
-            name=getattr(legacy, "title", None),
+            name=legacy.title,
             description=description,
-            inLanguage=getattr(legacy, "language", None),
-            keywords=getattr(legacy, "subjects", []) or [],
-            license=cls._to_schema_license(getattr(legacy, "rights", None)),
-            url=getattr(legacy, "url", None),
+            inLanguage=legacy.language,
+            keywords=legacy.subjects or [],
+            license=cls._to_schema_license(legacy.rights),
+            url=legacy.url,
             additionalProperty=additional_properties,
             spatialCoverage=cls._to_schema_spatial_coverage(
-                getattr(legacy, "spatial_coverage", None),
-                getattr(legacy, "spatial_reference", None),
+                legacy.spatial_coverage,
+                legacy.spatial_reference,
             ),
-            temporalCoverage=cls._to_schema_temporal_coverage(getattr(legacy, "period_coverage", None)),
+            temporalCoverage=cls._to_schema_temporal_coverage(legacy.period_coverage),
             variableMeasured=cls._to_schema_variable_measured(
-                getattr(legacy, "band_information", None),
-                getattr(legacy, "cell_information", None),
+                legacy.band_information,
+                legacy.cell_information,
             ),
             dimensions=cls._to_schema_dimensions(
-                getattr(legacy, "cell_information", None),
-                getattr(legacy, "band_information", None),
+                legacy.cell_information,
+                legacy.band_information,
             ),
+            associatedMedia=legacy.associatedMedia,
         )
 
     @staticmethod

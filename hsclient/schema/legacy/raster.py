@@ -5,7 +5,7 @@ from typing import Dict, List, Literal, Optional, Union
 
 from hsmodels.schemas.enums import AggregationType
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, model_validator
-
+from hsclient.schema.base import MediaType
 
 class LegacyRasterBaseModel(BaseModel):
     model_config = ConfigDict(extra="allow")
@@ -96,6 +96,7 @@ class Rights(LegacyRasterBaseModel):
 
 
 class GeographicRasterMetadata(LegacyRasterBaseModel):
+    type: AggregationType = AggregationType.GeographicRasterAggregation
     title: Optional[str] = None
     subjects: List[str] = Field(default_factory=list)
     language: Optional[str] = None
@@ -106,6 +107,10 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     band_information: Optional[Union[BandInformation, List[BandInformation]]] = None
     spatial_reference: Optional[Union[BoxSpatialReference, PointSpatialReference]] = None
     cell_information: Optional[CellInformation] = None
-    type: AggregationType = AggregationType.GeographicRasterAggregation
     url: Optional[AnyUrl] = None
     rights: Optional[Rights] = None
+
+    # associatedMedia is not part of the original HydroShare legacy raster metadata model,
+    # but it is included here to support the new schema.org-based raster metadata model
+    # as aggregation data files are represented as associatedMedia items.
+    associatedMedia: Optional[Union[MediaType, List[MediaType]]] = None
