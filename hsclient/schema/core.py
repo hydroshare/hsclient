@@ -1,21 +1,19 @@
 from typing import List, Optional, Union
 
-
-from pydantic import (
-    Field,
-    HttpUrl,
-)
+from pydantic import Field, HttpUrl
 
 from .base import (
     CreativeWork,
+    HasPart,
+    InLanguageStr,
+    IsPartOf,
+    LanguageEnum,
+    MediaType,
+    Place,
+    PropertyValue,
+    Relation,
     SchemaBaseModel,
     TemporalCoverage,
-    Place,
-    HasPart,
-    IsPartOf,
-    Relation,
-    MediaType,
-    PropertyValue,
 )
 
 
@@ -26,9 +24,7 @@ class CoreMetadata(SchemaBaseModel):
     ###################
     context: HttpUrl = Field(
         alias="@context",  # type: ignore
-        default=HttpUrl(
-            "https://hydroshare.org/schema"
-        ),  # TODO: This is a placeholder for now.
+        default=HttpUrl("https://hydroshare.org/schema"),  # TODO: This is a placeholder for now.
         description="Specifies the vocabulary employed for understanding the structured data markup.",
     )
     type: str = Field(
@@ -45,7 +41,7 @@ class CoreMetadata(SchemaBaseModel):
     additionalType: Optional[str] = Field(
         title="Additional type",
         description="An additional type for the resource. This can be used to further specify the type of the"
-                    " resource (e.g., Composite Resource).",
+        " resource (e.g., Composite Resource).",
         frozen=True,
         json_schema_extra={"readOnly": True},
     )
@@ -94,8 +90,8 @@ class CoreMetadata(SchemaBaseModel):
         "part of - e.g., a related collection.",
         default=None,
     )
-    # 'relation' is not a standard schema.org property, but we include it here to 
-    # capture any other types of relations that don't fit into the above properties 
+    # 'relation' is not a standard schema.org property, but we include it here to
+    # capture any other types of relations that don't fit into the above properties (hasPart, isPartOf).
     relation: Optional[List[Relation]] = Field(
         title="Relation",
         description="All other types of relations",
@@ -116,6 +112,11 @@ class CoreMetadata(SchemaBaseModel):
     )
     license: Optional[Union[CreativeWork, HttpUrl]] = Field(
         default=None, description="A license document that applies to the resource."
+    )
+    inLanguage: Optional[Union[LanguageEnum, InLanguageStr]] = Field(
+        title="Language",
+        description="The language of the content of the resource.",
+        default=None,
     )
     model_config = {
         "arbitrary_types_allowed": True,
