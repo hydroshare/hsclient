@@ -12,16 +12,16 @@ from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
-from typing import Callable, Dict, List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Union
 from urllib.parse import quote, unquote, urlparse
 from uuid import uuid4
+
 import s3fs
 
 from hsclient.metadata_adapter.adapter import MetadataAdapter
 from hsclient.metadata_adapter.aggregation_type_adapter import AggregationTypeAdapter
-from hsclient.schema.utils import load_json
 from hsclient.schema.dataset import ScientificDataset
-
+from hsclient.schema.utils import load_json
 
 if TYPE_CHECKING:
     import fiona
@@ -47,20 +47,19 @@ else:
         xarray = None
 
 import requests
-
-from hsclient.schema.legacy.raster import GeographicRasterMetadata
 from hsmodels.schemas.base_models import BaseMetadata
 from hsmodels.schemas.enums import AggregationType
 from hsmodels.schemas.fields import BoxCoverage, PointCoverage
 from pydantic import TypeAdapter
 from requests_oauthlib import OAuth2Session
 
+from hsclient import __version__ as VERSION
 from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
 from hsclient.schema.base import MediaType
+from hsclient.schema.legacy.netcdf import MultidimensionalMetadata
+from hsclient.schema.legacy.raster import GeographicRasterMetadata
 from hsclient.utils import attribute_filter, encode_resource_url, main_file_type
-
-from hsclient import __version__ as VERSION
 
 CHECK_TASK_PING_INTERVAL = 10
 METADATA_CREATION_WAIT_TIME = 2
@@ -118,6 +117,7 @@ class File(str):
         """The size of the file in bytes"""
         return self._size
 
+
 def refresh(f):
     """
     Decorator for refreshing metadata from HydroShare after the decorated method is called.
@@ -154,7 +154,7 @@ class Aggregation:
     }
 
     def __init__(self, map_path, hs_session, s3_client, checksums=None):
-        self._map_path = map_path   # TODO: should change it to jsonld_path
+        self._map_path = map_path  # TODO: should change it to jsonld_path
         self._hs_session = hs_session
         self._s3_client = s3_client
         self._retrieved_map = None  # TODO: probably not needed anymore
@@ -479,6 +479,9 @@ class Aggregation:
         if isinstance(metadata, GeographicRasterMetadata):
             schema_metadata = MetadataAdapter.to_geographic_raster_metadata(metadata)
             metadata_json = schema_metadata.model_dump_json(by_alias=True, exclude_none=True)
+        elif isinstance(metadata, MultidimensionalMetadata):
+            schema_metadata = MetadataAdapter.to_multidimensional_metadata(metadata)
+            metadata_json = schema_metadata.model_dump_json(by_alias=True, exclude_none=True)
         elif isinstance(metadata, ScientificDataset):
             metadata_json = metadata.model_dump_json(by_alias=True, exclude_none=True)
         else:
@@ -527,10 +530,10 @@ class Aggregation:
 
         for key, value in kwargs.items():
             if key.startswith('file__'):
-                file_args = {key[len('file__'):]: value}
+                file_args = {key[len('file__') :]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             elif key.startswith('files__'):
-                file_args = {key[len('files__'):]: value}
+                file_args = {key[len('files__') :]: value}
                 aggregations = [agg for agg in aggregations if agg.files(**file_args)]
             elif key == 'type':
                 aggregations = [agg for agg in aggregations if agg._aggregation_type == value]
@@ -566,7 +569,7 @@ class Aggregation:
         # give some time to s3 eventing to regenerate the metadata files
         time.sleep(METADATA_CREATION_WAIT_TIME)
 
-    #TODO: This delete method needs to be removed - the Resource class aggregation_delete()
+    # TODO: This delete method needs to be removed - the Resource class aggregation_delete()
     # method implements aggregation delete using s3 protocol
     def delete(self) -> None:
         """Deletes this aggregation from HydroShare"""
@@ -604,8 +607,9 @@ class DataObjectSupportingAggregation(Aggregation):
         self._data_object = None
 
     @property
-    def data_object(self) -> \
-            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
+    def data_object(
+        self,
+    ) -> Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset', None]:
         """Returns the data object for the aggregation if the aggregation has been loaded as
         a data object, otherwise None"""
         return self._data_object
@@ -623,8 +627,9 @@ class DataObjectSupportingAggregation(Aggregation):
     def _validate_aggregation_path(self, agg_path: str, for_save_data: bool = False) -> str:
         return self._get_file_path(agg_path)
 
-    def _get_data_object(self, agg_path: str, func: Callable, **func_kwargs) -> \
-            Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset']:
+    def _get_data_object(
+        self, agg_path: str, func: Callable, **func_kwargs
+    ) -> Union['pandas.DataFrame', 'fiona.Collection', 'rasterio.DatasetReader', 'xarray.Dataset']:
 
         if self._data_object is not None and self._aggregation_type != AggregationType.TimeSeriesAggregation:
             return self._data_object
@@ -692,8 +697,9 @@ class NetCDFAggregation(DataObjectSupportingAggregation):
             raise Exception("xarray package was not found")
         return self._get_data_object(agg_path=agg_path, func=xarray.open_dataset)
 
-    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
-                         destination_path: str = "") -> 'Aggregation':
+    def save_data_object(
+        self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False, destination_path: str = ""
+    ) -> 'Aggregation':
         """
         Saves the xarray Dataset object to the Multidimensional aggregation
         :param resource: the resource containing the aggregation
@@ -739,6 +745,7 @@ class NetCDFAggregation(DataObjectSupportingAggregation):
 
 class TimeseriesAggregation(DataObjectSupportingAggregation):
     """Represents a Time Series Aggregation in HydroShare"""
+
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -763,9 +770,9 @@ class TimeseriesAggregation(DataObjectSupportingAggregation):
 
         return self._get_data_object(agg_path=agg_path, func=to_series)
 
-    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
-                         destination_path: str = "") -> 'Aggregation':
-
+    def save_data_object(
+        self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False, destination_path: str = ""
+    ) -> 'Aggregation':
         """
         Saves the pandas DataFrame object to the Time Series aggregation
         :param resource: the resource containing the aggregation
@@ -824,6 +831,7 @@ class TimeseriesAggregation(DataObjectSupportingAggregation):
 
 class GeoFeatureAggregation(DataObjectSupportingAggregation):
     """Represents a Geo Feature Aggregation in HydroShare"""
+
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -836,8 +844,9 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
                     # these are optional files for geo feature aggregation
                     continue
                 if not os.path.exists(os.path.join(agg_path, aggr_file)):
-                    raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
-                                    f"Missing file '{aggr_file}'")
+                    raise Exception(
+                        f"Aggregation path '{agg_path}' is not a valid path. " f"Missing file '{aggr_file}'"
+                    )
         file_path = self._get_file_path(agg_path)
         return file_path
 
@@ -851,8 +860,9 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
             raise Exception("fiona package was not found")
         return self._get_data_object(agg_path=agg_path, func=fiona.open)
 
-    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
-                         destination_path: str = "") -> 'Aggregation':
+    def save_data_object(
+        self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False, destination_path: str = ""
+    ) -> 'Aggregation':
         """
         Saves the fiona Collection object to the Geo Feature aggregation
         :param resource: the resource containing the aggregation
@@ -861,6 +871,7 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
         :param destination_path: the destination path in Hydroshare to save the new aggregation
         :return: the updated or new Geo Feature aggregation
         """
+
         def upload_shape_files(main_file_path, dst_path=""):
             shp_file_dir_path = os.path.dirname(main_file_path)
             filename_starts_with = f"{pathlib.Path(main_file_path).stem}."
@@ -925,6 +936,7 @@ class GeoFeatureAggregation(DataObjectSupportingAggregation):
 
 class GeoRasterAggregation(DataObjectSupportingAggregation):
     """Represents a Geo Raster Aggregation in HydroShare"""
+
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -959,17 +971,19 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
                         vrt_file_path = item_full_path
                         vrt_file_count += 1
                         if vrt_file_count > 1:
-                            raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
-                                            f"More than one vrt was file found")
+                            raise Exception(
+                                f"Aggregation path '{agg_path}' is not a valid path. "
+                                f"More than one vrt was file found"
+                            )
                     else:
-                        raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
-                                        f"There are files that are not of raster file types")
+                        raise Exception(
+                            f"Aggregation path '{agg_path}' is not a valid path. "
+                            f"There are files that are not of raster file types"
+                        )
             if tif_file_count == 0:
-                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
-                                f"No tif file was found")
+                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. " f"No tif file was found")
             if tif_file_count > 1 and vrt_file_count == 0:
-                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. "
-                                f"Missing a vrt file")
+                raise Exception(f"Aggregation path '{agg_path}' is not a valid path. " f"Missing a vrt file")
             if vrt_file_path:
                 file_path = vrt_file_path
             else:
@@ -989,8 +1003,9 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
             raise Exception("rasterio package was not found")
         return self._get_data_object(agg_path=agg_path, func=rasterio.open)
 
-    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
-                         destination_path: str = "") -> 'Aggregation':
+    def save_data_object(
+        self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False, destination_path: str = ""
+    ) -> 'Aggregation':
         """
         Saves the rasterio DatasetReader object to the Geo Raster aggregation
         :param resource: the resource containing the aggregation
@@ -999,6 +1014,7 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
         :param destination_path: the destination path in Hydroshare to save the new aggregation
         :return: the updated or new Geo Raster aggregation
         """
+
         def upload_raster_files(dst_path=""):
             raster_files = []
             for item in os.listdir(agg_path):
@@ -1057,6 +1073,7 @@ class GeoRasterAggregation(DataObjectSupportingAggregation):
 
 class CSVAggregation(DataObjectSupportingAggregation):
     """Represents a CSV Aggregation in HydroShare"""
+
     @classmethod
     def create(cls, base_aggr):
         return super().create(aggr_cls=cls, base_aggr=base_aggr)
@@ -1070,12 +1087,13 @@ class CSVAggregation(DataObjectSupportingAggregation):
         if pandas is None:
             raise Exception("pandas package not found")
 
-        return self._get_data_object(agg_path=agg_path, func=pandas.read_csv, comment="#", dtype="string",
-                                     engine="python")
+        return self._get_data_object(
+            agg_path=agg_path, func=pandas.read_csv, comment="#", dtype="string", engine="python"
+        )
 
-    def save_data_object(self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False,
-                         destination_path: str = "") -> 'Aggregation':
-
+    def save_data_object(
+        self, resource: 'Resource', agg_path: str, as_new_aggr: bool = False, destination_path: str = ""
+    ) -> 'Aggregation':
         """
         Saves the pandas DataFrame object to the CSV aggregation
         :param resource: the resource containing the aggregation
@@ -1196,7 +1214,7 @@ class Resource(Aggregation):
         self._s3_client.mv(src_remote_path, dst_remote_path, recursive=True)
 
     def _download_file_folder(self, path: str, save_path: str) -> None:
-        # We don't need to use the S3 client for this as s3 signed 
+        # We don't need to use the S3 client for this as s3 signed
         # URLs are used by the rest api endpoint
         return self._hs_session.retrieve_zip(path, save_path)
 
@@ -1214,7 +1232,7 @@ class Resource(Aggregation):
     def _file_exists(self, path: str) -> bool:
         remote_path = self._build_s3_path(path)
         return self._s3_client.exists(remote_path)
-    
+
     # system information
 
     @property
@@ -1228,7 +1246,6 @@ class Resource(Aggregation):
     def metadata_file(self):
         """The path to the metadata file"""
         return self.metadata_path.split("/data/", 1)[1]
-
 
     def system_metadata(self):
         """
@@ -1522,7 +1539,7 @@ class Resource(Aggregation):
             existing_metadata = self._retrieve_and_parse(user_metadata_path, as_pydantic=False)
             self._s3_client.write_text(user_metadata_path, json.dumps(existing_metadata))
             aggregation_created = True
- 
+
         if refresh and aggregation_created:
             # Only return the newly created aggregation if a refresh is requested
             self.refresh()
@@ -1622,7 +1639,7 @@ class Resource(Aggregation):
             extract_meta_dst_path = f".hsmetadata/{extract_meta_dst_path}"
             if self._file_exists(extract_meta_src_path):
                 self._move_file(extract_meta_src_path, extract_meta_dst_path)
-            
+
             # move the user metadata file if it exists
             data_file_name = os.path.basename(aggr_path)
             user_meta_dst_path = os.path.join(dst_path, f"{data_file_name}.user_metadata.json")
@@ -1643,7 +1660,7 @@ class Resource(Aggregation):
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
-        
+
         # delete the user metadata file for the aggregation if it exists
         # TODO: We probably don't need to delete the user metadata file as it will be deleted
         # when the content file is deleted as part of s3 event processing
@@ -2006,9 +2023,7 @@ class HydroShare:
         if to_date:
             params["to_date"] = to_date.strftime('%Y-%m-%d')
         if spatial_coverage:
-            yield Exception(
-                "Bad Request, status_code 400, spatial_coverage queries are disabled."
-            )
+            yield Exception("Bad Request, status_code 400, spatial_coverage queries are disabled.")
             # TODO: re-enable after resolution of https://github.com/hydroshare/hydroshare/issues/5240
             # params["coverage_type"] = spatial_coverage.type
             # if spatial_coverage.type == "point":
@@ -2054,10 +2069,10 @@ class HydroShare:
         try:
             response = self._hs_session.get(f'/hsapi/resource/s3/{resource_id}/', status_code=200)
             response_json = response.json()
-            
+
             if 'bucket' not in response_json:
                 raise Exception(f"ERROR: Resource was not found for resource_id: {resource_id}")
-            
+
             bucket_name = response_json['bucket']
             prefix = response_json['prefix']
             assert resource_id == prefix.split("/")[0]
@@ -2114,7 +2129,7 @@ class HydroShare:
         try:
             response = self._hs_session.post('/hsapi/user/service/accounts/s3/', status_code=201)
             response_json = response.json()
-            
+
             if 'access_key' not in response_json:
                 print("ERROR: Invalid username/password")
                 self._s3_access_key = None
@@ -2134,9 +2149,7 @@ class HydroShare:
         """
         if self._s3_access_key and self._s3_secret_key:
             self._s3_client = s3fs.S3FileSystem(
-                key=self._s3_access_key,
-                secret=self._s3_secret_key,
-                endpoint_url=self._s3_endpoint_url
+                key=self._s3_access_key, secret=self._s3_secret_key, endpoint_url=self._s3_endpoint_url
             )
         else:
             self._s3_client = None

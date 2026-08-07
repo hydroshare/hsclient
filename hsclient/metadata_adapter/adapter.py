@@ -1,13 +1,14 @@
 from typing import Union
 
-from hsclient.schema.legacy.raster import GeographicRasterMetadata
-
 from hsclient.metadata_adapter.legacy_resource_adapter import LegacyResourceMetadataAdapter
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsclient.metadata_adapter.netcdf_adapter import NetCDFMetadataAdapter
 from hsclient.metadata_adapter.raster_adapter import RasterMetadataAdapter
 from hsclient.metadata_adapter.resource_adapter import ResourceMetadataAdapter
 from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.schema.dataset import ScientificDataset
+from hsclient.schema.legacy.netcdf import MultidimensionalMetadata
+from hsclient.schema.legacy.raster import GeographicRasterMetadata
 
 
 class MetadataAdapter:
@@ -34,3 +35,11 @@ class MetadataAdapter:
     @staticmethod
     def to_geographic_raster_metadata(metadata: Union[GeographicRasterMetadata, dict]) -> ScientificDataset:
         return RasterMetadataAdapter.to_geographic_raster_metadata(metadata)
+
+    @staticmethod
+    def to_legacy_multidimensional_metadata(metadata: Union[ScientificDataset, dict]) -> MultidimensionalMetadata:
+        return NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(metadata)
+
+    @staticmethod
+    def to_multidimensional_metadata(metadata: Union[MultidimensionalMetadata, dict]) -> ScientificDataset:
+        return NetCDFMetadataAdapter.to_multidimensional_metadata(metadata)
