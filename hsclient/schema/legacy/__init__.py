@@ -1,3 +1,4 @@
+from .netcdf import MultidimensionalBoxSpatialReference, MultidimensionalMetadata, Variable
 from .raster import (
     BandInformation,
     BoxCoverage,
@@ -11,6 +12,7 @@ from .raster import (
 )
 
 __all__ = [
+    # raster
     "BandInformation",
     "BoxCoverage",
     "BoxSpatialReference",
@@ -20,4 +22,8 @@ __all__ = [
     "PointCoverage",
     "PointSpatialReference",
     "Rights",
+    # netcdf / multidimensional
+    "MultidimensionalBoxSpatialReference",
+    "MultidimensionalMetadata",
+    "Variable",
 ]
