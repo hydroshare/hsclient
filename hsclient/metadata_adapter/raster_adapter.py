@@ -1,5 +1,53 @@
 from __future__ import annotations
 
+"""
+Adapter between the locally-owned GeographicRasterMetadata legacy model and the
+schema.org-based ScientificDataset.
+
+Conversion directions
+---------------------
+  to_legacy_geographic_raster_metadata : ScientificDataset | dict → GeographicRasterMetadata
+  to_geographic_raster_metadata        : GeographicRasterMetadata | dict → ScientificDataset
+
+CellInformation overflow fields
+--------------------------------
+``CellInformation.cell_size_x_value``, ``CellInformation.cell_size_y_value``, and
+``CellInformation.cell_data_type`` have no dedicated equivalent in the ``ScientificDataset``
+or ``Dimension`` schema.  They are round-tripped via ``ScientificDataset.additionalProperty``
+under the keys:
+
+  ``cell_size_x_value``
+  ``cell_size_y_value``
+  ``cell_data_type``
+
+HydroShare does not currently populate these keys, but the adapter reads them defensively
+so that future payloads carrying them are handled correctly.
+
+BandInformation ↔ variableMeasured mapping
+------------------------------------------
+Each ``BandInformation`` object maps to one ``DataVariable`` entry in
+``ScientificDataset.variableMeasured``.  The legacy model allows a single
+``BandInformation`` instance *or* a list; the adapter normalises both to a list
+before converting.
+
+  ``BandInformation.name``          ↔ ``DataVariable.name``
+  ``BandInformation.variable_unit`` ↔ ``DataVariable.unit``
+  ``BandInformation.minimum_value`` ↔ ``DataVariable.minValue``    (float-parsed)
+  ``BandInformation.maximum_value`` ↔ ``DataVariable.maxValue``    (float-parsed)
+  ``BandInformation.no_data_value`` ↔ ``DataVariable.noDataValue`` (float-parsed)
+  ``BandInformation.comment``       ↔ ``DataVariable.description``
+
+Dimension ↔ CellInformation mapping
+-------------------------------------
+``CellInformation.rows`` and ``CellInformation.columns`` are stored as named
+``Dimension`` objects (``name="rows"`` and ``name="columns"``) in
+``ScientificDataset.dimensions``.  On the return trip the adapter reconstructs
+``CellInformation.rows/columns`` by scanning for those exact names.
+
+When more than one band is present, an additional ``Dimension(name="band", shape=<count>)``
+is prepended to the dimensions list so that the full raster shape is represented.
+"""
+
 from typing import Any, Dict, List, Optional, Union
 
 from hsmodels.schemas.enums import AggregationType
@@ -28,16 +76,30 @@ from hsclient.schema.legacy.raster import (
 
 
 class RasterMetadataAdapter:
-    """Translate raster metadata between schema.org ScientificDataset and legacy hsmodels."""
+    """Translate Geographic Raster metadata between ScientificDataset and the
+    locally-owned GeographicRasterMetadata legacy model."""
 
     _DEFAULT_SRS_NAME = "Unknown spatial reference"
+
+    # ------------------------------------------------------------------
+    # Public conversion methods
+    # ------------------------------------------------------------------
 
     @classmethod
     def to_legacy_geographic_raster_metadata(
         cls, metadata: Union[ScientificDataset, Dict[str, Any]]
     ) -> GeographicRasterMetadata:
+        """Convert a ScientificDataset (or its dict representation) to GeographicRasterMetadata.
+
+        The ``additionalType`` of the incoming dataset is not validated here; the caller
+        (MetadataAdapter / load_json) is responsible for routing only GEOGRAPHIC_RASTER datasets
+        to this method.
+        """
         dataset = metadata if isinstance(metadata, ScientificDataset) else ScientificDataset.model_validate(metadata)
 
+        # Flatten additionalProperty to a plain dict first so that CellInformation overflow
+        # keys (cell_size_x_value, cell_size_y_value, cell_data_type) can be extracted inside
+        # _to_legacy_cell_information.
         additional_metadata = cls._additional_property_to_dict(dataset.additionalProperty)
 
         return GeographicRasterMetadata(
@@ -61,6 +123,7 @@ class RasterMetadataAdapter:
     def to_geographic_raster_metadata(
         cls, metadata: Union[GeographicRasterMetadata, Dict[str, Any]]
     ) -> ScientificDataset:
+        """Convert a GeographicRasterMetadata legacy object (or dict) to a ScientificDataset."""
         if isinstance(metadata, GeographicRasterMetadata):
             legacy = metadata
         else:
@@ -69,6 +132,8 @@ class RasterMetadataAdapter:
         additional_metadata = dict(legacy.additional_metadata or {})
         description = legacy.description
         additional_properties = cls._dict_to_additional_property(additional_metadata)
+        # Append CellInformation overflow entries (cell_size_x_value, cell_size_y_value,
+        # cell_data_type) that have no dedicated ScientificDataset attribute.
         additional_properties.extend(cls._cell_information_to_additional_properties(legacy.cell_information))
 
         return ScientificDataset.model_construct(
@@ -96,8 +161,13 @@ class RasterMetadataAdapter:
             associatedMedia=legacy.associatedMedia,
         )
 
+    # ------------------------------------------------------------------
+    # additionalProperty ↔ dict helpers
+    # ------------------------------------------------------------------
+
     @staticmethod
     def _additional_property_to_dict(additional_property: Any) -> Dict[str, str]:
+        """Flatten ScientificDataset.additionalProperty to a plain str→str dict."""
         if additional_property is None:
             return {}
 
@@ -125,13 +195,19 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _dict_to_additional_property(values: Dict[str, Any]) -> List[PropertyValue]:
+        """Convert a plain dict to a list of PropertyValue objects."""
         properties: List[PropertyValue] = []
         for key, value in values.items():
             properties.append(PropertyValue.model_construct(name=key, value=str(value)))
         return properties
 
+    # ------------------------------------------------------------------
+    # Rights / license helpers
+    # ------------------------------------------------------------------
+
     @staticmethod
     def _to_legacy_rights(license_data: Any) -> Optional[Rights]:
+        """Convert a ScientificDataset license (CreativeWork or URL string) → legacy Rights."""
         if license_data is None:
             return None
 
@@ -145,6 +221,7 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_schema_license(rights: Optional[Rights]) -> Optional[CreativeWork]:
+        """Convert legacy Rights → CreativeWork for ScientificDataset.license."""
         if rights is None:
             return None
         return CreativeWork.model_construct(
@@ -152,10 +229,15 @@ class RasterMetadataAdapter:
             url=str(getattr(rights, "url", None)) if getattr(rights, "url", None) else None,
         )
 
+    # ------------------------------------------------------------------
+    # Spatial coverage helpers
+    # ------------------------------------------------------------------
+
     @classmethod
     def _to_legacy_spatial_coverage(
         cls, spatial_coverage: Optional[Place]
     ) -> Optional[Union[BoxCoverage, PointCoverage]]:
+        """Convert ScientificDataset.spatialCoverage → legacy BoxCoverage or PointCoverage."""
         if spatial_coverage is None or spatial_coverage.geo is None:
             return None
 
@@ -198,6 +280,11 @@ class RasterMetadataAdapter:
     def _to_legacy_spatial_reference(
         cls, spatial_coverage: Optional[Place]
     ) -> Optional[Union[BoxSpatialReference, PointSpatialReference]]:
+        """Convert ScientificDataset.spatialCoverage.srs → BoxSpatialReference or PointSpatialReference.
+
+        Geographic raster aggregations support both box and point spatial references,
+        chosen based on the geometry type of the spatial coverage.
+        """
         if spatial_coverage is None or spatial_coverage.geo is None:
             return None
 
@@ -250,14 +337,25 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_legacy_period_coverage(temporal_coverage: Optional[TemporalCoverage]) -> Optional[PeriodCoverage]:
+        """Convert ScientificDataset.temporalCoverage → legacy PeriodCoverage."""
         if temporal_coverage is None:
             return None
         return PeriodCoverage(start=temporal_coverage.startDate, end=temporal_coverage.endDate)
+
+    # ------------------------------------------------------------------
+    # Band / variable helpers
+    # ------------------------------------------------------------------
 
     @classmethod
     def _to_legacy_band_information(
         cls, variable_measured: Optional[List[Union[str, PropertyValue, DataVariable]]]
     ) -> Optional[Union[BandInformation, List[BandInformation]]]:
+        """Convert ScientificDataset.variableMeasured → legacy BandInformation (or list thereof).
+
+        Returns a single ``BandInformation`` when only one band is present, or a list for
+        multi-band rasters, matching the legacy model's flexible field type.
+        Returns ``None`` when ``variableMeasured`` is empty or contains no recognised entries.
+        """
         if not variable_measured:
             return None
 
@@ -286,10 +384,24 @@ class RasterMetadataAdapter:
             return bands[0]
         return bands
 
+    # ------------------------------------------------------------------
+    # Cell information helpers
+    # ------------------------------------------------------------------
+
     @staticmethod
     def _to_legacy_cell_information(
         dimensions: Optional[List[Dimension]], additional_metadata: Dict[str, str]
     ) -> Optional[CellInformation]:
+        """Reconstruct legacy CellInformation from ScientificDataset dimensions and additionalProperty.
+
+        Rows and columns are recovered from named ``Dimension`` entries (``name="rows"`` /
+        ``name="columns"``).  The overflow fields ``cell_size_x_value``, ``cell_size_y_value``,
+        and ``cell_data_type`` are read from ``additional_metadata`` (already flattened from
+        ``additionalProperty``) since they have no dedicated ``Dimension`` attribute.
+
+        Returns ``None`` when neither rows/columns nor any overflow field can be recovered,
+        or when rows/columns are present individually but not together (incomplete grid info).
+        """
         rows = None
         columns = None
         for dimension in dimensions or []:
@@ -331,6 +443,7 @@ class RasterMetadataAdapter:
         spatial_coverage: Optional[Union[BoxCoverage, PointCoverage]],
         spatial_reference: Optional[Union[BoxSpatialReference, PointSpatialReference]],
     ) -> Optional[Place]:
+        """Convert legacy spatial coverage + spatial reference → ScientificDataset.spatialCoverage."""
         if spatial_coverage is None:
             return None
 
@@ -366,6 +479,11 @@ class RasterMetadataAdapter:
     def _to_schema_spatial_reference(
         cls, spatial_reference: Union[BoxSpatialReference, PointSpatialReference]
     ) -> SpatialReference:
+        """Convert BoxSpatialReference or PointSpatialReference → SpatialReference.
+
+        NOTE: The legacy model does not carry an explicit geographic/projected enum, so
+        ``srsType`` is inferred heuristically from projection text.
+        """
         # NOTE: Legacy spatial reference does not carry an explicit geographic/projected enum compatible with
         # ScientificDataset.srs.srsType, so we infer it heuristically from projection text.
         projection = (getattr(spatial_reference, "projection", "") or "").lower()
@@ -388,6 +506,7 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_schema_temporal_coverage(period_coverage: Optional[PeriodCoverage]) -> Optional[TemporalCoverage]:
+        """Convert legacy PeriodCoverage → ScientificDataset.temporalCoverage."""
         if period_coverage is None or period_coverage.start is None:
             return None
         return TemporalCoverage.model_construct(startDate=period_coverage.start, endDate=period_coverage.end)
@@ -398,9 +517,19 @@ class RasterMetadataAdapter:
         band_information: Optional[Union[BandInformation, List[BandInformation]]],
         cell_information: Optional[CellInformation],
     ) -> List[DataVariable]:
+        """Convert legacy BandInformation → list of DataVariable objects.
+
+        Each band becomes one ``DataVariable``.  The spatial dimensions (``rows``,
+        ``columns``) are derived from ``CellInformation`` and attached to every variable
+        so that ``DataVariable.dimensions`` reflects the 2-D grid structure.
+
+        ``cell_data_type`` is stored on ``CellInformation``; it is mapped to
+        ``DataVariable.dataType`` for each band since all bands share the same cell type.
+        """
         if band_information is None:
             return []
 
+        # Collect dimension names present in CellInformation for all DataVariable entries.
         dimensions: List[str] = []
         if cell_information is not None:
             if getattr(cell_information, "rows", None) is not None:
@@ -430,14 +559,26 @@ class RasterMetadataAdapter:
         cell_information: Optional[CellInformation],
         band_information: Optional[Union[BandInformation, List[BandInformation]]] = None,
     ) -> List[Dimension]:
+        """Build the ScientificDataset.dimensions list from CellInformation and BandInformation.
+
+        Produces up to three ``Dimension`` objects in order:
+          1. ``band``    – only when more than one band is present (shape = band count)
+          2. ``rows``    – when ``CellInformation.rows`` is set
+          3. ``columns`` – when ``CellInformation.columns`` is set
+
+        On the return trip (``_to_legacy_cell_information``) the ``rows`` and ``columns``
+        entries are matched by name to reconstruct ``CellInformation.rows/columns``.
+        """
         dimensions: List[Dimension] = []
 
+        # Determine band count to decide whether a band dimension is needed.
         band_count = 0
         if isinstance(band_information, list):
             band_count = len(band_information)
         elif band_information is not None:
             band_count = 1
 
+        # Only emit a band dimension for multi-band rasters; single-band rasters omit it.
         if band_count > 1:
             dimensions.append(Dimension.model_construct(name="band", shape=band_count))
 
@@ -451,6 +592,16 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _cell_information_to_additional_properties(cell_information: Optional[CellInformation]) -> List[PropertyValue]:
+        """Produce additionalProperty entries for CellInformation fields with no Dimension equivalent.
+
+        Fields round-tripped this way:
+          - ``cell_size_x_value`` → ``PropertyValue(name="cell_size_x_value", value=...)``
+          - ``cell_size_y_value`` → ``PropertyValue(name="cell_size_y_value", value=...)``
+          - ``cell_data_type``    → ``PropertyValue(name="cell_data_type",    value=...)``
+
+        ALTERNATIVE: encode these fields inside a ``Dimension`` subtype or as a JSON-encoded
+        PropertyValue.
+        """
         if cell_information is None:
             return []
 
@@ -471,8 +622,13 @@ class RasterMetadataAdapter:
             )
         return properties
 
+    # ------------------------------------------------------------------
+    # Generic utilities
+    # ------------------------------------------------------------------
+
     @staticmethod
     def _parse_bbox(box: str) -> Optional[List[float]]:
+        """Parse a GeoShape bbox string ``"N E S W"`` into [north, east, south, west]."""
         if not box:
             return None
         parts = str(box).split()
@@ -485,10 +641,12 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _compose_box(north: float, east: float, south: float, west: float) -> str:
+        """Serialise four cardinal limits to a GeoShape bbox string ``"N E S W"``."""
         return f"{north} {east} {south} {west}"
 
     @staticmethod
     def _parse_float(value: Any) -> Optional[float]:
+        """Safely parse any value to float; returns ``None`` for empty or unconvertible input."""
         if value is None or value == "":
             return None
         try:
@@ -498,6 +656,7 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_str(value: Any) -> Optional[str]:
+        """Return ``str(value)`` or ``None`` when value is ``None``."""
         if value is None:
             return None
         return str(value)
