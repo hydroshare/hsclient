@@ -1,13 +1,14 @@
-from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.schema import base as schema
 
 
 class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     """This adapter takes legacy resource metadata and converts it to schema.org format.
-       This adapter is used for saving user edited legacy resource metadata in schema.org format,
-       (as user resource metadata) to write to s3.
+    This adapter is used for saving user edited legacy resource metadata in schema.org format,
+    (as user resource metadata) to write to s3.
     """
+
     def to_dataset_creators(self):
         creators = []
         if not self.creators:

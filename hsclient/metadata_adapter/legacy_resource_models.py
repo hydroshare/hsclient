@@ -1,9 +1,10 @@
-from enum import Enum
 from datetime import datetime
-from typing import Any, List, Optional, Union, Literal
+from enum import Enum
+from typing import Any, List, Literal, Optional, Union
 
-from pydantic import BaseModel, HttpUrl, model_validator, ValidationError, TypeAdapter, AnyUrl
 from hsmodels.schemas.enums import RelationType
+from pydantic import AnyUrl, BaseModel, HttpUrl, TypeAdapter, ValidationError, model_validator
+
 import hsclient.schema.base as schema
 from hsclient.schema.core import SchemaBaseModel
 
@@ -13,6 +14,7 @@ class StringEnum(str, Enum):
 
 
 url_adapter = TypeAdapter(AnyUrl)
+
 
 def is_url(value: str) -> bool:
     try:
@@ -56,7 +58,7 @@ class BasePerson(BaseModel):
 
 class Creator(BasePerson):
     # TODO: The field 'creator_order' is not part of the schema.org Creator model
-    # and our implementation of the schema.org Creator model is yet to support it. Until then, 
+    # and our implementation of the schema.org Creator model is yet to support it. Until then,
     # we cannot map it to this legacy Creator model
     # creator_order: Optional[int] = None
 
@@ -69,6 +71,7 @@ class Contributor(BasePerson):
     def to_dataset_contributor(self):
         return self.to_dataset_person(schema.Contributor)
 
+
 class Publisher(BaseModel):
     name: Optional[str] = None
     url: Optional[HttpUrl] = None
@@ -78,6 +81,7 @@ class Publisher(BaseModel):
         publisher.name = self.name
         publisher.url = self.url
         return publisher
+
 
 class Award(BaseModel):
     funding_agency_name: str
@@ -124,11 +128,10 @@ class SpatialCoverageBox(BaseModel):
     westlimit: float
     type: str = "box"
     # TODO: These 2 fields are not supported as there are no matching fields in the
-    # schema.org spatial coverage model, but we may have to add them to the schema.org 
+    # schema.org spatial coverage model, but we may have to add them to the schema.org
     # spatial coverage model if we want to preserve the metadata editing api in hsclient
     # units: Optional[str] = None
     # projection: Optional[str] = None
-
 
     def to_dataset_spatial_coverage(self):
         place = schema.Place.model_construct()
@@ -146,11 +149,10 @@ class SpatialCoveragePoint(BaseModel):
     east: float
     type: str = "point"
     # TODO: These 2 fields are not supported as there are no matching fields in the schema.org
-    # spatial coverage model, but we may have to add them to the schema.org 
+    # spatial coverage model, but we may have to add them to the schema.org
     # spatial coverage model if we want to preserve the metadata editing api in hsclient
     # units: Optional[str] = None
     # projection: Optional[str] = None
-    
 
     def to_dataset_spatial_coverage(self):
         place = schema.Place.model_construct()
@@ -171,7 +173,6 @@ class Relation(BaseModel):
         relation.name = self.type
         return self._to_dataset_relation(relation)
 
-
     def to_dataset_part_relation(self, relation_type: str):
         relation = None
         self.value = self.value.strip()
@@ -186,7 +187,6 @@ class Relation(BaseModel):
             relation.name = self.type
 
         return self._to_dataset_relation(relation)
-
 
     def _to_dataset_relation(self, relation):
         self.value = self.value.strip()
@@ -205,6 +205,7 @@ class Relation(BaseModel):
                 relation.description = self.value
         return relation
 
+
 class Rights(BaseModel):
     statement: Optional[str] = None
     url: Optional[HttpUrl] = None
@@ -215,11 +216,13 @@ class Rights(BaseModel):
         _license.url = self.url
         return _license
 
+
 class LegacyResourceMetadata(SchemaBaseModel):
     """This represents legacy metadata model for a HydroShare resource.
-       This is used to convert legacy resource metadata to resource metadata in schema.org format
-       to write to s3 as user metadata for a resource.
+    This is used to convert legacy resource metadata to resource metadata in schema.org format
+    to write to s3 as user metadata for a resource.
     """
+
     type: Optional[str] = None
     title: Optional[str] = None
     abstract: Optional[str] = None
@@ -251,7 +254,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
     associatedMedia: Union[List[Any], Any] = None
     sharing_status: Optional[Literal["private", "public", "published", "discoverable"]] = None
     additional_metadata: Optional[dict] = {}
-    extra_columns : Optional[dict] = {}
+    extra_columns: Optional[dict] = {}
 
     _frozen_fields: set = set()
 
@@ -275,7 +278,5 @@ class LegacyResourceMetadata(SchemaBaseModel):
             if "extra_columns" not in data:
                 data["extra_columns"] = {}
             if extra_fields:
-                data["extra_columns"].update(
-                    {field_name: data[field_name] for field_name in extra_fields}
-                )
+                data["extra_columns"].update({field_name: data[field_name] for field_name in extra_fields})
         return data

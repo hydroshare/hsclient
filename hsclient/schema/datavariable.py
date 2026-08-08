@@ -5,8 +5,9 @@ CUAHSI's extension to the SchemaOrg vocabulary to better encapsulate
 scientific data variable metadata.
 """
 
-from typing import Optional, Literal, Union
-from pydantic import Field, BaseModel, HttpUrl
+from typing import Literal, Optional, Union
+
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class Dimension(BaseModel):
@@ -17,9 +18,7 @@ class Dimension(BaseModel):
 
     context: HttpUrl = Field(
         alias="@context",  # type: ignore
-        default=HttpUrl(
-            "https://hydroshare.org/schema"
-        ),  # TODO: This is a placeholder for now.
+        default=HttpUrl("https://hydroshare.org/schema"),  # TODO: This is a placeholder for now.
         description="Specifies the vocabulary employed for understanding the structured data markup.",
     )
     type: Literal["Dimension"] = Field(
@@ -41,13 +40,12 @@ class Dimension(BaseModel):
         description="The description of the variable measured",
     )
 
+
 class DataVariable(BaseModel):
 
     context: HttpUrl = Field(
         alias="@context",  # type: ignore
-        default=HttpUrl(
-            "https://hydroshare.org/schema"
-        ),  # TODO: This is a placeholder for now.
+        default=HttpUrl("https://hydroshare.org/schema"),  # TODO: This is a placeholder for now.
         description="Specifies the vocabulary employed for understanding the structured data markup.",
     )
     type: Literal["DataVariable"] = Field(
@@ -79,17 +77,17 @@ class DataVariable(BaseModel):
         title="Variable Unit",
         description="The unit of the variable measured",
     )
-    minValue: Optional[Union[float,str]] = Field(
+    minValue: Optional[Union[float, str]] = Field(
         title="Minimum Value",
         description="The minimum value in the raster grid",
         default=None,
     )
-    maxValue: Optional[Union[float,str]] = Field(
+    maxValue: Optional[Union[float, str]] = Field(
         title="Maximum Value",
         description="The maximum value in the raster grid",
         default=None,
     )
-    noDataValue: Optional[Union[float,str]] = Field(
+    noDataValue: Optional[Union[float, str]] = Field(
         title="No Data Value",
         description="The numerical value used to represent null data in the raster grid",
         default=None,

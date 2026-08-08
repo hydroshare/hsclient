@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from hsclient import HydroShare
 
 
@@ -20,9 +22,10 @@ def hydroshare(change_test_dir):
         host=os.getenv("HYDRO_HOST", "localhost"),
         port=int(os.getenv("HYDRO_PORT", "8000")),
         protocol=os.getenv("HYDRO_PROTOCOL", "http"),
-        s3_endpoint_url=os.getenv("HYDRO_S3_ENDPOINT_URL", "http://localhost:9002")
+        s3_endpoint_url=os.getenv("HYDRO_S3_ENDPOINT_URL", "http://localhost:9002"),
     )
     return hs
+
 
 @pytest.fixture()
 def new_resource(hydroshare):

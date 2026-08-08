@@ -3,13 +3,13 @@ __version__ = "1.1.7"
 
 from hsclient.hydroshare import (
     Aggregation,
+    CSVAggregation,
     File,
-    HydroShare,
-    Resource,
-    NetCDFAggregation,
-    TimeseriesAggregation,
-    GeoRasterAggregation,
     GeoFeatureAggregation,
-    CSVAggregation
+    GeoRasterAggregation,
+    HydroShare,
+    NetCDFAggregation,
+    Resource,
+    TimeseriesAggregation,
 )
 from hsclient.oauth2_model import Token

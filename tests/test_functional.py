@@ -4,11 +4,13 @@ import tempfile
 import pytest
 from hsmodels.schemas.enums import AggregationType, RelationType
 from hsmodels.schemas.fields import Creator
+
+from hsclient import HydroShare
+
 # from hsmodels.schemas.fields import Relation
 # for now using the Relation class from hsclient.metadata_adapter.legacy_resource_models
 # until we update hsmodels for metadata adapters for legacy <-> schema.org
 from hsclient.metadata_adapter.legacy_resource_models import Relation
-from hsclient import HydroShare
 
 
 def test_absolute_path_multiple_file_upload(new_resource):
@@ -136,7 +138,10 @@ def test_filtering_files(resource):
     assert len(resource.files(bad="testing.xml")) == 0
     assert not resource.file(bad="testing.xml")
 
-@pytest.mark.skip(reason="Creator order is not currently supported in schema.org based Creator model we have implemented.")
+
+@pytest.mark.skip(
+    reason="Creator order is not currently supported in schema.org based Creator model we have implemented."
+)
 def test_creator_order(new_resource):
     res = new_resource  # hydroshare.resource("1248abc1afc6454199e65c8f642b99a0")
     assert len(res.metadata.creators) == 1
@@ -215,11 +220,11 @@ def test_resource_cached_by_HydroShare_instances(monkeypatch):
     from hsclient import HydroShare, Resource
 
     res_id = "fakeresource"
-    
+
     # Mock HydroShare initialization to avoid backend connection
     def mock_my_user_info(self):
         return {"username": "testuser"}
-    
+
     # Mock the session.get method to return a fake S3 response
     def mock_session_get(path, status_code=None, **kwargs):
         class MockResponse:
@@ -227,14 +232,15 @@ def test_resource_cached_by_HydroShare_instances(monkeypatch):
                 if 'userInfo' in path:
                     return {'username': 'testuser'}
                 return {'bucket': 'fake-bucket', 'prefix': f'{res_id}/data'}
+
         return MockResponse()
-    
+
     monkeypatch.setattr(HydroShare, "my_user_info", mock_my_user_info)
     monkeypatch.setattr(Resource, "metadata", lambda self: None)
-    
+
     # Create HydroShare client without triggering backend connection
     hydroshare = HydroShare(username="admin", password="default", host="localhost", port=8000, protocol="http")
-    
+
     # Mock the session after creation
     monkeypatch.setattr(hydroshare._hs_session, 'get', mock_session_get)
 
@@ -272,7 +278,9 @@ def test_file_download(resource):
         assert os.path.basename(downloaded_file) == file.name
 
 
-@pytest.mark.skip(reason="Aggregation download is not yet supported in the JSON metadata workflow (direct file upload to s3 doesn't register an aggregation in django db).")
+@pytest.mark.skip(
+    reason="Aggregation download is not yet supported in the JSON metadata workflow (direct file upload to s3 doesn't register an aggregation in django db)."
+)
 @pytest.mark.integration
 def test_aggregation_download(resource):
     resource.refresh()
@@ -342,7 +350,10 @@ def test_file_upload_and_rename(new_resource):
     assert len(new_resource.files()) == 1
     assert new_resource.files()[0].name == "updated.txt"
 
-@pytest.mark.skip(reason="Aggregation creation from existing file is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this).")
+
+@pytest.mark.skip(
+    reason="Aggregation creation from existing file is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this)."
+)
 def test_file_aggregate(new_resource):
     assert len(new_resource.files()) == 0
     new_resource.folder_create("folder", refresh=False)
@@ -352,7 +363,10 @@ def test_file_aggregate(new_resource):
     assert len(new_resource.aggregations()) == 1
     assert len(new_resource.aggregations()[0].files()) == 1
 
-@pytest.mark.skip(reason="Reference based aggregation is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this).")
+
+@pytest.mark.skip(
+    reason="Reference based aggregation is not yet supported in the JSON metadata workflow (hsextract needs to be updated to support this)."
+)
 def test_create_update_reference(new_resource):
     assert len(new_resource.aggregations()) == 0
     new_resource.reference_create("reference", "http://studio.bakajo.com")
@@ -375,7 +389,10 @@ def test_create_update_reference(new_resource):
         with open(os.path.join(tmp, file.name), "r") as f:
             assert "https://duckduckgo.com" in str(f.read())
 
-@pytest.mark.skip(reason="There seems to be a bug in hydroshare s3 object event tracking where a file move doesn't trigger PutObject events, preventing automatic extracting metadata from files.")
+
+@pytest.mark.skip(
+    reason="There seems to be a bug in hydroshare s3 object event tracking where a file move doesn't trigger PutObject events, preventing automatic extracting metadata from files."
+)
 def test_file_unzip(new_resource):
     new_resource.file_upload("data/georaster_composite.zip")
     assert len(new_resource.files()) == 1
@@ -512,7 +529,9 @@ def test_aggregations(
     root_path = "data/test_resource_metadata_files/"
     new_resource.file_upload(*[os.path.join(root_path, file) for file in data_files], refresh=False)
     if metadata_sidecar:
-        new_resource.file_upload(os.path.join(root_path, metadata_sidecar), destination_path=".hsmetadata", refresh=False)
+        new_resource.file_upload(
+            os.path.join(root_path, metadata_sidecar), destination_path=".hsmetadata", refresh=False
+        )
 
     # Allow async metadata extraction/indexing to populate .hsjsonld aggregation metadata in S3.
     agg = None
@@ -691,7 +710,9 @@ def test_resource_version(new_resource):
         res_version.delete()
 
 
-@pytest.mark.skip(reason="Public/private sharing status is not yet supported in the JSON metadata workflow (required metadata check is based on metadata in Django DB).")
+@pytest.mark.skip(
+    reason="Public/private sharing status is not yet supported in the JSON metadata workflow (required metadata check is based on metadata in Django DB)."
+)
 def test_resource_public(resource):
     # TODO: The JSON metadata workflow needs to be updated to flush the resource metadata to the Django DB so that the sharing status can be updated.
     resource.metadata.title = "test title"

@@ -1,29 +1,28 @@
 from datetime import datetime
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from pydantic import Field, HttpUrl
 
-from hsclient.metadata_adapter.legacy_resource_models import Creator as LegacyCreator
-from hsclient.metadata_adapter.legacy_resource_models import Contributor as LegacyContributor
+from hsclient.metadata_adapter.legacy_resource_models import Contributor as LegacyContributor, Creator as LegacyCreator
 from hsclient.schema.base import (
     Contributor,
     CreativeWork,
     Creator,
+    Discoverable,
+    Draft,
     Grant,
+    Incomplete,
+    InLanguageStr,
+    LanguageEnum,
     MediaType,
+    Obsolete,
     Organization,
     Private,
-    Draft,
-    Incomplete,
-    Obsolete,
     Provider,
-    Published,
     Public,
-    Discoverable,
+    Published,
     PublisherOrganization,
     SubjectOf,
-    LanguageEnum,
-    InLanguageStr,
 )
 from hsclient.schema.core import CoreMetadata
 
@@ -40,10 +39,11 @@ class SchemaOrgResourceMetadata(CoreMetadata):
     additionalType: Optional[str] = Field(
         title="Additional type",
         description="An additional type for the resource. This can be used to further specify the type of the"
-                    " resource (e.g., Composite Resource).",
+        " resource (e.g., Composite Resource).",
     )
     dateCreated: datetime = Field(
-        title="Date created", description="The date on which the resource was created.",
+        title="Date created",
+        description="The date on which the resource was created.",
         json_schema_extra={"readOnly": True},
     )
     datePublished: Optional[datetime] = Field(
@@ -76,12 +76,9 @@ class SchemaOrgResourceMetadata(CoreMetadata):
         "assigned by a repository. Multiple identifiers can be entered. Where identifiers can be "
         "encoded as URLs, enter URLs here.",
     )
-    creator: List[Union[Creator, Organization]] = Field(
-        description="Person or Organization that created the resource."
-    )
+    creator: List[Union[Creator, Organization]] = Field(description="Person or Organization that created the resource.")
     contributor: Optional[List[Union[Contributor, Organization]]] = Field(
-        description="Person or Organization that contributed to the resource.",
-        default=None
+        description="Person or Organization that contributed to the resource.", default=None
     )
     publisher: Optional[PublisherOrganization] = Field(
         title="Publisher",
@@ -112,9 +109,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
         "Example terms include Incomplete, Draft, Published, and Obsolete.",
         default=None,
     )
-    license: Union[CreativeWork, HttpUrl] = Field(
-        description="A license document that applies to the resource."
-    )
+    license: Union[CreativeWork, HttpUrl] = Field(description="A license document that applies to the resource.")
     provider: Union[Organization, Provider] = Field(
         description="The repository, service provider, organization, person, or service performer that provides"
         " access to the resource."
@@ -130,6 +125,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
         description="A media object that encodes this CreativeWork. This property is a synonym for encoding.",
         default=None,
     )
+
 
 class SchemaOrgOrganization(Organization):
 
@@ -164,8 +160,9 @@ class SchemaOrgCreator(Creator):
                 creator.identifiers = {"ORCID": orcid}
         if self.affiliation:
             creator.organization = self.affiliation.name
-        
+
         return creator
+
 
 class SchemaOrgContributor(Contributor):
 

@@ -1,9 +1,10 @@
-from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
-from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsmodels.schemas.enums import RelationType
+
 from hsclient.metadata_adapter.adapter import MetadataAdapter
+from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.schema.base import LinkedData
 from hsclient.schema.utils import load_json
-from hsmodels.schemas.enums import RelationType
 
 
 def test_adapter_to_legacy_resource_metadata() -> None:
@@ -49,7 +50,7 @@ def test_adapter_to_legacy_resource_metadata() -> None:
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
         "hasPart": [
             {"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"},
-            {"@id": "https://example.com/linked-child"}
+            {"@id": "https://example.com/linked-child"},
         ],
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],
         # "relations": [{"type": "The content of this resource references", "value": "Journal article https://example.com/paper"}],
@@ -251,7 +252,7 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],
         "hasPart": [
             {"@type": "CreativeWork", "name": "Child resource", "url": "https://example.com/child"},
-            {"@id": "https://example.com/linked-child"}
+            {"@id": "https://example.com/linked-child"},
         ],
         "creativeWorkStatus": {"name": "Public"},
         "provider": {"@type": "Organization", "name": "HydroShare", "url": "https://www.hydroshare.org/"},

@@ -1,7 +1,6 @@
 import pytest
 from hsmodels.schemas.enums import AggregationType
 
-
 pytestmark = pytest.mark.integration
 
 

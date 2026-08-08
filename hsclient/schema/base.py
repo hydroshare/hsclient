@@ -1,23 +1,20 @@
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Optional, Union, Literal
-
+from typing import Any, List, Literal, Optional, Union
 
 from pydantic import (
+    AnyUrl,
     BaseModel,
     ConfigDict,
     EmailStr,
     Field,
+    GetJsonSchemaHandler,
     HttpUrl,
-    AnyUrl,
+    ValidationInfo,
     field_validator,
     model_validator,
-    GetJsonSchemaHandler,
-    ValidationInfo,
 )
-
-
 from pydantic.json_schema import JsonSchemaValue
 
 orcid_pattern = "\\b\\d{4}-\\d{4}-\\d{4}-\\d{3}[0-9X]\\b"
@@ -93,9 +90,7 @@ class CreativeWork(SchemaBaseModel):
         "software source code, digital documents, etc.",
     )
     name: Optional[str] = Field(description="Submission's name or title", title="Name or title", default=None)
-    description: Optional[str] = Field(
-        description="The description of the creative work.", default=None
-    )
+    description: Optional[str] = Field(description="The description of the creative work.", default=None)
     url: Optional[HttpUrl] = Field(
         title="URL",
         description="A URL to the creative work.",
@@ -104,15 +99,11 @@ class CreativeWork(SchemaBaseModel):
 
 
 class Person(SchemaBaseModel):
-    type: Literal["Person"] = Field(
-        alias="@type", description="A person.", default="Person"  # type: ignore
-    )
+    type: Literal["Person"] = Field(alias="@type", description="A person.", default="Person")  # type: ignore
     name: str = Field(
         description="A string containing the full name of the person. Personal name format: Family Name, Given Name."
     )
-    email: Optional[EmailStr] = Field(
-        description="A string containing an email address for the person.", default=None
-    )
+    email: Optional[EmailStr] = Field(description="A string containing an email address for the person.", default=None)
     identifier: Optional[List[str]] = Field(
         description="Unique identifiers for the person. Where identifiers can be encoded as URLs, enter URLs here.",
         default=None,
@@ -143,9 +134,7 @@ class Organization(SchemaBaseModel):
 
 
 class Affiliation(Organization):
-    name: str = Field(
-        description="Name of the organization the creator is affiliated with."
-    )
+    name: str = Field(description="Name of the organization the creator is affiliated with.")
 
 
 class Provider(Person):
@@ -210,9 +199,7 @@ class Contributor(Person):
 
 class FunderOrganization(Organization):
     @classmethod
-    def __get_pydantic_json_schema__(
-        cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler
-    ) -> JsonSchemaValue:
+    def __get_pydantic_json_schema__(cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
         schema.update(schema, title="Funding Organization")
         return schema
 
@@ -266,9 +253,7 @@ class Obsolete(DefinedTerm):
 
 
 class HasPart(CreativeWork):
-    url: Optional[HttpUrl] = Field(
-        title="URL", description="The URL address to the data resource.", default=None
-    )
+    url: Optional[HttpUrl] = Field(title="URL", description="The URL address to the data resource.", default=None)
     description: Optional[str] = Field(
         description="Information about a related resource that is part of this resource.",
         default=None,
@@ -276,9 +261,7 @@ class HasPart(CreativeWork):
 
 
 class IsPartOf(CreativeWork):
-    url: Optional[HttpUrl] = Field(
-        title="URL", description="The URL address to the data resource.", default=None
-    )
+    url: Optional[HttpUrl] = Field(title="URL", description="The URL address to the data resource.", default=None)
     description: Optional[str] = Field(
         description="Information about a related resource that this resource is a "
         "part of - e.g., a related collection.",
@@ -287,9 +270,7 @@ class IsPartOf(CreativeWork):
 
 
 class Relation(CreativeWork):
-    url: Optional[HttpUrl] = Field(
-        title="URL", description="The URL address to the data resource.", default=None
-    )
+    url: Optional[HttpUrl] = Field(title="URL", description="The URL address to the data resource.", default=None)
     description: Optional[str] = Field(
         description="Holds all relations other than 'hasPart' and 'isPartOf'.",
         default=None,
@@ -302,9 +283,7 @@ class MediaObjectPartOf(CreativeWork):
         description="The URL address to the related metadata document.",
         default=None,
     )
-    description: Optional[str] = Field(
-        description="Information about a related metadata document.", default=None
-    )
+    description: Optional[str] = Field(description="Information about a related metadata document.", default=None)
 
 
 class SubjectOf(CreativeWork):
@@ -324,9 +303,7 @@ class SubjectOf(CreativeWork):
 
 class LanguageEnum(str, Enum):
     @classmethod
-    def __get_pydantic_json_schema__(
-        cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler
-    ) -> JsonSchemaValue:
+    def __get_pydantic_json_schema__(cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
         schema.update(type="string", title="Language", description="")
         return schema
 
@@ -336,12 +313,8 @@ class LanguageEnum(str, Enum):
 
 class InLanguageStr(str):
     @classmethod
-    def __get_pydantic_json_schema__(
-        cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler
-    ) -> JsonSchemaValue:
-        schema.update(
-            type="string", title="Other", description="Please specify another language."
-        )
+    def __get_pydantic_json_schema__(cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
+        schema.update(type="string", title="Other", description="Please specify another language.")
         return schema
 
 
@@ -350,12 +323,8 @@ class InLanguageStr(str):
 # of identifiers which seems strange.
 class IdentifierStr(str):
     @classmethod
-    def __get_pydantic_json_schema__(
-        cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler
-    ) -> JsonSchemaValue:
-        schema.update(
-            {"type": "array", "items": {"type": "string", "title": "Identifier"}}
-        )
+    def __get_pydantic_json_schema__(cls, schema: JsonSchemaValue, handler: GetJsonSchemaHandler) -> JsonSchemaValue:
+        schema.update({"type": "array", "items": {"type": "string", "title": "Identifier"}})
         return schema
 
     @classmethod
@@ -363,14 +332,10 @@ class IdentifierStr(str):
         yield cls.validate
 
     @classmethod
-    def validate(
-        cls, value: Union[str, List[str]], info: ValidationInfo
-    ) -> "IdentifierStr":
+    def validate(cls, value: Union[str, List[str]], info: ValidationInfo) -> "IdentifierStr":
         if isinstance(value, str):
             value = [value]  # Convert single string to list
-        if not isinstance(value, list) or not all(
-            isinstance(item, str) for item in value
-        ):
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             raise TypeError("Identifier must be a string or a list of strings")
         return cls(", ".join(value))  # Join the list into a single string for storage
 
@@ -412,6 +377,7 @@ class SpatialReference(SchemaBaseModel):
     def is_geographic(self) -> bool:
         return self.srsType.lower() == "geographic"
 
+
 class Grant(SchemaBaseModel):
     type: Literal["Grant"] = Field(
         alias="@type",  # type: ignore
@@ -445,9 +411,7 @@ class TemporalCoverage(SchemaBaseModel):
         "interval (ISO8601 formatted date - YYYY-MM-DDTHH:MM).",
         json_schema_extra={
             "formatMaximum": {"$data": "1/endDate"},
-            "errorMessage": {
-                "formatMaximum": "must be lesser than or equal to End date"
-            },
+            "errorMessage": {"formatMaximum": "must be lesser than or equal to End date"},
         },
     )
     endDate: Optional[datetime] = Field(
@@ -457,9 +421,7 @@ class TemporalCoverage(SchemaBaseModel):
         "that means the temporal coverage is ongoing.",
         json_schema_extra={
             "formatMinimum": {"$data": "1/startDate"},
-            "errorMessage": {
-                "formatMinimum": "must be greater than or equal to Start date"
-            },
+            "errorMessage": {"formatMinimum": "must be greater than or equal to Start date"},
         },
         default=None,
     )
@@ -519,23 +481,17 @@ class PropertyValue(SchemaBaseModel):
     )
     name: str = Field(description="The name of the property.")
 
-    value: Union[str, float, bool] = (
-        Field(  # this also could be a StructuredValue for more complex cases (if we want)
-            description="The value of the property."
-        )
+    value: Union[str, float, bool] = Field(  # this also could be a StructuredValue for more complex cases (if we want)
+        description="The value of the property."
     )
 
-    propertyID: Optional[str] = Field(
-        title="Property ID", description="The ID of the property.", default=None
-    )
+    propertyID: Optional[str] = Field(title="Property ID", description="The ID of the property.", default=None)
     unitCode: Optional[str] = Field(
         title="Measurement unit",
         description="The unit of measurement for the value.",
         default=None,
     )
-    description: Optional[str] = Field(
-        description="A description of the property.", default=None
-    )
+    description: Optional[str] = Field(description="A description of the property.", default=None)
     minValue: Optional[float] = Field(
         title="Minimum value",
         description="The minimum allowed value for the property.",
@@ -584,9 +540,7 @@ class Place(SchemaBaseModel):
     @model_validator(mode="after")
     def validate_geo_or_name_required(self):
         if not self.name and not self.geo:
-            raise ValueError(
-                "Either place name or geo location of the place must be provided"
-            )
+            raise ValueError("Either place name or geo location of the place must be provided")
         return self
 
     @model_validator(mode="after")
@@ -619,6 +573,7 @@ class Place(SchemaBaseModel):
             raise ValueError("east longitude out of range")
 
         return self
+
 
 class MediaObject(SchemaBaseModel):
     type: Literal["MediaObject"] = Field(
@@ -727,6 +682,7 @@ class LinkedData(SchemaBaseModel):
         description="The unique identifier for the linked data object.",
     )
 
+
 # combine the media objects together to make referencing easier
 MediaType = Union[MediaObject, DataDownload, VideoObject, LinkedData]
 
@@ -754,9 +710,7 @@ class Dataset(CreativeWork):
         ]
     ] = None
     catalog: Optional[Union["DataCatalog", List["DataCatalog"]]] = None
-    variablesMeasured: Optional[
-        Union[str, List[str], "PropertyValue", List["PropertyValue"]]
-    ] = None
+    variablesMeasured: Optional[Union[str, List[str], "PropertyValue", List["PropertyValue"]]] = None
     variableMeasured: Optional[
         Union[
             str,

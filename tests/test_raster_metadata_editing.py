@@ -3,12 +3,7 @@ import json
 from hsmodels.schemas.enums import AggregationType
 
 from hsclient.hydroshare import Aggregation
-from hsclient.schema.legacy.raster import (
-    BandInformation,
-    BoxCoverage,
-    CellInformation,
-    GeographicRasterMetadata,
-)
+from hsclient.schema.legacy.raster import BandInformation, BoxCoverage, CellInformation, GeographicRasterMetadata
 
 
 class DummyS3Client:
@@ -39,6 +34,7 @@ def test_raster_metadata_can_be_edited_in_legacy_format_and_saved_as_schema_org(
     raster_aggr.metadata.title = "Edited Legacy Raster Metadata"
     raster_aggr.metadata.subjects = ["legacy", "raster", "editing"]
     raster_aggr.metadata.additional_metadata = {"processing_level": "L2"}
+    # TODO: Maybe we shouldn't allow editing of extracted metadata
     raster_aggr.metadata.spatial_coverage = BoxCoverage(
         name="Cache Valley",
         northlimit=42.0,

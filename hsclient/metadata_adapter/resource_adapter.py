@@ -1,53 +1,51 @@
 from datetime import datetime
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
+from hsmodels.schemas.enums import RelationType
 from pydantic import HttpUrl
-from hsclient.metadata_adapter.resource_models import (
-    SchemaOrgCreator,
-    SchemaOrgContributor,
-    SchemaOrgOrganization,
-)
+
 from hsclient.metadata_adapter.legacy_resource_models import (
-    Rights as LegacyRights,
     Award as LegacyAward,
+    LegacyResourceMetadata,
+    Publisher as LegacyPublisher,
     Relation as LegacyRelation,
-    TemporalCoverage as LegacyPeriodCoverage,
+    Rights as LegacyRights,
     SpatialCoverageBox as LegacyBoxCoverage,
     SpatialCoveragePoint as LegacyPointCoverage,
-    Publisher as LegacyPublisher,
-    LegacyResourceMetadata,
+    TemporalCoverage as LegacyPeriodCoverage,
 )
-from hsmodels.schemas.enums import RelationType
+from hsclient.metadata_adapter.resource_models import SchemaOrgContributor, SchemaOrgCreator, SchemaOrgOrganization
 from hsclient.schema.base import (
     CreativeWork,
+    Discoverable,
+    Draft,
+    GeoCoordinates,
+    GeoShape,
     Grant,
-    IsPartOf,
     HasPart,
+    Incomplete,
+    IsPartOf,
     LinkedData,
+    MediaType,
+    Obsolete,
+    Organization,
     Place,
-    PublisherOrganization,
+    Private,
     PropertyValue,
+    Provider,
+    Public,
+    Published,
+    PublisherOrganization,
     Relation,
     SchemaBaseModel,
     TemporalCoverage,
-    GeoCoordinates,
-    Organization,
-    Provider,
-    Draft,
-    Private,
-    Incomplete,
-    Obsolete,
-    Published,
-    Public,
-    Discoverable,
-    GeoShape,
-    MediaType,
 )
 
 
 class ResourceMetadataAdapter(SchemaBaseModel):
-    """A pydantic model representing the Schema.org based CoreMetadata for HydroShare resources, 
+    """A pydantic model representing the Schema.org based CoreMetadata for HydroShare resources,
     with methods to convert to legacy resource metadata models used for metadata editing using hsclient."""
+
     type: Optional[str] = None
     additionalType: Optional[str] = None
     name: Optional[str] = None
@@ -64,7 +62,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     license: Optional[Union[CreativeWork, HttpUrl]] = None
     funding: Optional[List[Grant]] = []
     relation: Optional[List[Relation]] = []
-    associatedMedia: Optional[Union[MediaType, List[MediaType]]] =[]
+    associatedMedia: Optional[Union[MediaType, List[MediaType]]] = []
     isPartOf: Optional[List[IsPartOf]] = []
     hasPart: Optional[List[Union[LinkedData, HasPart]]] = []
 
@@ -90,7 +88,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         elif isinstance(self.creativeWorkStatus, Discoverable):
             return "discoverable"
         return 'private'
-    
+
     def to_legacy_citation(self) -> Optional[str]:
         if not self.citation:
             return None
@@ -141,7 +139,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             )
         else:
             return None
-    
+
     def to_legacy_temporal_coverage(self) -> Optional[LegacyPeriodCoverage]:
         if not self.temporalCoverage:
             return None
@@ -241,6 +239,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             legacy_metadata.freeze_field(field)
 
         return legacy_metadata
+
 
 def _build_relation_value(description: Optional[str], url: Optional[str]) -> str:
     description = (description or "").strip()
