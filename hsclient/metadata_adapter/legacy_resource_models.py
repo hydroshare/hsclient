@@ -170,24 +170,23 @@ class Relation(BaseModel):
 
     def to_dataset_relation(self):
         relation = schema.Relation.model_construct()
-        relation.name = self.type
+        relation.name = self.type.name
         return self._to_dataset_relation(relation)
 
     def _to_dataset_relation(self, relation):
-        self.value = self.value.strip()
-        if "," in self.value:
-            description, url = self.value.rsplit(",", 1)
-            relation.description = description.strip()
-            url = url.strip()
+        value = self.value.strip()
+        if "," in value:
+            description, _, url = value.rpartition(",")
+            description, url = description.strip(), url.strip()
             if is_url(url):
+                if description:
+                    relation.description = description
                 relation.url = url
-            else:
-                relation.description = self.value
+                return relation
+        if is_url(value):
+            relation.url = value
         else:
-            if is_url(self.value):
-                relation.url = self.value
-            else:
-                relation.description = self.value
+            relation.description = value
         return relation
 
 

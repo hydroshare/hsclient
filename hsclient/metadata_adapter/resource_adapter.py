@@ -167,8 +167,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             legacy_relation = LegacyRelation.model_construct()
             relation_type = _to_legacy_relation_type(relation.name)
             if relation_type is None:
-                print(f"Warning: Could not convert relation name '{relation.name}' to legacy relation type")
-                continue
+                raise ValueError(f"Could not convert relation name '{relation.name}' to legacy relation type")
             legacy_relation.type = relation_type
             legacy_relation.value = _build_relation_value(relation.description, relation.url)
             legacy_relations.append(legacy_relation)
@@ -267,11 +266,7 @@ def _to_legacy_relation_type(relation_name: Optional[str]) -> Optional[RelationT
         return RelationType[relation_name]
     except KeyError:
         pass
-
-    normalized_name = relation_name.replace(" ", "").lower()
     for relation_type in RelationType:
-        if relation_type.name.lower() == normalized_name:
-            return relation_type
-        if relation_type.value.lower() == relation_name.lower():
+        if relation_type.name.lower() == relation_name.lower():
             return relation_type
     return None

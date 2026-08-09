@@ -208,7 +208,7 @@ def test_adapter_to_schema_org_metadata() -> None:
     assert result.publisher.name == "CUAHSI HydroShare"
     assert str(result.publisher.url) == "https://www.hydroshare.org/"
     assert len(result.relation) == 1
-    assert result.relation[0].name == "The content of this resource references"
+    assert result.relation[0].name == "references"
     assert result.inLanguage == "eng"
     assert result.license.name == "CC-BY-4.0"
     assert str(result.license.url) == "https://example.com/license"
