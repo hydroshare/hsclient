@@ -19,13 +19,13 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
 
     def to_dataset_contributors(self):
         contributors = []
-        for contributor in self.contributors:
+        for contributor in self.contributors or []:
             contributors.append(contributor.to_dataset_contributor())
         return contributors
 
     def to_dataset_funding(self):
         grants = []
-        for award in self.awards:
+        for award in self.awards or []:
             grants.append(award.to_dataset_grant())
         return grants
 
@@ -51,11 +51,12 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     def to_dataset_keywords(self):
         if self.subjects:
             return self.subjects
-        return ["HydroShare"]
+        return []
 
     def to_dataset_license(self):
         if self.rights:
             return self.rights.to_dataset_license()
+        return None
 
     def to_dataset_creative_work_status(self):
         status_defined_terms = {
