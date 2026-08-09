@@ -32,25 +32,11 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     def to_dataset_associated_media(self):
         return self.associatedMedia
 
-    def to_dataset_is_part_of(self):
-        return self._to_dataset_part_relations("IsPartOf")
-
-    def to_dataset_has_part(self):
-        return self._to_dataset_part_relations("HasPart")
-
     def to_dataset_relation(self):
         relations = []
         for relation in self.relations:
             relations.append(relation.to_dataset_relation())
         return relations
-
-    def _to_dataset_part_relations(self, relation_type: str):
-        part_relations = []
-        for relation in self.relations:
-            part_relation = relation.to_dataset_part_relation(relation_type)
-            if part_relation:
-                part_relations.append(part_relation)
-        return part_relations
 
     def to_dataset_spatial_coverage(self):
         if self.spatial_coverage:

@@ -173,21 +173,6 @@ class Relation(BaseModel):
         relation.name = self.type
         return self._to_dataset_relation(relation)
 
-    def to_dataset_part_relation(self, relation_type: str):
-        relation = None
-        self.value = self.value.strip()
-        if relation_type not in ["isPartOf", "hasPart"]:
-            relation = schema.IsPartOf.model_construct()
-        if relation_type == "IsPartOf" and self.type.endswith("is part of"):
-            relation = schema.IsPartOf.model_construct()
-        elif relation_type == "HasPart" and self.type.endswith("resource includes"):
-            relation = schema.HasPart.model_construct()
-        else:
-            relation = schema.Relation.model_construct()
-            relation.name = self.type
-
-        return self._to_dataset_relation(relation)
-
     def _to_dataset_relation(self, relation):
         self.value = self.value.strip()
         if "," in self.value:
