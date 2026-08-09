@@ -36,7 +36,7 @@ def test_update_resource_metadata(hydroshare) -> None:
         assert new_res.metadata.citation is not None
         assert new_res.metadata.additional_metadata == {}
         assert len(new_res.metadata.associatedMedia) == 1
-        assert new_res.metadata.associatedMedia[0].contentUrl.endswith(
+        assert new_res.metadata.associatedMedia[0].id.endswith(
             f"/{new_res.resource_id}/.hsjsonld/file_manifest.json"
         )
         assert new_res.metadata.publisher is None
