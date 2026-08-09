@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from hsmodels.schemas.enums import RelationType
 from hsmodels.schemas.fields import (
     AwardInfo,
@@ -11,6 +12,43 @@ from hsmodels.schemas.fields import (
     Relation,
     Rights,
 )
+
+# frozen fields on the resource metadata object and a reasonable dummy value to attempt assigning
+FROZEN_FIELDS = [
+    ("type", "Dataset"),
+    ("url", "http://www.hydroshare.org/resource/abc123"),
+    ("identifier", "http://www.hydroshare.org/resource/abc123"),
+    ("created", datetime(2024, 1, 1)),
+    ("modified", datetime(2024, 1, 1)),
+    ("published", datetime(2024, 1, 1)),
+    ("publisher", None),
+    ("provider", None),
+    ("isPartOf", []),
+    ("hasPart", []),
+    ("version", "2.0"),
+    ("citation", "Some citation"),
+    ("associatedMedia", []),
+    ("sharing_status", "public"),
+]
+
+
+def test_frozen_fields(hydroshare) -> None:
+    """
+    Test that frozen/read-only fields of the resource metadata object cannot be edited via hsclient.
+    """
+    hs = hydroshare
+    new_res = None
+    try:
+        new_res = hs.create()
+        for field_name, dummy_value in FROZEN_FIELDS:
+            with pytest.raises(AttributeError):
+                setattr(new_res.metadata, field_name, dummy_value)
+    finally:
+        if new_res is not None:
+            try:
+                new_res.delete()
+            except Exception:
+                pass
 
 
 def test_update_resource_metadata(hydroshare) -> None:
@@ -44,6 +82,7 @@ def test_update_resource_metadata(hydroshare) -> None:
         assert new_res.metadata.created is not None
         assert new_res.metadata.modified is not None
         assert new_res.metadata.published is None
+        assert new_res.metadata.version is None
         # update the resource metadata
         new_res.metadata.title = "Resource Metadata Editing Example"
         new_res.metadata.abstract = (
