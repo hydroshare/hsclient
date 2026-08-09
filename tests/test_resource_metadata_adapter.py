@@ -57,6 +57,7 @@ def test_adapter_to_legacy_resource_metadata() -> None:
         "citation": ["Citation text"],
         "creativeWorkStatus": {"name": "Public"},
         "additionalProperty": [{"name": "custom-key", "value": "custom-value"}],
+        "version": "2.0",
     }
 
     result = MetadataAdapter.to_legacy_resource_metadata(metadata)
@@ -107,6 +108,7 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.creators[0].identifiers == {"ORCID": "https://orcid.org/0000-0001-2345-6789"}
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
+    assert result.version == "2.0"
 
 
 def test_adapter_to_legacy_resource_metadata_with_linked_data_associated_media() -> None:
@@ -179,6 +181,7 @@ def test_adapter_to_schema_org_metadata() -> None:
         "citation": "Citation text",
         "additional_metadata": {"custom-key": "custom-value"},
         "publisher": {"name": "CUAHSI HydroShare", "url": "https://www.hydroshare.org/"},
+        "version": "1.0",
     }
 
     result = MetadataAdapter.to_resource_metadata(metadata)
@@ -215,6 +218,7 @@ def test_adapter_to_schema_org_metadata() -> None:
     assert result.temporalCoverage.endDate.isoformat() == "2024-01-31T00:00:00"
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
+    assert result.version == "1.0"
 
 
 def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_file() -> None:
@@ -258,6 +262,7 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
         "provider": {"@type": "Organization", "name": "HydroShare", "url": "https://www.hydroshare.org/"},
         "citation": ["Citation text"],
         "additionalProperty": [{"name": "custom-key", "value": "custom-value"}],
+        "version": "3.0",
     }
 
     result = load_json(metadata, "123/.hsjsonld/dataset_metadata.json")
@@ -306,3 +311,4 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
     assert result.citation == "Citation text"
+    assert result.version == "3.0"

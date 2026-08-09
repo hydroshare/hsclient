@@ -65,7 +65,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = []
     isPartOf: Optional[List[IsPartOf]] = []
     hasPart: Optional[List[Union[LinkedData, HasPart]]] = []
-
+    version: Optional[str] = None
     temporalCoverage: Optional[TemporalCoverage] = None
     spatialCoverage: Optional[Place] = None
     publisher: Optional[PublisherOrganization] = None
@@ -209,12 +209,13 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.spatial_coverage = self.to_legacy_spatial_coverage()
         legacy_metadata.period_coverage = self.to_legacy_temporal_coverage()
         legacy_metadata.relations = self.to_legacy_relations()
-        # The legacy model originally doesnot have hasPart, isPartOf, and provider fields,
+        # The legacy model originally doesnot have hasPart, isPartOf, provider, version fields,
         # we are providing them here for completeness so that they can be accessed in hsclient,
         # - no conversion is needed from schemaorg to legacy for these fields
         legacy_metadata.hasPart = self.hasPart
         legacy_metadata.isPartOf = self.isPartOf
         legacy_metadata.provider = self.provider
+        legacy_metadata.version = self.version
 
         legacy_metadata.citation = self.to_legacy_citation()
         legacy_metadata.additional_metadata = self.to_legacy_additional_metadata()
@@ -234,6 +235,8 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             "citation",
             'provider',
             'hasPart',
+            'isPartOf',
+            'version',
             "associatedMedia",
         ]:
             legacy_metadata.freeze_field(field)

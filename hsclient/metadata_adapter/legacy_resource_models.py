@@ -227,10 +227,11 @@ class LegacyResourceMetadata(SchemaBaseModel):
     period_coverage: Optional[TemporalCoverage] = None
     relations: Optional[List[Relation]] = []
 
-    # 'isPartOf', 'hasPart', and 'provider' are not part of the legacy resource metadata model
+    # 'isPartOf', 'hasPart', 'provider', and 'version' are not part of the legacy resource metadata model
     isPartOf: Optional[List[schema.IsPartOf]] = []
     hasPart: Optional[List[schema.HasPart]] = []
     provider: Optional[Union[schema.Organization, schema.Provider]] = None
+    version: Optional[str] = None
 
     citation: Optional[str] = None
 
