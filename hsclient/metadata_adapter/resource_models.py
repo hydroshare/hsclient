@@ -61,7 +61,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
     citation: Optional[List[str]] = Field(
         title="Citation",
         description="A bibliographic citation for the resource.",
-        default=None,
+        default=[],
         json_schema_extra={"readOnly": True},
     )
     url: HttpUrl = Field(
@@ -78,7 +78,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
     )
     creator: List[Union[Creator, Organization]] = Field(description="Person or Organization that created the resource.")
     contributor: Optional[List[Union[Contributor, Organization]]] = Field(
-        description="Person or Organization that contributed to the resource.", default=None
+        description="Person or Organization that contributed to the resource.", default=[]
     )
     publisher: Optional[PublisherOrganization] = Field(
         title="Publisher",
@@ -92,7 +92,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
         description="Link to or citation for a related resource that is about or describes this resource"
         " - e.g., a journal paper that describes this resource or a related metadata document "
         "describing the resource.",
-        default=None,
+        default=[],
     )
     version: Optional[str] = Field(
         description="A text string indicating the version of the resource.",
@@ -117,7 +117,7 @@ class SchemaOrgResourceMetadata(CoreMetadata):
     funding: Optional[List[Grant]] = Field(
         description="A Grant or monetary assistance that directly or indirectly provided funding or sponsorship "
         "for creation of the resource.",
-        default=None,
+        default=[],
     )
     # using MediaType here to allow for MediaObject and its subclasses (e.g., DataDownload, VideoObject)
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = Field(
