@@ -238,7 +238,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
     # 'associatedMedia' is not part of the legacy resource metadata model,
     #  but we need it to generate the resource files objects in hsclient Resource model
     associatedMedia: Union[List[Any], Any] = None
-    sharing_status: Optional[Literal["private", "public", "published", "discoverable"]] = None
+    sharing_status: Optional[Literal["private", "public", "published", "discoverable", "draft", "incomplete", "obsolete"]] = None
     additional_metadata: Optional[dict] = {}
     extra_columns: Optional[dict] = {}
 

@@ -63,6 +63,9 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
             "published": schema.Published,
             "discoverable": schema.Discoverable,
             "private": schema.Private,
+            "draft": schema.Draft,
+            "incomplete": schema.Incomplete,
+            "obsolete": schema.Obsolete,
         }
         if self.sharing_status:
             return status_defined_terms[self.sharing_status].model_construct()

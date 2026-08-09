@@ -1,7 +1,10 @@
+import pytest
 from hsmodels.schemas.enums import RelationType
 
 from hsclient.metadata_adapter.adapter import MetadataAdapter
+from hsclient.metadata_adapter.legacy_resource_adapter import LegacyResourceMetadataAdapter
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
+from hsclient.metadata_adapter.resource_adapter import ResourceMetadataAdapter
 from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.schema.base import LinkedData
 from hsclient.schema.utils import load_json
@@ -312,3 +315,58 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
     assert str(result.provider.url) == "https://www.hydroshare.org/"
     assert result.citation == "Citation text"
     assert result.version == "3.0"
+
+
+@pytest.mark.parametrize(
+    "sharing_status,creative_work_status_name",
+    [
+        ("public", "Public"),
+        ("private", "Private"),
+        ("published", "Published"),
+        ("discoverable", "Discoverable"),
+        ("draft", "Draft"),
+        ("incomplete", "Incomplete"),
+        ("obsolete", "Obsolete"),
+    ],
+)
+def test_legacy_to_dataset_creative_work_status(sharing_status, creative_work_status_name) -> None:
+    """Every legacy sharing_status value should convert to its matching schema.org
+    creativeWorkStatus DefinedTerm."""
+    adapter = LegacyResourceMetadataAdapter(creators=[{"name": "Doe, Jane"}], sharing_status=sharing_status)
+
+    creative_work_status = adapter.to_dataset_creative_work_status()
+
+    assert creative_work_status.name == creative_work_status_name
+
+
+@pytest.mark.parametrize(
+    "creative_work_status_name,sharing_status",
+    [
+        ("Public", "public"),
+        ("Private", "private"),
+        ("Published", "published"),
+        ("Discoverable", "discoverable"),
+        ("Draft", "draft"),
+        ("Incomplete", "incomplete"),
+        ("Obsolete", "obsolete"),
+    ],
+)
+def test_dataset_to_legacy_sharing_status(creative_work_status_name, sharing_status) -> None:
+    """Every schema.org creativeWorkStatus DefinedTerm should convert to its matching legacy
+    sharing_status value."""
+    adapter = ResourceMetadataAdapter(creativeWorkStatus={"name": creative_work_status_name})
+
+    assert adapter.to_legacy_sharing_status() == sharing_status
+
+
+def test_dataset_to_legacy_sharing_status_none() -> None:
+    adapter = ResourceMetadataAdapter(creativeWorkStatus=None)
+
+    assert adapter.to_legacy_sharing_status() is None
+
+
+def test_dataset_to_legacy_sharing_status_unknown_raises() -> None:
+    adapter = ResourceMetadataAdapter.model_construct(creativeWorkStatus="unrecognized")
+
+    with pytest.raises(ValueError):
+        adapter.to_legacy_sharing_status()

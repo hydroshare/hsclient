@@ -80,14 +80,22 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     def to_legacy_sharing_status(self) -> Optional[str]:
         if self.creativeWorkStatus is None:
             return None
-        print(f"Creative work status: {self.creativeWorkStatus}")
         if isinstance(self.creativeWorkStatus, Published):
             return "published"
         elif isinstance(self.creativeWorkStatus, Public):
             return "public"
         elif isinstance(self.creativeWorkStatus, Discoverable):
             return "discoverable"
-        return 'private'
+        elif isinstance(self.creativeWorkStatus, Draft):
+            return "draft"
+        elif isinstance(self.creativeWorkStatus, Incomplete):
+            return "incomplete"
+        elif isinstance(self.creativeWorkStatus, Obsolete):
+            return "obsolete"
+        elif isinstance(self.creativeWorkStatus, Private):
+            return "private"
+        else:
+            raise ValueError(f"Unknown creativeWorkStatus: {self.creativeWorkStatus}")
 
     def to_legacy_citation(self) -> Optional[str]:
         if not self.citation:
