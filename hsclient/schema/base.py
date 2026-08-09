@@ -219,12 +219,6 @@ class SourceOrganization(Organization):
     name: str = Field(description="Name of the organization that created the data.")
 
 
-class DefinedTerm(SchemaBaseModel):
-    type: Literal["DefinedTerm"] = Field(alias="@type", default="DefinedTerm")  # type: ignore
-    name: str = Field(description="The name of the term or item being defined.")
-    description: str = Field(description="The description of the item being defined.")
-
-
 class Draft(DefinedTerm):
     name: Literal["Draft"] = Field(default="Draft")
     description: str = Field(
