@@ -134,8 +134,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             try:
                 northlimit, eastlimit, southlimit, westlimit = map(float, geo.box.split())
             except Exception as e:
-                print(f"Error parsing geo.box string: {geo.box}, error: {e}")
-                return None
+                raise ValueError(f"Invalid geo.box string: {geo.box}, error: {str(e)}")
 
             return LegacyBoxCoverage.model_construct(
                 name=self.spatialCoverage.name,
