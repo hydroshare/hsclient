@@ -553,7 +553,7 @@ class Place(SchemaBaseModel):
         if len(parts) != 4:
             raise ValueError("Bounding box must have 4 coordinate points")
 
-        south, west, north, east = map(float, parts)
+        north, east, south, west = map(float, parts)
         if not (-90 <= south <= 90):
             raise ValueError("south latitude out of range")
 

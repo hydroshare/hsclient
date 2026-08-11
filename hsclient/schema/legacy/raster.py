@@ -20,7 +20,7 @@ from typing import Dict, List, Literal, Optional, Union
 from hsmodels.schemas.enums import AggregationType
 from pydantic import AnyUrl, Field
 
-from hsclient.schema.base import MediaType
+from hsclient.schema.base import HasPart, IsPartOf, MediaType
 
 from .common import BoxCoverage, LegacyBaseModel, PeriodCoverage, PointCoverage, Rights
 
@@ -77,6 +77,9 @@ class BoxSpatialReference(LegacyRasterBaseModel):
     projection_string_type: Optional[str] = None
     datum: Optional[str] = None
     projection_name: Optional[str] = None
+    # Round-tripped directly from ScientificDataset.spatialCoverage.srs.srsType ("geographic" or
+    # "projected"). Added here so this doesn't have to be reconstructed heuristically.
+    srs_type: Optional[str] = None
 
 
 class PointSpatialReference(LegacyRasterBaseModel):
@@ -97,6 +100,9 @@ class PointSpatialReference(LegacyRasterBaseModel):
     projection_string: Optional[str] = None
     projection_string_type: Optional[str] = None
     projection_name: Optional[str] = None
+    # Round-tripped directly from ScientificDataset.spatialCoverage.srs.srsType ("geographic" or
+    # "projected"). Added here so this doesn't have to be reconstructed heuristically.
+    srs_type: Optional[str] = None
 
 
 class CellInformation(LegacyRasterBaseModel):
@@ -119,10 +125,7 @@ class CellInformation(LegacyRasterBaseModel):
 class GeographicRasterMetadata(LegacyRasterBaseModel):
     """Locally-owned legacy metadata model for Geographic Raster aggregations.
 
-    This mirrors hsmodels.schemas.aggregations.GeographicRasterMetadata with two additions:
-      - ``description``: stores ScientificDataset.description across round-trips.
-      - ``associatedMedia``: preserves aggregation file references from ScientificDataset so
-        that they survive a full round-trip through this local model.
+    This mirrors hsmodels.schemas.aggregations.GeographicRasterMetadata with some additional fields as noted below:
     """
 
     type: AggregationType = AggregationType.GeographicRasterAggregation
@@ -130,9 +133,11 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     subjects: List[str] = Field(default_factory=list)
     language: Optional[str] = None
     additional_metadata: Dict[str, str] = Field(default_factory=dict)
+
     # description is not in hsmodels.GeographicRasterMetadata; added here to round-trip
     # ScientificDataset.description without losing it in additional_metadata.
     description: Optional[str] = None
+
     spatial_coverage: Optional[Union[PointCoverage, BoxCoverage]] = None
     period_coverage: Optional[PeriodCoverage] = None
     band_information: Optional[Union[BandInformation, List[BandInformation]]] = None
@@ -140,6 +145,12 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     cell_information: Optional[CellInformation] = None
     url: Optional[AnyUrl] = None
     rights: Optional[Rights] = None
+
     # associatedMedia is not in hsmodels.GeographicRasterMetadata; added here to preserve
     # aggregation file references from ScientificDataset across round-trips.
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = None
+
+    # hasPart/isPartOf are not in hsmodels.GeographicRasterMetadata; added here so these
+    # ScientificDataset relation fields survive a round-trip instead of being dropped.
+    hasPart: Optional[List[HasPart]] = None
+    isPartOf: Optional[List[IsPartOf]] = None

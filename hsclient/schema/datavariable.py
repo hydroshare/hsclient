@@ -42,7 +42,8 @@ class Dimension(BaseModel):
 
 
 class DataVariable(BaseModel):
-
+    # NOTE: It seems DataVariable is not a schema.org type, but rather a CUAHSI extension to the SchemaOrg vocabulary
+    # to better encapsulate scientific data variable metadata.
     context: HttpUrl = Field(
         alias="@context",  # type: ignore
         default=HttpUrl("https://hydroshare.org/schema"),  # TODO: This is a placeholder for now.
@@ -91,4 +92,11 @@ class DataVariable(BaseModel):
         title="No Data Value",
         description="The numerical value used to represent null data in the raster grid",
         default=None,
+    )
+    # NOTE: This field is not part of the DataVariable as defined in upstream (hydroshare)
+    # It is added here to support the round-trip of the method field in the legacy BandInformation model.
+    method: Optional[str] = Field(
+        default=None,
+        title="Method",
+        description="The method used to derive or measure the variable.",
     )

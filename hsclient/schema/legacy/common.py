@@ -69,15 +69,21 @@ class PeriodCoverage(LegacyBaseModel):
 class Rights(LegacyBaseModel):
     """License or rights statement attached to an aggregation.
 
-    At least one of ``statement`` or ``url`` must be provided; the model
-    validator enforces this to mirror the hsmodels constraint.
+    At least one of ``statement``, ``url``, or ``description`` must be provided.
     """
 
     statement: Optional[str] = None
     url: Optional[AnyUrl] = None
 
+    # Added so a ScientificDataset license carrying only a CreativeWork.description (no name,
+    # no url -- e.g. free-text license terms with no formal name) can round-trip through this
+    # model without being dropped or raising a validation error.
+    description: Optional[str] = None
+
     @model_validator(mode="after")
-    def validate_statement_or_url_required(self) -> Rights:
-        if not (self.statement and self.statement.strip()) and self.url is None:
-            raise ValueError("Either 'statement' or 'url' must have a value")
+    def validate_statement_or_url_or_description_required(self) -> Rights:
+        has_statement = bool(self.statement and self.statement.strip())
+        has_description = bool(self.description and self.description.strip())
+        if not has_statement and self.url is None and not has_description:
+            raise ValueError("Either 'statement', 'url', or 'description' must have a value")
         return self
