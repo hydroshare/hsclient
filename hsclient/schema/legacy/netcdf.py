@@ -3,14 +3,9 @@ from __future__ import annotations
 """
 Locally-owned legacy metadata model for Multidimensional (NetCDF) aggregations.
 
-Why a local model instead of importing hsmodels.schemas.aggregations.MultidimensionalMetadata
-directly?
-  - We need an optional ``description`` field that has no equivalent in the hsmodels model.
-  - We need an optional ``associatedMedia`` field for round-tripping aggregation file references.
-  - ``Variable.unit`` and ``Variable.type`` must be Optional to handle incomplete schema payloads
-    without raising validation errors.
-  - All local models use extra="allow" via LegacyBaseModel so that unknown upstream fields are
-    preserved during round-trips rather than discarded.
+Using this local model for now instead of the external hsmodels.schemas.aggregations.MultidimensionalMetadata
+for POC implementation of metadata adapter as it makes it easy to adjust the model to support
+round-tripping of ScientificDataset metadata that has no direct equivalent in hsmodels.
 TODO: Update hsmodels to support these changes and remove this local model.
 """
 
@@ -19,7 +14,7 @@ from typing import Dict, List, Literal, Optional, Union
 from hsmodels.schemas.enums import AggregationType
 from pydantic import AnyUrl, Field
 
-from hsclient.schema.base import MediaType
+from hsclient.schema.base import HasPart, IsPartOf, MediaType
 
 from .common import BoxCoverage, LegacyBaseModel, PeriodCoverage, PointCoverage, Rights
 
@@ -55,11 +50,16 @@ class Variable(LegacyNetCDFBaseModel):
     # on unknown values coming from schema.org payloads).
     type: Optional[str] = None
     # Space-separated list of dimension names, e.g. "time lat lon".
-    # This is a string in hsmodels, not a list of integers.
+    # This is a string in hsmodels.
     shape: Optional[str] = None
     descriptive_name: Optional[str] = None
     method: Optional[str] = None
     missing_value: Optional[str] = None
+
+    # minimum_value and maximum_value are not in hsmodels Variable
+    # added here to map to corresponding DataVariable.minValue/maxValue  from schema-org side
+    minimum_value: Optional[str] = None
+    maximum_value: Optional[str] = None
 
 
 class MultidimensionalBoxSpatialReference(LegacyNetCDFBaseModel):
@@ -86,14 +86,16 @@ class MultidimensionalBoxSpatialReference(LegacyNetCDFBaseModel):
     datum: Optional[str] = None
     projection_name: Optional[str] = None
 
+    # This is a new field not present in the corresponding model in hsmodels
+    # It is added here to round-trip the srsType field from ScientificDataset.spatialCoverage.srs.srsType 
+    srs_type: Optional[str] = None
+
 
 class MultidimensionalMetadata(LegacyNetCDFBaseModel):
     """Locally-owned legacy metadata model for Multidimensional (NetCDF) aggregations.
 
-    This mirrors hsmodels.schemas.aggregations.MultidimensionalMetadata with two additions:
-      - ``description``: stores ScientificDataset.description across round-trips.
-      - ``associatedMedia``: preserves aggregation file references from ScientificDataset so
-        that they survive a full round-trip through this local model.
+    This mirrors hsmodels.schemas.aggregations.MultidimensionalMetadata with few additional fields to
+    support round-tripping of ScientificDataset metadata that has no direct equivalent in hsmodels.
     """
 
     type: AggregationType = AggregationType.MultidimensionalAggregation
@@ -101,15 +103,24 @@ class MultidimensionalMetadata(LegacyNetCDFBaseModel):
     subjects: List[str] = Field(default_factory=list)
     language: Optional[str] = None
     # description is not in hsmodels.MultidimensionalMetadata; added here to round-trip
-    # ScientificDataset.description without losing it in additional_metadata.
+    # ScientificDataset.description.
     description: Optional[str] = None
     additional_metadata: Dict[str, str] = Field(default_factory=dict)
     spatial_coverage: Optional[Union[PointCoverage, BoxCoverage]] = None
     period_coverage: Optional[PeriodCoverage] = None
     variables: List[Variable] = Field(default_factory=list)
+    # coordinates is not in hsmodels.MultidimensionalMetadata; added here to round-trip
+    # ScientificDataset.coordinates (the hydroshare NetCDF extractor populates this field
+    # with one entry per coordinate axis).
+    coordinates: Optional[List[Variable]] = None
     spatial_reference: Optional[MultidimensionalBoxSpatialReference] = None
     url: Optional[AnyUrl] = None
     rights: Optional[Rights] = None
     # associatedMedia is not in hsmodels.MultidimensionalMetadata; added here to preserve
     # aggregation file references from ScientificDataset across round-trips.
     associatedMedia: Optional[Union[MediaType, List[MediaType]]] = None
+    # hasPart/isPartOf are not in hsmodels.MultidimensionalMetadata; added here so these
+    # ScientificDataset relation fields survive a round-trip instead of being dropped.
+    # TODO: make these 2 fields read-only
+    hasPart: Optional[List[HasPart]] = None
+    isPartOf: Optional[List[IsPartOf]] = None

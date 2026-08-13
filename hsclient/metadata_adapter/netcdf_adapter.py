@@ -9,45 +9,79 @@ Conversion directions
   to_legacy_multidimensional_metadata : ScientificDataset | dict → MultidimensionalMetadata
   to_multidimensional_metadata        : MultidimensionalMetadata | dict → ScientificDataset
 
-Variable overflow fields
-------------------------
-``Variable.descriptive_name`` and ``Variable.method`` have no direct equivalent in
-``DataVariable``.  Both are round-tripped via ``ScientificDataset.additionalProperty``
-under the keys:
+Variable.descriptive_name <-> DataVariable.description
+--------------------------------------------------------
 
-  ``variable_{varname}_descriptive_name``
-  ``variable_{varname}_method``
+Variable.method <-> DataVariable.method
+NOTE: 'method' field has been added locally to DataVariable (note DataVariable is not a schema-org term)
 
-where ``{varname}`` is the variable name with spaces replaced by underscores.
+Coordinates
+-----------
+'ScientificDataset.coordinates' (coordinate axis variables, e.g. lat/lon/time -- distinct from
+'variableMeasured', the actual data variables) has no equivalent on
+'hsmodels.schemas.aggregations.MultidimensionalMetadata'. 'MultidimensionalMetadata' gained an additive 'coordinates:
+Optional[List[Variable]]' field to round-trip it.
 
-ALTERNATIVE (not implemented): fold both into ``DataVariable.description`` as a formatted
-string, e.g. ``"descriptive_name: {dn}; method: {m}"``.  This is simpler but conflates
-two semantically distinct fields and requires fragile string parsing on the return trip.
-The chosen approach (separate additionalProperty keys) avoids data loss at the cost of
-slightly larger additionalProperty lists.
 
 Variable.shape ↔ Dimension mapping
 ------------------------------------
-``Variable.shape`` in the legacy model is a space-separated string of dimension *names*,
-e.g. ``"time lat lon"``.  ``ScientificDataset`` represents each dimension as a ``Dimension``
-object with a ``name`` (str) and ``shape`` (int).
+'Variable.shape' in the legacy model is a space-separated string of dimension names,
+e.g. '"time lat lon"'.  'ScientificDataset' represents each dimension as a 'Dimension'
+object with a 'name' (str) and a required 'shape' (size of the dimension as an int) -- and HydroShare's NetCDF
+extractor populates that 'shape' with the dimension's actual axis length (e.g. 365 for a
+365-step time axis).
 
-Legacy → Schema:
-  Each unique dimension name across all variables becomes a ``Dimension(name=..., shape=0)``.
-  The integer ``shape=0`` is used as a placeholder when the actual dimension size is not
-  available in the legacy metadata.  The dimension *name* is preserved so
-  that the shape string can be reconstructed on the return trip.
+The legacy model has no per-dimension size slot of its own -- only dimension names survive
+directly via 'Variable.shape' -- so real sizes are round-tripped via 'additional_metadata'
+under the keys:
 
-Schema → Legacy:
-  ``DataVariable.dimensions`` (list of dimension name strings) is joined with spaces to
-  produce ``Variable.shape``.
+  'dimension_{dimname}_shape'
 
-Variable.type normalisation
+NOTE: This is not a permanent solution; it is a temporary workaround to preserve dimension
+sizes across the round-trip until a better mechanism is implemented.
+TODO: Consider adding a proper per-dimension size field to the legacy model.
+
+
+Variable.type normalisation (TODO: This needs to be fixed)
 ---------------------------
-``Variable.type`` in the legacy model corresponds to ``hsmodels.schemas.enums.VariableType``.
-``DataVariable.dataType`` is a free-form string.  On the schema → legacy path, the adapter
-attempts a case-insensitive match against known ``VariableType`` values and falls back to
-``"Unknown"`` for unrecognised strings.
+'Variable.type' in the legacy model corresponds to 'hsmodels.schemas.enums.VariableType', but is
+stored here as a plain 'Optional[str]' (not a real 'VariableType'-constrained enum). On the
+schema → legacy path, the adapter attempts a case-insensitive match against known 'VariableType'
+values and, when one matches, normalises to that value's canonical casing (e.g. '"float"' ->
+'"Float"'). When nothing matches -- the common case for real NetCDF data, since HydroShare's
+extractor sets 'DataVariable.dataType' from the numpy/xarray dtype string (e.g. '"float32"',
+'"int64"', '"datetime64[ns]"'), not an OPeNDAP/netCDF type name -- the original string is
+preserved unchanged rather than being overwritten with '"Unknown"'.
+
+
+SpatialReference.srsType ↔ MultidimensionalBoxSpatialReference.srs_type
+-------------------------------------------------------------------------
+'srs_type' is a dedicated field on 'MultidimensionalBoxSpatialReference' (added specifically for
+this round trip, it has no equivalent in 'hsmodels'). It is populated directly from
+'ScientificDataset.spatialCoverage.srs.srsType' on the schema → legacy leg, and read back directly
+on the legacy → schema leg, defaulting to '"geographic"'.
+
+Spatial units/datum overflow fields
+------------------------------------
+'BoxCoverage.units'/'PointCoverage.units' 
+and 'MultidimensionalBoxSpatialReference.units'/'datum' already exist on the legacy models but
+have no equivalent on 'GeoShape'/'GeoCoordinates'/'SpatialReference' -- this is a schema.org-side
+gap. They are round-tripped via 'Place.additionalProperty':
+
+  'spatial_coverage_units'
+  'spatial_reference_units'
+  'spatial_reference_datum'
+
+NOTE: This is not a permanent solution; it is a temporary workaround to preserve these fields across the round-trip
+until a better mechanism is implemented.
+TODO: Consider adding these missing fields to schema side models.
+
+hasPart / isPartOf
+-------------------
+'ScientificDataset.hasPart'/'isPartOf' have no equivalent on 'hsmodels.schemas.aggregations.
+MultidimensionalMetadata', so these are added to 'MultidimensionalMetadata'. These reuse the schema.org
+'HasPart'/'IsPartOf' types directly and are passed straight through unconverted in both
+directions.
 """
 
 from typing import Any, Dict, List, Optional, Union
@@ -95,19 +129,18 @@ class NetCDFMetadataAdapter:
         cls, metadata: Union[ScientificDataset, Dict[str, Any]]
     ) -> MultidimensionalMetadata:
         """Convert a ScientificDataset (or its dict representation) to MultidimensionalMetadata.
-
-        The ``additionalType`` of the incoming dataset is not validated here; the caller
-        (MetadataAdapter / load_json) is responsible for routing only MULTIDIMENSIONAL datasets
-        to this method.
         """
         dataset = metadata if isinstance(metadata, ScientificDataset) else ScientificDataset.model_validate(metadata)
 
         # Start with the flat additionalProperty → dict conversion.
-        # Variable overflow keys are extracted inside _schema_to_legacy_variables so that
-        # only the *remaining* keys end up in additional_metadata.
         additional_metadata = cls._additional_property_to_dict(dataset.additionalProperty)
 
-        variables = cls._schema_to_legacy_variables(dataset.variableMeasured, additional_metadata)
+        # Real dimension sizes have no per-dimension slot on the legacy model; preserve them via
+        # additional_metadata overflow keys.
+        cls._dimensions_to_overflow_metadata(dataset.dimensions, additional_metadata)
+
+        variables = cls._schema_to_legacy_variables(dataset.variableMeasured)
+        coordinates = cls._schema_to_legacy_variables(dataset.coordinates)
 
         return MultidimensionalMetadata(
             type=AggregationType.MultidimensionalAggregation,
@@ -119,28 +152,29 @@ class NetCDFMetadataAdapter:
             spatial_coverage=cls._to_legacy_spatial_coverage(dataset.spatialCoverage),
             period_coverage=cls._to_legacy_period_coverage(dataset.temporalCoverage),
             variables=variables,
+            coordinates=coordinates or None,
             spatial_reference=cls._to_legacy_spatial_reference(dataset.spatialCoverage),
             url=dataset.url,
             rights=cls._to_legacy_rights(dataset.license),
             associatedMedia=dataset.associatedMedia,
+            hasPart=dataset.hasPart,
+            isPartOf=dataset.isPartOf,
         )
 
     @classmethod
     def to_multidimensional_metadata(
         cls, metadata: Union[MultidimensionalMetadata, Dict[str, Any]]
     ) -> ScientificDataset:
-        """Convert a MultidimensionalMetadata legacy object (or dict) to a ScientificDataset."""
+        """Convert a MultidimensionalMetadata legacy metadata object (or dict) to a ScientificDataset."""
         if isinstance(metadata, MultidimensionalMetadata):
             legacy = metadata
         else:
             legacy = MultidimensionalMetadata.model_validate(metadata)
 
         additional_metadata = dict(legacy.additional_metadata or {})
-        additional_properties = cls._dict_to_additional_property(additional_metadata)
+        dimensions = cls._variable_shape_to_dimensions(legacy.variables, additional_metadata, legacy.coordinates)
 
-        # Append overflow additionalProperty entries for variable descriptive_name / method.
-        for variable in legacy.variables:
-            additional_properties.extend(cls._variable_to_overflow_properties(variable))
+        additional_properties = cls._dict_to_additional_property(additional_metadata)
 
         return ScientificDataset.model_construct(
             additionalType=AdditionalType.MULTIDIMENSIONAL,
@@ -157,8 +191,11 @@ class NetCDFMetadataAdapter:
             ),
             temporalCoverage=cls._to_schema_temporal_coverage(legacy.period_coverage),
             variableMeasured=cls._to_schema_variable_measured(legacy.variables),
-            dimensions=cls._variable_shape_to_dimensions(legacy.variables),
+            coordinates=cls._to_schema_variable_measured(legacy.coordinates or []) or None,
+            dimensions=dimensions,
             associatedMedia=legacy.associatedMedia,
+            hasPart=legacy.hasPart,
+            isPartOf=legacy.isPartOf,
         )
 
     # ------------------------------------------------------------------
@@ -169,13 +206,12 @@ class NetCDFMetadataAdapter:
     def _schema_to_legacy_variables(
         cls,
         variable_measured: Optional[List[Union[str, PropertyValue, DataVariable]]],
-        additional_metadata: Dict[str, str],
     ) -> List[Variable]:
-        """Convert ScientificDataset.variableMeasured → list of legacy Variable objects.
+        """Convert a ScientificDataset variable list ('variableMeasured' or 'coordinates') to a
+        list of legacy Variable objects.
 
-        Variable overflow fields (descriptive_name, method) are *popped* from
-        ``additional_metadata`` so that they are not duplicated in the legacy model's
-        ``additional_metadata`` dict.
+        'descriptive_name' is read directly from 'DataVariable.description', and 'method'
+        directly from 'DataVariable.method'
         """
         if not variable_measured:
             return []
@@ -183,10 +219,6 @@ class NetCDFMetadataAdapter:
         variables: List[Variable] = []
         for item in variable_measured:
             if isinstance(item, DataVariable):
-                var_key = (item.name or "").replace(" ", "_")
-                descriptive_name = additional_metadata.pop(f"variable_{var_key}_descriptive_name", None)
-                method = additional_metadata.pop(f"variable_{var_key}_method", None)
-
                 # Resolve shape: DataVariable.dimensions is Union[str, list[str]].
                 dims = item.dimensions
                 if isinstance(dims, list):
@@ -200,9 +232,11 @@ class NetCDFMetadataAdapter:
                         unit=item.unit,
                         type=cls._normalize_variable_type(item.dataType),
                         shape=shape,
-                        descriptive_name=descriptive_name,
-                        method=method,
+                        descriptive_name=item.description,
+                        method=item.method,
                         missing_value=cls._to_str(item.noDataValue),
+                        minimum_value=cls._to_str(item.minValue),
+                        maximum_value=cls._to_str(item.maxValue),
                     )
                 )
             elif isinstance(item, PropertyValue):
@@ -216,13 +250,8 @@ class NetCDFMetadataAdapter:
     def _to_schema_variable_measured(variables: List[Variable]) -> List[DataVariable]:
         """Convert legacy Variable list → list of DataVariable objects.
 
-        ``Variable.descriptive_name`` and ``Variable.method`` are *not* stored on the
-        DataVariable directly (no corresponding field exists).  They are instead preserved
-        via additionalProperty entries produced by ``_variable_to_overflow_properties``.
-
-        ALTERNATIVE: store both in ``DataVariable.description`` as a formatted string,
-        e.g. ``f"{descriptive_name}; method: {method}"``.  This avoids extra additionalProperty
-        entries but conflates two distinct fields and requires parsing on the return trip.
+        'Variable.descriptive_name' is mapped directly to 'DataVariable.description', and
+        'Variable.method' directly to 'DataVariable.method'
         """
         result: List[DataVariable] = []
         for var in variables:
@@ -234,83 +263,63 @@ class NetCDFMetadataAdapter:
                     unit=var.unit,
                     dataType=var.type,
                     noDataValue=var.missing_value,
-                    # description is intentionally left None here; descriptive_name and method
-                    # are stored as additionalProperty entries (see _variable_to_overflow_properties).
-                    description=None,
+                    minValue=NetCDFMetadataAdapter._parse_float_or_original(var.minimum_value),
+                    maxValue=NetCDFMetadataAdapter._parse_float_or_original(var.maximum_value),
+                    method=var.method,
+                    description=var.descriptive_name,
                 )
             )
         return result
 
     @staticmethod
-    def _variable_to_overflow_properties(variable: Variable) -> List[PropertyValue]:
-        """Produce additionalProperty entries for Variable fields with no DataVariable equivalent.
-
-        Keys follow the convention ``variable_{varname}_{field}`` where ``{varname}`` is the
-        variable name with spaces replaced by underscores.
-
-        Fields round-tripped this way:
-          - ``descriptive_name`` → ``variable_{varname}_descriptive_name``
-          - ``method``           → ``variable_{varname}_method``
-
-        ALTERNATIVE: a nested structure (e.g. JSON-encoded PropertyValue) could encode more
-        variable-level metadata, but flat string keys are simpler and consistent with how
-        raster CellInformation overflow fields are stored.
-        """
-        if not variable.name:
-            return []
-        var_key = variable.name.replace(" ", "_")
-        entries: List[PropertyValue] = []
-        if variable.descriptive_name is not None:
-            entries.append(
-                PropertyValue.model_construct(
-                    name=f"variable_{var_key}_descriptive_name",
-                    value=variable.descriptive_name,
-                )
-            )
-        if variable.method is not None:
-            entries.append(
-                PropertyValue.model_construct(
-                    name=f"variable_{var_key}_method",
-                    value=variable.method,
-                )
-            )
-        return entries
-
-    @staticmethod
-    def _variable_shape_to_dimensions(variables: List[Variable]) -> List[Dimension]:
+    def _variable_shape_to_dimensions(
+        variables: List[Variable],
+        additional_metadata: Optional[Dict[str, str]] = None,
+        coordinates: Optional[List[Variable]] = None,
+    ) -> List[Dimension]:
         """Derive a deduplicated Dimension list from variable shape strings.
-
-        Each unique dimension name token (across all variables' space-separated ``shape``
-        strings) becomes one ``Dimension(name=..., shape=0)``.  Insertion order is preserved.
-
-        ``shape=0`` is used as a placeholder for the integer dimension size, which is not
-        stored in the legacy MultidimensionalMetadata model.  Preserving the
-        dimension name is what matters for reconstructing Variable.shape on the return trip.
         """
+        additional_metadata = additional_metadata if additional_metadata is not None else {}
         seen: Dict[str, bool] = {}
-        for var in variables:
+        for var in list(variables) + list(coordinates or []):
             for dim_name in (var.shape or "").split():
                 if dim_name and dim_name not in seen:
                     seen[dim_name] = True
-        return [Dimension.model_construct(name=dim_name, shape=0) for dim_name in seen]
+
+        dimensions: List[Dimension] = []
+        for dim_name in seen:
+            shape = NetCDFMetadataAdapter._parse_int(additional_metadata.pop(f"dimension_{dim_name}_shape", None))
+            dimensions.append(Dimension.model_construct(name=dim_name, shape=shape if shape is not None else 0))
+        return dimensions
+
+    @staticmethod
+    def _dimensions_to_overflow_metadata(
+        dimensions: Optional[List[Dimension]], additional_metadata: Dict[str, str]
+    ) -> None:
+        """Write each Dimension's real integer shape into 'additional_metadata' (in place) under
+        'dimension_{dimname}_shape' keys.
+
+        The legacy MultidimensionalMetadata/Variable models have no per-dimension size slot --
+        'Variable.shape' only records dimension names -- so real sizes from
+        'ScientificDataset.dimensions' are round-tripped via this additional_metadata overflow
+        instead.
+        # TODO: Consider adding a proper per-dimension size field to the legacy model.
+        """
+        for dimension in dimensions or []:
+            if not dimension.name:
+                continue
+            additional_metadata[f"dimension_{dimension.name}_shape"] = str(dimension.shape)
 
     @classmethod
     def _normalize_variable_type(cls, type_str: Optional[str]) -> Optional[str]:
-        """Normalise a free-form type string to a canonical VariableType value.
-
-        Performs a case-insensitive match against known VariableType enum values.
-        Falls back to ``VariableType.Unknown`` if the string is not recognised.
-
-        ALTERNATIVE: preserve the raw string instead of falling back to "Unknown".
-        This would be lossless but could result in invalid values when the legacy model
-        is later serialised to an API endpoint that enforces the VariableType enum.
+        """Normalise a free-form type string to a canonical VariableType value where possible.
         """
         if type_str is None:
             return None
         matched = _VARIABLE_TYPE_MAP.get(type_str.lower())
         if matched:
             return matched
-        return VariableType.Unknown.value
+        return type_str
 
     # ------------------------------------------------------------------
     # Spatial coverage helpers
@@ -324,14 +333,16 @@ class NetCDFMetadataAdapter:
         if spatial_coverage is None or spatial_coverage.geo is None:
             return None
 
+        # NOTE: GeoShape/GeoCoordinates carry no 'units' concept in schema.org, unlike the
+        # legacy BoxCoverage/PointCoverage models which do. This one field, 'units', is
+        # round-tripped via Place.additionalProperty under the key "spatial_coverage_units".
+        # TODO: Consider adding a proper 'units' field to GeoShape/GeoCoordinates/SpatialReference.
+        overflow = cls._additional_property_to_dict(spatial_coverage.additionalProperty)
+        units = overflow.get("spatial_coverage_units")
+
         geo = spatial_coverage.geo
         if isinstance(geo, GeoShape):
-            bbox = cls._parse_bbox(geo.box)
-            if bbox is None:
-                return None
-            north, east, south, west = bbox
-            # NOTE: GeoShape does not carry units or projection; BoxCoverage.units /
-            # BoxCoverage.projection will be None on this conversion path.
+            north, east, south, west = cls._parse_bbox(geo.box)
             return BoxCoverage(
                 type="box",
                 name=spatial_coverage.name,
@@ -339,18 +350,17 @@ class NetCDFMetadataAdapter:
                 eastlimit=east,
                 southlimit=south,
                 westlimit=west,
-                units=None,
+                units=units,
                 projection=None,
             )
 
         if isinstance(geo, GeoCoordinates):
-            # NOTE: GeoCoordinates does not carry units or projection.
             return PointCoverage(
                 type="point",
                 name=spatial_coverage.name,
                 east=geo.longitude,
                 north=geo.latitude,
-                units=None,
+                units=units,
                 projection=None,
             )
 
@@ -374,22 +384,29 @@ class NetCDFMetadataAdapter:
         if not isinstance(geo, GeoShape):
             return None
 
-        bbox = cls._parse_bbox(geo.box)
-        if bbox is None:
-            return None
-        north, east, south, west = bbox
+        north, east, south, west = cls._parse_bbox(geo.box)
 
         srs = spatial_coverage.srs
         projection = None
         projection_string = None
         projection_string_type = None
         projection_name = None
+        srs_type = None
 
         if srs is not None:
             projection_name = srs.name
             projection = srs.code or srs.name
             projection_string = srs.wktString
             projection_string_type = srs.code
+            srs_type = srs.srsType
+
+        # NOTE: 'units' and 'datum' have no schema.org equivalent -- SpatialReference (Place.srs)
+        # carries neither, so -- same as 'spatial_coverage_units' above -- they're round-tripped
+        # via Place.additionalProperty.
+        # TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference.
+        overflow = cls._additional_property_to_dict(spatial_coverage.additionalProperty)
+        units = overflow.get("spatial_reference_units")
+        datum = overflow.get("spatial_reference_datum")
 
         return MultidimensionalBoxSpatialReference(
             type="box",
@@ -398,11 +415,13 @@ class NetCDFMetadataAdapter:
             eastlimit=east,
             southlimit=south,
             westlimit=west,
-            units=None,
+            units=units,
             projection=projection,
             projection_string=projection_string,
             projection_string_type=projection_string_type,
             projection_name=projection_name,
+            srs_type=srs_type,
+            datum=datum,
         )
 
     @classmethod
@@ -419,7 +438,8 @@ class NetCDFMetadataAdapter:
         place.name = getattr(spatial_coverage, "name", None)
 
         if isinstance(spatial_coverage, BoxCoverage):
-            # NOTE: Legacy BoxCoverage.units / projection are not preserved in GeoShape.
+            # NOTE: Legacy BoxCoverage.units has no dedicated GeoShape field; preserved via
+            # Place.additionalProperty below instead.
             place.geo = GeoShape.model_construct(
                 box=cls._compose_box(
                     spatial_coverage.northlimit,
@@ -430,7 +450,8 @@ class NetCDFMetadataAdapter:
                 validate_bbox=False,
             )
         elif isinstance(spatial_coverage, PointCoverage):
-            # NOTE: Legacy PointCoverage.units / projection are not preserved in GeoCoordinates.
+            # NOTE: Legacy PointCoverage.units has no dedicated GeoCoordinates field; preserved
+            # via Place.additionalProperty below instead.
             place.geo = GeoCoordinates.model_construct(
                 latitude=spatial_coverage.north,
                 longitude=spatial_coverage.east,
@@ -439,23 +460,21 @@ class NetCDFMetadataAdapter:
         if spatial_reference is not None:
             place.srs = cls._to_schema_spatial_reference(spatial_reference)
 
+        # NOTE: 'units' (on spatial_coverage and spatial_reference) and 'datum' (on
+        # spatial_reference) have no dedicated field on Place/GeoShape/GeoCoordinates/
+        # SpatialReference, so they're round-tripped via Place.additionalProperty.
+        # TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference.
+        overflow_properties = cls._spatial_overflow_to_additional_properties(spatial_coverage, spatial_reference)
+        if overflow_properties:
+            place.additionalProperty = overflow_properties
+
         return place
 
     @classmethod
     def _to_schema_spatial_reference(cls, spatial_reference: MultidimensionalBoxSpatialReference) -> SpatialReference:
         """Convert MultidimensionalBoxSpatialReference → SpatialReference.
-
-        NOTE: The legacy model does not carry an explicit geographic/projected enum, so
-        ``srsType`` is inferred heuristically from projection text.
         """
-        projection = (getattr(spatial_reference, "projection", "") or "").lower()
-        projection_name = (getattr(spatial_reference, "projection_name", "") or "").lower()
-        srs_type = "geographic"
-        projected_tokens = ["utm", "mercator", "albers", "lambert", "state plane", "projected"]
-        if any(token in projection for token in projected_tokens) or any(
-            token in projection_name for token in projected_tokens
-        ):
-            srs_type = "projected"
+        srs_type = getattr(spatial_reference, "srs_type", None) or "geographic"
 
         return SpatialReference.model_construct(
             name=getattr(spatial_reference, "projection_name", None)
@@ -474,7 +493,9 @@ class NetCDFMetadataAdapter:
     def _to_legacy_period_coverage(
         temporal_coverage: Optional[TemporalCoverage],
     ) -> Optional[PeriodCoverage]:
-        if temporal_coverage is None:
+        """Convert ScientificDataset.temporalCoverage → legacy PeriodCoverage.
+        """
+        if temporal_coverage is None or temporal_coverage.startDate is None:
             return None
         return PeriodCoverage(start=temporal_coverage.startDate, end=temporal_coverage.endDate)
 
@@ -495,20 +516,26 @@ class NetCDFMetadataAdapter:
         if license_data is None:
             return None
         if isinstance(license_data, CreativeWork):
-            return Rights(
-                statement=license_data.name,
-                url=str(license_data.url) if license_data.url else None,
-            )
+            statement = license_data.name
+            url = str(license_data.url) if license_data.url else None
+            description = license_data.description
+            if not statement and not url and not description:
+                # A CreativeWork with nothing set (no name/url/description) carries no rights
+                return None
+            return Rights(statement=statement, url=url, description=description)
         return Rights(url=str(license_data))
 
     @staticmethod
     def _to_schema_license(rights: Optional[Rights]) -> Optional[CreativeWork]:
         if rights is None:
             return None
-        return CreativeWork.model_construct(
-            name=getattr(rights, "statement", None),
-            url=str(getattr(rights, "url", None)) if getattr(rights, "url", None) else None,
-        )
+        name = getattr(rights, "statement", None)
+        url = str(getattr(rights, "url", None)) if getattr(rights, "url", None) else None
+        description = getattr(rights, "description", None)
+        if not name and not url and not description:
+            # A Rights with nothing set (no statement/url/description) carries no license
+            return None
+        return CreativeWork.model_construct(name=name, url=url, description=description)
 
     # ------------------------------------------------------------------
     # additionalProperty ↔ dict helpers
@@ -517,7 +544,22 @@ class NetCDFMetadataAdapter:
 
     @staticmethod
     def _additional_property_to_dict(additional_property: Any) -> Dict[str, str]:
-        """Flatten ScientificDataset.additionalProperty to a plain str→str dict."""
+        """Flatten ScientificDataset.additionalProperty to a plain str→str dict.
+
+        'additionalProperty' is typed as 'Optional[Union[str, List[str], PropertyValue,
+        List[PropertyValue]]]', and this
+        method handles all of those shapes. It seems, currently no HydroShare content-type
+        extractor ever populates 'additionalProperty' at all; the only real
+        producer for netcdf is this adapter's own '_dict_to_additional_property', which always
+        emits 'List[PropertyValue]' with string-coerced values. So in practice, 'PropertyValue''s
+        fields ('propertyID', 'unitCode', 'minValue', 'maxValue', 'measurementTechnique',
+        etc.) are not preserved here --
+        only 'name' and a stringified 'value' survive the flatten to
+        'MultidimensionalMetadata.additional_metadata' (a plain 'Dict[str, str]'). This is
+        intentionally left as-is, since nothing currently
+        generates those richer shapes for netcdf.
+        TODO: To avoid data loss, consider adding the 'additionalProperty' field to the legacy model
+        """
         if additional_property is None:
             return {}
 
@@ -531,11 +573,18 @@ class NetCDFMetadataAdapter:
 
         if isinstance(additional_property, list):
             result: Dict[str, str] = {}
+            value_index = 0
             for item in additional_property:
                 if isinstance(item, PropertyValue):
                     result[item.name] = str(item.value)
                 elif isinstance(item, dict) and "name" in item:
                     result[str(item.get("name"))] = str(item.get("value", ""))
+                elif isinstance(item, str):
+                    # A bare string within the list (the List[str] shape) has no "name" of its
+                    # own, so give it a synthetic, positional key rather than silently dropping
+                    # it.
+                    result[f"value_{value_index}"] = item
+                    value_index += 1
             return result
 
         if isinstance(additional_property, str):
@@ -548,29 +597,73 @@ class NetCDFMetadataAdapter:
         """Convert a plain dict to a list of PropertyValue objects."""
         return [PropertyValue.model_construct(name=key, value=str(value)) for key, value in values.items()]
 
+    @staticmethod
+    def _spatial_overflow_to_additional_properties(
+        spatial_coverage: Union[BoxCoverage, PointCoverage],
+        spatial_reference: Optional[MultidimensionalBoxSpatialReference],
+    ) -> List[PropertyValue]:
+        """Produce Place.additionalProperty entries for legacy fields with no schema.org equivalent.
+
+        Fields round-tripped this way:
+          - 'spatial_coverage.units'   → 'PropertyValue(name="spatial_coverage_units", value=...)'
+          - 'spatial_reference.units'  → 'PropertyValue(name="spatial_reference_units", value=...)'
+          - 'spatial_reference.datum'  → 'PropertyValue(name="spatial_reference_datum", value=...)'
+        TODO: Consider adding these missing fields to schema.org models instead of round-tripping via additionalProperty.
+        """
+        properties: List[PropertyValue] = []
+        if getattr(spatial_coverage, "units", None):
+            properties.append(PropertyValue.model_construct(name="spatial_coverage_units", value=spatial_coverage.units))
+        if spatial_reference is not None:
+            if getattr(spatial_reference, "units", None):
+                properties.append(
+                    PropertyValue.model_construct(name="spatial_reference_units", value=spatial_reference.units)
+                )
+            if getattr(spatial_reference, "datum", None):
+                properties.append(
+                    PropertyValue.model_construct(name="spatial_reference_datum", value=spatial_reference.datum)
+                )
+        return properties
+
     # ------------------------------------------------------------------
     # Generic utilities
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _parse_bbox(box: str) -> Optional[List[float]]:
-        """Parse a GeoShape bbox string ``"N E S W"`` into [north, east, south, west]."""
-        if not box:
-            return None
-        parts = str(box).split()
-        if len(parts) != 4:
-            return None
+    def _parse_bbox(box: str) -> List[float]:
+        """Parse a GeoShape bbox string '"S W N E"' into [north, east, south, west].
+        """
         try:
-            return [float(p) for p in parts]
-        except Exception:
-            return None
+            south, west, north, east = map(float, str(box).split())
+        except Exception as e:
+            raise ValueError(f"Invalid geo.box string: {box!r}, error: {e}")
+        return [north, east, south, west]
 
     @staticmethod
     def _compose_box(north: float, east: float, south: float, west: float) -> str:
-        return f"{north} {east} {south} {west}"
+        """Serialise four cardinal limits to a GeoShape bbox string, in the real 'S W N E'
+        token order (see _parse_bbox)."""
+        return f"{south} {west} {north} {east}"
 
     @staticmethod
     def _to_str(value: Any) -> Optional[str]:
         if value is None:
             return None
         return str(value)
+
+    @staticmethod
+    def _parse_int(value: Any) -> Optional[int]:
+        if value is None or value == "":
+            return None
+        try:
+            return int(value)
+        except Exception:
+            return None
+
+    @staticmethod
+    def _parse_float_or_original(value: Any) -> Optional[Union[float, str]]:
+        if value is None or value == "":
+            return None
+        try:
+            return float(value)
+        except Exception:
+            return value
