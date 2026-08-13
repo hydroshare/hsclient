@@ -283,4 +283,7 @@ def _to_legacy_relation_type(relation_name: Optional[str]) -> Optional[RelationT
     for relation_type in RelationType:
         if relation_type.name.lower() == relation_name.lower():
             return relation_type
+    for relation_type in RelationType:
+        if relation_type.value.lower() == relation_name.lower():
+            return relation_type
     return None

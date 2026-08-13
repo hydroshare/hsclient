@@ -137,6 +137,35 @@ def test_adapter_to_legacy_resource_metadata_with_linked_data_associated_media()
     assert str(result.associatedMedia[0].id) == manifest_url
 
 
+@pytest.mark.parametrize(
+    "relation_name,expected_type",
+    [
+        # HydroShare's copy/new_version operations store auto-generated relations using the
+        # RelationType enum's value/description text rather than its name.
+        ("The content of this resource is derived from", RelationType.source),
+        ("This resource updates and replaces a previous version", RelationType.isVersionOf),
+        # matching by value should also be case-insensitive, same as the existing name match
+        ("the content of this resource is derived from", RelationType.source),
+    ],
+)
+def test_to_legacy_relations_matches_relation_type_by_value(relation_name, expected_type) -> None:
+    """A relation whose name is the RelationType's value/description text (rather than its
+    enum name) should still resolve to the correct legacy relation type."""
+    adapter = ResourceMetadataAdapter(relation=[{"name": relation_name}])
+
+    legacy_relations = adapter.to_legacy_relations()
+
+    assert len(legacy_relations) == 1
+    assert legacy_relations[0].type == expected_type
+
+
+def test_to_legacy_relations_unknown_name_raises() -> None:
+    adapter = ResourceMetadataAdapter(relation=[{"name": "not a real relation name"}])
+
+    with pytest.raises(ValueError):
+        adapter.to_legacy_relations()
+
+
 def test_adapter_to_schema_org_metadata() -> None:
     metadata = {
         "type": "CompositeResource",
