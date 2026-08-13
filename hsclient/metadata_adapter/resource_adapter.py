@@ -5,7 +5,7 @@ from hsmodels.schemas.enums import RelationType
 from pydantic import HttpUrl
 
 from hsclient.metadata_adapter.legacy_resource_models import (
-    Award as LegacyAward,
+    AwardInfo as LegacyAward,
     LegacyResourceMetadata,
     Publisher as LegacyPublisher,
     Relation as LegacyRelation,
@@ -43,7 +43,7 @@ from hsclient.schema.base import (
 
 
 class ResourceMetadataAdapter(SchemaBaseModel):
-    """A pydantic model representing the Schema.org based CoreMetadata for HydroShare resources,
+    """A pydantic model representing the Schema.org based metadata for HydroShare resources,
     with methods to convert to legacy resource metadata models used for metadata editing using hsclient."""
 
     type: Optional[str] = None
@@ -69,12 +69,10 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     temporalCoverage: Optional[TemporalCoverage] = None
     spatialCoverage: Optional[Place] = None
     publisher: Optional[PublisherOrganization] = None
+    # TODO: it should be set to : Union[str, List[str], PropertyValue, List[PropertyValue]]
     additionalProperty: Optional[List[PropertyValue]] = []
     citation: Optional[List[str]] = []
-    # No need to convert provider as there is no matching field in the legacy metadata model
-    # and it is not allowed for editing using hsclient
     provider: Union[Organization, Provider] = None
-
     creativeWorkStatus: Optional[Union[Draft, Private, Incomplete, Obsolete, Published, Public, Discoverable]] = None
 
     def to_legacy_sharing_status(self) -> Optional[str]:
@@ -102,6 +100,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             return None
         return self.citation[0]
 
+    # TODO: This conversion won't work as the data formats at each end is different - so remove it
     def to_legacy_additional_metadata(self) -> Optional[dict]:
         if not self.additionalProperty:
             return {}
@@ -121,6 +120,9 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         if not self.spatialCoverage or not self.spatialCoverage.geo:
             return None
 
+        srs = self.spatialCoverage.srs
+        projection = srs.name if srs else None
+
         geo = self.spatialCoverage.geo
         if isinstance(geo, GeoCoordinates):
             return LegacyPointCoverage.model_construct(
@@ -128,11 +130,12 @@ class ResourceMetadataAdapter(SchemaBaseModel):
                 north=geo.latitude,
                 east=geo.longitude,
                 type="point",
+                projection=projection,
             )
         elif isinstance(geo, GeoShape):
-            northlimit, eastlimit, southlimit, westlimit = None, None, None, None
+            # Box token order is "S W N E" 
             try:
-                northlimit, eastlimit, southlimit, westlimit = map(float, geo.box.split())
+                southlimit, westlimit, northlimit, eastlimit = map(float, geo.box.split())
             except Exception as e:
                 raise ValueError(f"Invalid geo.box string: {geo.box}, error: {str(e)}")
 
@@ -143,6 +146,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
                 southlimit=southlimit,
                 westlimit=westlimit,
                 type="box",
+                projection=projection,
             )
         else:
             return None
@@ -202,8 +206,14 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.abstract = self.description
         legacy_metadata.url = self.url
         if self.identifier:
+            # type mismatch: legacy_metadata.identifier is a HttpUrl, while self.identifier is a list of strings
+            # It seems the schema side identifier list always has only one item - url to the resource landing page
             legacy_metadata.identifier = self.identifier[0]
-        legacy_metadata.creators = [creator.to_legacy_creator() for creator in self.creator or []]
+        legacy_metadata.creators = []
+        for order, creator in enumerate(self.creator or [], start=1):
+            legacy_creator = creator.to_legacy_creator()
+            legacy_creator.creator_order = order
+            legacy_metadata.creators.append(legacy_creator)
         legacy_metadata.contributors = [contributor.to_legacy_contributor() for contributor in self.contributor or []]
         legacy_metadata.created = self.dateCreated
         legacy_metadata.modified = self.dateModified
@@ -215,7 +225,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.spatial_coverage = self.to_legacy_spatial_coverage()
         legacy_metadata.period_coverage = self.to_legacy_temporal_coverage()
         legacy_metadata.relations = self.to_legacy_relations()
-        # The legacy model originally doesnot have hasPart, isPartOf, provider, version fields,
+        # The legacy model originally doesnot have 'hasPart', 'isPartOf', 'provider', 'version' fields,
         # we are providing them here for completeness so that they can be accessed in hsclient,
         # - no conversion is needed from schemaorg to legacy for these fields
         legacy_metadata.hasPart = self.hasPart
@@ -224,10 +234,15 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.version = self.version
 
         legacy_metadata.citation = self.to_legacy_citation()
+        # TODO: This conversion won't work as the data formats at each end is different.
         legacy_metadata.additional_metadata = self.to_legacy_additional_metadata()
+
         legacy_metadata.associatedMedia = self.associatedMedia
         legacy_metadata.publisher = self.to_legacy_publisher()
+        # The legacy model originally doesnot have 'sharing_status' field,
+        # we are providing it here for completeness so that it can be accessed in hsclient.
         legacy_metadata.sharing_status = self.to_legacy_sharing_status()
+
         # set the frozen fields so that these fields can't be edited using hsclient
         for field in [
             "type",

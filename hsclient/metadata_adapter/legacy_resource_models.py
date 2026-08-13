@@ -57,10 +57,8 @@ class BasePerson(BaseModel):
 
 
 class Creator(BasePerson):
-    # TODO: The field 'creator_order' is not part of the schema.org Creator model
-    # and our implementation of the schema.org Creator model is yet to support it. Until then,
-    # we cannot map it to this legacy Creator model
-    # creator_order: Optional[int] = None
+    # TODO: make this a required field
+    creator_order: Optional[int] = None
 
     def to_dataset_creator(self):
         return self.to_dataset_person(schema.Creator)
@@ -83,7 +81,7 @@ class Publisher(BaseModel):
         return publisher
 
 
-class Award(BaseModel):
+class AwardInfo(BaseModel):
     funding_agency_name: str
     title: Optional[str] = None
     number: Optional[str] = None
@@ -108,6 +106,7 @@ class Award(BaseModel):
 
 
 class TemporalCoverage(BaseModel):
+    # original: hsmodels.schemas.fields.PeriodCoverage
     start: datetime
     end: datetime
 
@@ -121,17 +120,17 @@ class TemporalCoverage(BaseModel):
 
 
 class SpatialCoverageBox(BaseModel):
+    # original: hsmodels.schemas.fields.BoxCoverage
     name: Optional[str] = None
     northlimit: float
     eastlimit: float
     southlimit: float
     westlimit: float
     type: str = "box"
-    # TODO: These 2 fields are not supported as there are no matching fields in the
-    # schema.org spatial coverage model, but we may have to add them to the schema.org
-    # spatial coverage model if we want to preserve the metadata editing api in hsclient
+    projection: Optional[str] = None
+    # TODO: 'units' is not supported as there is no matching field in the schema.org spatial
+    # coverage model. In original BoxCoverage model, 'units' is a required field.
     # units: Optional[str] = None
-    # projection: Optional[str] = None
 
     def to_dataset_spatial_coverage(self):
         place = schema.Place.model_construct()
@@ -139,20 +138,25 @@ class SpatialCoverageBox(BaseModel):
             place.name = self.name
 
         place.geo = schema.GeoShape.model_construct()
-        place.geo.box = f"{self.northlimit} {self.eastlimit} {self.southlimit} {self.westlimit}"
+        # Box token order is "S W N E" (south, west, north, east).
+        place.geo.box = f"{self.southlimit} {self.westlimit} {self.northlimit} {self.eastlimit}"
+        if self.projection:
+            # Resource-level coverage coordinates are always decimal degrees in HydroShare, so
+            # srsType is always "geographic" -- there is no legacy field to round-trip it from.
+            place.srs = schema.SpatialReference(name=self.projection, srsType="geographic")
         return place
 
 
 class SpatialCoveragePoint(BaseModel):
+    # original: hsmodels.schemas.fields.PointCoverage
     name: Optional[str] = None
     north: float
     east: float
     type: str = "point"
-    # TODO: These 2 fields are not supported as there are no matching fields in the schema.org
-    # spatial coverage model, but we may have to add them to the schema.org
-    # spatial coverage model if we want to preserve the metadata editing api in hsclient
+    projection: Optional[str] = None
+    # TODO: 'units' is not supported as there is no matching field in the schema.org spatial
+    # coverage model. In original PointCoverage model 'units' is a required field.
     # units: Optional[str] = None
-    # projection: Optional[str] = None
 
     def to_dataset_spatial_coverage(self):
         place = schema.Place.model_construct()
@@ -161,6 +165,10 @@ class SpatialCoveragePoint(BaseModel):
         place.geo = schema.GeoCoordinates.model_construct()
         place.geo.latitude = self.north
         place.geo.longitude = self.east
+        if self.projection:
+            # Resource-level coverage coordinates are always decimal degrees in HydroShare, so
+            # srsType is always "geographic" -- there is no legacy field to round-trip it from.
+            place.srs = schema.SpatialReference(name=self.projection, srsType="geographic")
         return place
 
 
@@ -221,7 +229,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
     subjects: Optional[List[str]] = []
     language: Optional[str] = None
     rights: Optional[Rights] = None
-    awards: Optional[List[Award]] = []
+    awards: Optional[List[AwardInfo]] = []
     spatial_coverage: Optional[Union[SpatialCoverageBox, SpatialCoveragePoint]] = None
     period_coverage: Optional[TemporalCoverage] = None
     relations: Optional[List[Relation]] = []
@@ -237,6 +245,8 @@ class LegacyResourceMetadata(SchemaBaseModel):
     # 'associatedMedia' is not part of the legacy resource metadata model,
     #  but we need it to generate the resource files objects in hsclient Resource model
     associatedMedia: Union[List[Any], Any] = None
+
+    # 'sharing_status' is not part of the legacy resource metadata model
     sharing_status: Optional[Literal["private", "public", "published", "discoverable", "draft", "incomplete", "obsolete"]] = None
     additional_metadata: Optional[dict] = {}
     extra_columns: Optional[dict] = {}

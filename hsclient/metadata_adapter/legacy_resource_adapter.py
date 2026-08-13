@@ -13,7 +13,8 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
         creators = []
         if not self.creators:
             raise ValueError("creators list must have at least one creator")
-        for creator in self.creators:
+        ordered_creators = sorted(self.creators, key=lambda c: (c.creator_order is None, c.creator_order or 0))
+        for creator in ordered_creators:
             creators.append(creator.to_dataset_creator())
         return creators
 
