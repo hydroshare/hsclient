@@ -91,7 +91,8 @@ def test_netcdf_metadata_can_be_edited_in_legacy_format_and_saved_as_schema_org(
     # Spatial coverage should be encoded as a schema.org Place with a GeoShape box.
     assert saved_metadata["spatialCoverage"]["@type"] == "Place"
     assert saved_metadata["spatialCoverage"]["geo"]["@type"] == "GeoShape"
-    assert saved_metadata["spatialCoverage"]["geo"]["box"] == "40.5 -111.5 40.0 -112.0"
+    # Box token order is "S W N E" (south, west, north, east)
+    assert saved_metadata["spatialCoverage"]["geo"]["box"] == "40.0 -112.0 40.5 -111.5"
 
     # Temporal coverage should carry start and end dates.
     assert saved_metadata["temporalCoverage"]["startDate"].startswith("2020-01-01")
@@ -111,7 +112,6 @@ def test_netcdf_metadata_can_be_edited_in_legacy_format_and_saved_as_schema_org(
     assert precip_var["name"] == "precipitation"
     assert precip_var["unit"] == "mm"
 
-    # Variable overflow fields (descriptive_name, method) should be round-tripped via additionalProperty.
-    assert additional_props["variable_temperature_descriptive_name"] == "Air Temperature at 2m"
-    assert additional_props["variable_temperature_method"] == "Direct Measurement"
-    assert additional_props["variable_precipitation_descriptive_name"] == "Daily Precipitation"
+    assert temp_var["description"] == "Air Temperature at 2m"
+    assert temp_var["method"] == "Direct Measurement"
+    assert precip_var["description"] == "Daily Precipitation"

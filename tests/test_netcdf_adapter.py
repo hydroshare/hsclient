@@ -7,7 +7,8 @@ Coverage:
   - Full round-trips in both directions
   - Variable.shape ↔ Dimension name list conversion
   - Variable.type normalisation (valid enum value, unknown string, None)
-  - Variable.method / descriptive_name overflow via additionalProperty
+  - Variable.method direct mapping to DataVariable.method; Variable.descriptive_name direct
+    mapping to DataVariable.description
   - description field round-trip
   - Spatial coverage (box and point)
   - Spatial reference (box only)
@@ -29,6 +30,8 @@ from hsclient.schema.base import (
     CreativeWork,
     GeoCoordinates,
     GeoShape,
+    HasPart,
+    IsPartOf,
     Place,
     PropertyValue,
     SpatialReference,
@@ -115,10 +118,13 @@ def _make_schema_dataset(**kwargs) -> ScientificDataset:
         unit="mm/day",
         dataType="Float",
         noDataValue="-9999.0",
+        method="Accumulated over 24 hours",
+        description="Daily precipitation at surface",
     )
     place = Place.model_construct()
     place.name = None
-    place.geo = GeoShape.model_construct(box="45.0 -70.0 40.0 -80.0", validate_bbox=False)
+    # Box token order is "S W N E" (south, west, north, east)
+    place.geo = GeoShape.model_construct(box="40.0 -80.0 45.0 -70.0", validate_bbox=False)
     place.srs = SpatialReference.model_construct(
         name="NAD83",
         srsType="geographic",
@@ -139,14 +145,6 @@ def _make_schema_dataset(**kwargs) -> ScientificDataset:
         ],
         additionalProperty=[
             PropertyValue.model_construct(name="source", value="reanalysis"),
-            PropertyValue.model_construct(
-                name="variable_precipitation_descriptive_name",
-                value="Daily precipitation at surface",
-            ),
-            PropertyValue.model_construct(
-                name="variable_precipitation_method",
-                value="Accumulated over 24 hours",
-            ),
         ],
         spatialCoverage=place,
         temporalCoverage=TemporalCoverage.model_construct(
@@ -175,6 +173,20 @@ class TestSchemaToLegacy:
         assert result.language == "eng"
         assert result.description == "A test multidimensional dataset"
 
+    def test_has_part_and_is_part_of(self):
+        dataset = _make_schema_dataset(
+            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
+            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
+        )
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert len(result.hasPart) == 1
+        assert result.hasPart[0].name == "Child resource"
+        assert str(result.hasPart[0].url) == "https://example.com/child"
+        assert len(result.isPartOf) == 1
+        assert result.isPartOf[0].name == "Parent collection"
+        assert str(result.isPartOf[0].url) == "https://example.com/parent"
+
     def test_variable_fields(self):
         dataset = _make_schema_dataset()
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
@@ -186,6 +198,28 @@ class TestSchemaToLegacy:
         assert var.type == "Float"
         assert var.missing_value == "-9999.0"
 
+    def test_variable_min_max_value_converted_to_legacy(self):
+        dv = DataVariable.model_construct(
+            name="precipitation", dimensions=["time"], minValue=0.0, maxValue=125.4
+        )
+        dataset = _make_schema_dataset(variableMeasured=[dv])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        var = result.variables[0]
+        assert var.minimum_value == "0.0"
+        assert var.maximum_value == "125.4"
+
+    def test_variable_non_numeric_min_max_value_preserved_as_string(self):
+        dv = DataVariable.model_construct(
+            name="precipitation", dimensions=["time"], minValue="NA", maxValue="NA"
+        )
+        dataset = _make_schema_dataset(variableMeasured=[dv])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        var = result.variables[0]
+        assert var.minimum_value == "NA"
+        assert var.maximum_value == "NA"
+
     def test_variable_shape_from_dimensions(self):
         dataset = _make_schema_dataset()
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
@@ -193,23 +227,77 @@ class TestSchemaToLegacy:
         var = result.variables[0]
         assert var.shape == "time lat lon"
 
-    def test_variable_overflow_fields_extracted(self):
-        """descriptive_name and method should be popped from additional_metadata."""
+    def test_coordinates_converted_to_legacy(self):
+        coord = DataVariable.model_construct(
+            name="time", dimensions=["time"], unit="days since 2000-01-01", dataType="Float"
+        )
+        dataset = _make_schema_dataset(coordinates=[coord])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.coordinates is not None
+        assert len(result.coordinates) == 1
+        assert result.coordinates[0].name == "time"
+        assert result.coordinates[0].unit == "days since 2000-01-01"
+        assert result.coordinates[0].type == "Float"
+
+    def test_no_coordinates_produces_none(self):
+        dataset = _make_schema_dataset(coordinates=None)
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.coordinates is None
+
+    def test_coordinate_and_variable_descriptive_name_independent(self):
+        """A coordinate and a data variable sharing the same name must not collide -- each
+        DataVariable carries its own 'description', mapped independently to its own legacy
+        Variable's 'descriptive_name'."""
+        coord = DataVariable.model_construct(
+            name="precipitation", dimensions=["time"], description="Coordinate axis"
+        )
+        dataset = _make_schema_dataset(coordinates=[coord])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.coordinates[0].descriptive_name == "Coordinate axis"
+        assert result.variables[0].descriptive_name == "Daily precipitation at surface"
+        assert result.variables[0].method == "Accumulated over 24 hours"
+
+    def test_dimension_shape_written_to_additional_metadata(self):
+        dataset = _make_schema_dataset(
+            dimensions=[
+                Dimension.model_construct(name="time", shape=365),
+                Dimension.model_construct(name="lat", shape=180),
+                Dimension.model_construct(name="lon", shape=360),
+            ]
+        )
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.additional_metadata["dimension_time_shape"] == "365"
+        assert result.additional_metadata["dimension_lat_shape"] == "180"
+        assert result.additional_metadata["dimension_lon_shape"] == "360"
+
+    def test_variable_descriptive_name_from_description(self):
+        """descriptive_name is mapped directly from DataVariable.description; method comes
+        directly from DataVariable.method."""
         dataset = _make_schema_dataset()
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
 
         var = result.variables[0]
         assert var.descriptive_name == "Daily precipitation at surface"
         assert var.method == "Accumulated over 24 hours"
-        # Overflow keys should NOT leak into additional_metadata
-        assert "variable_precipitation_descriptive_name" not in result.additional_metadata
-        assert "variable_precipitation_method" not in result.additional_metadata
 
     def test_additional_metadata_non_overflow_keys_preserved(self):
         dataset = _make_schema_dataset()
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
 
         assert result.additional_metadata.get("source") == "reanalysis"
+
+    def test_additional_property_bare_string_list_entries_not_dropped(self):
+        """a List[str] additionalProperty (a legal shape per the ScientificDataset type)
+        must be preserved under synthetic keys."""
+        dataset = _make_schema_dataset(additionalProperty=["first note", "second note"])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.additional_metadata.get("value_0") == "first note"
+        assert result.additional_metadata.get("value_1") == "second note"
 
     def test_spatial_coverage_box(self):
         dataset = _make_schema_dataset()
@@ -229,6 +317,60 @@ class TestSchemaToLegacy:
         assert srs.projection_string == "GEOGCS[NAD83]"
         assert srs.projection_string_type == "EPSG:4269"
 
+    def test_spatial_reference_srs_type_captured_directly(self):
+        dataset = _make_schema_dataset()
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.spatial_reference.srs_type == "geographic"
+
+    def test_spatial_reference_srs_type_projected_captured_directly(self):
+        place = Place.model_construct()
+        place.geo = GeoShape.model_construct(box="40.0 -80.0 45.0 -70.0", validate_bbox=False)
+        place.srs = SpatialReference.model_construct(
+            name="NAD83",
+            srsType="projected",
+            code="EPSG:26912",
+        )
+        dataset = _make_schema_dataset(spatialCoverage=place)
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.spatial_reference.srs_type == "projected"
+
+    def test_spatial_units_and_datum_from_place_additional_property(self):
+        """units/datum have no schema.org field, so they're carried via Place.additionalProperty."""
+        place = Place.model_construct()
+        place.geo = GeoShape.model_construct(box="40.0 -80.0 45.0 -70.0", validate_bbox=False)
+        place.srs = SpatialReference.model_construct(name="NAD83", srsType="geographic")
+        place.additionalProperty = [
+            PropertyValue.model_construct(name="spatial_coverage_units", value="Decimal degrees"),
+            PropertyValue.model_construct(name="spatial_reference_units", value="Decimal degrees"),
+            PropertyValue.model_construct(name="spatial_reference_datum", value="NAD83"),
+        ]
+        dataset = _make_schema_dataset(spatialCoverage=place)
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.spatial_coverage.units == "Decimal degrees"
+        assert result.spatial_reference.units == "Decimal degrees"
+        assert result.spatial_reference.datum == "NAD83"
+
+    def test_malformed_box_raises_value_error_on_spatial_coverage(self):
+        """a malformed geo.box must raise."""
+        place = Place.model_construct()
+        place.geo = GeoShape.model_construct(box="not a valid box", validate_bbox=False)
+        dataset = _make_schema_dataset(spatialCoverage=place)
+
+        with pytest.raises(ValueError, match="Invalid geo.box string"):
+            NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+    def test_wrong_part_count_box_raises_value_error(self):
+        """A box string with the wrong number of components must also raise."""
+        place = Place.model_construct()
+        place.geo = GeoShape.model_construct(box="45.0 -70.0 40.0", validate_bbox=False)
+        dataset = _make_schema_dataset(spatialCoverage=place)
+
+        with pytest.raises(ValueError, match="Invalid geo.box string"):
+            NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
     def test_spatial_reference_none_for_point_coverage(self):
         """Point coverage has no MultidimensionalBoxSpatialReference equivalent."""
         place = Place.model_construct()
@@ -247,6 +389,14 @@ class TestSchemaToLegacy:
         assert result.period_coverage is not None
         assert result.period_coverage.start == datetime(2000, 1, 1)
         assert result.period_coverage.end == datetime(2020, 12, 31)
+
+    def test_temporal_coverage_with_none_start_date_returns_none_instead_of_raising(self):
+        dataset = _make_schema_dataset(
+            temporalCoverage=TemporalCoverage.model_construct(startDate=None, endDate=None)
+        )
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.period_coverage is None
 
     def test_rights_from_creative_work(self):
         dataset = _make_schema_dataset()
@@ -308,6 +458,18 @@ class TestLegacyToSchema:
         assert result.inLanguage == "eng"
         assert "climate" in (result.keywords or [])
 
+    def test_has_part_and_is_part_of(self):
+        legacy = _make_legacy_metadata(
+            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
+            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert len(result.hasPart) == 1
+        assert result.hasPart[0].name == "Child resource"
+        assert len(result.isPartOf) == 1
+        assert result.isPartOf[0].name == "Parent collection"
+
     def test_variable_measured(self):
         legacy = _make_legacy_metadata()
         result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
@@ -321,6 +483,61 @@ class TestLegacyToSchema:
         assert var.dataType == "Float"
         assert var.noDataValue == "-9999.0"
 
+    def test_variable_min_max_value_converted_to_schema(self):
+        legacy = _make_legacy_metadata(
+            variables=[_make_variable(minimum_value="0.0", maximum_value="125.4")]
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        var = result.variableMeasured[0]
+        assert var.minValue == 0.0
+        assert var.maxValue == 125.4
+
+    def test_variable_non_numeric_min_max_value_preserved_as_string(self):
+        legacy = _make_legacy_metadata(
+            variables=[_make_variable(minimum_value="NA", maximum_value="NA")]
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        var = result.variableMeasured[0]
+        assert var.minValue == "NA"
+        assert var.maxValue == "NA"
+
+    def test_coordinates_converted_to_schema(self):
+        """legacy coordinates must be converted to ScientificDataset.coordinates."""
+        legacy = _make_legacy_metadata(
+            coordinates=[Variable(name="time", unit="days since 2000-01-01", type="Float", shape="time")]
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.coordinates is not None
+        assert len(result.coordinates) == 1
+        coord = result.coordinates[0]
+        assert isinstance(coord, DataVariable)
+        assert coord.name == "time"
+        assert coord.unit == "days since 2000-01-01"
+        assert coord.dataType == "Float"
+
+    def test_no_coordinates_produces_none(self):
+        legacy = _make_legacy_metadata(coordinates=None)
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.coordinates is None
+
+    def test_coordinate_and_variable_descriptive_name_independent(self):
+        """A coordinate and a data variable sharing the same name must not collide -- each legacy
+        Variable's 'descriptive_name' is mapped independently to its own DataVariable's
+        'description'."""
+        legacy = _make_legacy_metadata(
+            coordinates=[
+                Variable(name="precipitation", descriptive_name="Coordinate axis", type="Float")
+            ]
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.coordinates[0].description == "Coordinate axis"
+        assert result.variableMeasured[0].description == "Daily precipitation at surface"
+
     def test_variable_shape_to_dimensions(self):
         legacy = _make_legacy_metadata()
         result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
@@ -331,13 +548,49 @@ class TestLegacyToSchema:
         assert "lat" in dim_names
         assert "lon" in dim_names
 
+    def test_dimension_from_coordinate_only_shape(self):
+        """A dimension name that appears only in a coordinate's shape string (never in any
+        data variable's) must still be picked up -- not just names found in 'variables'."""
+        legacy = _make_legacy_metadata(
+            coordinates=[Variable(name="time_bnds", shape="time nv")]
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        dim_names = [d.name for d in result.dimensions]
+        assert "nv" in dim_names
+
     def test_dimension_shape_placeholder(self):
-        """Dimension.shape should be 0 when size is unknown (plan decision 3)."""
+        """Dimension.shape should be 0 when size is unknown."""
         legacy = _make_legacy_metadata()
         result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
 
         for dim in result.dimensions or []:
             assert dim.shape == 0
+
+    def test_dimension_shape_read_from_additional_metadata(self):
+        """a real dimension size stored in additional_metadata must be read back into Dimension.shape."""
+        legacy = _make_legacy_metadata(
+            additional_metadata={
+                "source": "reanalysis",
+                "dimension_time_shape": "365",
+                "dimension_lat_shape": "180",
+                "dimension_lon_shape": "360",
+            }
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        shapes = {d.name: d.shape for d in result.dimensions or []}
+        assert shapes == {"time": 365, "lat": 180, "lon": 360}
+
+    def test_dimension_shape_overflow_keys_not_duplicated_in_additional_property(self):
+        legacy = _make_legacy_metadata(
+            additional_metadata={"source": "reanalysis", "dimension_time_shape": "365"}
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        prop_names = {p.name for p in result.additionalProperty or []}
+        assert "dimension_time_shape" not in prop_names
+        assert "source" in prop_names
 
     def test_variable_dimensions_from_shape(self):
         """DataVariable.dimensions should be the list of tokens from Variable.shape."""
@@ -347,14 +600,6 @@ class TestLegacyToSchema:
         var = result.variableMeasured[0]
         assert isinstance(var, DataVariable)
         assert var.dimensions == ["time", "lat", "lon"]
-
-    def test_overflow_properties_in_additional_property(self):
-        legacy = _make_legacy_metadata()
-        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
-
-        prop_dict = {p.name: p.value for p in (result.additionalProperty or []) if isinstance(p, PropertyValue)}
-        assert prop_dict.get("variable_precipitation_descriptive_name") == "Daily precipitation at surface"
-        assert prop_dict.get("variable_precipitation_method") == "Accumulated over 24 hours"
 
     def test_additional_metadata_in_additional_property(self):
         legacy = _make_legacy_metadata()
@@ -379,6 +624,58 @@ class TestLegacyToSchema:
         assert srs.name == "NAD83"
         assert srs.code == "EPSG:4269"
         assert srs.wktString == "GEOGCS[NAD83]"
+
+    def test_srs_type_read_directly_when_present(self):
+        """Finding #6 (netcdf-adapter-improvements-plan.md): srs_type should be read straight
+        from MultidimensionalBoxSpatialReference.srs_type when present."""
+        legacy = _make_legacy_metadata(
+            spatial_reference=MultidimensionalBoxSpatialReference(
+                northlimit=45.0,
+                eastlimit=-70.0,
+                southlimit=40.0,
+                westlimit=-80.0,
+                projection_name="NAD83 / UTM zone 12N",
+                srs_type="projected",
+            )
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.spatialCoverage.srs.srsType == "projected"
+
+    def test_srs_type_defaults_to_geographic_when_absent(self):
+        """A legacy object predating the srs_type field must fall back to 'geographic', not a
+        keyword heuristic over projection text."""
+        legacy = _make_legacy_metadata(
+            spatial_reference=MultidimensionalBoxSpatialReference(
+                northlimit=45.0,
+                eastlimit=-70.0,
+                southlimit=40.0,
+                westlimit=-80.0,
+                projection_name="UTM Zone 12N",
+            )
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.spatialCoverage.srs.srsType == "geographic"
+
+    def test_spatial_units_and_datum_written_to_place_additional_property(self):
+        """legacy units/datum must be written to Place.additionalProperty."""
+        legacy = _make_legacy_metadata(
+            spatial_coverage=BoxCoverage(
+                northlimit=45.0, eastlimit=-70.0, southlimit=40.0, westlimit=-80.0,
+                units="Decimal degrees",
+            ),
+            spatial_reference=MultidimensionalBoxSpatialReference(
+                northlimit=45.0, eastlimit=-70.0, southlimit=40.0, westlimit=-80.0,
+                units="Decimal degrees", datum="NAD83",
+            ),
+        )
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        prop_by_name = {p.name: p.value for p in result.spatialCoverage.additionalProperty or []}
+        assert prop_by_name["spatial_coverage_units"] == "Decimal degrees"
+        assert prop_by_name["spatial_reference_units"] == "Decimal degrees"
+        assert prop_by_name["spatial_reference_datum"] == "NAD83"
 
     def test_temporal_coverage(self):
         legacy = _make_legacy_metadata()
@@ -444,20 +741,32 @@ class TestVariableTypeNormalisation:
         result = NetCDFMetadataAdapter._normalize_variable_type(input_type)
         assert result == expected
 
-    def test_unknown_type_falls_back_to_unknown(self):
+    def test_unrecognised_type_preserves_original_string(self):
+        """an unrecognised type string must be
+        preserved unchanged, -- NetCDF data types (numpy/xarray
+        dtype strings like 'float32') never match the VariableType enum and would otherwise always
+        be destroyed."""
         result = NetCDFMetadataAdapter._normalize_variable_type("FancyCustomType")
-        assert result == "Unknown"
+        assert result == "FancyCustomType"
+
+    @pytest.mark.parametrize("dtype_str", ["float32", "float64", "int16", "uint8", "datetime64[ns]"])
+    def test_real_numpy_dtype_strings_preserved(self, dtype_str):
+        """Real numpy/xarray dtype strings (what HydroShare's NetCDF extractor actually sets on
+        DataVariable.dataType) don't match any VariableType value and must survive unchanged."""
+        result = NetCDFMetadataAdapter._normalize_variable_type(dtype_str)
+        assert result == dtype_str
 
     def test_none_returns_none(self):
         result = NetCDFMetadataAdapter._normalize_variable_type(None)
         assert result is None
 
-    def test_schema_to_legacy_unknown_type_normalised(self):
-        """Unknown dataType strings from schema should become 'Unknown' in legacy Variable."""
-        dv = DataVariable.model_construct(name="temp", dimensions=["x"], dataType="MyCustomType")
+    def test_schema_to_legacy_unrecognised_type_preserved(self):
+        """An unrecognised dataType string from schema should survive unchanged in legacy Variable,
+        not become 'Unknown'."""
+        dv = DataVariable.model_construct(name="temp", dimensions=["x"], dataType="float32")
         dataset = _make_schema_dataset(variableMeasured=[dv], additionalProperty=[], dimensions=[])
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
-        assert result.variables[0].type == "Unknown"
+        assert result.variables[0].type == "float32"
 
 
 # ---------------------------------------------------------------------------
@@ -527,6 +836,143 @@ class TestRoundTrip:
         # Dimension names should be preserved
         assert set(var.dimensions) == {"time", "lat", "lon"}
 
+    def test_round_trip_dimension_shape_schema_to_legacy_to_schema(self):
+        """real dimension sizes must survive a
+        schema -> legacy -> schema round trip instead of being replaced with the 0 placeholder."""
+        original = _make_schema_dataset(
+            dimensions=[
+                Dimension.model_construct(name="time", shape=365),
+                Dimension.model_construct(name="lat", shape=180),
+                Dimension.model_construct(name="lon", shape=360),
+            ]
+        )
+        legacy = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        shapes = {d.name: d.shape for d in recovered.dimensions or []}
+        assert shapes == {"time": 365, "lat": 180, "lon": 360}
+
+    def test_round_trip_dimension_shape_legacy_to_schema_to_legacy(self):
+        original = _make_legacy_metadata(
+            additional_metadata={"dimension_time_shape": "365", "dimension_lat_shape": "180"}
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert recovered.additional_metadata["dimension_time_shape"] == "365"
+        assert recovered.additional_metadata["dimension_lat_shape"] == "180"
+
+    def test_round_trip_dimension_used_only_by_coordinate_schema_to_legacy_to_schema(self):
+        """A dimension referenced only by a coordinate (e.g. a CF 'nv'/'bnds' bounds axis backing
+        a 'time_bnds'-style coordinate, never used by any data variable) must survive a
+        schema -> legacy -> schema round trip as a real Dimension."""
+        coord = DataVariable.model_construct(
+            name="time_bnds", dimensions=["time", "nv"], dataType="Float"
+        )
+        original = _make_schema_dataset(
+            dimensions=[
+                Dimension.model_construct(name="time", shape=365),
+                Dimension.model_construct(name="lat", shape=180),
+                Dimension.model_construct(name="lon", shape=360),
+                Dimension.model_construct(name="nv", shape=2),
+            ],
+            coordinates=[coord],
+        )
+        legacy = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        shapes = {d.name: d.shape for d in recovered.dimensions or []}
+        assert shapes == {"time": 365, "lat": 180, "lon": 360, "nv": 2}
+        prop_names = {p.name for p in recovered.additionalProperty or []}
+        assert "dimension_nv_shape" not in prop_names
+
+    def test_round_trip_coordinates_schema_to_legacy_to_schema(self):
+        """coordinates must survive a schema -> legacy -> schema round trip."""
+        coord = DataVariable.model_construct(
+            name="time", dimensions=["time"], unit="days since 2000-01-01", dataType="Float"
+        )
+        original = _make_schema_dataset(coordinates=[coord])
+        legacy = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert recovered.coordinates is not None
+        assert len(recovered.coordinates) == 1
+        assert recovered.coordinates[0].name == "time"
+        assert recovered.coordinates[0].unit == "days since 2000-01-01"
+        assert recovered.coordinates[0].dataType == "Float"
+
+    def test_round_trip_coordinates_legacy_to_schema_to_legacy(self):
+        original = _make_legacy_metadata(
+            coordinates=[Variable(name="time", unit="days since 2000-01-01", type="Float", shape="time")]
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert recovered.coordinates is not None
+        assert len(recovered.coordinates) == 1
+        assert recovered.coordinates[0].name == "time"
+        assert recovered.coordinates[0].unit == "days since 2000-01-01"
+
+    def test_round_trip_non_numeric_min_max_value(self):
+        """a non-numeric minValue/maxValue sentinel must survive a legacy -> schema -> legacy round trip unchanged."""
+        original = _make_legacy_metadata(
+            variables=[_make_variable(minimum_value="NA", maximum_value="NA")]
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert recovered.variables[0].minimum_value == "NA"
+        assert recovered.variables[0].maximum_value == "NA"
+
+    def test_round_trip_srs_type_legacy_to_schema_to_legacy(self):
+        """srs_type must survive a legacy -> schema -> legacy round trip."""
+        original = _make_legacy_metadata(
+            spatial_reference=MultidimensionalBoxSpatialReference(
+                northlimit=45.0,
+                eastlimit=-70.0,
+                southlimit=40.0,
+                westlimit=-80.0,
+                srs_type="projected",
+            )
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert recovered.spatial_reference.srs_type == "projected"
+
+    def test_round_trip_spatial_units_and_datum_legacy_to_schema_to_legacy(self):
+        """units/datum must survive a legacy -> schema -> legacy round trip."""
+        original = _make_legacy_metadata(
+            spatial_coverage=BoxCoverage(
+                northlimit=45.0, eastlimit=-70.0, southlimit=40.0, westlimit=-80.0,
+                units="Decimal degrees",
+            ),
+            spatial_reference=MultidimensionalBoxSpatialReference(
+                northlimit=45.0, eastlimit=-70.0, southlimit=40.0, westlimit=-80.0,
+                units="Decimal degrees", datum="NAD83",
+            ),
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert recovered.spatial_coverage.units == "Decimal degrees"
+        assert recovered.spatial_reference.units == "Decimal degrees"
+        assert recovered.spatial_reference.datum == "NAD83"
+
+    def test_round_trip_has_part_and_is_part_of_legacy_to_schema_to_legacy(self):
+        """hasPart/isPartOf must survive a legacy -> schema -> legacy round trip."""
+        original = _make_legacy_metadata(
+            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
+            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
+        )
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+
+        assert len(recovered.hasPart) == 1
+        assert recovered.hasPart[0].name == "Child resource"
+        assert len(recovered.isPartOf) == 1
+        assert recovered.isPartOf[0].name == "Parent collection"
+
     def test_dimension_deduplication(self):
         """Two variables sharing dimensions should not produce duplicate Dimension entries."""
         v1 = Variable(name="temp", shape="time lat lon")
@@ -589,13 +1035,56 @@ class TestAggregationSave:
 
 
 class TestRightsModel:
-    def test_rights_requires_statement_or_url(self):
-        with pytest.raises(ValidationError, match="Either 'statement' or 'url' must have a value"):
+    def test_rights_requires_statement_or_url_or_description(self):
+        with pytest.raises(ValidationError, match="Either 'statement', 'url', or 'description' must have a value"):
             Rights()
 
     def test_rights_accepts_url_only(self):
         rights = Rights(url="https://example.com/license")
         assert str(rights.url) == "https://example.com/license"
+
+    def test_rights_accepts_description_only(self):
+        rights = Rights(description="Free-text license terms with no formal name or URL.")
+        assert rights.description == "Free-text license terms with no formal name or URL."
+
+
+class TestRightsFromLicense:
+    def test_license_with_only_description_works(self):
+        dataset = _make_schema_dataset(
+            license=CreativeWork.model_construct(description="Free-text license terms.")
+        )
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.rights is not None
+        assert result.rights.description == "Free-text license terms."
+        assert result.rights.statement is None
+        assert result.rights.url is None
+
+    def test_license_with_nothing_set_returns_none(self):
+        dataset = _make_schema_dataset(license=CreativeWork.model_construct())
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.rights is None
+
+    def test_license_description_preserved_alongside_name_and_url(self):
+        dataset = _make_schema_dataset(
+            license=CreativeWork.model_construct(
+                name="CC BY 4.0", url="https://example.com/license", description="Attribution required."
+            )
+        )
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.rights.statement == "CC BY 4.0"
+        assert str(result.rights.url) == "https://example.com/license"
+        assert result.rights.description == "Attribution required."
+
+    def test_license_description_round_trips_back_to_schema(self):
+        legacy = _make_legacy_metadata(rights=Rights(description="Free-text license terms."))
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+
+        assert result.license.description == "Free-text license terms."
+        assert result.license.name is None
+        assert result.license.url is None
 
 
 # ---------------------------------------------------------------------------
