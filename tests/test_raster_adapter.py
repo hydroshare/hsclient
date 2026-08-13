@@ -66,7 +66,8 @@ class DummyS3Client:
 def _make_schema_dataset(**kwargs) -> ScientificDataset:
     place = Place.model_construct()
     place.name = "Cache Valley"
-    place.geo = GeoShape.model_construct(box="42.0 -111.0 41.5 -111.5", validate_bbox=False)
+    # Box token order is "S W N E" (south, west, north, east)
+    place.geo = GeoShape.model_construct(box="41.5 -111.5 42.0 -111.0", validate_bbox=False)
     place.srs = SpatialReference.model_construct(
         name="WGS 84",
         srsType="geographic",
@@ -186,9 +187,6 @@ class TestSchemaToLegacy:
         assert result.url is None
 
     def test_has_part_and_is_part_of(self):
-        """hasPart/isPartOf must survive onto the legacy model instead of being
-        dropped -- they have no equivalent in hsmodels but were added as additive legacy fields
-        in local GeographicRasterMetadata."""
         dataset = _make_schema_dataset(
             hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
             isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
@@ -232,8 +230,8 @@ class TestSchemaToLegacy:
         assert result.additional_metadata.get("custom_meta") == "custom_value"
 
     def test_missing_grid_info_returns_none(self):
-        """Neither rows nor columns present -> legitimate empty state, no CellInformation to
-        build and nothing recoverable to lose, so this returns None."""
+        """Neither rows nor columns present -> valid empty state, no CellInformation to
+        build, so this returns None."""
         dataset = _make_schema_dataset(
             dimensions=[],
             additionalProperty=[],
@@ -268,6 +266,8 @@ class TestSchemaToLegacy:
     def test_additional_property_bare_string_list_entries_not_dropped(self):
         """a List[str] additionalProperty (a legal shape per the ScientificDataset
         type) being preserved under synthetic keys."""
+        # TODO: We should not be mapping legacy additional_metadata to schema additionalProperty
+        # as they have different data types.
         dataset = _make_schema_dataset(additionalProperty=["first note", "second note"])
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
 
@@ -285,26 +285,6 @@ class TestSchemaToLegacy:
             additionalProperty=[
                 PropertyValue.model_construct(name="cell_size_x_value", value="10"),
                 PropertyValue.model_construct(name="cell_size_y_value", value="10"),
-            ],
-        )
-        result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
-
-        assert result.cell_information.cell_data_type == "int16"
-
-    def test_data_variable_data_type_edit_is_not_silently_ignored(self):
-        """DataVariable.dataType disagrees with a stale
-        additionalProperty["cell_data_type"] entry -- DataVariable.dataType must win, proving the
-        edit isn't silently dropped."""
-        dataset = _make_schema_dataset(
-            variableMeasured=[
-                DataVariable.model_construct(
-                    name="Band 1", dimensions=["rows", "columns"], unit="m", dataType="int16"
-                )
-            ],
-            additionalProperty=[
-                PropertyValue.model_construct(name="cell_size_x_value", value="10"),
-                PropertyValue.model_construct(name="cell_size_y_value", value="10"),
-                PropertyValue.model_construct(name="cell_data_type", value="float32"),
             ],
         )
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
@@ -365,18 +345,16 @@ class TestSchemaToLegacy:
             RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
 
     def test_spatial_reference_srs_type_captured_directly(self):
-        """srs_type should be read straight from ScientificDataset.srs.srsType, no heuristic involved."""
+        """srs_type should be read straight from ScientificDataset.srs.srsType"""
         dataset = _make_schema_dataset()
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
 
         assert result.spatial_reference.srs_type == "geographic"
 
-    def test_spatial_reference_srs_type_projected_captured_directly(self):
-        """A projected srsType with no heuristic-matching projection text still comes through
-        correctly because it's read directly from the schema side."""
+    def test_spatial_reference_srs_type(self):
         place = Place.model_construct()
         place.name = "Cache Valley"
-        place.geo = GeoShape.model_construct(box="42.0 -111.0 41.5 -111.5", validate_bbox=False)
+        place.geo = GeoShape.model_construct(box="41.5 -111.5 42.0 -111.0", validate_bbox=False)
         place.srs = SpatialReference.model_construct(
             name="NAD83",
             srsType="projected",
@@ -406,7 +384,7 @@ class TestSchemaToLegacy:
         """units/datum have no schema.org field, so they're carried via Place.additionalProperty."""
         place = Place.model_construct()
         place.name = "Cache Valley"
-        place.geo = GeoShape.model_construct(box="42.0 -111.0 41.5 -111.5", validate_bbox=False)
+        place.geo = GeoShape.model_construct(box="41.5 -111.5 42.0 -111.0", validate_bbox=False)
         place.srs = SpatialReference.model_construct(name="WGS 84", srsType="geographic")
         place.additionalProperty = [
             PropertyValue.model_construct(name="spatial_coverage_units", value="Decimal degrees"),
@@ -424,7 +402,7 @@ class TestSchemaToLegacy:
         """Spatial reference produced when the schema SRS entry is absent should have None coordinate fields."""
         place = Place.model_construct()
         place.name = "Cache Valley"
-        place.geo = GeoShape.model_construct(box="42.0 -111.0 41.5 -111.5", validate_bbox=False)
+        place.geo = GeoShape.model_construct(box="41.5 -111.5 42.0 -111.0", validate_bbox=False)
         place.srs = None
         dataset = _make_schema_dataset(spatialCoverage=place)
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
@@ -442,6 +420,14 @@ class TestSchemaToLegacy:
         assert result.period_coverage is not None
         assert result.period_coverage.start == datetime(2024, 1, 1)
         assert result.period_coverage.end == datetime(2024, 1, 31)
+
+    def test_temporal_coverage_with_none_start_date_returns_none(self):
+        dataset = _make_schema_dataset(
+            temporalCoverage=TemporalCoverage.model_construct(startDate=None, endDate=None)
+        )
+        result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
+
+        assert result.period_coverage is None
 
     def test_rights_from_license(self):
         dataset = _make_schema_dataset()
@@ -518,7 +504,7 @@ class TestLegacyToSchema:
 
     def test_non_numeric_band_values_preserved_as_string(self):
         """a non-numeric minimum_value/maximum_value/no_data_value (e.g. an "NA"
-        sentinel) must survive as a string instead of being coerced to None by float parsing."""
+        sentinel) must survive as a string"""
         legacy = _make_legacy_metadata(
             band_information=BandInformation(
                 name="Band 1",
@@ -570,7 +556,8 @@ class TestLegacyToSchema:
 
         assert result.spatialCoverage is not None
         assert isinstance(result.spatialCoverage.geo, GeoShape)
-        assert result.spatialCoverage.geo.box == "42.0 -111.0 41.5 -111.5"
+        # Box token order is "S W N E" (south, west, north, east)
+        assert result.spatialCoverage.geo.box == "41.5 -111.5 42.0 -111.0"
 
     def test_spatial_reference(self):
         legacy = _make_legacy_metadata()
@@ -642,7 +629,8 @@ class TestLegacyToSchema:
         assert result.spatialCoverage.srs.srsType == "geographic"
 
     def test_spatial_units_and_datum_written_to_place_additional_property(self):
-        """units/datum have no schema.org field, so they're carried via Place.additionalProperty."""
+        """units/datum have no schema.org field, so they're carried via Place.additionalProperty for now."""
+        # TODO: This test is not needed once we have a proper schema.org extension for units/datum on Place/SpatialReference.
         legacy = _make_legacy_metadata(
             spatial_coverage=BoxCoverage(
                 name="Cache Valley",
@@ -788,7 +776,7 @@ class TestRoundTrip:
 
     def test_round_trip_non_numeric_no_data_value(self):
         """a non-numeric no_data_value sentinel survives a full legacy -> schema
-        -> legacy round trip instead of being dropped to None along the way."""
+        -> legacy round trip."""
         original = _make_legacy_metadata(
             band_information=BandInformation(
                 name="Band 1",

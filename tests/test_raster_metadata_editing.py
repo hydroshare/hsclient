@@ -78,7 +78,8 @@ def test_raster_metadata_can_be_edited_in_legacy_format_and_saved_as_schema_org(
 
     assert saved_metadata["spatialCoverage"]["@type"] == "Place"
     assert saved_metadata["spatialCoverage"]["geo"]["@type"] == "GeoShape"
-    assert saved_metadata["spatialCoverage"]["geo"]["box"] == "42.0 -111.0 41.5 -111.5"
+    # Box token order is "S W N E" (south, west, north, east)
+    assert saved_metadata["spatialCoverage"]["geo"]["box"] == "41.5 -111.5 42.0 -111.0"
 
     assert saved_metadata["variableMeasured"][0]["@type"] == "DataVariable"
     assert saved_metadata["variableMeasured"][0]["name"] == "Band 1"
