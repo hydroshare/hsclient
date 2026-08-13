@@ -3,15 +3,9 @@ from __future__ import annotations
 """
 Locally-owned legacy metadata model for Geographic Raster aggregations.
 
-Why a local model instead of importing hsmodels.schemas.aggregations.GeographicRasterMetadata
-directly?
-  - We need an optional ``description`` field that has no equivalent in the hsmodels model.
-  - We need an optional ``associatedMedia`` field for round-tripping aggregation file references.
-  - ``BoxSpatialReference`` and ``PointSpatialReference`` positional limits are kept as required
-    ``float`` fields (matching hsmodels) while ``BandInformation`` and ``CellInformation`` fields
-    are fully Optional to handle incomplete schema payloads without raising validation errors.
-  - All local models use extra="allow" via LegacyBaseModel so that unknown upstream fields are
-    preserved during round-trips rather than discarded.
+Using this local model for now instead of the external hsmodels.schemas.aggregations.GeographicRasterMetadata
+for POC implementation of metadata adapter as it makes it easy to adjust the model to support
+round-tripping of ScientificDataset metadata that has no direct equivalent in hsmodels.
 TODO: Update hsmodels to support these changes and remove this local model.
 """
 
@@ -78,7 +72,7 @@ class BoxSpatialReference(LegacyRasterBaseModel):
     datum: Optional[str] = None
     projection_name: Optional[str] = None
     # Round-tripped directly from ScientificDataset.spatialCoverage.srs.srsType ("geographic" or
-    # "projected"). Added here so this doesn't have to be reconstructed heuristically.
+    # "projected"). 'srs_type' is a new field - doesn't exist in hsmodels.
     srs_type: Optional[str] = None
 
 
@@ -101,7 +95,7 @@ class PointSpatialReference(LegacyRasterBaseModel):
     projection_string_type: Optional[str] = None
     projection_name: Optional[str] = None
     # Round-tripped directly from ScientificDataset.spatialCoverage.srs.srsType ("geographic" or
-    # "projected"). Added here so this doesn't have to be reconstructed heuristically.
+    # "projected"). 'srs_type' is a new field - doesn't exist in hsmodels.
     srs_type: Optional[str] = None
 
 
@@ -135,7 +129,7 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     additional_metadata: Dict[str, str] = Field(default_factory=dict)
 
     # description is not in hsmodels.GeographicRasterMetadata; added here to round-trip
-    # ScientificDataset.description without losing it in additional_metadata.
+    # ScientificDataset.description.
     description: Optional[str] = None
 
     spatial_coverage: Optional[Union[PointCoverage, BoxCoverage]] = None
@@ -152,5 +146,6 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
 
     # hasPart/isPartOf are not in hsmodels.GeographicRasterMetadata; added here so these
     # ScientificDataset relation fields survive a round-trip instead of being dropped.
+    # TODO: make these 2 fields read-only
     hasPart: Optional[List[HasPart]] = None
     isPartOf: Optional[List[IsPartOf]] = None

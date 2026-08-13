@@ -18,12 +18,12 @@ equivalent in the 'ScientificDataset' or 'Dimension' schema.  They are round-tri
   'cell_size_x_value'
   'cell_size_y_value'
 
-Since HydroShare does not currently populate these keys, this way ensures that any user-provided values (using hsclient)
-are preserved across round-trips.
+NOTE: This is a temporary solution until we add a dedicated field for cell size to schema-org based models.
+TODO: Consider adding a proper per-dimension size field to the legacy model.
 
-'CellInformation.cell_data_type' *does* have a natural home on the
+'CellInformation.cell_data_type' does have a natural home on the
 schema.org side ('DataVariable.dataType'), so 'DataVariable.dataType' is the single
-authoritative source for it in both directions —
+source for it in both directions —
 '_to_schema_variable_measured' sets every band's 'dataType' identically from
 'cell_information.cell_data_type' (legacy → schema), and '_to_legacy_cell_information' reads it
 back from the first band's 'DataVariable.dataType' (schema → legacy).
@@ -32,7 +32,7 @@ BandInformation ↔ variableMeasured mapping
 ------------------------------------------
 Each 'BandInformation' object maps to one 'DataVariable' entry in
 'ScientificDataset.variableMeasured'.  The legacy model allows a single
-'BandInformation' instance *or* a list; the adapter normalises both to a list
+'BandInformation' instance or a list; the adapter normalises both to a list
 before converting.
 
   'BandInformation.name'          ↔ 'DataVariable.name'
@@ -69,25 +69,22 @@ Spatial units/datum overflow fields
 'BoxCoverage.units'/'PointCoverage.units', 'BoxSpatialReference.units'/
 'PointSpatialReference.units', and 'BoxSpatialReference.datum' already exist on the legacy
 models but have no equivalent on 'GeoShape'/'GeoCoordinates'/'SpatialReference' -- unlike
-'srsType' above, this is a schema.org-side gap, not a legacy-side one, and those schema.org
-models mirror the actual JSON-LD persisted to/read from HydroShare, so they were not extended for
-these two auxiliary fields. They are instead round-tripped via 'Place.additionalProperty' (not
-'ScientificDataset.additionalProperty' — this keeps the overflow data scoped to the spatial
-object it describes) under the keys:
+'srsType' above, this is a schema.org-side gap, not a legacy-side one. They are instead round-tripped
+via 'Place.additionalProperty' (not 'ScientificDataset.additionalProperty' — this keeps the overflow data
+scoped to the spatial object it describes) under the keys:
 
   'spatial_coverage_units'
   'spatial_reference_units'
   'spatial_reference_datum'
 
 See 'RasterMetadataAdapter._spatial_overflow_to_additional_properties'.
-This way if the user provides a value for these fields (using hsclient), it will be preserved across round-trips.
+NOTE: This is a temporary solution until we add a dedicated field for spatial units and datum to schema.org based models.
+TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference.
 
  hasPart / isPartOf
 -------------------
-'ScientificDataset.hasPart'/'isPartOf' have no equivalent on
-'legacy GeographicRasterMetadata', so 'GeographicRasterMetadata' gained matching 'hasPart'/
-'isPartOf' fields. These reuse the schema.org 'HasPart'/'IsPartOf' types directly and are passed straight through unconverted in
-both directions.
+'ScientificDataset.hasPart'/'isPartOf' had no equivalent on
+'legacy GeographicRasterMetadata', so these 2 fields added to GeographicRasterMetadata.
 """
 
 import logging
@@ -136,16 +133,10 @@ class RasterMetadataAdapter:
         cls, metadata: Union[ScientificDataset, Dict[str, Any]]
     ) -> GeographicRasterMetadata:
         """Convert a ScientificDataset (or its dict representation) to GeographicRasterMetadata.
-
-        The 'additionalType' of the incoming dataset is not validated here; the caller
-        (MetadataAdapter / load_json) is responsible for routing only GEOGRAPHIC_RASTER datasets
-        to this method.
         """
         dataset = metadata if isinstance(metadata, ScientificDataset) else ScientificDataset.model_validate(metadata)
 
-        # Flatten additionalProperty to a plain dict first so that CellInformation overflow
-        # keys (cell_size_x_value, cell_size_y_value, cell_data_type) can be extracted inside
-        # _to_legacy_cell_information.
+        # NOTE: This is not a permanent solution to handle fields that can't be directly mapped between the 2 metadata formats.
         additional_metadata = cls._additional_property_to_dict(dataset.additionalProperty)
 
         return GeographicRasterMetadata(
@@ -182,8 +173,7 @@ class RasterMetadataAdapter:
         additional_metadata = dict(legacy.additional_metadata or {})
         description = legacy.description
         additional_properties = cls._dict_to_additional_property(additional_metadata)
-        # Append CellInformation overflow entries (cell_size_x_value, cell_size_y_value,
-        # cell_data_type) that have no dedicated ScientificDataset attribute.
+        # NOTE: This is not a permanent solution to handle fields that can't be directly mapped between the 2 metadata formats.
         additional_properties.extend(cls._cell_information_to_additional_properties(legacy.cell_information))
 
         return ScientificDataset.model_construct(
@@ -222,17 +212,17 @@ class RasterMetadataAdapter:
         """Flatten ScientificDataset.additionalProperty to a plain str→str dict.
 
         'additionalProperty' is typed as 'Optional[Union[str, List[str], PropertyValue,
-        List[PropertyValue]]]' (matching HydroShare's own 'ScientificDataset' schema), and this
-        method handles all of those shapes. That said, currently no HydroShare content-type
-        extractor (raster or otherwise) ever populates
+        List[PropertyValue]]]', and this
+        method handles all of those shapes. It seems currently no HydroShare content-type
+        extractor ever populates
         'additionalProperty' at all; the only real producer for raster is this adapter's own
         '_dict_to_additional_property', which always emits 'List[PropertyValue]' with
-        string-coerced values. So in practice, 'PropertyValue''s richer fields ('propertyID',
-        'unitCode', 'minValue', 'maxValue', 'measurementTechnique', etc.) and the original
-        'value' type ('float'/'bool' vs. 'str') are not preserved here -- only 'name' and
+        string-coerced values. So in practice, 'PropertyValue''s fields ('propertyID',
+        'unitCode', 'minValue', 'maxValue', 'measurementTechnique', etc.) are not preserved here -- only 'name' and
         a stringified 'value' survive the flatten to 'GeographicRasterMetadata.additional_metadata'
-        (a plain 'Dict[str, str]'). This is intentionally left as-is rather than widening that
-        field's type, since nothing currently generates those richer shapes for raster.
+        (a plain 'Dict[str, str]'). This is intentionally left as-is since nothing currently
+        generates those richer shapes for raster.
+        TODO: To avoid data loss, consider adding the 'additionalProperty' field to the legacy model.
         """
         if additional_property is None:
             return {}
@@ -326,16 +316,15 @@ class RasterMetadataAdapter:
 
         # NOTE: GeoShape/GeoCoordinates carry no 'units' concept in schema.org, unlike the
         # legacy BoxCoverage/PointCoverage models which do. This one
-        # auxiliary field, 'units' is round-tripped via Place.additionalProperty under the key
-        # "spatial_coverage_units" -- the same overflow mechanism already used for CellInformation.
+        # field, 'units' is round-tripped via Place.additionalProperty under the key
+        # "spatial_coverage_units".
+        # TODO: Consider adding a proper 'units' field to GeoShape/GeoCoordinates to avoid this workaround.
         overflow = cls._additional_property_to_dict(spatial_coverage.additionalProperty)
         units = overflow.get("spatial_coverage_units")
 
         geo = spatial_coverage.geo
         if isinstance(geo, GeoShape):
             north, east, south, west = cls._parse_bbox(geo.box)
-            # NOTE: projection is not carried via Place.additionalProperty since the legacy
-            # spatial_reference already has a dedicated slot (projection/projection_name) for it.
             return BoxCoverage(
                 type="box",
                 name=spatial_coverage.name,
@@ -376,7 +365,6 @@ class RasterMetadataAdapter:
         projection_string = ""
         projection_string_type = None
         projection_name = None
-        # Captured directly from the schema.org side (this leg always has the real value).
         srs_type = None
 
         if srs is not None:
@@ -389,6 +377,7 @@ class RasterMetadataAdapter:
         # NOTE: 'units' and 'datum' have no schema.org equivalent - SpatialReference (Place.srs) carries
         # neither, so -- same as 'spatial_coverage_units' above -- they're round-tripped via
         # Place.additionalProperty.
+        # TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference.
         overflow = cls._additional_property_to_dict(spatial_coverage.additionalProperty)
         units = overflow.get("spatial_reference_units")
         datum = overflow.get("spatial_reference_datum")
@@ -432,8 +421,9 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_legacy_period_coverage(temporal_coverage: Optional[TemporalCoverage]) -> Optional[PeriodCoverage]:
-        """Convert ScientificDataset.temporalCoverage → legacy PeriodCoverage."""
-        if temporal_coverage is None:
+        """Convert ScientificDataset.temporalCoverage → legacy PeriodCoverage.
+        """
+        if temporal_coverage is None or temporal_coverage.startDate is None:
             return None
         return PeriodCoverage(start=temporal_coverage.startDate, end=temporal_coverage.endDate)
 
@@ -448,7 +438,7 @@ class RasterMetadataAdapter:
         """Convert ScientificDataset.variableMeasured → legacy BandInformation (or list thereof).
 
         Returns a single 'BandInformation' when only one band is present, or a list for
-        multi-band rasters, matching the legacy model's flexible field type.
+        multi-band rasters, matching the legacy model's field type.
         Returns 'None' when 'variableMeasured' is empty or contains no recognised entries.
         """
         if not variable_measured:
@@ -498,26 +488,19 @@ class RasterMetadataAdapter:
         on the legacy model, so a 'CellInformation' object can only be constructed when *both* are
         recovered.
 
-        - If *neither* is present, this returns 'None' immediately, without looking at
+        - If neither is present, this returns 'None' immediately, without looking at
           cell_size_x_value/cell_size_y_value/cell_data_type at all, since those overflow fields
-          have no relevance without a 'CellInformation'. This is a legitimate empty state (the
+          have no relevance without a 'CellInformation'. This is a valid empty state (the
           dataset simply has no cell information), so there is nothing to lose by returning
           'None' here.
-        - If *exactly one* of rows/columns is present, this raises 'ValueError' instead of
+        - If exactly one of rows/columns is present, this raises 'ValueError' instead of
           returning 'None'. Silently discarding the one real value would be a real data-loss
           bug with Aggregation.save().
 
         Hydroshare does not currently populate the cell size fields, however, if the user provides
         them as part of the CellInformation using hsclient, the adapter stores them in
         ScientificDataset.additionalProperty for the round-trip to work.
-
-        Once rows/columns are both available, 'cell_size_x_value'/'cell_size_y_value' are read
-        from 'additional_metadata' (already flattened from 'additionalProperty'; HydroShare does
-        not currently populate these keys, but the adapter reads them defensively in case future
-        payloads do), and 'cell_data_type' is read from the first 'DataVariable.dataType' found
-        in 'variable_measured' (CellInformation applies to the whole grid, so all bands share the
-        same value -- see '_to_schema_variable_measured', which sets every DataVariable's
-        'dataType' identically from 'cell_information.cell_data_type' on the return leg).
+        TODO: Consider adding dedicated fields for cell size fields to the schema.org based models to avoid this workaround.
         """
         rows = None
         columns = None
@@ -530,8 +513,8 @@ class RasterMetadataAdapter:
             elif dim_name != "band":
                 # "band" is expected and handled separately (its count is re-derived from
                 # variableMeasured); anything else is a dimension GeographicRasterMetadata has no
-                # slot for - so it's dropped -- but
-                # logged so a future/custom dimension doesn't disappear silently.
+                # slot for - so it's dropped. Logging this case so a future/custom dimension
+                # doesn't disappear silently.
                 _logger.warning(
                     "Unrecognized raster dimension %r (shape=%r) has no legacy equivalent and is "
                     "being dropped.",
@@ -551,7 +534,8 @@ class RasterMetadataAdapter:
         # NOTE: CellInformation has fields 'cell_size_x_value' and 'cell_size_y_value' that do not
         # have dedicated ScientificDataset attributes as part of Dimension. Though hydroshare does not currently populate
         # these fields as additionalProperty, we are retrieving them from additionalProperty as part of
-        # round-trip flow (user providing/editing them using hsclient).
+        # round-trip flow.
+        # TODO: Consider adding dedicated fields for cell size fields to the schema.org based models to avoid this workaround.
         cell_size_x_value = RasterMetadataAdapter._parse_float(additional_metadata.get("cell_size_x_value"))
         cell_size_y_value = RasterMetadataAdapter._parse_float(additional_metadata.get("cell_size_y_value"))
 
@@ -592,10 +576,8 @@ class RasterMetadataAdapter:
         place.name = getattr(spatial_coverage, "name", None)
 
         if isinstance(spatial_coverage, BoxCoverage):
-            # NOTE: Legacy box coverage includes a units/projection field, but GeoShape stores
-            # only bbox geometry. 'projection' is intentionally not round-tripped here since the
-            # legacy spatial_reference already carries projection/projection_name for that. 'units'
-            # is preserved via Place.additionalProperty -- see below.
+            # NOTE: Legacy BoxCoverage.units has no dedicated GeoShape field; preserved via
+            # Place.additionalProperty below instead.
             place.geo = GeoShape.model_construct(
                 box=cls._compose_box(
                     spatial_coverage.northlimit,
@@ -606,20 +588,24 @@ class RasterMetadataAdapter:
                 validate_bbox=False,
             )
         elif isinstance(spatial_coverage, PointCoverage):
-            # NOTE: Legacy point coverage includes a units/projection field, but GeoCoordinates
-            # stores only lat/lon.
+            # NOTE: Legacy PointCoverage.units has no dedicated GeoCoordinates field; preserved
+            # via Place.additionalProperty below instead.
             place.geo = GeoCoordinates.model_construct(
                 latitude=spatial_coverage.north,
                 longitude=spatial_coverage.east,
             )
 
         if spatial_reference is not None:
+            # NOTE: Legacy BoxSpatialReference/PointSpatialReference.units and
+            # BoxSpatialReference.datum have no dedicated SpatialReference
+            # fields; preserved via Place.additionalProperty below instead.
             place.srs = cls._to_schema_spatial_reference(spatial_reference)
 
         # NOTE: 'units' (on spatial_coverage and spatial_reference) and 'datum' (on
         # spatial_reference) have no dedicated field on Place/GeoShape/GeoCoordinates/
-        # So they're round-tripped via Place.additionalProperty, the same
-        # overflow mechanism already used for CellInformation's unrepresented fields.
+        # So they're round-tripped via Place.additionalProperty.
+        # TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference
+        # to avoid this workaround.
         overflow_properties = cls._spatial_overflow_to_additional_properties(spatial_coverage, spatial_reference)
         if overflow_properties:
             place.additionalProperty = overflow_properties
@@ -631,10 +617,6 @@ class RasterMetadataAdapter:
         cls, spatial_reference: Union[BoxSpatialReference, PointSpatialReference]
     ) -> SpatialReference:
         """Convert legacy BoxSpatialReference or legacy PointSpatialReference → SpatialReference.
-
-        'srs_type' is read directly from 'spatial_reference.srs_type' (populated by
-        '_to_legacy_spatial_reference' from the original 'ScientificDataset.spatialCoverage.srs.srsType' on
-        the prior schema→legacy leg), defaulting to "geographic" if unset.
         """
         srs_type = getattr(spatial_reference, "srs_type", None) or "geographic"
 
@@ -738,9 +720,8 @@ class RasterMetadataAdapter:
           - 'cell_size_x_value' → 'PropertyValue(name="cell_size_x_value", value=...)'
           - 'cell_size_y_value' → 'PropertyValue(name="cell_size_y_value", value=...)'
 
-        'cell_data_type' is deliberately NOT written here — it round-trips via
-        'DataVariable.dataType' instead (set below by '_to_schema_variable_measured', and read
-        back by '_to_legacy_cell_information' on the return leg).
+        'cell_data_type' is NOT written here — it round-trips via 'DataVariable.dataType' instead.
+        TODO: Consider adding dedicated fields for cell size fields to the schema.org based models to avoid this workaround.
         """
         if cell_information is None:
             return []
@@ -768,6 +749,7 @@ class RasterMetadataAdapter:
           - 'spatial_reference.units'  → 'PropertyValue(name="spatial_reference_units", value=...)'
           - 'spatial_reference.datum'  → 'PropertyValue(name="spatial_reference_datum", value=...)'
             (only present on 'BoxSpatialReference' — 'PointSpatialReference' has no 'datum')
+        TODO: Consider adding dedicated fields for spatial units and datum to the schema.org based models to avoid this workaround.
         """
         properties: List[PropertyValue] = []
         if getattr(spatial_coverage, "units", None):
@@ -789,25 +771,20 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _parse_bbox(box: str) -> List[float]:
-        """Parse a GeoShape bbox string '"N E S W"' into [north, east, south, west].
-
-        Raises 'ValueError' on a missing or malformed box string, instead of silently
-        discarding the whole spatial coverage/reference by returning 'None'.
+        """Parse a GeoShape bbox string '"S W N E"' into [north, east, south, west].
         """
         try:
-            north, east, south, west = map(float, str(box).split())
+            south, west, north, east = map(float, str(box).split())
         except Exception as e:
             raise ValueError(f"Invalid geo.box string: {box!r}, error: {e}")
         return [north, east, south, west]
 
     @staticmethod
     def _compose_box(north: float, east: float, south: float, west: float) -> str:
-        """Serialise four cardinal limits to a GeoShape bbox string '"N E S W"'."""
-        return f"{north} {east} {south} {west}"
+        return f"{south} {west} {north} {east}"
 
     @staticmethod
     def _parse_float(value: Any) -> Optional[float]:
-        """Safely parse any value to float; returns 'None' for empty or unconvertible input."""
         if value is None or value == "":
             return None
         try:
@@ -817,13 +794,6 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _parse_float_or_original(value: Any) -> Optional[Union[float, str]]:
-        """Parse 'value' to float when possible; otherwise return it unchanged.
-
-        Used for 'DataVariable.minValue'/'maxValue'/'noDataValue', which are typed
-        'Optional[Union[float, str]]' to allow non-numeric sentinels (e.g. '"NA"'). Unlike
-        '_parse_float', this must not collapse an unparsable-but-legitimate string value to
-        'None'.
-        """
         if value is None or value == "":
             return None
         try:
@@ -833,7 +803,6 @@ class RasterMetadataAdapter:
 
     @staticmethod
     def _to_str(value: Any) -> Optional[str]:
-        """Return 'str(value)' or 'None' when value is 'None'."""
         if value is None:
             return None
         return str(value)
