@@ -20,9 +20,10 @@ class AdditionalType(str, Enum):
 class ScientificDataset(CoreMetadata):
     """
     A generic dataset extends the CoreMetadata class with a few additional fields and is designed to capture
-    scientific file-level metadata. It also overrides many of the required CoreMetadata fields to make them
-    optional. It generally follows the design of the Schema.org Dataset class.
+    scientific file-level (aggregation/content-type) metadata. It also overrides many of the required
+    CoreMetadata fields to make them optional. It generally follows the design of the Schema.org Dataset class.
     Used for metadata representation of content types (aggregations).
+    TODO: This class needs to be part of hsmodels so that both hydroshare and hsclient can share it.
     """
 
     context: HttpUrl = Field(
