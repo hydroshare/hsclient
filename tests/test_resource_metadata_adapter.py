@@ -48,7 +48,9 @@ def test_adapter_to_legacy_resource_metadata() -> None:
         "spatialCoverage": {
             "@type": "Place",
             "name": "Logan",
-            "geo": {"@type": "GeoShape", "box": "42.0 -111.0 41.5 -111.5"},
+            # Box token order is "S W N E" (south, west, north, east)
+            "geo": {"@type": "GeoShape", "box": "41.5 -111.5 42.0 -111.0"},
+            "srs": {"@type": "SpatialReference", "name": "WGS 84 EPSG:4326", "srsType": "geographic"},
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
         "hasPart": [
@@ -80,6 +82,7 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.spatial_coverage.eastlimit == -111.0
     assert result.spatial_coverage.southlimit == 41.5
     assert result.spatial_coverage.westlimit == -111.5
+    assert result.spatial_coverage.projection == "WGS 84 EPSG:4326"
     assert result.citation == "Citation text"
     assert len(result.relations) == 1
     assert result.relations[0].type == RelationType.references
@@ -216,7 +219,9 @@ def test_adapter_to_schema_org_metadata() -> None:
     assert result.funding[0].identifier == "NSF-123"
     assert result.funding[0].funder.name == "NSF"
     assert str(result.funding[0].funder.url) == "https://nsf.gov/"
-    assert result.spatialCoverage.geo.box == "42.0 -111.0 41.5 -111.5"
+    assert result.spatialCoverage.geo.box == "41.5 -111.5 42.0 -111.0"
+    assert result.spatialCoverage.srs.name == "WGS 84 EPSG:4326"
+    assert result.spatialCoverage.srs.srsType == "geographic"
     assert result.temporalCoverage.startDate.isoformat() == "2024-01-01T00:00:00"
     assert result.temporalCoverage.endDate.isoformat() == "2024-01-31T00:00:00"
     assert result.provider.name == "HydroShare"
@@ -253,7 +258,8 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
         "spatialCoverage": {
             "@type": "Place",
             "name": "Logan",
-            "geo": {"@type": "GeoShape", "box": "42.0 -111.0 41.5 -111.5"},
+            # Box token order is "S W N E" (south, west, north, east)
+            "geo": {"@type": "GeoShape", "box": "41.5 -111.5 42.0 -111.0"},
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],

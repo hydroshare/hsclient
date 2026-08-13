@@ -6,12 +6,13 @@ from hsmodels.schemas.fields import (
     AwardInfo,
     BoxCoverage,
     Contributor,
-    Creator,
     PeriodCoverage,
     PointCoverage,
     Relation,
     Rights,
 )
+
+from hsclient.metadata_adapter.legacy_resource_models import Creator
 
 # frozen fields on the resource metadata object and a reasonable dummy value to attempt assigning
 FROZEN_FIELDS = [
@@ -148,8 +149,6 @@ def test_update_resource_metadata(hydroshare) -> None:
         )
 
         new_res.save()
-        # sleep(1)  # wait for the resource to be saved and the metadata to be updated in HydroShare
-
         assert new_res.metadata.title == "Resource Metadata Editing Example"
         assert (
             new_res.metadata.abstract
@@ -183,20 +182,13 @@ def test_update_resource_metadata(hydroshare) -> None:
         assert new_res.metadata.spatial_coverage.eastlimit == -111.7664
         assert new_res.metadata.spatial_coverage.southlimit == 41.6732
         assert new_res.metadata.spatial_coverage.westlimit == -111.9079
-        # check projection attribute does exist as the schema.org spatial coverage model has no matching fields
-        # if we add the 'projection' field to the schema.org spatial coverage model,
-        # we can update this assertion to check the value of the projection field.
-        assert not hasattr(new_res.metadata.spatial_coverage, "projection")
-        # assert new_res.metadata.spatial_coverage.projection == "WGS 84 EPSG:4326"
+        assert new_res.metadata.spatial_coverage.projection == "WGS 84 EPSG:4326"
 
         assert hasattr(new_res.metadata.spatial_coverage, "type")
         assert new_res.metadata.spatial_coverage.type == "box"
 
         # check units attribute does exist as the schema.org spatial coverage model has no matching fields
-        # if we add the 'units' field to the schema.org spatial coverage model,
-        # we can update this assertion to check the value of the units field.
         assert not hasattr(new_res.metadata.spatial_coverage, "units")
-        # assert new_res.metadata.spatial_coverage.units == "Decimal degrees"
         assert new_res.metadata.period_coverage.start.isoformat() == "2024-01-01T00:00:00"
         assert new_res.metadata.period_coverage.end.isoformat() == "2024-01-31T00:00:00"
         assert new_res.metadata.publisher is None
@@ -214,6 +206,7 @@ def test_update_resource_metadata(hydroshare) -> None:
         assert new_res.metadata.spatial_coverage.north == 41.7910
         assert new_res.metadata.spatial_coverage.east == -111.7664
         assert new_res.metadata.spatial_coverage.type == "point"
+        assert new_res.metadata.spatial_coverage.projection == "WGS 84 EPSG:4326"
     finally:
         if new_res is not None:
             try:
