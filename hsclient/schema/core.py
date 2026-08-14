@@ -123,4 +123,9 @@ class CoreMetadata(SchemaBaseModel):
         "json_encoders": {
             HttpUrl: str,  # Convert HttpUrl to a string during serialization
         },
+        # Preserve schema.org fields hsclient doesn't yet declare (rather than the inherited
+        # extra="ignore" silently discarding them) so the catch-all mechanisms
+        # (ResourceMetadataAdapter.extra_columns, LegacyResourceMetadata.extra_columns) can
+        # capture those fields and do the round-trip.
+        "extra": "allow",
     }

@@ -30,6 +30,8 @@ FROZEN_FIELDS = [
     ("citation", "Some citation"),
     ("associatedMedia", []),
     ("sharing_status", "public"),
+    ("subjectOf", []),
+    ("extra_columns", {}),
 ]
 
 
@@ -74,6 +76,13 @@ def test_update_resource_metadata(hydroshare) -> None:
         assert new_res.metadata.relations == []
         assert new_res.metadata.citation is not None
         assert new_res.metadata.additional_metadata == {}
+        # extra_columns is read-only: it captures HydroShare system fields
+        # (resource_id, doi, status, viewCount, etc.) that ResourceMetadataAdapter doesn't
+        # declare, so it's never empty on a real resource, and can't be cleared/overwritten
+        # by hsclient users (see FROZEN_FIELDS above).
+        assert new_res.metadata.extra_columns != {}
+        with pytest.raises(AttributeError):
+            new_res.metadata.extra_columns = {}
         assert len(new_res.metadata.associatedMedia) == 1
         assert new_res.metadata.associatedMedia[0].id.endswith(
             f"/{new_res.resource_id}/.hsjsonld/file_manifest.json"
@@ -159,6 +168,11 @@ def test_update_resource_metadata(hydroshare) -> None:
             "Observed Variable": "Temperature",
             "Site Location": "Logan, Utah",
         }
+        # extra_columns keeps passively reflecting whatever HydroShare tracks that hsclient
+        # doesn't model -- unaffected by the unrelated edits above, and still not user-settable.
+        assert new_res.metadata.extra_columns != {}
+        with pytest.raises(AttributeError):
+            new_res.metadata.extra_columns = {}
         assert len(new_res.metadata.relations) == 1
         assert new_res.metadata.relations[0].type == RelationType.isReferencedBy
         assert new_res.metadata.relations[0].value == "Example article, https://example.com/article"

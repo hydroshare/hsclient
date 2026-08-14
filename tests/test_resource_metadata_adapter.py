@@ -405,3 +405,59 @@ def test_dataset_to_legacy_sharing_status_unknown_raises() -> None:
 
     with pytest.raises(ValueError):
         adapter.to_legacy_sharing_status()
+
+
+def test_unknown_schema_org_field_survives_object_input_round_trip() -> None:
+    """A schema.org field with no matching legacy field must not be silently dropped: it should
+    be captured into LegacyResourceMetadata.extra_columns, then replayed back unchanged when
+    converting back to schema.org form."""
+    metadata = {
+        "name": "Test Resource",
+        "creator": [{"name": "Doe, Jane"}],
+        "someFutureField": "abc123",
+    }
+
+    legacy = MetadataAdapter.to_legacy_resource_metadata(metadata)
+
+    assert legacy.extra_columns == {"someFutureField": "abc123"}
+
+    dataset = MetadataAdapter.to_resource_metadata(legacy)
+
+    assert dataset.model_extra == {"someFutureField": "abc123"}
+    assert dataset.model_dump(exclude_none=True)["someFutureField"] == "abc123"
+
+
+def test_unknown_legacy_field_survives_dict_input_round_trip() -> None:
+    """MetadataAdapter.to_resource_metadata() also accepts a raw legacy-shaped dict directly
+    (not just a LegacyResourceMetadata instance) -- an unrecognized key on that path must
+    survive via LegacyResourceMetadataAdapter's own extra_columns capture."""
+    legacy_dict = {
+        "title": "Test Resource",
+        "creators": [{"name": "Doe, Jane"}],
+        "someLegacySideUnknownField": "xyz",
+    }
+
+    dataset = MetadataAdapter.to_resource_metadata(legacy_dict)
+
+    assert dataset.model_extra == {"someLegacySideUnknownField": "xyz"}
+
+
+def test_subject_of_round_trips_as_named_field() -> None:
+    """subjectOf is a known schema.org field -- it should round-trip
+    as a real, frozen field rather than falling into the generic extra_columns catch-all."""
+    metadata = {
+        "name": "Test Resource",
+        "creator": [{"name": "Doe, Jane"}],
+        "subjectOf": [{"name": "A related paper", "url": "https://doi.org/10.1/xyz"}],
+    }
+
+    legacy = MetadataAdapter.to_legacy_resource_metadata(metadata)
+
+    assert legacy.subjectOf[0].name == "A related paper"
+    assert str(legacy.subjectOf[0].url) == "https://doi.org/10.1/xyz"
+    with pytest.raises(AttributeError):
+        legacy.subjectOf = []
+
+    dataset = MetadataAdapter.to_resource_metadata(legacy)
+
+    assert dataset.subjectOf[0].name == "A related paper"

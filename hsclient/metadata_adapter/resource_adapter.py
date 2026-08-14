@@ -38,6 +38,7 @@ from hsclient.schema.base import (
     PublisherOrganization,
     Relation,
     SchemaBaseModel,
+    SubjectOf,
     TemporalCoverage,
 )
 
@@ -45,6 +46,11 @@ from hsclient.schema.base import (
 class ResourceMetadataAdapter(SchemaBaseModel):
     """A pydantic model representing the Schema.org based metadata for HydroShare resources,
     with methods to convert to legacy resource metadata models used for metadata editing using hsclient."""
+
+    # Preserve schema.org fields this model doesn't declare (rather than the inherited
+    # extra="ignore" silently discarding them) so they survive into extra_columns below
+    # instead of being lost.
+    model_config = {"extra": "allow"}
 
     type: Optional[str] = None
     additionalType: Optional[str] = None
@@ -74,6 +80,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
     citation: Optional[List[str]] = []
     provider: Union[Organization, Provider] = None
     creativeWorkStatus: Optional[Union[Draft, Private, Incomplete, Obsolete, Published, Public, Discoverable]] = None
+    subjectOf: Optional[List[SubjectOf]] = []
 
     def to_legacy_sharing_status(self) -> Optional[str]:
         if self.creativeWorkStatus is None:
@@ -232,6 +239,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.isPartOf = self.isPartOf
         legacy_metadata.provider = self.provider
         legacy_metadata.version = self.version
+        legacy_metadata.subjectOf = self.subjectOf
 
         legacy_metadata.citation = self.to_legacy_citation()
         # TODO: This conversion won't work as the data formats at each end is different.
@@ -242,6 +250,12 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         # The legacy model originally doesnot have 'sharing_status' field,
         # we are providing it here for completeness so that it can be accessed in hsclient.
         legacy_metadata.sharing_status = self.to_legacy_sharing_status()
+
+        # Preserve any schema.org field this adapter doesn't declare a named field for (captured
+        # into self.model_extra via extra="allow" above) so it survives the round trip instead of
+        # being silently dropped. model_construct() bypasses LegacyResourceMetadata's own
+        # set_extra_columns validator, so it's set explicitly here.
+        legacy_metadata.extra_columns = dict(self.model_extra or {})
 
         # set the frozen fields so that these fields can't be edited using hsclient
         for field in [
@@ -258,7 +272,13 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             'hasPart',
             'isPartOf',
             'version',
+            'subjectOf',
             "associatedMedia",
+            # extra_columns is a passive capture of whatever hsclient doesn't otherwise model
+            # (see above) -- not a field users are meant to add arbitrary metadata through.
+            # Frozen so it can't be accidentally cleared/overwritten and silently drop data
+            # (e.g. HydroShare system fields like viewCount).
+            'extra_columns',
         ]:
             legacy_metadata.freeze_field(field)
 
