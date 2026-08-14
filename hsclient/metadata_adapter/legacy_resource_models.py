@@ -234,11 +234,13 @@ class LegacyResourceMetadata(SchemaBaseModel):
     period_coverage: Optional[TemporalCoverage] = None
     relations: Optional[List[Relation]] = []
 
-    # 'isPartOf', 'hasPart', 'provider', and 'version' are not part of the legacy resource metadata model
+    # 'isPartOf', 'hasPart', 'provider', 'version', and 'subjectOf' are not part of the legacy
+    # resource metadata model
     isPartOf: Optional[List[schema.IsPartOf]] = []
     hasPart: Optional[List[schema.HasPart]] = []
     provider: Optional[Union[schema.Organization, schema.Provider]] = None
     version: Optional[str] = None
+    subjectOf: Optional[List[schema.SubjectOf]] = []
 
     citation: Optional[str] = None
 
@@ -249,6 +251,12 @@ class LegacyResourceMetadata(SchemaBaseModel):
     # 'sharing_status' is not part of the legacy resource metadata model
     sharing_status: Optional[Literal["private", "public", "published", "discoverable", "draft", "incomplete", "obsolete"]] = None
     additional_metadata: Optional[dict] = {}
+
+    # Read-only capture of schema.org fields with no dedicated model field, so Resource.save()
+    # doesn't silently drop them: S3 has no partial write, so hsclient's JSON becomes the entire
+    # new content of user_metadata.json. Fields like viewCount live only there (unlike
+    # metadata items, which HydroShare re-merges from system_metadata.json
+    # on every read), so anything not captured and replayed here is lost on the next save.
     extra_columns: Optional[dict] = {}
 
     _frozen_fields: set = set()

@@ -118,5 +118,6 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
         dataset.creativeWorkStatus = self.to_dataset_creative_work_status()
         dataset.relation = self.to_dataset_relation()
         dataset.version = self.version
+        dataset.subjectOf = self.subjectOf
         dataset.additionalProperty = self.to_dataset_additional_properties()
         return dataset
