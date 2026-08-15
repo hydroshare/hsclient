@@ -360,19 +360,16 @@ class RasterMetadataAdapter:
         if spatial_coverage is None or spatial_coverage.geo is None:
             return None
 
-        srs = spatial_coverage.srs
-        projection = None
-        projection_string = ""
-        projection_string_type = None
-        projection_name = None
-        srs_type = None
+        if spatial_coverage.srs is None:
+            # No spatial reference on the schema side at all
+            return None
 
-        if srs is not None:
-            projection_name = srs.name
-            projection = srs.code or srs.name
-            projection_string = srs.wktString or ""
-            projection_string_type = srs.code
-            srs_type = srs.srsType
+        srs = spatial_coverage.srs
+        projection_name = srs.name
+        projection = srs.code or srs.name
+        projection_string = srs.wktString or ""
+        projection_string_type = srs.code
+        srs_type = srs.srsType
 
         # NOTE: 'units' and 'datum' have no schema.org equivalent - SpatialReference (Place.srs) carries
         # neither, so -- same as 'spatial_coverage_units' above -- they're round-tripped via
