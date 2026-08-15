@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from hsmodels.schemas.enums import RelationType
 from pydantic import AnyUrl, BaseModel, HttpUrl, TypeAdapter, ValidationError, model_validator
@@ -250,7 +250,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
 
     # 'sharing_status' is not part of the legacy resource metadata model
     sharing_status: Optional[Literal["private", "public", "published", "discoverable", "draft", "incomplete", "obsolete"]] = None
-    additional_metadata: Optional[dict] = {}
+    additional_metadata: Dict[str, str] = {}
 
     # Read-only capture of schema.org fields with no dedicated model field, so Resource.save()
     # doesn't silently drop them: S3 has no partial write, so hsclient's JSON becomes the entire
