@@ -47,7 +47,7 @@ class Variable(LegacyNetCDFBaseModel):
     # unit is required in hsmodels but Optional here (relaxed to avoid hard failures on incomplete schema payloads).
     unit: Optional[str] = None
     # type is a VariableType enum in hsmodels; stored as str here (relaxed to avoid hard failures
-    # on unknown values coming from schema.org payloads).
+    # on unknown values coming from schema.org payloads - DataVariable.dataType = Optional[str]).
     type: Optional[str] = None
     # Space-separated list of dimension names, e.g. "time lat lon".
     # This is a string in hsmodels.

@@ -6,7 +6,7 @@ Coverage:
   - Legacy → schema conversion (MultidimensionalMetadata → ScientificDataset)
   - Full round-trips in both directions
   - Variable.shape ↔ Dimension name list conversion
-  - Variable.type normalisation (valid enum value, unknown string, None)
+  - Variable.type passed through unchanged (free-form string, None)
   - Variable.method direct mapping to DataVariable.method; Variable.descriptive_name direct
     mapping to DataVariable.description
   - description field round-trip
@@ -735,50 +735,23 @@ class TestLegacyToSchema:
 # ---------------------------------------------------------------------------
 
 
-class TestVariableTypeNormalisation:
+class TestVariableTypePassThrough:
     @pytest.mark.parametrize(
-        "input_type, expected",
-        [
-            ("Float", "Float"),
-            ("float", "Float"),
-            ("FLOAT", "Float"),
-            ("Double", "Double"),
-            ("Int", "Int"),
-            ("Char", "Char"),
-            ("Unsigned Byte", "Unsigned Byte"),
-            ("unsigned byte", "Unsigned Byte"),
-        ],
+        "dtype_str",
+        ["Float", "float", "FLOAT", "Double", "Unsigned Byte", "FancyCustomType", "float32", "int16", "datetime64[ns]"],
     )
-    def test_known_types_normalised(self, input_type, expected):
-        result = NetCDFMetadataAdapter._normalize_variable_type(input_type)
-        assert result == expected
-
-    def test_unrecognised_type_preserves_original_string(self):
-        """an unrecognised type string must be
-        preserved unchanged, -- NetCDF data types (numpy/xarray
-        dtype strings like 'float32') never match the VariableType enum and would otherwise always
-        be destroyed."""
-        result = NetCDFMetadataAdapter._normalize_variable_type("FancyCustomType")
-        assert result == "FancyCustomType"
-
-    @pytest.mark.parametrize("dtype_str", ["float32", "float64", "int16", "uint8", "datetime64[ns]"])
-    def test_real_numpy_dtype_strings_preserved(self, dtype_str):
-        """Real numpy/xarray dtype strings (what HydroShare's NetCDF extractor actually sets on
-        DataVariable.dataType) don't match any VariableType value and must survive unchanged."""
-        result = NetCDFMetadataAdapter._normalize_variable_type(dtype_str)
-        assert result == dtype_str
-
-    def test_none_returns_none(self):
-        result = NetCDFMetadataAdapter._normalize_variable_type(None)
-        assert result is None
-
-    def test_schema_to_legacy_unrecognised_type_preserved(self):
-        """An unrecognised dataType string from schema should survive unchanged in legacy Variable,
-        not become 'Unknown'."""
-        dv = DataVariable.model_construct(name="temp", dimensions=["x"], dataType="float32")
+    def test_schema_to_legacy_type_preserved_unchanged(self, dtype_str):
+        """'DataVariable.dataType' should survive unchanged into legacy 'Variable.type'."""
+        dv = DataVariable.model_construct(name="temp", dimensions=["x"], dataType=dtype_str)
         dataset = _make_schema_dataset(variableMeasured=[dv], additionalProperty=[], dimensions=[])
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
-        assert result.variables[0].type == "float32"
+        assert result.variables[0].type == dtype_str
+
+    def test_none_type_preserved(self):
+        dv = DataVariable.model_construct(name="temp", dimensions=["x"], dataType=None)
+        dataset = _make_schema_dataset(variableMeasured=[dv], additionalProperty=[], dimensions=[])
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+        assert result.variables[0].type is None
 
 
 # ---------------------------------------------------------------------------

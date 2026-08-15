@@ -42,16 +42,13 @@ sizes across the round-trip until a better mechanism is implemented.
 TODO: Consider adding a proper per-dimension size field to the legacy model.
 
 
-Variable.type normalisation (TODO: This needs to be fixed)
----------------------------
+Variable.type
+-------------
 'Variable.type' in the legacy model corresponds to 'hsmodels.schemas.enums.VariableType', but is
-stored here as a plain 'Optional[str]' (not a real 'VariableType'-constrained enum). On the
-schema → legacy path, the adapter attempts a case-insensitive match against known 'VariableType'
-values and, when one matches, normalises to that value's canonical casing (e.g. '"float"' ->
-'"Float"'). When nothing matches -- the common case for real NetCDF data, since HydroShare's
-extractor sets 'DataVariable.dataType' from the numpy/xarray dtype string (e.g. '"float32"',
-'"int64"', '"datetime64[ns]"'), not an OPeNDAP/netCDF type name -- the original string is
-preserved unchanged rather than being overwritten with '"Unknown"'.
+stored here as a plain 'Optional[str]' (not a real 'VariableType'-constrained enum), since
+HydroShare's extractor sets 'DataVariable.dataType' from the numpy/xarray dtype string (e.g.
+'"float32"', '"int64"', '"datetime64[ns]"'), not an OPeNDAP/netCDF type name. The value is passed
+through unchanged in both conversion directions.
 
 
 SpatialReference.srsType ↔ MultidimensionalBoxSpatialReference.srs_type
@@ -79,7 +76,7 @@ TODO: Consider adding these missing fields to schema side models.
 
 from typing import Any, Dict, List, Optional, Union
 
-from hsmodels.schemas.enums import AggregationType, VariableType
+from hsmodels.schemas.enums import AggregationType
 
 from hsclient.schema.base import (
     CreativeWork,
@@ -101,11 +98,6 @@ from hsclient.schema.legacy.netcdf import (
     Rights,
     Variable,
 )
-
-# Build a case-insensitive lookup from raw string values → canonical VariableType value.
-# e.g. {"float": "Float", "unsigned byte": "Unsigned Byte", ...}
-_VARIABLE_TYPE_MAP: Dict[str, str] = {vt.value.lower(): vt.value for vt in VariableType}
-
 
 class NetCDFMetadataAdapter:
     """Translate Multidimensional (NetCDF) metadata between ScientificDataset and the
@@ -224,7 +216,7 @@ class NetCDFMetadataAdapter:
                     Variable(
                         name=item.name,
                         unit=item.unit,
-                        type=cls._normalize_variable_type(item.dataType),
+                        type=item.dataType,
                         shape=shape,
                         descriptive_name=item.description,
                         method=item.method,
@@ -303,17 +295,6 @@ class NetCDFMetadataAdapter:
             if not dimension.name:
                 continue
             additional_metadata[f"dimension_{dimension.name}_shape"] = str(dimension.shape)
-
-    @classmethod
-    def _normalize_variable_type(cls, type_str: Optional[str]) -> Optional[str]:
-        """Normalise a free-form type string to a canonical VariableType value where possible.
-        """
-        if type_str is None:
-            return None
-        matched = _VARIABLE_TYPE_MAP.get(type_str.lower())
-        if matched:
-            return matched
-        return type_str
 
     # ------------------------------------------------------------------
     # Spatial coverage helpers
