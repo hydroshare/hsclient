@@ -120,6 +120,14 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     """Locally-owned legacy metadata model for Geographic Raster aggregations.
 
     This mirrors hsmodels.schemas.aggregations.GeographicRasterMetadata with some additional fields as noted below:
+
+    'ScientificDataset.coordinates' represents coordinate axis variables (e.g. lat/lon/time)
+    populated by HydroShare's NetCDF extractor for gridded/multidimensional data. Raster
+    aggregations have no equivalent concept -- their spatial extent is already fully captured by
+    'cell_information' (rows/columns) and 'spatial_reference' (box/point), and their data bands map
+    to 'band_information'/'variableMeasured' instead. Nothing currently populates
+    'ScientificDataset.coordinates' for raster aggregations. For that reason, 'coordinates'
+    is not included in this model.
     """
 
     type: AggregationType = AggregationType.GeographicRasterAggregation
