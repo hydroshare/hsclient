@@ -14,7 +14,7 @@ from typing import Dict, List, Literal, Optional, Union
 from hsmodels.schemas.enums import AggregationType
 from pydantic import AnyUrl, Field
 
-from hsclient.schema.base import HasPart, IsPartOf, MediaType
+from hsclient.schema.base import HasPart, IsPartOf, MediaType, Relation
 
 from .common import BoxCoverage, LegacyBaseModel, PeriodCoverage, PointCoverage, Rights
 
@@ -146,6 +146,9 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
 
     # hasPart/isPartOf are not in hsmodels.GeographicRasterMetadata; added here so these
     # ScientificDataset relation fields survive a round-trip instead of being dropped.
-    # TODO: make these 2 fields read-only
-    hasPart: Optional[List[HasPart]] = None
-    isPartOf: Optional[List[IsPartOf]] = None
+    # Read-only: users are not allowed to modify these fields.
+    hasPart: Optional[List[HasPart]] = Field(default_factory=list, frozen=True)
+    isPartOf: Optional[List[IsPartOf]] = Field(default_factory=list, frozen=True)
+
+    # Read-only capture of ScientificDataset fields with no GeographicRasterMetadata equivalent
+    extra_columns: Optional[dict] = Field(default_factory=dict, frozen=True)

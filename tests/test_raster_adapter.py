@@ -399,7 +399,9 @@ class TestSchemaToLegacy:
         assert result.spatial_reference.datum == "NAD83"
 
     def test_spatial_reference_missing_srs(self):
-        """Spatial reference produced when the schema SRS entry is absent should have None coordinate fields."""
+        """No SpatialReference at all on the schema side must not set a legacy side spatial
+        reference object.
+        """
         place = Place.model_construct()
         place.name = "Cache Valley"
         place.geo = GeoShape.model_construct(box="41.5 -111.5 42.0 -111.0", validate_bbox=False)
@@ -407,11 +409,7 @@ class TestSchemaToLegacy:
         dataset = _make_schema_dataset(spatialCoverage=place)
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
 
-        assert isinstance(result.spatial_reference, BoxSpatialReference)
-        assert result.spatial_reference.units is None
-        assert result.spatial_reference.projection is None
-        assert result.spatial_reference.projection_name is None
-        assert result.spatial_reference.projection_string_type is None
+        assert result.spatial_reference is None
 
     def test_period_coverage(self):
         dataset = _make_schema_dataset()
@@ -455,6 +453,20 @@ class TestSchemaToLegacy:
         data = _make_schema_dataset().model_dump(by_alias=True, exclude_none=True)
         result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(data)
         assert isinstance(result, GeographicRasterMetadata)
+
+    def test_unknown_schema_field_survives_object_input(self):
+        """A ScientificDataset field this adapter has no named slot for must be captured into
+        legacy.extra_columns instead of being silently dropped."""
+        dataset = _make_schema_dataset(someFutureField="raster123")
+        result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
+        assert result.extra_columns == {"someFutureField": "raster123"}
+        with pytest.raises(ValidationError):
+            result.extra_columns = {}
+
+    def test_unknown_schema_field_survives_dict_input(self):
+        data = _make_schema_dataset(someFutureField="raster123").model_dump(by_alias=True, exclude_none=True)
+        result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(data)
+        assert result.extra_columns == {"someFutureField": "raster123"}
 
 
 # ---------------------------------------------------------------------------
@@ -691,6 +703,19 @@ class TestLegacyToSchema:
         result = RasterMetadataAdapter.to_geographic_raster_metadata(data)
         assert isinstance(result, ScientificDataset)
 
+    def test_unknown_legacy_field_survives_dict_input(self):
+        """A legacy field this adapter has no named slot for (captured into legacy.model_extra via
+        extra="allow" on LegacyBaseModel) must survive into the resulting ScientificDataset."""
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        data = legacy.model_dump()
+        result = RasterMetadataAdapter.to_geographic_raster_metadata(data)
+        assert result.model_extra.get("someLegacyField") == "xyz789"
+
+    def test_unknown_legacy_field_survives_object_input(self):
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        result = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
+        assert result.model_extra.get("someLegacyField") == "xyz789"
+
 
 # ---------------------------------------------------------------------------
 # Round-trip tests
@@ -698,6 +723,21 @@ class TestLegacyToSchema:
 
 
 class TestRoundTrip:
+    def test_projected_box_with_no_srs_survives_round_trip_without_becoming_geographic(self):
+        place = Place.model_construct()
+        place.name = None
+        # Real UTM-like values (meters), not lat/lon degrees -- would fail geographic bbox
+        # validation if ever mislabeled as "geographic".
+        place.geo = GeoShape.model_construct(box="4616916.5 433970.90625 4663316.5 464370.90625", validate_bbox=False)
+        place.srs = None
+        dataset = _make_schema_dataset(spatialCoverage=place)
+
+        legacy = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
+        assert legacy.spatial_reference is None
+
+        recovered = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
+        assert recovered.spatialCoverage.srs is None
+
     def test_single_band_round_trip_legacy_to_schema_to_legacy(self):
         original = _make_legacy_metadata()
         schema = RasterMetadataAdapter.to_geographic_raster_metadata(original)
@@ -719,6 +759,20 @@ class TestRoundTrip:
 
         assert recovered.hasPart[0].name == "Child resource"
         assert recovered.isPartOf[0].name == "Parent collection"
+
+    def test_unknown_field_survives_schema_to_legacy_to_schema_round_trip(self):
+        dataset = _make_schema_dataset(someFutureField="raster123")
+        legacy = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
+        assert legacy.extra_columns == {"someFutureField": "raster123"}
+        recovered = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
+        assert recovered.model_extra.get("someFutureField") == "raster123"
+
+    def test_unknown_field_survives_legacy_to_schema_to_legacy_round_trip(self):
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        schema = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
+        assert schema.model_extra.get("someLegacyField") == "xyz789"
+        recovered = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(schema)
+        assert recovered.extra_columns.get("someLegacyField") == "xyz789"
 
     def test_multi_band_round_trip_schema_to_legacy_to_schema(self):
         """A multi-band raster with band_information as a list survives a full schema -> legacy -> schema round trip."""

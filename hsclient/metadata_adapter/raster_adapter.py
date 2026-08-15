@@ -158,6 +158,9 @@ class RasterMetadataAdapter:
             associatedMedia=dataset.associatedMedia,
             hasPart=dataset.hasPart,
             isPartOf=dataset.isPartOf,
+            # Preserve any schema.org field this adapter doesn't declare a named field for so it survives
+            # the round trip instead of being silently dropped.
+            extra_columns=dict(dataset.model_extra or {}),
         )
 
     @classmethod
@@ -175,8 +178,9 @@ class RasterMetadataAdapter:
         additional_properties = cls._dict_to_additional_property(additional_metadata)
         # NOTE: This is not a permanent solution to handle fields that can't be directly mapped between the 2 metadata formats.
         additional_properties.extend(cls._cell_information_to_additional_properties(legacy.cell_information))
-
-        return ScientificDataset.model_construct(
+        extras = dict(legacy.extra_columns or {})
+        extras.update(legacy.model_extra or {})
+        extras.update(
             additionalType=AdditionalType.GEOGRAPHIC_RASTER,
             name=legacy.title,
             description=description,
@@ -202,6 +206,7 @@ class RasterMetadataAdapter:
             hasPart=legacy.hasPart,
             isPartOf=legacy.isPartOf,
         )
+        return ScientificDataset.model_construct(**extras)
 
     # ------------------------------------------------------------------
     # additionalProperty ↔ dict helpers
