@@ -138,8 +138,10 @@ class SpatialCoverageBox(BaseModel):
             place.name = self.name
 
         place.geo = schema.GeoShape.model_construct()
-        # Box token order is "S W N E" (south, west, north, east).
-        place.geo.box = f"{self.southlimit} {self.westlimit} {self.northlimit} {self.eastlimit}"
+        # Resource-level box token order is "N E S W", matching HydroShare's own schema.org
+        # generator (hs_core/hydroshare_schemaorg_adapter.py) -- not the "S W N E" order used by
+        # the aggregation-level raster/netcdf extractors.
+        place.geo.box = f"{self.northlimit} {self.eastlimit} {self.southlimit} {self.westlimit}"
         if self.projection:
             # Resource-level coverage coordinates are always decimal degrees in HydroShare, so
             # srsType is always "geographic" -- there is no legacy field to round-trip it from.

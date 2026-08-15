@@ -140,9 +140,9 @@ class ResourceMetadataAdapter(SchemaBaseModel):
                 projection=projection,
             )
         elif isinstance(geo, GeoShape):
-            # Box token order is "S W N E" 
+            # Resource-level box token order is "N E S W" as in HydroShare's schema.org generator.
             try:
-                southlimit, westlimit, northlimit, eastlimit = map(float, geo.box.split())
+                northlimit, eastlimit, southlimit, westlimit = map(float, geo.box.split())
             except Exception as e:
                 raise ValueError(f"Invalid geo.box string: {geo.box}, error: {str(e)}")
 

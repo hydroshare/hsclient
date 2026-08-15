@@ -48,8 +48,8 @@ def test_adapter_to_legacy_resource_metadata() -> None:
         "spatialCoverage": {
             "@type": "Place",
             "name": "Logan",
-            # Box token order is "S W N E" (south, west, north, east)
-            "geo": {"@type": "GeoShape", "box": "41.5 -111.5 42.0 -111.0"},
+            # Resource-level box token order is "N E S W" (north, east, south, west)
+            "geo": {"@type": "GeoShape", "box": "42.0 -111.0 41.5 -111.5"},
             "srs": {"@type": "SpatialReference", "name": "WGS 84 EPSG:4326", "srsType": "geographic"},
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
@@ -248,7 +248,7 @@ def test_adapter_to_schema_org_metadata() -> None:
     assert result.funding[0].identifier == "NSF-123"
     assert result.funding[0].funder.name == "NSF"
     assert str(result.funding[0].funder.url) == "https://nsf.gov/"
-    assert result.spatialCoverage.geo.box == "41.5 -111.5 42.0 -111.0"
+    assert result.spatialCoverage.geo.box == "42.0 -111.0 41.5 -111.5"
     assert result.spatialCoverage.srs.name == "WGS 84 EPSG:4326"
     assert result.spatialCoverage.srs.srsType == "geographic"
     assert result.temporalCoverage.startDate.isoformat() == "2024-01-01T00:00:00"
@@ -287,8 +287,8 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
         "spatialCoverage": {
             "@type": "Place",
             "name": "Logan",
-            # Box token order is "S W N E" (south, west, north, east)
-            "geo": {"@type": "GeoShape", "box": "41.5 -111.5 42.0 -111.0"},
+            # Resource-level box token order is "N E S W" (north, east, south, west)
+            "geo": {"@type": "GeoShape", "box": "42.0 -111.0 41.5 -111.5"},
         },
         "temporalCoverage": {"startDate": "2024-01-01T00:00:00", "endDate": "2024-01-31T00:00:00"},
         "relation": [{"name": "References", "description": "Journal article", "url": "https://example.com/paper"}],
