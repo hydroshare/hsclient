@@ -29,8 +29,6 @@ from hsclient.metadata_adapter.raster_adapter import RasterMetadataAdapter
 from hsclient.schema.base import (
     CreativeWork,
     GeoShape,
-    HasPart,
-    IsPartOf,
     Place,
     PropertyValue,
     SpatialReference,
@@ -185,20 +183,6 @@ class TestSchemaToLegacy:
         assert result.language == "eng"
         assert result.description == "Raster dataset description"
         assert result.url is None
-
-    def test_has_part_and_is_part_of(self):
-        dataset = _make_schema_dataset(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        result = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(dataset)
-
-        assert len(result.hasPart) == 1
-        assert result.hasPart[0].name == "Child resource"
-        assert str(result.hasPart[0].url) == "https://example.com/child"
-        assert len(result.isPartOf) == 1
-        assert result.isPartOf[0].name == "Parent collection"
-        assert str(result.isPartOf[0].url) == "https://example.com/parent"
 
     def test_band_information(self):
         dataset = _make_schema_dataset()
@@ -486,19 +470,6 @@ class TestLegacyToSchema:
         assert result.keywords == ["raster", "legacy"]
         assert str(result.url) == "https://www.hydroshare.org/resource/legacy-raster"
 
-    def test_has_part_and_is_part_of(self):
-        """hasPart/isPartOf on the legacy model must survive onto ScientificDataset."""
-        legacy = _make_legacy_metadata(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        result = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
-
-        assert len(result.hasPart) == 1
-        assert result.hasPart[0].name == "Child resource"
-        assert len(result.isPartOf) == 1
-        assert result.isPartOf[0].name == "Parent collection"
-
     def test_variable_measured(self):
         legacy = _make_legacy_metadata()
         result = RasterMetadataAdapter.to_geographic_raster_metadata(legacy)
@@ -747,18 +718,6 @@ class TestRoundTrip:
         assert recovered.subjects == original.subjects
         assert recovered.language == original.language
         assert recovered.description == original.description
-
-    def test_round_trip_has_part_and_is_part_of_legacy_to_schema_to_legacy(self):
-        """hasPart/isPartOf survive a full legacy -> schema -> legacy round trip."""
-        original = _make_legacy_metadata(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        schema = RasterMetadataAdapter.to_geographic_raster_metadata(original)
-        recovered = RasterMetadataAdapter.to_legacy_geographic_raster_metadata(schema)
-
-        assert recovered.hasPart[0].name == "Child resource"
-        assert recovered.isPartOf[0].name == "Parent collection"
 
     def test_unknown_field_survives_schema_to_legacy_to_schema_round_trip(self):
         dataset = _make_schema_dataset(someFutureField="raster123")

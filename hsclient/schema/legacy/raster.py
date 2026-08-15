@@ -14,7 +14,7 @@ from typing import Dict, List, Literal, Optional, Union
 from hsmodels.schemas.enums import AggregationType
 from pydantic import AnyUrl, Field
 
-from hsclient.schema.base import HasPart, IsPartOf, MediaType, Relation
+from hsclient.schema.base import MediaType
 
 from .common import BoxCoverage, LegacyBaseModel, PeriodCoverage, PointCoverage, Rights
 
@@ -140,15 +140,11 @@ class GeographicRasterMetadata(LegacyRasterBaseModel):
     url: Optional[AnyUrl] = None
     rights: Optional[Rights] = None
 
-    # associatedMedia is not in hsmodels.GeographicRasterMetadata; added here to preserve
-    # aggregation file references from ScientificDataset across round-trips.
-    associatedMedia: Optional[Union[MediaType, List[MediaType]]] = None
-
-    # hasPart/isPartOf are not in hsmodels.GeographicRasterMetadata; added here so these
-    # ScientificDataset relation fields survive a round-trip instead of being dropped.
-    # Read-only: users are not allowed to modify these fields.
-    hasPart: Optional[List[HasPart]] = Field(default_factory=list, frozen=True)
-    isPartOf: Optional[List[IsPartOf]] = Field(default_factory=list, frozen=True)
+    # associatedMedia is not in hsmodels.GeographicRasterMetadata; added here so it survives
+    # conversion from ScientificDataset — Aggregation._files() uses it to build the aggregation's
+    # File objects (contentUrl/name/checksum/size), so it must remain on this legacy model too.
+    # Read-only: users are not allowed to modify this field.
+    associatedMedia: Optional[Union[MediaType, List[MediaType]]] = Field(default=None, frozen=True)
 
     # Read-only capture of ScientificDataset fields with no GeographicRasterMetadata equivalent
     extra_columns: Optional[dict] = Field(default_factory=dict, frozen=True)

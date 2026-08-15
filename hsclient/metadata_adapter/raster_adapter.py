@@ -80,11 +80,6 @@ scoped to the spatial object it describes) under the keys:
 See 'RasterMetadataAdapter._spatial_overflow_to_additional_properties'.
 NOTE: This is a temporary solution until we add a dedicated field for spatial units and datum to schema.org based models.
 TODO: Consider adding proper 'units' and 'datum' fields to GeoShape/GeoCoordinates/SpatialReference.
-
- hasPart / isPartOf
--------------------
-'ScientificDataset.hasPart'/'isPartOf' had no equivalent on
-'legacy GeographicRasterMetadata', so these 2 fields added to GeographicRasterMetadata.
 """
 
 import logging
@@ -156,8 +151,6 @@ class RasterMetadataAdapter:
             url=dataset.url,
             rights=cls._to_legacy_rights(dataset.license),
             associatedMedia=dataset.associatedMedia,
-            hasPart=dataset.hasPart,
-            isPartOf=dataset.isPartOf,
             # Preserve any schema.org field this adapter doesn't declare a named field for so it survives
             # the round trip instead of being silently dropped.
             extra_columns=dict(dataset.model_extra or {}),
@@ -203,8 +196,6 @@ class RasterMetadataAdapter:
                 legacy.band_information,
             ),
             associatedMedia=legacy.associatedMedia,
-            hasPart=legacy.hasPart,
-            isPartOf=legacy.isPartOf,
         )
         return ScientificDataset.model_construct(**extras)
 

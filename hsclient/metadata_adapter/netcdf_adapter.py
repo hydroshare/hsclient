@@ -75,13 +75,6 @@ gap. They are round-tripped via 'Place.additionalProperty':
 NOTE: This is not a permanent solution; it is a temporary workaround to preserve these fields across the round-trip
 until a better mechanism is implemented.
 TODO: Consider adding these missing fields to schema side models.
-
-hasPart / isPartOf
--------------------
-'ScientificDataset.hasPart'/'isPartOf' have no equivalent on 'hsmodels.schemas.aggregations.
-MultidimensionalMetadata', so these are added to 'MultidimensionalMetadata'. These reuse the schema.org
-'HasPart'/'IsPartOf' types directly and are passed straight through unconverted in both
-directions.
 """
 
 from typing import Any, Dict, List, Optional, Union
@@ -157,8 +150,6 @@ class NetCDFMetadataAdapter:
             url=dataset.url,
             rights=cls._to_legacy_rights(dataset.license),
             associatedMedia=dataset.associatedMedia,
-            hasPart=dataset.hasPart,
-            isPartOf=dataset.isPartOf,
             # Preserve any schema.org field this adapter doesn't declare a named field for so it survives
             # the round trip instead of being silently dropped.
             extra_columns=dict(dataset.model_extra or {}),
@@ -198,8 +189,6 @@ class NetCDFMetadataAdapter:
             coordinates=cls._to_schema_variable_measured(legacy.coordinates or []) or None,
             dimensions=dimensions,
             associatedMedia=legacy.associatedMedia,
-            hasPart=legacy.hasPart,
-            isPartOf=legacy.isPartOf,
         )
         return ScientificDataset.model_construct(**extras)
 

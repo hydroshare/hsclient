@@ -30,8 +30,6 @@ from hsclient.schema.base import (
     CreativeWork,
     GeoCoordinates,
     GeoShape,
-    HasPart,
-    IsPartOf,
     Place,
     PropertyValue,
     SpatialReference,
@@ -183,20 +181,6 @@ class TestSchemaToLegacy:
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
 
         assert result.spatial_reference is None
-
-    def test_has_part_and_is_part_of(self):
-        dataset = _make_schema_dataset(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
-
-        assert len(result.hasPart) == 1
-        assert result.hasPart[0].name == "Child resource"
-        assert str(result.hasPart[0].url) == "https://example.com/child"
-        assert len(result.isPartOf) == 1
-        assert result.isPartOf[0].name == "Parent collection"
-        assert str(result.isPartOf[0].url) == "https://example.com/parent"
 
     def test_variable_fields(self):
         dataset = _make_schema_dataset()
@@ -484,18 +468,6 @@ class TestLegacyToSchema:
         assert result.description == "A test multidimensional dataset"
         assert result.inLanguage == "eng"
         assert "climate" in (result.keywords or [])
-
-    def test_has_part_and_is_part_of(self):
-        legacy = _make_legacy_metadata(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
-
-        assert len(result.hasPart) == 1
-        assert result.hasPart[0].name == "Child resource"
-        assert len(result.isPartOf) == 1
-        assert result.isPartOf[0].name == "Parent collection"
 
     def test_variable_measured(self):
         legacy = _make_legacy_metadata()
@@ -1027,20 +999,6 @@ class TestRoundTrip:
         assert schema.model_extra.get("someLegacyField") == "xyz789"
         recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
         assert recovered.extra_columns.get("someLegacyField") == "xyz789"
-
-    def test_round_trip_has_part_and_is_part_of_legacy_to_schema_to_legacy(self):
-        """hasPart/isPartOf must survive a legacy -> schema -> legacy round trip."""
-        original = _make_legacy_metadata(
-            hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
-            isPartOf=[IsPartOf(name="Parent collection", url="https://example.com/parent")],
-        )
-        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
-        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
-
-        assert len(recovered.hasPart) == 1
-        assert recovered.hasPart[0].name == "Child resource"
-        assert len(recovered.isPartOf) == 1
-        assert recovered.isPartOf[0].name == "Parent collection"
 
     def test_dimension_deduplication(self):
         """Two variables sharing dimensions should not produce duplicate Dimension entries."""
