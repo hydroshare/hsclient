@@ -159,6 +159,9 @@ class NetCDFMetadataAdapter:
             associatedMedia=dataset.associatedMedia,
             hasPart=dataset.hasPart,
             isPartOf=dataset.isPartOf,
+            # Preserve any schema.org field this adapter doesn't declare a named field for so it survives
+            # the round trip instead of being silently dropped.
+            extra_columns=dict(dataset.model_extra or {}),
         )
 
     @classmethod
@@ -175,8 +178,9 @@ class NetCDFMetadataAdapter:
         dimensions = cls._variable_shape_to_dimensions(legacy.variables, additional_metadata, legacy.coordinates)
 
         additional_properties = cls._dict_to_additional_property(additional_metadata)
-
-        return ScientificDataset.model_construct(
+        extras = dict(legacy.extra_columns or {})
+        extras.update(legacy.model_extra or {})
+        extras.update(
             additionalType=AdditionalType.MULTIDIMENSIONAL,
             name=legacy.title,
             description=legacy.description,
@@ -197,6 +201,7 @@ class NetCDFMetadataAdapter:
             hasPart=legacy.hasPart,
             isPartOf=legacy.isPartOf,
         )
+        return ScientificDataset.model_construct(**extras)
 
     # ------------------------------------------------------------------
     # Variable conversion helpers
@@ -384,21 +389,18 @@ class NetCDFMetadataAdapter:
         if not isinstance(geo, GeoShape):
             return None
 
+        if spatial_coverage.srs is None:
+            # No spatial reference on the schema side at all, means no spatial reference on the legacy side also
+            return None
+
         north, east, south, west = cls._parse_bbox(geo.box)
 
         srs = spatial_coverage.srs
-        projection = None
-        projection_string = None
-        projection_string_type = None
-        projection_name = None
-        srs_type = None
-
-        if srs is not None:
-            projection_name = srs.name
-            projection = srs.code or srs.name
-            projection_string = srs.wktString
-            projection_string_type = srs.code
-            srs_type = srs.srsType
+        projection_name = srs.name
+        projection = srs.code or srs.name
+        projection_string = srs.wktString
+        projection_string_type = srs.code
+        srs_type = srs.srsType
 
         # NOTE: 'units' and 'datum' have no schema.org equivalent -- SpatialReference (Place.srs)
         # carries neither, so -- same as 'spatial_coverage_units' above -- they're round-tripped
@@ -458,6 +460,9 @@ class NetCDFMetadataAdapter:
             )
 
         if spatial_reference is not None:
+            # NOTE: Legacy BoxSpatialReference/PointSpatialReference.units and
+            # BoxSpatialReference.datum have no dedicated SpatialReference
+            # fields; preserved via Place.additionalProperty below instead.
             place.srs = cls._to_schema_spatial_reference(spatial_reference)
 
         # NOTE: 'units' (on spatial_coverage and spatial_reference) and 'datum' (on

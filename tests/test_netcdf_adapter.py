@@ -173,6 +173,17 @@ class TestSchemaToLegacy:
         assert result.language == "eng"
         assert result.description == "A test multidimensional dataset"
 
+    def test_no_legacy_spatial_reference_when_schema_srs_is_none(self):
+        place = Place.model_construct()
+        place.name = None
+        place.geo = GeoShape.model_construct(box="4616916.5 433970.90625 4663316.5 464370.90625", validate_bbox=False)
+        place.srs = None
+        dataset = _make_schema_dataset(spatialCoverage=place)
+
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+
+        assert result.spatial_reference is None
+
     def test_has_part_and_is_part_of(self):
         dataset = _make_schema_dataset(
             hasPart=[HasPart(name="Child resource", url="https://example.com/child")],
@@ -293,6 +304,8 @@ class TestSchemaToLegacy:
     def test_additional_property_bare_string_list_entries_not_dropped(self):
         """a List[str] additionalProperty (a legal shape per the ScientificDataset type)
         must be preserved under synthetic keys."""
+        # TODO: We should not be mapping legacy additional_metadata to schema additionalProperty
+        # as they have different data types.
         dataset = _make_schema_dataset(additionalProperty=["first note", "second note"])
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
 
@@ -423,6 +436,20 @@ class TestSchemaToLegacy:
         data = dataset.model_dump(by_alias=True, exclude_none=True)
         result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(data)
         assert isinstance(result, MultidimensionalMetadata)
+
+    def test_unknown_schema_field_survives_object_input(self):
+        """A ScientificDataset field this adapter has no named slot for must be captured into
+        legacy.extra_columns instead of being silently dropped."""
+        dataset = _make_schema_dataset(someFutureField="netcdf123")
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+        assert result.extra_columns == {"someFutureField": "netcdf123"}
+        with pytest.raises(ValidationError):
+            result.extra_columns = {}
+
+    def test_unknown_schema_field_survives_dict_input(self):
+        data = _make_schema_dataset(someFutureField="netcdf123").model_dump(by_alias=True, exclude_none=True)
+        result = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(data)
+        assert result.extra_columns == {"someFutureField": "netcdf123"}
 
     def test_empty_variable_list(self):
         dataset = _make_schema_dataset(variableMeasured=[], dimensions=[])
@@ -699,6 +726,19 @@ class TestLegacyToSchema:
         result = NetCDFMetadataAdapter.to_multidimensional_metadata(data)
         assert isinstance(result, ScientificDataset)
 
+    def test_unknown_legacy_field_survives_dict_input(self):
+        """A legacy field this adapter has no named slot for (captured into legacy.model_extra via
+        extra="allow" on LegacyBaseModel) must survive into the resulting ScientificDataset."""
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        data = legacy.model_dump()
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(data)
+        assert result.model_extra.get("someLegacyField") == "xyz789"
+
+    def test_unknown_legacy_field_survives_object_input(self):
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+        assert result.model_extra.get("someLegacyField") == "xyz789"
+
     def test_no_spatial_reference_when_no_srs(self):
         legacy = _make_legacy_metadata(spatial_reference=None)
         result = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
@@ -775,6 +815,21 @@ class TestVariableTypeNormalisation:
 
 
 class TestRoundTrip:
+    def test_projected_box_with_no_srs_survives_round_trip_without_becoming_geographic(self):
+        place = Place.model_construct()
+        place.name = None
+        # Real UTM-like values (meters), not lat/lon degrees -- would fail geographic bbox
+        # validation if ever mislabeled as "geographic".
+        place.geo = GeoShape.model_construct(box="4616916.5 433970.90625 4663316.5 464370.90625", validate_bbox=False)
+        place.srs = None
+        dataset = _make_schema_dataset(spatialCoverage=place)
+
+        legacy = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+        assert legacy.spatial_reference is None
+
+        recovered = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+        assert recovered.spatialCoverage.srs is None
+
     def test_legacy_to_schema_to_legacy_core_fields(self):
         original = _make_legacy_metadata()
         schema = NetCDFMetadataAdapter.to_multidimensional_metadata(original)
@@ -958,6 +1013,20 @@ class TestRoundTrip:
         assert recovered.spatial_coverage.units == "Decimal degrees"
         assert recovered.spatial_reference.units == "Decimal degrees"
         assert recovered.spatial_reference.datum == "NAD83"
+
+    def test_unknown_field_survives_schema_to_legacy_to_schema_round_trip(self):
+        dataset = _make_schema_dataset(someFutureField="netcdf123")
+        legacy = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(dataset)
+        assert legacy.extra_columns == {"someFutureField": "netcdf123"}
+        recovered = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+        assert recovered.model_extra.get("someFutureField") == "netcdf123"
+
+    def test_unknown_field_survives_legacy_to_schema_to_legacy_round_trip(self):
+        legacy = _make_legacy_metadata(someLegacyField="xyz789")
+        schema = NetCDFMetadataAdapter.to_multidimensional_metadata(legacy)
+        assert schema.model_extra.get("someLegacyField") == "xyz789"
+        recovered = NetCDFMetadataAdapter.to_legacy_multidimensional_metadata(schema)
+        assert recovered.extra_columns.get("someLegacyField") == "xyz789"
 
     def test_round_trip_has_part_and_is_part_of_legacy_to_schema_to_legacy(self):
         """hasPart/isPartOf must survive a legacy -> schema -> legacy round trip."""
