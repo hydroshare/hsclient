@@ -1,5 +1,6 @@
 import getpass
 import json
+import logging
 import os
 import pathlib
 import pickle
@@ -64,6 +65,8 @@ from hsclient.utils import attribute_filter, encode_resource_url, main_file_type
 CHECK_TASK_PING_INTERVAL = 10
 METADATA_CREATION_WAIT_TIME = 2
 MEDIA_ITEMS_ADAPTER = TypeAdapter(List[MediaType])
+
+_logger = logging.getLogger(__name__)
 
 
 class File(str):
@@ -292,42 +295,9 @@ class Aggregation:
 
     @property
     def _aggregations_file_based(self):
-        # For now, only Resource discovers aggregations; nested aggregation traversal is disabled.
-        if not isinstance(self, Resource):
-            return []
-
-        existing_paths = {aggr.jsonld_metadata_path for aggr in self._parsed_aggregations}
-        file_based_aggregations = []
-        # has_parts.json is a resource-level index file listing the JSON-LD URLs of the
-        # resource's aggregations
-        resource_has_parts_jsonld_path = f"{dirname(self.jsonld_metadata_path)}/has_parts.json"
-
-        def _parse_bucket_path(url_value: str) -> Union[str, None]:
-            parsed_path = urlparse(str(url_value)).path
-            if not parsed_path:
-                return None
-            return unquote(parsed_path.strip("/"))
-
-        def _append_aggregation_path(candidate_path: str) -> None:
-            if not candidate_path.endswith(".json"):
-                return
-            if candidate_path in existing_paths:
-                return
-            file_based_aggregations.append(Aggregation(candidate_path, self._hs_session, self._s3_client))
-            existing_paths.add(candidate_path)
-
-        if self._s3_client.exists(resource_has_parts_jsonld_path):
-            has_parts_payload = self._retrieve_and_parse(resource_has_parts_jsonld_path, as_pydantic=False)
-            if isinstance(has_parts_payload, list):
-                for entry in has_parts_payload:
-                    if not isinstance(entry, dict):
-                        continue
-                    entry_url = entry.get("url")
-                    entry_path = _parse_bucket_path(entry_url) if entry_url else None
-                    if entry_path:
-                        _append_aggregation_path(entry_path)
-
-        return file_based_aggregations
+        # Nested aggregation traversal is disabled for now -- only Resource discovers
+        # aggregations (see Resource._aggregations_file_based).
+        return []
 
     @property
     def _checksums_path(self):
@@ -1126,6 +1096,67 @@ class Resource(Aggregation):
     @property
     def _file_manifest_path(self) -> str:
         return f"{dirname(self.jsonld_metadata_path)}/file_manifest.json"
+
+    @property
+    def _aggregations_file_based(self):
+        # has_parts.json is a resource-level index file listing the JSON-LD URLs of the
+        # resource's aggregations
+        resource_has_parts_jsonld_path = f"{dirname(self.jsonld_metadata_path)}/has_parts.json"
+        existing_paths = {aggr.jsonld_metadata_path for aggr in self._parsed_aggregations}
+        file_based_aggregations = []
+
+        def _parse_bucket_path(url_value: str) -> Union[str, None]:
+            parsed_path = urlparse(str(url_value)).path
+            if not parsed_path:
+                return None
+            return unquote(parsed_path.strip("/"))
+
+        def _append_aggregation_path(candidate_path: str) -> None:
+            if not candidate_path.endswith(".json"):
+                return
+            if candidate_path in existing_paths:
+                return
+            file_based_aggregations.append(Aggregation(candidate_path, self._hs_session, self._s3_client))
+            existing_paths.add(candidate_path)
+
+        if self._s3_client.exists(resource_has_parts_jsonld_path):
+            has_parts_payload = self._retrieve_and_parse(resource_has_parts_jsonld_path, as_pydantic=False)
+            if isinstance(has_parts_payload, list):
+                for entry in has_parts_payload:
+                    if not isinstance(entry, dict):
+                        _logger.warning(
+                            "Skipping malformed has_parts.json entry for resource %s "
+                            "(expected an object, got %s): %r",
+                            self.resource_id,
+                            type(entry).__name__,
+                            entry,
+                        )
+                        continue
+                    entry_url = entry.get("url")
+                    if not entry_url:
+                        _logger.warning(
+                            "Skipping has_parts.json entry with no 'url' for resource %s: %r",
+                            self.resource_id,
+                            entry,
+                        )
+                        continue
+                    entry_path = _parse_bucket_path(entry_url)
+                    if not entry_path:
+                        _logger.warning(
+                            "Skipping has_parts.json entry with unparseable url %r for resource %s",
+                            entry_url,
+                            self.resource_id,
+                        )
+                        continue
+                    _append_aggregation_path(entry_path)
+            else:
+                _logger.warning(
+                    "Skipping malformed has_parts.json for resource %s (expected a list, got %s)",
+                    self.resource_id,
+                    type(has_parts_payload).__name__,
+                )
+
+        return file_based_aggregations
 
     def _associated_media_items(self):
         try:
