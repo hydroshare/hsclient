@@ -179,26 +179,33 @@ class Relation(BaseModel):
     value: str
 
     def to_dataset_relation(self):
-        relation = schema.Relation.model_construct()
-        relation.name = self.type.name
-        return self._to_dataset_relation(relation)
-
-    def _to_dataset_relation(self, relation):
-        value = self.value.strip()
-        if "," in value:
-            description, _, url = value.rpartition(",")
-            description, url = description.strip(), url.strip()
-            if is_url(url):
-                if description:
-                    relation.description = description
-                relation.url = url
-                return relation
-        if is_url(value):
-            relation.url = value
+        if self.type == RelationType.isPartOf:
+            relation = schema.IsPartOf.construct()
+        elif self.type == RelationType.hasPart:
+            relation = schema.HasPart.construct()
         else:
-            relation.description = value
-        return relation
+            relation = schema.Relation.construct()
+            relation.name = self.type.name
 
+        if ',' in self.value:
+            description, url = self.value.rsplit(',', 1)
+        else:
+            description, url = self.value, ""
+        if not description:
+            description = ""
+        if not url:
+            url = ""
+        url_str = url.strip()
+        relation.description = description.strip()
+        parsed_url = None
+        if url_str:
+            try:
+                parsed_url = HttpUrl(url_str)
+            except Exception:
+                # url_str is not a valid URL — treat as part of the description
+                relation.description = f"{relation.description}, {url_str}".strip(", ")
+        relation.url = parsed_url
+        return relation
 
 class Rights(BaseModel):
     statement: Optional[str] = None
@@ -236,10 +243,8 @@ class LegacyResourceMetadata(SchemaBaseModel):
     period_coverage: Optional[TemporalCoverage] = None
     relations: Optional[List[Relation]] = []
 
-    # 'isPartOf', 'hasPart', 'provider', 'version', and 'subjectOf' are not part of the legacy
-    # resource metadata model
-    isPartOf: Optional[List[schema.IsPartOf]] = []
-    hasPart: Optional[List[schema.HasPart]] = []
+    # 'provider', 'version', and 'subjectOf' are not part of the legacy
+    # resource metadata model - added here for completeness with schema.org resource metadata model.
     provider: Optional[Union[schema.Organization, schema.Provider]] = None
     version: Optional[str] = None
     subjectOf: Optional[List[schema.SubjectOf]] = []
@@ -251,6 +256,7 @@ class LegacyResourceMetadata(SchemaBaseModel):
     associatedMedia: Union[List[Any], Any] = None
 
     # 'sharing_status' is not part of the legacy resource metadata model
+    # - added here for completeness with schema.org resource metadata model.
     sharing_status: Optional[Literal["private", "public", "published", "discoverable", "draft", "incomplete", "obsolete"]] = None
     additional_metadata: Dict[str, str] = {}
 

@@ -1,6 +1,7 @@
 from hsclient.metadata_adapter.legacy_resource_models import LegacyResourceMetadata
 from hsclient.metadata_adapter.resource_models import SchemaOrgResourceMetadata
 from hsclient.schema import base as schema
+from hsclient.metadata_adapter.legacy_resource_models import RelationType
 
 
 class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
@@ -33,11 +34,17 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     def to_dataset_associated_media(self):
         return self.associatedMedia
 
-    def to_dataset_relation(self):
-        relations = []
+    def _partition_relations_by_type(self):
+        is_part_of, has_part, other = [], [], []
         for relation in self.relations:
-            relations.append(relation.to_dataset_relation())
-        return relations
+            result = relation.to_dataset_relation()
+            if relation.type == RelationType.isPartOf:
+                is_part_of.append(result)
+            elif relation.type == RelationType.hasPart:
+                has_part.append(result)
+            else:
+                other.append(result)
+        return is_part_of, has_part, other
 
     def to_dataset_spatial_coverage(self):
         if self.spatial_coverage:
@@ -72,6 +79,7 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
         if self.sharing_status:
             return status_defined_terms[self.sharing_status].model_construct()
 
+    # TODO: This conversion won't work (causes data loss) as the data formats at each end is different
     def to_dataset_additional_properties(self):
         additional_properties = []
         if self.additional_metadata:
@@ -92,6 +100,7 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
     def to_resource_metadata(self):
         # Generate resource metadata in schema.org format from the legacy resource metadata
         dataset = SchemaOrgResourceMetadata.model_construct(**self.extra_columns)
+        is_part_of, has_part, other_relations = self._partition_relations_by_type()
         dataset.additionalType = self.type
         dataset.provider = self.to_dataset_provider()
         dataset.name = self.title
@@ -109,14 +118,14 @@ class LegacyResourceMetadataAdapter(LegacyResourceMetadata):
         dataset.spatialCoverage = self.to_dataset_spatial_coverage()
         dataset.temporalCoverage = self.to_dataset_period_coverage()
         dataset.associatedMedia = self.to_dataset_associated_media()
-        dataset.isPartOf = self.isPartOf
-        dataset.hasPart = self.hasPart
+        dataset.isPartOf = is_part_of
+        dataset.hasPart = has_part
+        dataset.relation = other_relations
         if self.publisher:
             dataset.publisher = self.publisher.to_dataset_publisher()
         dataset.license = self.to_dataset_license()
         dataset.citation = [self.citation]
         dataset.creativeWorkStatus = self.to_dataset_creative_work_status()
-        dataset.relation = self.to_dataset_relation()
         dataset.version = self.version
         dataset.subjectOf = self.subjectOf
         dataset.additionalProperty = self.to_dataset_additional_properties()

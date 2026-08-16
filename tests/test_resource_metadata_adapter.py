@@ -84,9 +84,16 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.spatial_coverage.westlimit == -111.5
     assert result.spatial_coverage.projection == "WGS 84 EPSG:4326"
     assert result.citation == "Citation text"
-    assert len(result.relations) == 1
-    assert result.relations[0].type == RelationType.references
-    assert result.relations[0].value == "Journal article, https://example.com/paper"
+    # isPartOf, hasPart, and relation are all schema.org-only fields -- they collapse into the
+    # legacy model's single 'relations' list, tagged by RelationType, since the legacy model has
+    # no separate isPartOf/hasPart fields.
+    assert len(result.relations) == 3
+    assert result.relations[0].type == RelationType.hasPart
+    assert result.relations[0].value == "Child resource, https://example.com/child"
+    assert result.relations[1].type == RelationType.hasPart
+    assert result.relations[1].value == "https://example.com/linked-child"
+    assert result.relations[2].type == RelationType.references
+    assert result.relations[2].value == "Journal article, https://example.com/paper"
     assert result.contributors[0].organization == "Utah State University"
     assert str(result.contributors[0].homepage) == "https://usu.edu/"
     assert result.created.isoformat() == "2024-01-01T00:00:00"
@@ -94,14 +101,6 @@ def test_adapter_to_legacy_resource_metadata() -> None:
     assert result.published.isoformat() == "2024-01-03T00:00:00"
     assert result.subjects == ["hydrology", "water"]
     assert result.sharing_status == "public"
-    assert result.isPartOf == []
-    assert len(result.hasPart) == 2
-    # Check HasPart model format
-    assert str(result.hasPart[0].url) == "https://example.com/child"
-    assert result.hasPart[0].name == "Child resource"
-    # Check LinkedData format
-    assert isinstance(result.hasPart[1], LinkedData)
-    assert str(result.hasPart[1].id) == "https://example.com/linked-child"
     assert result.rights.statement == "CC-BY-4.0"
     assert str(result.rights.url) == "https://example.com/license"
     assert result.awards[0].title == "Grant Title"
@@ -335,17 +334,16 @@ def test_load_json_returns_legacy_resource_metadata_for_resource_metadata_json_f
     assert result.additional_metadata == {"custom-key": "custom-value"}
     assert result.publisher.name == "HydroShare"
     assert str(result.publisher.url) == "https://www.hydroshare.org/"
-    assert len(result.relations) == 1
-    assert result.relations[0].type == RelationType.references
-    assert result.relations[0].value == "Journal article, https://example.com/paper"
-    assert result.isPartOf == []
-    assert len(result.hasPart) == 2
-    # Check HasPart model format
-    assert str(result.hasPart[0].url) == "https://example.com/child"
-    assert result.hasPart[0].name == "Child resource"
-    # Check LinkedData format
-    assert isinstance(result.hasPart[1], LinkedData)
-    assert str(result.hasPart[1].id) == "https://example.com/linked-child"
+    # isPartOf, hasPart, and relation are all schema.org-only fields -- they collapse into the
+    # legacy model's single 'relations' list, tagged by RelationType, since the legacy model has
+    # no separate isPartOf/hasPart fields.
+    assert len(result.relations) == 3
+    assert result.relations[0].type == RelationType.hasPart
+    assert result.relations[0].value == "Child resource, https://example.com/child"
+    assert result.relations[1].type == RelationType.hasPart
+    assert result.relations[1].value == "https://example.com/linked-child"
+    assert result.relations[2].type == RelationType.references
+    assert result.relations[2].value == "Journal article, https://example.com/paper"
     assert result.provider.name == "HydroShare"
     assert str(result.provider.url) == "https://www.hydroshare.org/"
     assert result.citation == "Citation text"

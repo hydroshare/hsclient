@@ -107,7 +107,9 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             return None
         return self.citation[0]
 
-    # TODO: This conversion won't work as the data formats at each end is different - so remove it
+    # TODO: This conversion won't work (causes data loss) as the data formats at each end is different - so remove it
+    # add 'additionalProperty' to the legacy model and 'additional_metadata' to the schema model 
+    # so we don't need to convert between them.
     def to_legacy_additional_metadata(self) -> Optional[dict]:
         if not self.additionalProperty:
             return {}
@@ -168,12 +170,29 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         return legacy_period
 
     def to_legacy_relations(self) -> Optional[List[LegacyRelation]]:
-        if not self.relation:
-            return []
+        # The legacy model has a single 'relations' field -- 'isPartOf', 'hasPart', and 'relation'
+        # (schema.org's three separate fields) all collapse back into it here, tagged by
+        # RelationType so the legacy<->schema.org round trip is lossless.
         legacy_relations = []
-        for relation in self.relation:
-            if type(relation) in (IsPartOf, HasPart):
-                continue
+
+        for is_part_of in self.isPartOf or []:
+            legacy_relation = LegacyRelation.model_construct()
+            legacy_relation.type = RelationType.isPartOf
+            # legacy relation values have no separate title field, so fall back to name
+            # when description isn't set
+            legacy_relation.value = _build_relation_value(is_part_of.description or is_part_of.name, is_part_of.url)
+            legacy_relations.append(legacy_relation)
+
+        for has_part in self.hasPart or []:
+            legacy_relation = LegacyRelation.model_construct()
+            legacy_relation.type = RelationType.hasPart
+            if isinstance(has_part, LinkedData):
+                legacy_relation.value = str(has_part.id)
+            else:
+                legacy_relation.value = _build_relation_value(has_part.description or has_part.name, has_part.url)
+            legacy_relations.append(legacy_relation)
+
+        for relation in self.relation or []:
             legacy_relation = LegacyRelation.model_construct()
             relation_type = _to_legacy_relation_type(relation.name)
             if relation_type is None:
@@ -181,6 +200,7 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             legacy_relation.type = relation_type
             legacy_relation.value = _build_relation_value(relation.description, relation.url)
             legacy_relations.append(legacy_relation)
+
         return legacy_relations
 
     def to_legacy_award(self) -> Optional[List[LegacyAward]]:
@@ -232,23 +252,17 @@ class ResourceMetadataAdapter(SchemaBaseModel):
         legacy_metadata.spatial_coverage = self.to_legacy_spatial_coverage()
         legacy_metadata.period_coverage = self.to_legacy_temporal_coverage()
         legacy_metadata.relations = self.to_legacy_relations()
-        # The legacy model originally doesnot have 'hasPart', 'isPartOf', 'provider', 'version' fields,
-        # we are providing them here for completeness so that they can be accessed in hsclient,
-        # - no conversion is needed from schemaorg to legacy for these fields
-        legacy_metadata.hasPart = self.hasPart
-        legacy_metadata.isPartOf = self.isPartOf
         legacy_metadata.provider = self.provider
         legacy_metadata.version = self.version
         legacy_metadata.subjectOf = self.subjectOf
 
         legacy_metadata.citation = self.to_legacy_citation()
-        # TODO: This conversion won't work as the data formats at each end is different.
+        # TODO: This conversion won't work (causes data loss) as the data formats at each end is different.
+        # Consider adding 'additionalProperty' to the legacy model and 'additional_metadata' to the schema model.
         legacy_metadata.additional_metadata = self.to_legacy_additional_metadata()
 
         legacy_metadata.associatedMedia = self.associatedMedia
         legacy_metadata.publisher = self.to_legacy_publisher()
-        # The legacy model originally doesnot have 'sharing_status' field,
-        # we are providing it here for completeness so that it can be accessed in hsclient.
         legacy_metadata.sharing_status = self.to_legacy_sharing_status()
 
         # Preserve any schema.org field this adapter doesn't declare a named field for (captured
@@ -269,8 +283,6 @@ class ResourceMetadataAdapter(SchemaBaseModel):
             "sharing_status",
             "citation",
             'provider',
-            'hasPart',
-            'isPartOf',
             'version',
             'subjectOf',
             "associatedMedia",
@@ -296,6 +308,7 @@ def _build_relation_value(description: Optional[str], url: Optional[str]) -> str
 def _to_legacy_relation_type(relation_name: Optional[str]) -> Optional[RelationType]:
     if not relation_name:
         return None
+    relation_name = relation_name.strip()
     try:
         return RelationType[relation_name]
     except KeyError:
