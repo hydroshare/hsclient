@@ -198,7 +198,7 @@ class Aggregation:
         raise ValueError(f"Could not determine file path from associatedMedia contentUrl: {content_url}")
 
     def _associated_media_items(self):
-        associated_media = getattr(self.metadata, "associatedMedia", None)
+        associated_media = self.metadata.associatedMedia
         if associated_media is None:
             return []
         if self._aggregation_type == AggregationType.FileSetAggregation:
@@ -207,9 +207,13 @@ class Aggregation:
             if not self._s3_client.exists(file_manifest_path):
                 return []
             associated_media = self._retrieve_and_parse(file_manifest_path, as_pydantic=False)
-            if isinstance(associated_media, list):
-                return MEDIA_ITEMS_ADAPTER.validate_python(associated_media)
-            return [MEDIA_ITEMS_ADAPTER.validate_python([associated_media])[0]]
+            try:
+                if isinstance(associated_media, list):
+                    return MEDIA_ITEMS_ADAPTER.validate_python(associated_media)
+                return [MEDIA_ITEMS_ADAPTER.validate_python([associated_media])[0]]
+            except Exception as e:
+                _logger.warning("Skipping malformed file_manifest.json content at %s: %s", file_manifest_path, e)
+                return []
 
         if isinstance(associated_media, list):
             return associated_media
