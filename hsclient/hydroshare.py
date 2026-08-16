@@ -298,7 +298,9 @@ class Aggregation:
 
         existing_paths = {aggr.jsonld_metadata_path for aggr in self._parsed_aggregations}
         file_based_aggregations = []
-        resource_jsonld_file_path = self.jsonld_metadata_path
+        # has_parts.json is a resource-level index file listing the JSON-LD URLs of the
+        # resource's aggregations
+        resource_has_parts_jsonld_path = f"{dirname(self.jsonld_metadata_path)}/has_parts.json"
 
         def _parse_bucket_path(url_value: str) -> Union[str, None]:
             parsed_path = urlparse(str(url_value)).path
@@ -307,44 +309,23 @@ class Aggregation:
             return unquote(parsed_path.strip("/"))
 
         def _append_aggregation_path(candidate_path: str) -> None:
-            if not candidate_path:
-                return
             if not candidate_path.endswith(".json"):
-                return
-            if candidate_path.endswith("file_manifest.json") or candidate_path.endswith("has_parts.json"):
-                return
-            if candidate_path == resource_jsonld_file_path:
                 return
             if candidate_path in existing_paths:
                 return
             file_based_aggregations.append(Aggregation(candidate_path, self._hs_session, self._s3_client))
             existing_paths.add(candidate_path)
 
-        has_part_items = getattr(self.metadata, "hasPart", None) or []
-        for has_part_item in has_part_items:
-            has_part_url = getattr(has_part_item, "id", None)
-            if not has_part_url:
-                continue
-
-            has_part_path = _parse_bucket_path(has_part_url)
-            if not has_part_path:
-                continue
-
-            # Case 1: hasPart points to an index JSON file that lists aggregation JSON-LD URLs.
-            if has_part_path.endswith(".json") and self._s3_client.exists(has_part_path):
-                has_part_payload = self._retrieve_and_parse(has_part_path, as_pydantic=False)
-                if isinstance(has_part_payload, list):
-                    for entry in has_part_payload:
-                        if not isinstance(entry, dict):
-                            continue
-                        entry_url = entry.get("url")
-                        entry_path = _parse_bucket_path(entry_url) if entry_url else None
-                        if entry_path:
-                            _append_aggregation_path(entry_path)
-                    continue
-
-            # Case 2: hasPart points directly to an aggregation JSON-LD file.
-            _append_aggregation_path(has_part_path)
+        if self._s3_client.exists(resource_has_parts_jsonld_path):
+            has_parts_payload = self._retrieve_and_parse(resource_has_parts_jsonld_path, as_pydantic=False)
+            if isinstance(has_parts_payload, list):
+                for entry in has_parts_payload:
+                    if not isinstance(entry, dict):
+                        continue
+                    entry_url = entry.get("url")
+                    entry_path = _parse_bucket_path(entry_url) if entry_url else None
+                    if entry_path:
+                        _append_aggregation_path(entry_path)
 
         return file_based_aggregations
 
