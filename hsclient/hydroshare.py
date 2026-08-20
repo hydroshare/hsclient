@@ -1299,6 +1299,7 @@ class Resource(Aggregation):
         Creates a new version of the resource on HydroShare
         :return: A Resource object of the newly created resource version
         """
+        # TODO: This hydroshare api endpoint needs to be updated to copy the metadata json files on s3 as well.
         path = urljoin(self._hsapi_path, "version")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
@@ -1310,6 +1311,7 @@ class Resource(Aggregation):
         Copies this Resource into a new resource on HydroShare
         :return: A Resource object of the newly copied resource
         """
+        # TODO: This hydroshare api endpoint needs to be updated to copy the metadata json files on s3 as well.
         path = urljoin(self._hsapi_path, "copy")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
@@ -1529,9 +1531,16 @@ class Resource(Aggregation):
         :param refresh: Defaults True, toggles automatic refreshing of the updated resource in HydroShare
         :return: The newly created Aggregation object if refresh is True
         """
-        # For creating a singlefile or fileset aggregation, we just need to write a user_metadata.json
-        # file as {file_path}.user_metadata.json or {folder_path}/user_metadata.json
-        # For other aggregation types, I think we need to write the {file_path}.user_metadata.json file
+        # TODO: Until we update the API endpoint to work with metadata json files on s3,
+        # we are doing this on-demand aggregation creation by directly accessing s3.
+
+        # NOTE: In the current json metadata workflow (hsextract), there is no support for on-demand
+        # metadata extraction from a file that already exists on s3.  So, on-demand aggregation
+        # creation will have no extracted metadata. This needs to be fixed in the 'hsextract' application code. 
+
+        # For on-demand aggregation creation, we just need to write a user_metadata.json
+        # file as {file_path}.user_metadata.json (for file-based aggregations) or {folder_path}/user_metadata.json
+        # (for folder-based aggregations) For other aggregation types, I think we can write/update the {file_path}.user_metadata.json file
         # and we need to update the hsextract application code to trigger extract metadata from that file (path)
         # if the {file_path}.json doesn't exist
 
@@ -1552,6 +1561,9 @@ class Resource(Aggregation):
             aggregation_created = True
         elif agg_type not in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
             # fetch the existing user metadata and write it back to s3 to trigger metadata extraction
+            # TODO: This trigger mechanism needs to be implemented in hydroshare to extract metadata from the
+            # corresponding content file that already exists on s3. Normally, metadata extraction is triggered
+            # when a new content file is uploaded to s3.
             existing_metadata = self._retrieve_and_parse(user_metadata_path, as_pydantic=False)
             self._s3_client.write_text(user_metadata_path, json.dumps(existing_metadata))
             aggregation_created = True
@@ -1584,6 +1596,9 @@ class Resource(Aggregation):
         :param aggregation: The aggregation object to remove
         :return: None
         """
+        # TODO: Until we update the API endpoint to work with metadata json files on s3,
+        # we are doing the aggregation removal by directly accessing s3.
+        # This works for now as hydroshare currently allows user to delete extracted metadata files (a bug)
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
@@ -1594,6 +1609,7 @@ class Resource(Aggregation):
 
         if aggregation_type not in [AggregationType.FileSetAggregation, AggregationType.SingleFileAggregation]:
             extract_meta_file_to_delete = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
+            # TODO: User should not be able to delete the extracted metadata file - hydroshare needs to be updated to not allow this.
             if self._file_exists(extract_meta_file_to_delete):
                 self._delete_file(extract_meta_file_to_delete)
 
@@ -1613,6 +1629,8 @@ class Resource(Aggregation):
         :param  dst_path: The target file path to move the aggregation to - target folder must exist
         :return: None
         """
+        # TODO: Until we update the API endpoint to work with metadata json files,
+        # we are doing the aggregation move by directly accessing s3
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
@@ -1649,12 +1667,13 @@ class Resource(Aggregation):
             # move the extracted metadata file if it exists
             # TODO: We probably don't need to move the extracted metadata file as it will be generated
             # on content file move as part of s3 event processing
-            extract_meta_src_path = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
-            extracted_file_name = os.path.basename(aggr_path) + ".json"
-            extract_meta_dst_path = os.path.join(dst_path, extracted_file_name)
-            extract_meta_dst_path = f".hsmetadata/{extract_meta_dst_path}"
-            if self._file_exists(extract_meta_src_path):
-                self._move_file(extract_meta_src_path, extract_meta_dst_path)
+            # extract_meta_src_path = aggregation.extracted_metadata_path.replace(self.bucket_path + "/", "", 1)
+            # extracted_file_name = os.path.basename(aggr_path) + ".json"
+            # extract_meta_dst_path = os.path.join(dst_path, extracted_file_name)
+            # extract_meta_dst_path = f".hsmetadata/{extract_meta_dst_path}"
+            # if self._file_exists(extract_meta_src_path):
+            #     # user should not be able to move the extracted metadata file - hydroshare needs to be updated to not allow this.
+            #     self._move_file(extract_meta_src_path, extract_meta_dst_path)
 
             # move the user metadata file if it exists
             data_file_name = os.path.basename(aggr_path)
@@ -1673,13 +1692,16 @@ class Resource(Aggregation):
         :param aggregation: The aggregation object to delete
         :return: None
         """
+        # TODO: Until we have an updated API endpoint for aggregation delete
+        # we can do the same directly accessing s3.
         aggregation_type = aggregation._aggregation_type
         if aggregation_type is None:
             raise Exception("Aggregation type could not be determined")
 
         # delete the user metadata file for the aggregation if it exists
-        # TODO: We probably don't need to delete the user metadata file as it will be deleted
-        # when the content file is deleted as part of s3 event processing
+        # TODO: Currently hydroshare does not delete user metadata file of an aggregation when the
+        # aggregation data file is deleted. Until hydroshare is updated to delete the user metadata file
+        # we need to delete it here.
         if self._s3_client.exists(aggregation.user_metadata_path):
             self._s3_client.delete(aggregation.user_metadata_path)
 
@@ -1696,12 +1718,6 @@ class Resource(Aggregation):
             # for file set aggregations we need to delete the entire folder
             self._delete_file_folder(aggregation.main_file_path)
         else:
-            # delete the extracted metadata json file for the aggregation
-            # TODO: We probably don't need to delete the extracted metadata file as it will be deleted
-            # when the content file is deleted as part of s3 event processing
-            if self._s3_client.exists(aggregation.extracted_metadata_path):
-                self._s3_client.delete(aggregation.extracted_metadata_path)
-
             # delete all data files in the aggregation
             for associated_media_item in aggregation._associated_media_items():
                 media_item_url_path = getattr(associated_media_item, "contentUrl", None)
@@ -1709,6 +1725,9 @@ class Resource(Aggregation):
                     media_item_path = self._file_path_from_content_url(media_item_url_path)
                     if self._file_exists(media_item_path):
                         self._delete_file(media_item_path)
+
+            # no need to delete any extracted metadata files for the aggregation as they will be deleted
+            # when the data files are deleted
 
     def aggregation_download(self, aggregation: Aggregation, save_path: str = "", unzip_to: str = None) -> str:
         """
