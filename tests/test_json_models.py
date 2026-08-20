@@ -98,8 +98,13 @@ def test_resource_preview_required_fields():
     assert not resource_preview.immutable
     assert not resource_preview.published
     assert resource_preview.resource_url == "http://beta.hydroshare.org/resource/97523bdb7b174901b3fc2d89813458f1/"
-    assert resource_preview.resource_map_url == "http://beta.hydroshare.org/resource/97523bdb7b174901b3fc2d89813458f1/map/"
-    assert resource_preview.science_metadata_url == "http://beta.hydroshare.org/resource/97523bdb7b174901b3fc2d89813458f1/science-metadata/"
+    assert (
+        resource_preview.resource_map_url == "http://beta.hydroshare.org/resource/97523bdb7b174901b3fc2d89813458f1/map/"
+    )
+    assert (
+        resource_preview.science_metadata_url
+        == "http://beta.hydroshare.org/resource/97523bdb7b174901b3fc2d89813458f1/science-metadata/"
+    )
     # check the optional fields
     assert resource_preview.abstract is None
     assert resource_preview.authors == []
@@ -116,8 +121,14 @@ def test_user_info(user):
     assert user.organization == "CUAHSI"
     assert str(user.website) == "http://anthonycastronova.com/"
     assert str(user.identifiers[UserIdentifierType.ORCID]) == "https://orcid.org/0000-0002-1341-5681"
-    assert str(user.identifiers[UserIdentifierType.research_gate_id]) == "https://www.researchgate.net/profile/Anthony_Castronova"
-    assert str(user.identifiers[UserIdentifierType.google_scholar_id]) == "https://scholar.google.com/citations?user=ScWTFoQAAAAJ&hl=en"
+    assert (
+        str(user.identifiers[UserIdentifierType.research_gate_id])
+        == "https://www.researchgate.net/profile/Anthony_Castronova"
+    )
+    assert (
+        str(user.identifiers[UserIdentifierType.google_scholar_id])
+        == "https://scholar.google.com/citations?user=ScWTFoQAAAAJ&hl=en"
+    )
 
     assert user.type == "Commercial/Professional"
     assert user.date_joined == parser.parse("2015-06-03T16:09:31.636Z")

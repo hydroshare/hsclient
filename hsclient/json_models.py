@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Union, Any
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from hsmodels.schemas.enums import UserIdentifierType
 from pydantic import AnyUrl, BaseModel, HttpUrl, field_validator

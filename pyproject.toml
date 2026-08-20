@@ -49,6 +49,9 @@ version = {attr = "hsclient.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: integration tests that require a HydroShare backend (deselect with '-m \"not integration\"')",
+]
 
 [tool.flake8]
 max-line-length = 120

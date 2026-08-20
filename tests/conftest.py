@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from hsclient import HydroShare
 
 
@@ -12,7 +14,16 @@ def change_test_dir(request):
 
 @pytest.fixture()
 def hydroshare(change_test_dir):
-    hs = HydroShare(os.getenv("HYDRO_USERNAME"), os.getenv("HYDRO_PASSWORD"), os.getenv("HYDRO_HOST", "beta.hydroshare.org"))
+    # Use environment variables with sensible defaults for local development
+    # CI should set HYDRO_USERNAME, HYDRO_PASSWORD, and optionally HYDRO_HOST
+    hs = HydroShare(
+        username=os.getenv("HYDRO_USERNAME", "admin"),
+        password=os.getenv("HYDRO_PASSWORD", "default"),
+        host=os.getenv("HYDRO_HOST", "localhost"),
+        port=int(os.getenv("HYDRO_PORT", "8000")),
+        protocol=os.getenv("HYDRO_PROTOCOL", "http"),
+        s3_endpoint_url=os.getenv("HYDRO_S3_ENDPOINT_URL", "http://localhost:9002"),
+    )
     return hs
 
 
@@ -22,15 +33,35 @@ def new_resource(hydroshare):
     yield new_resource
     try:
         new_resource.delete()
-    except:
+    except Exception:
         # resource already deleted
         pass
 
 
 @pytest.fixture()
 def resource(new_resource):
-    new_resource.file_upload("data/georaster_composite.zip", refresh=False)
-    new_resource.file_unzip("georaster_composite.zip", refresh=False)
+    root_path = "data/test_resource_metadata_files/"
+    # Use shapefile files for GeoFeature aggregation (as file unzip that was originally used for raster aggregation doesn't work - unzip
+    # doesn't fire a PutObject s3 event- so no metadata extraction).
+    geofiles = [
+        "watersheds.shp",
+        "watersheds.cpg",
+        "watersheds.dbf",
+        "watersheds.prj",
+        "watersheds.sbn",
+        "watersheds.sbx",
+        "watersheds.shx",
+    ]
+    new_resource.file_upload(os.path.join("data", "other.txt"), refresh=False)
+    # upload shapefile components
+    new_resource.file_upload(*[os.path.join(root_path, file) for file in geofiles], refresh=False)
+
+    # Give backend extraction some time to materialize JSON-LD aggregation metadata.
+    for _ in range(10):
+        new_resource.refresh()
+        if new_resource.aggregations():
+            break
+
     return new_resource
 
 

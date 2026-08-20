@@ -10,11 +10,11 @@ from hsmodels.schemas.enums import AggregationType
 from rasterio.windows import Window
 
 from hsclient import (
+    CSVAggregation,
     GeoFeatureAggregation,
     GeoRasterAggregation,
     NetCDFAggregation,
     TimeseriesAggregation,
-    CSVAggregation,
 )
 
 
@@ -65,8 +65,9 @@ def test_timeseries_save_data_object(timeseries_resource, as_new_aggr):
             dst_path = "raster_aggr_folder"
             timeseries_resource.folder_create(dst_path)
 
-        aggr = aggr.save_data_object(resource=timeseries_resource, agg_path=agg_path, as_new_aggr=as_new_aggr,
-                                     destination_path=dst_path)
+        aggr = aggr.save_data_object(
+            resource=timeseries_resource, agg_path=agg_path, as_new_aggr=as_new_aggr, destination_path=dst_path
+        )
         assert type(aggr) is TimeseriesAggregation
 
     # check the updated/new timeseries aggregation
@@ -151,8 +152,12 @@ def test_raster_save_data_object(resource_with_raster_aggr, as_new_aggr):
             resource_with_raster_aggr.folder_create(dst_path)
 
         # save the new tif file to update the aggregation or create a new aggregation
-        aggr = aggr.save_data_object(resource=resource_with_raster_aggr, agg_path=output_raster_dir_path,
-                                     as_new_aggr=as_new_aggr, destination_path=dst_path)
+        aggr = aggr.save_data_object(
+            resource=resource_with_raster_aggr,
+            agg_path=output_raster_dir_path,
+            as_new_aggr=as_new_aggr,
+            destination_path=dst_path,
+        )
         assert aggr is not None
         assert type(aggr) is GeoRasterAggregation
 
@@ -218,8 +223,9 @@ def test_netcdf_save_data_object(resource_with_netcdf_aggr, as_new_aggr):
             dst_path = "netcdf_aggr_folder"
             resource_with_netcdf_aggr.folder_create(dst_path)
 
-        aggr = aggr.save_data_object(resource=resource_with_netcdf_aggr, agg_path=agg_path, as_new_aggr=as_new_aggr,
-                                     destination_path=dst_path)
+        aggr = aggr.save_data_object(
+            resource=resource_with_netcdf_aggr, agg_path=agg_path, as_new_aggr=as_new_aggr, destination_path=dst_path
+        )
 
         assert type(aggr) is NetCDFAggregation
         xr_dataset = aggr.as_data_object(agg_path=agg_path)
@@ -257,8 +263,9 @@ def test_geofeature_as_data_object(resource_with_geofeature_aggr, search_by):
         # download aggregation
         unzip_to = os.path.join(tmp, "unzipped_aggr")
         os.makedirs(unzip_to)
-        agg_path = resource_with_geofeature_aggr.aggregation_download(aggregation=aggr, save_path=tmp,
-                                                                      unzip_to=unzip_to)
+        agg_path = resource_with_geofeature_aggr.aggregation_download(
+            aggregation=aggr, save_path=tmp, unzip_to=unzip_to
+        )
         fn_collection = aggr.as_data_object(agg_path=agg_path)
         assert fn_collection.__class__.__name__ == "Collection"
         # check projection type
@@ -278,16 +285,18 @@ def test_geofeature_save_data_object(resource_with_geofeature_aggr, as_new_aggr)
         # download aggregation
         unzip_to = os.path.join(tmp, "unzipped_aggr")
         os.makedirs(unzip_to)
-        agg_path = resource_with_geofeature_aggr.aggregation_download(aggregation=aggr, save_path=tmp,
-                                                                      unzip_to=unzip_to)
+        agg_path = resource_with_geofeature_aggr.aggregation_download(
+            aggregation=aggr, save_path=tmp, unzip_to=unzip_to
+        )
         fn_collection = aggr.as_data_object(agg_path=agg_path)
         assert fn_collection.__class__.__name__ == "Collection"
         original_shp_filename = os.path.basename(fn_collection.path)
         updated_shp_file_dir = os.path.join(tmp, "updated_aggr")
         os.makedirs(updated_shp_file_dir)
         output_shp_file_path = os.path.join(updated_shp_file_dir, original_shp_filename)
-        with fiona.open(output_shp_file_path, 'w', schema=fn_collection.schema, driver=fn_collection.driver,
-                        crs=fn_collection.crs) as out_shp_file:
+        with fiona.open(
+            output_shp_file_path, 'w', schema=fn_collection.schema, driver=fn_collection.driver, crs=fn_collection.crs
+        ) as out_shp_file:
             for feature in fn_collection:
                 ft_dict = to_dict(feature)
                 if ft_dict['properties']['Id'] < 5:
@@ -298,8 +307,12 @@ def test_geofeature_save_data_object(resource_with_geofeature_aggr, as_new_aggr)
             dst_path = "geo_aggr_folder"
             resource_with_geofeature_aggr.folder_create(dst_path)
 
-        aggr = aggr.save_data_object(resource=resource_with_geofeature_aggr, agg_path=updated_shp_file_dir,
-                                     as_new_aggr=as_new_aggr,  destination_path=dst_path)
+        aggr = aggr.save_data_object(
+            resource=resource_with_geofeature_aggr,
+            agg_path=updated_shp_file_dir,
+            as_new_aggr=as_new_aggr,
+            destination_path=dst_path,
+        )
         assert aggr is not None
         assert type(aggr) is GeoFeatureAggregation
         assert aggr.data_object is None
@@ -316,8 +329,9 @@ def test_geofeature_save_data_object(resource_with_geofeature_aggr, as_new_aggr)
         assert aggr is not None
         assert type(aggr) is GeoFeatureAggregation
 
-        agg_path = resource_with_geofeature_aggr.aggregation_download(aggregation=aggr, save_path=tmp,
-                                                                      unzip_to=unzip_to)
+        agg_path = resource_with_geofeature_aggr.aggregation_download(
+            aggregation=aggr, save_path=tmp, unzip_to=unzip_to
+        )
         fn_collection = aggr.as_data_object(agg_path=agg_path)
         for feature in fn_collection:
             ft_dict = to_dict(feature)
@@ -375,8 +389,9 @@ def test_csv_save_data_object(resource_with_csv_aggr, as_new_aggr):
             dst_path = "csv_aggr_folder"
             resource_with_csv_aggr.folder_create(dst_path)
         # save the dataframe to a new csv file
-        aggr = aggr.save_data_object(resource=resource_with_csv_aggr, agg_path=agg_path, as_new_aggr=as_new_aggr,
-                                     destination_path=dst_path)
+        aggr = aggr.save_data_object(
+            resource=resource_with_csv_aggr, agg_path=agg_path, as_new_aggr=as_new_aggr, destination_path=dst_path
+        )
         assert aggr is not None
         assert type(aggr) is CSVAggregation
         if as_new_aggr:
