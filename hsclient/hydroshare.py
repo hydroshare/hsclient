@@ -934,7 +934,7 @@ class CSVAggregation(DataObjectSupportingAggregation):
 class Resource(Aggregation):
     """Represents a Resource in HydroShare"""
 
-    _parsed_s3_bucket_path: str | None = None
+    _parsed_s3_bucket_path: Optional[str] = None
 
     def __init__(self, map_path, hs_session, checksums=None, s3_client=None):
         super().__init__(map_path, hs_session, checksums)
@@ -983,7 +983,7 @@ class Resource(Aggregation):
     # S3 protocol operations
 
     @property
-    def s3_client(self) -> s3fs.S3FileSystem | None:
+    def s3_client(self) -> Optional[s3fs.S3FileSystem]:
         """The s3fs.S3FileSystem client used for direct S3 access to this resource's files, or None if unavailable"""
         return self._s3_client
 
@@ -1003,7 +1003,9 @@ class Resource(Aggregation):
         normalized_path = path.strip("/")
         return f"{base}/{normalized_path}" if normalized_path else base
 
-    def _s3_list(self, folder_path: str | None = None, recursive: bool = False, include_folders: bool = False) -> List[str]:
+    def _s3_list(
+        self, folder_path: Optional[str] = None, recursive: bool = False, include_folders: bool = False
+    ) -> List[str]:
         remote_path = self._build_s3_path(folder_path or "")
         if recursive:
             entries = self.s3_client.find(remote_path, withdirs=include_folders)
@@ -1014,7 +1016,7 @@ class Resource(Aggregation):
         return [entry[len(prefix):] for entry in entries if entry.rstrip("/") != remote_path.rstrip("/")]
 
     def s3_list_objects(
-        self, folder_path: str | None = None, recursive: bool = False, include_folders: bool = True
+        self, folder_path: Optional[str] = None, recursive: bool = False, include_folders: bool = True
     ) -> List[str]:
         """
         Lists files (and optionally folders) in this resource (or a subfolder of it) via the S3 protocol
@@ -1043,7 +1045,7 @@ class Resource(Aggregation):
         self.s3_client.get(remote_path, local_path)
         return local_path
 
-    def s3_file_upload(self, local_file_path: str, folder: str | None = None) -> str:
+    def s3_file_upload(self, local_file_path: str, folder: Optional[str] = None) -> str:
         """
         Uploads a local file to this resource directly via the S3 protocol
         :param local_file_path: The path to the local file to upload
