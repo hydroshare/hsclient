@@ -1057,7 +1057,8 @@ class Resource(Aggregation):
             raise FileNotFoundError(f"Local file not found: {local_file_path}")
         file_name = os.path.basename(local_file_path)
         relative_path = f"{folder.strip('/')}/{file_name}" if folder else file_name
-        self.s3_client.put(local_file_path, self._build_s3_path(relative_path))
+        remote_path = self._build_s3_path(relative_path)
+        self.s3_client.put(local_file_path, remote_path)
         return relative_path
 
     def s3_file_delete(self, file_path: str) -> None:
