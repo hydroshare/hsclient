@@ -92,16 +92,45 @@ def test_s3_bucket_path_discovered_via_rest(mock_session_init):
         mock_resource_id.return_value = "abc123"
         mock_hs_session = MagicMock()
         mock_hs_session.get.return_value = FakeResponse(
-            200, {"bucket": "test-bucket", "prefix": "abc123/data/contents"}
+            200, {"bucket": "test-bucket", "prefix": "abc123/data/contents/"}
         )
         resource = Resource(map_path="x", hs_session=mock_hs_session, s3_client=MagicMock())
 
-        assert resource.s3_bucket_path == "test-bucket/abc123/data/contents"
+        assert resource.s3_path == "test-bucket/abc123/data/contents"
         mock_hs_session.get.assert_called_once_with("/hsapi/resource/s3/abc123/", status_code=200)
 
         # cached on second access
-        resource.s3_bucket_path
+        resource.s3_path
         mock_hs_session.get.assert_called_once()
+
+
+def test_get_resource_path_returns_s3_bucket_path(mock_session_init, resource_with_s3):
+    with patch("hsclient.hydroshare.s3fs"):
+        hs = HydroShare()
+        resource, _ = resource_with_s3
+        with patch.object(hs, "resource", return_value=resource) as mock_resource:
+            result = hs.get_resource_path("abc123")
+
+            mock_resource.assert_called_once_with("abc123", validate=False, use_cache=False)
+            assert result == "test-bucket/abc123/data/contents"
+
+
+def test_get_resource_path_discovered_via_rest(mock_session_init):
+    with patch("hsclient.hydroshare.s3fs"), patch.object(
+        Resource, "resource_id", new_callable=PropertyMock
+    ) as mock_resource_id:
+        mock_resource_id.return_value = "abc123"
+        hs = HydroShare()
+        resource = Resource(map_path="x", hs_session=MagicMock(), s3_client=MagicMock())
+        resource._hs_session.get.return_value = FakeResponse(
+            200, {"bucket": "test-bucket", "prefix": "abc123/data/contents"}
+        )
+
+        with patch.object(hs, "resource", return_value=resource):
+            result = hs.get_resource_path("abc123")
+
+            assert result == "test-bucket/abc123/data/contents"
+            resource._hs_session.get.assert_called_once_with("/hsapi/resource/s3/abc123/", status_code=200)
 
 
 def test_s3_list_objects_files_only_non_recursive(resource_with_s3):

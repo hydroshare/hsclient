@@ -988,18 +988,18 @@ class Resource(Aggregation):
         return self._s3_client
 
     @property
-    def s3_bucket_path(self) -> str:
+    def s3_path(self) -> str:
         """The bucket/prefix for this resource in S3 storage, discovered via HydroShare's S3 account REST endpoint"""
         if self._parsed_s3_bucket_path is None:
             response = self._hs_session.get(f"/hsapi/resource/s3/{self.resource_id}/", status_code=200)
             data = response.json()
-            self._parsed_s3_bucket_path = f"{data['bucket']}/{data['prefix']}"
+            self._parsed_s3_bucket_path = f"{data['bucket']}/{data['prefix']}".rstrip("/")
         return self._parsed_s3_bucket_path
 
     def _build_s3_path(self, path: str = "") -> str:
         if self.s3_client is None:
             raise Exception("S3 client is not available for this resource - sign in with username/password")
-        base = self.s3_bucket_path.strip("/")
+        base = self.s3_path.strip("/")
         normalized_path = path.strip("/")
         return f"{base}/{normalized_path}" if normalized_path else base
 
@@ -1045,6 +1045,7 @@ class Resource(Aggregation):
         self.s3_client.get(remote_path, local_path)
         return local_path
 
+    @refresh
     def s3_file_upload(self, local_file_path: str, folder: Optional[str] = None) -> str:
         """
         Uploads a local file to this resource directly via the S3 protocol
@@ -1061,6 +1062,7 @@ class Resource(Aggregation):
         self.s3_client.put(local_file_path, remote_path)
         return relative_path
 
+    @refresh
     def s3_file_delete(self, file_path: str) -> None:
         """
         Deletes a file from this resource directly via the S3 protocol
@@ -1823,6 +1825,15 @@ class HydroShare:
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
         return self.resource(resource_id, use_cache=use_cache)
+
+    def get_resource_path(self, resource_id: str) -> str:
+        """
+        Retrieves the S3 bucket/prefix path for the given resource
+        :param resource_id: The resource id of the resource
+        :return: The S3 bucket/prefix path for the resource
+        """
+        res = self.resource(resource_id, validate=False, use_cache=False)
+        return res.s3_path
 
     def user(self, user_id: int) -> User:
         """
