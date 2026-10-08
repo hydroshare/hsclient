@@ -13,7 +13,7 @@ from datetime import datetime
 from functools import wraps
 from posixpath import basename, dirname, join as urljoin, splitext
 from pprint import pformat
-from typing import Callable, Dict, List, TYPE_CHECKING, Union
+from typing import Any, Callable, Dict, List, TYPE_CHECKING, Tuple, Union
 from urllib.parse import quote, unquote, urlparse
 from uuid import uuid4
 from zipfile import ZipFile
@@ -21,6 +21,7 @@ from zipfile import ZipFile
 if TYPE_CHECKING:
     import fiona
     import pandas
+    import pyarrow.parquet as pyarrow_parquet  # type: ignore[import-not-found]
     import rasterio
     import xarray
 else:
@@ -40,6 +41,10 @@ else:
         import xarray
     except ImportError:
         xarray = None
+    try:
+        import pyarrow.parquet as pyarrow_parquet
+    except ImportError:
+        pyarrow_parquet = None
 
 import requests
 import s3fs
@@ -1607,6 +1612,28 @@ class HydroShare:
     default_port = 443
     default_s3_endpoint_url = "https://s3.hydroshare.org"
 
+    # Streaming resource data directly from S3 into native Python objects (issue #6484).
+    #
+    # Registry mapping a file extension to the object_type selectors it supports, most-preferred
+    # first; the first entry is the default used when object_type is not specified. Readers are
+    # resolved lazily in _stream_read() so optional dependencies are only touched when used.
+    _STREAM_OBJECT_TYPES: Dict[str, Tuple[str, ...]] = {
+        ".zarr": ("xarray",),
+        ".csv": ("pandas",),
+        ".parquet": ("pandas", "pyarrow"),
+        ".nc": ("xarray",),
+        ".tif": ("rasterio",),
+        ".tiff": ("rasterio",),
+        # Registered so object_type is still validated, but not yet streamable (see below).
+        ".vrt": ("rasterio",),
+        ".shp": ("fiona",),
+        ".sqlite": ("pandas",),
+    }
+
+    # Extensions registered for validation but not yet streamable as a single S3 object in
+    # this first POC iteration (multi-file aggregations / non-seekable stores).
+    _STREAM_NOT_SUPPORTED = (".vrt", ".shp", ".sqlite")
+
     def __init__(
         self,
         username: str = None,
@@ -1851,3 +1878,112 @@ class HydroShare:
         """
         response = self._hs_session.get('/hsapi/userInfo/', status_code=200)
         return response.json()
+
+    def stream_data_object(
+        self, s3_path: str, object_type: Optional[str] = None, **reader_kwargs: Any
+    ) -> Any:
+        """
+        Streams a file from S3-backed HydroShare storage directly into a native Python library
+        object, without downloading it first.
+
+        :param s3_path: The fully-qualified S3 path of the file/store, i.e.
+            "bucket/prefix/<relative>/file.ext" (build this on top of
+            :meth:`HydroShare.get_resource_path`).
+        :param object_type: Which library to load the data into, for formats that map to more than
+            one. One of "xarray", "pandas", "pyarrow", "rasterio", "fiona". Defaults to the format's
+            default object type when not provided.
+        :param reader_kwargs: Extra keyword arguments forwarded to the underlying reader (e.g.
+            keyword arguments for pandas.read_csv).
+        :return: The native object (e.g. xarray.Dataset, pandas.DataFrame, pyarrow.Table).
+        :raises Exception: if no S3 client is available (sign in with username/password), or if the
+            optional dependency for the chosen object_type is not installed.
+        :raises ValueError: for an unsupported file extension, or an invalid (extension, object_type)
+            combination.
+        :raises NotImplementedError: for a format that is registered but not yet streamable in this
+            POC iteration (.vrt, .shp, .sqlite).
+        """
+        if self._s3_client is None:
+            raise Exception("S3 client is not available - sign in with username/password")
+
+        ext = splitext(s3_path.rstrip("/"))[1].lower()
+        if ext not in self._STREAM_OBJECT_TYPES:
+            supported = ", ".join(sorted(self._STREAM_OBJECT_TYPES))
+            raise ValueError(f"Unsupported file format '{ext}'. Supported formats: {supported}")
+
+        object_types = self._STREAM_OBJECT_TYPES[ext]
+        selected = object_type or object_types[0]
+        if selected not in object_types:
+            valid = ", ".join(object_types)
+            raise ValueError(
+                f"Cannot load a '{ext}' file as '{selected}'. "
+                f"Valid object_type options for '{ext}': {valid}"
+            )
+
+        if ext in self._STREAM_NOT_SUPPORTED:
+            raise NotImplementedError(f"Streaming '{ext}' files is not supported yet")
+
+        return self._stream_read(s3_path, ext, selected, reader_kwargs)
+
+    @staticmethod
+    def _require_module(module: Any, name: str) -> Any:
+        """Returns the optional dependency module, or raises if it is not installed"""
+        if module is None:
+            raise Exception(f"{name} package was not found")
+        return module
+
+    def _stream_read(
+        self, s3_path: str, ext: str, object_type: str, reader_kwargs: Dict[str, Any]
+    ) -> Any:
+        """Streams and reads the S3 object for an already-validated (extension, object_type) pair"""
+        if ext == ".zarr":
+            xr = self._require_module(xarray, "xarray")
+            store = self._s3_client.get_mapper(s3_path)
+            return xr.open_zarr(store, **reader_kwargs)
+
+        if object_type == "xarray":  # .nc over a file-like requires the h5netcdf engine
+            xr = self._require_module(xarray, "xarray")
+            reader_kwargs.setdefault("engine", "h5netcdf")
+            # xarray/h5netcdf does not take ownership of a caller-supplied file-like, so hold a
+            # reference: close it if open fails, and otherwise chain its close into the dataset so
+            # ds.close() releases the underlying S3 handle instead of leaking it.
+            f = self._s3_client.open(s3_path)
+            try:
+                ds = xr.open_dataset(f, **reader_kwargs)
+            except Exception:
+                f.close()
+                raise
+            ds.set_close(f.close)
+            return ds
+
+        if object_type == "pandas":  # .csv / .parquet -> fully read into a DataFrame
+            pd = self._require_module(pandas, "pandas")
+            # pandas.read_parquet needs a parquet engine (pyarrow/fastparquet) that the bare
+            # "pandas" extra does not pull in; fail fast with an actionable hint - before opening
+            # the S3 object - instead of pandas' generic ImportError when none is installed.
+            if ext == ".parquet" and pyarrow_parquet is None:
+                raise Exception(
+                    "Reading a .parquet file requires a parquet engine. Install it with "
+                    "'pip install hsclient[pyarrow]', or install `pyarrow` separately."
+                )
+            with self._s3_client.open(s3_path) as f:
+                if ext == ".parquet":
+                    return pd.read_parquet(f, **reader_kwargs)
+                return pd.read_csv(f, **reader_kwargs)
+
+        if object_type == "pyarrow":  # .parquet -> pyarrow.Table
+            pq = self._require_module(pyarrow_parquet, "pyarrow")
+            with self._s3_client.open(s3_path) as f:
+                return pq.read_table(f, **reader_kwargs)
+
+        if object_type == "rasterio":  # .tif / .tiff
+            rio = self._require_module(rasterio, "rasterio")
+            # Pass the s3fs filesystem as opener rather than an opened file-like: a file-like with
+            # .read() makes rasterio buffer the whole object into an in-memory MemoryFile (OOM risk
+            # on large rasters) and leak the s3fs handle. Handing rasterio the filesystem routes I/O
+            # through GDAL's virtual filesystem (/vsiriopener), so reads stay lazy/streamed and GDAL
+            # manages the handle lifecycle. Note: the opener must be the filesystem object, not its
+            # .open method - a bare callable fails opener registration for s3fs-style paths.
+            return rio.open(s3_path, opener=self._s3_client, **reader_kwargs)
+
+        # Unreachable: validation in stream_data_object() guarantees a known object_type.
+        raise ValueError(f"No streaming reader for object_type '{object_type}'")
