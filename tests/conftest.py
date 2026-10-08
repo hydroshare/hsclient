@@ -12,7 +12,16 @@ def change_test_dir(request):
 
 @pytest.fixture()
 def hydroshare(change_test_dir):
-    hs = HydroShare(os.getenv("HYDRO_USERNAME"), os.getenv("HYDRO_PASSWORD"), os.getenv("HYDRO_HOST", "beta.hydroshare.org"))
+    # Use environment variables with sensible defaults for local development
+    # CI should set all these necessary environment variables for HydroShare access
+    hs = HydroShare(
+        username=os.getenv("HYDRO_USERNAME", "admin"),
+        password=os.getenv("HYDRO_PASSWORD", "default"),
+        host=os.getenv("HYDRO_HOST", "localhost"),
+        port=int(os.getenv("HYDRO_PORT", "8000")),
+        protocol=os.getenv("HYDRO_PROTOCOL", "http"),
+        s3_endpoint_url=os.getenv("HYDRO_S3_ENDPOINT_URL", "http://localhost:9002"),
+    )
     return hs
 
 
