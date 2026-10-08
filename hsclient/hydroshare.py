@@ -1,3 +1,4 @@
+from typing_extensions import Optional
 import getpass
 import os
 import pathlib
@@ -6,7 +7,6 @@ import shutil
 import sqlite3
 import tempfile
 import time
-import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from datetime import datetime
@@ -42,6 +42,7 @@ else:
         xarray = None
 
 import requests
+import s3fs
 
 from hsmodels.schemas import load_rdf, rdf_string
 from hsmodels.schemas.base_models import BaseMetadata
@@ -933,6 +934,12 @@ class CSVAggregation(DataObjectSupportingAggregation):
 class Resource(Aggregation):
     """Represents a Resource in HydroShare"""
 
+    _parsed_s3_bucket_path: Optional[str] = None
+
+    def __init__(self, map_path, hs_session, checksums=None, s3_client=None):
+        super().__init__(map_path, hs_session, checksums)
+        self._s3_client = s3_client
+
     @property
     def _hsapi_path(self):
         path = urlparse(str(self.metadata.identifier)).path
@@ -973,6 +980,99 @@ class Resource(Aggregation):
         hsapi_path = urljoin(self._hsapi_path, 'sysmeta')
         return self._hs_session.get(hsapi_path, status_code=200).json()
 
+    # S3 protocol operations
+
+    @property
+    def s3_client(self) -> Optional[s3fs.S3FileSystem]:
+        """The s3fs.S3FileSystem client used for direct S3 access to this resource's files, or None if unavailable"""
+        return self._s3_client
+
+    @property
+    def s3_path(self) -> str:
+        """The bucket/prefix for this resource in S3 storage, discovered via HydroShare's S3 account REST endpoint"""
+        if self._parsed_s3_bucket_path is None:
+            response = self._hs_session.get(f"/hsapi/resource/s3/{self.resource_id}/", status_code=200)
+            data = response.json()
+            self._parsed_s3_bucket_path = f"{data['bucket']}/{data['prefix']}".rstrip("/")
+        return self._parsed_s3_bucket_path
+
+    def _build_s3_path(self, path: str = "") -> str:
+        if self.s3_client is None:
+            raise Exception("S3 client is not available for this resource - sign in with username/password")
+        base = self.s3_path.strip("/")
+        normalized_path = path.strip("/")
+        return f"{base}/{normalized_path}" if normalized_path else base
+
+    def _s3_list(
+        self, folder_path: Optional[str] = None, recursive: bool = False, include_folders: bool = False
+    ) -> List[str]:
+        remote_path = self._build_s3_path(folder_path or "")
+        if recursive:
+            entries = self.s3_client.find(remote_path, withdirs=include_folders)
+        else:
+            entries = self.s3_client.ls(remote_path, detail=True)
+            entries = [entry["name"] for entry in entries if include_folders or entry.get("type") != "directory"]
+        prefix = self._build_s3_path("") + "/"
+        return [entry[len(prefix):] for entry in entries if entry.rstrip("/") != remote_path.rstrip("/")]
+
+    def s3_list_objects(
+        self, folder_path: Optional[str] = None, recursive: bool = False, include_folders: bool = True
+    ) -> List[str]:
+        """
+        Lists files (and optionally folders) in this resource (or a subfolder of it) via the S3 protocol
+        :param folder_path: The relative path within the resource's contents to list, lists the whole resource
+        if not provided
+        :param recursive: Defaults to False, set to True to recursively list objects in all subfolders too
+        :param include_folders: Defaults to True, set to False to list only files
+        :return: A list of file (and folder, if included) paths relative to the resource's contents root
+        """
+        return self._s3_list(folder_path, recursive, include_folders=include_folders)
+
+    def s3_file_download(self, file_path: str, download_location: str) -> str:
+        """
+        Downloads a file from this resource directly via the S3 protocol
+        :param file_path: The relative path (within the resource's contents) of the file to download
+        :param download_location: The local directory or full file path to save the download to
+        :return: The local path of the downloaded file
+        """
+        remote_path = self._build_s3_path(file_path)
+        if not self.s3_client.exists(remote_path):
+            raise FileNotFoundError(f"File not found in S3 storage: {file_path}")
+        if not download_location or os.path.isdir(download_location):
+            local_path = os.path.join(download_location, os.path.basename(file_path))
+        else:
+            local_path = download_location
+        self.s3_client.get(remote_path, local_path)
+        return local_path
+
+    @refresh
+    def s3_file_upload(self, local_file_path: str, folder: Optional[str] = None) -> str:
+        """
+        Uploads a local file to this resource directly via the S3 protocol
+        :param local_file_path: The path to the local file to upload
+        :param folder: The relative destination folder within the resource's contents, uploads to the root
+        if not provided
+        :return: The path (relative to the resource's contents root) the file was uploaded to
+        """
+        if not os.path.isfile(local_file_path):
+            raise FileNotFoundError(f"Local file not found: {local_file_path}")
+        file_name = os.path.basename(local_file_path)
+        relative_path = f"{folder.strip('/')}/{file_name}" if folder else file_name
+        remote_path = self._build_s3_path(relative_path)
+        self.s3_client.put(local_file_path, remote_path)
+        return relative_path
+
+    @refresh
+    def s3_file_delete(self, file_path: str) -> None:
+        """
+        Deletes a file from this resource directly via the S3 protocol
+        :param file_path: The relative path (within the resource's contents) of the file to delete
+        """
+        remote_path = self._build_s3_path(file_path)
+        if not self.s3_client.exists(remote_path):
+            raise FileNotFoundError(f"File not found in S3 storage: {file_path}")
+        self.s3_client.rm(remote_path)
+
     # access operations
 
     def set_sharing_status(self, public: bool):
@@ -1004,7 +1104,9 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "version")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
-        return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
+        return Resource(
+            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+        )
 
     def copy(self):
         """
@@ -1014,7 +1116,9 @@ class Resource(Aggregation):
         path = urljoin(self._hsapi_path, "copy")
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
-        return Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
+        return Resource(
+            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+        )
 
     def download(self, save_path: str = "") -> str:
         """
@@ -1495,11 +1599,13 @@ class HydroShare:
     :param port: The port to use, defaults to `443`
     :param client_id: The client id associated with the OAuth2 token
     :param token: The OAuth2 token to use
+    :param s3_endpoint_url: The S3 endpoint URL to use for direct S3 access, defaults to `https://s3.hydroshare.org`
     """
 
     default_host = 'www.hydroshare.org'
     default_protocol = "https"
     default_port = 443
+    default_s3_endpoint_url = "https://s3.hydroshare.org"
 
     def __init__(
         self,
@@ -1510,7 +1616,13 @@ class HydroShare:
         port: int = default_port,
         client_id: str = None,
         token: Union[Token, Dict[str, str]] = None,
+        s3_endpoint_url: str = default_s3_endpoint_url,
     ):
+        self._s3_access_key: str = None
+        self._s3_secret_key: str = None
+        self._s3_client: s3fs.S3FileSystem = None
+        self._s3_endpoint_url: str = s3_endpoint_url
+
         if client_id or token:
             if not client_id or not token:
                 raise ValueError("Oauth2 requires a client_id to be paired with a token")
@@ -1525,6 +1637,7 @@ class HydroShare:
             )
             if username or password:
                 self.my_user_info()  # validate credentials
+                self._init_s3_client()
 
         self._resource_object_cache: Dict[str, Resource] = dict()
 
@@ -1534,6 +1647,46 @@ class HydroShare:
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
         self.my_user_info()  # validate credentials
+        self._init_s3_client()
+
+    @property
+    def s3_client(self) -> Optional[s3fs.S3FileSystem]:
+        """
+        The s3fs.S3FileSystem client for direct S3 access to HydroShare-backed storage.
+        Available after authenticating with a username/password. None if S3 credentials could not
+        be obtained, or no username/password was supplied.
+        """
+        return self._s3_client
+
+    def _init_s3_client(self) -> None:
+        """Retrieves the user's S3 credentials from HydroShare and creates an s3fs S3FileSystem client"""
+        try:
+            self._set_user_s3_credentials()
+            if self._s3_access_key and self._s3_secret_key:
+                self._s3_client = s3fs.S3FileSystem(
+                    key=self._s3_access_key,
+                    secret=self._s3_secret_key,
+                    endpoint_url=self._s3_endpoint_url,
+                    # botocore defaults to streaming request/response bodies with an aws-chunked
+                    # checksum trailer. HydroShare's S3 proxy (in front of its GCS-backed storage)
+                    # doesn't decode that framing correctly, which silently corrupts uploaded/
+                    # downloaded file contents. Forcing "when_required" falls back to plain,
+                    # non-chunked bodies, which the proxy handles correctly.
+                    config_kwargs={
+                        "request_checksum_calculation": "when_required",
+                        "response_checksum_validation": "when_required",
+                    },
+                )
+        except Exception as e:
+            print(f"WARNING: Failed to initialize S3 client - {str(e)}")
+            self._s3_client = None
+
+    def _set_user_s3_credentials(self) -> None:
+        """Retrieves and stores the user's S3 credentials from HydroShare"""
+        response = self._hs_session.post('/hsapi/user/service/accounts/s3/', status_code=201)
+        response_json = response.json()
+        self._s3_access_key = response_json['access_key']
+        self._s3_secret_key = response_json['secret_key']
 
     @classmethod
     def hs_juptyerhub(cls, hs_auth_path="/home/jovyan/data/.hs_auth"):
@@ -1651,7 +1804,9 @@ class HydroShare:
         if resource_id in self._resource_object_cache and use_cache:
             return self._resource_object_cache[resource_id]
 
-        res = Resource("/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session)
+        res = Resource(
+            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+        )
         if validate:
             res.metadata
 
@@ -1670,6 +1825,15 @@ class HydroShare:
         response = self._hs_session.post('/hsapi/resource/', status_code=201)
         resource_id = response.json()['resource_id']
         return self.resource(resource_id, use_cache=use_cache)
+
+    def get_resource_path(self, resource_id: str) -> str:
+        """
+        Retrieves the S3 bucket/prefix path for the given resource
+        :param resource_id: The resource id of the resource
+        :return: The S3 bucket/prefix path for the resource
+        """
+        res = self.resource(resource_id, validate=False, use_cache=False)
+        return res.s3_path
 
     def user(self, user_id: int) -> User:
         """

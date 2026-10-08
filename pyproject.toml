@@ -24,6 +24,7 @@ dependencies = [
     "hsmodels>=1.1.2",
     "requests",
     "requests_oauthlib",
+    "s3fs",
 ]
 
 [project.urls]
