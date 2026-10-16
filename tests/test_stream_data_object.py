@@ -40,7 +40,7 @@ def test_stream_invalid_object_type_pair_raises(hs_with_s3):
 def test_stream_deferred_format_raises_not_implemented(hs_with_s3):
     """Multi-file / non-seekable formats are registered but not yet streamable."""
     hs, _ = hs_with_s3
-    for path in (f"{S3_BASE}/layer.shp", f"{S3_BASE}/raster.vrt", f"{S3_BASE}/series.sqlite"):
+    for path in (f"{S3_BASE}/layer.shp", f"{S3_BASE}/series.sqlite"):
         with pytest.raises(NotImplementedError, match="is not supported yet"):
             hs.stream_data_object(path)
 
@@ -107,6 +107,17 @@ def test_stream_tif_dispatches_to_rasterio(hs_with_s3):
         result = hs.stream_data_object(f"{S3_BASE}/dem.tif")
 
     assert mock_rasterio.open.call_count == 1
+    assert result is mock_rasterio.open.return_value
+
+
+def test_stream_vrt_dispatches_to_rasterio(hs_with_s3):
+    """A .vrt is the main file of a GeoRaster aggregation; rasterio/GDAL opens it, resolving the
+    referenced source rasters through the s3fs opener."""
+    hs, mock_s3_client = hs_with_s3
+    with patch("hsclient.hydroshare.rasterio") as mock_rasterio:
+        result = hs.stream_data_object(f"{S3_BASE}/mosaic.vrt")
+
+    mock_rasterio.open.assert_called_once_with(f"{S3_BASE}/mosaic.vrt", opener=mock_s3_client)
     assert result is mock_rasterio.open.return_value
 
 
