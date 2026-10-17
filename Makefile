@@ -9,7 +9,7 @@ format:
 
 .PHONY: install
 install:
-	pip install -r requirements.txt
+	pip install -e ".[dev]"
 
 .PHONY: docs
 docs:
