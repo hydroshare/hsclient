@@ -1375,7 +1375,7 @@ class HydroShareSession:
             if not path.endswith(".zip"):
                 path += ".zip"
             file_is_ready = True
-        if content_type == "binary/octet-stream":
+        if content_type in ["binary/octet-stream", "application/octet-stream"]:
             # here we assume that the stream is a zip file
             if not path.endswith(".zip"):
                 path += ".zip"
