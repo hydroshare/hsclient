@@ -1,5 +1,5 @@
 # Version information
-__version__ = "1.1.7"
+__version__ = "1.1.9"
 
 from hsclient.hydroshare import (
     Aggregation,
