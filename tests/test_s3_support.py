@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
+import requests
 
 from hsclient.hydroshare import HydroShare, Resource
 
@@ -26,11 +27,25 @@ def mock_session_init():
         yield mock_get, mock_post
 
 
-def test_s3_client_initialized_on_login(mock_session_init):
+def test_s3_client_initialized_lazily_on_first_access(mock_session_init):
+    _, mock_post = mock_session_init
     with patch("hsclient.hydroshare.s3fs") as mock_s3fs:
         mock_s3fs.S3FileSystem.return_value = MagicMock()
         hs = HydroShare(username="test_user", password="test_pass")
 
+        # S3 client is created lazily on first access, not during login, so logging in must not
+        # make the (potentially slow) S3 credentials call.
+        mock_s3fs.S3FileSystem.assert_not_called()
+        assert all(call.args[0] != "/hsapi/user/service/accounts/s3/" for call in mock_post.call_args_list)
+
+        assert hs.s3_client is mock_s3fs.S3FileSystem.return_value
+
+        # first access fetches credentials (with a bounded timeout) and builds the client
+        mock_post.assert_called_once_with(
+            "/hsapi/user/service/accounts/s3/",
+            status_code=201,
+            timeout=HydroShare.default_s3_credentials_timeout,
+        )
         mock_s3fs.S3FileSystem.assert_called_once_with(
             key="AKIATEST",
             secret="SECRETTEST",
@@ -40,7 +55,10 @@ def test_s3_client_initialized_on_login(mock_session_init):
                 "response_checksum_validation": "when_required",
             },
         )
+
+        # subsequent accesses are cached - no repeat credential fetch
         assert hs.s3_client is mock_s3fs.S3FileSystem.return_value
+        mock_s3fs.S3FileSystem.assert_called_once()
 
 
 def test_s3_client_is_none_when_credential_fetch_fails(mock_session_init):
@@ -54,12 +72,78 @@ def test_s3_client_is_none_when_credential_fetch_fails(mock_session_init):
         mock_s3fs.S3FileSystem.assert_not_called()
 
 
+def test_s3_client_retries_after_transient_failure(mock_session_init):
+    """A timeout/connection error must not permanently disable S3 - a later access retries."""
+    _, mock_post = mock_session_init
+    good_response = mock_post.return_value
+    mock_post.side_effect = [requests.exceptions.ConnectionError("connection reset"), good_response]
+
+    with patch("hsclient.hydroshare.s3fs") as mock_s3fs:
+        mock_s3fs.S3FileSystem.return_value = MagicMock()
+        hs = HydroShare(username="test_user", password="test_pass")
+
+        # first access hits a transient failure -> None, nothing built, bootstrap left open
+        assert hs.s3_client is None
+        mock_s3fs.S3FileSystem.assert_not_called()
+
+        # a later access retries the credential fetch and succeeds
+        assert hs.s3_client is mock_s3fs.S3FileSystem.return_value
+        mock_s3fs.S3FileSystem.assert_called_once()
+        assert mock_post.call_count == 2
+
+
+def test_s3_client_does_not_retry_after_permanent_failure(mock_session_init):
+    """A non-transient failure is attempted at most once - no repeat credential fetch."""
+    _, mock_post = mock_session_init
+    mock_post.side_effect = Exception("Failed POST, status_code 403")
+
+    with patch("hsclient.hydroshare.s3fs") as mock_s3fs:
+        hs = HydroShare(username="test_user", password="test_pass")
+        assert hs.s3_client is None
+        assert hs.s3_client is None
+        # the credential endpoint was called exactly once across both accesses
+        s3_cred_calls = [
+            c for c in mock_post.call_args_list if c.args and c.args[0] == "/hsapi/user/service/accounts/s3/"
+        ]
+        assert len(s3_cred_calls) == 1
+        mock_s3fs.S3FileSystem.assert_not_called()
+
+
 def test_s3_client_is_none_without_credentials(mock_session_init):
     """No username/password supplied -> no S3 bootstrap attempted at all."""
     with patch("hsclient.hydroshare.s3fs") as mock_s3fs:
         hs = HydroShare()
         assert hs.s3_client is None
         mock_s3fs.S3FileSystem.assert_not_called()
+
+
+def test_resource_access_does_not_trigger_s3_credentials(mock_session_init):
+    """Opening a resource (e.g. for metadata) must not fetch S3 credentials; only an S3 operation does."""
+    _, mock_post = mock_session_init
+    with patch("hsclient.hydroshare.s3fs") as mock_s3fs:
+        mock_s3fs.S3FileSystem.return_value = MagicMock()
+        hs = HydroShare(username="test_user", password="test_pass")
+
+        res = hs.resource("abc123", validate=False, use_cache=False)
+
+        # merely opening the resource resolves no S3 client and fetches no credentials
+        assert all(call.args[0] != "/hsapi/user/service/accounts/s3/" for call in mock_post.call_args_list)
+        mock_s3fs.S3FileSystem.assert_not_called()
+
+        # an actual S3 operation resolves the client lazily, fetching credentials now
+        with patch.object(Resource, "s3_path", new_callable=PropertyMock) as mock_s3_path:
+            mock_s3_path.return_value = "test-bucket/abc123/data/contents"
+            mock_s3fs.S3FileSystem.return_value.ls.return_value = [
+                {"name": "test-bucket/abc123/data/contents/file1.txt", "type": "file"}
+            ]
+            assert res.s3_list_objects(include_folders=False) == ["file1.txt"]
+
+        mock_post.assert_called_once_with(
+            "/hsapi/user/service/accounts/s3/",
+            status_code=201,
+            timeout=HydroShare.default_s3_credentials_timeout,
+        )
+        mock_s3fs.S3FileSystem.assert_called_once()
 
 
 @pytest.fixture

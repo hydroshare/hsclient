@@ -936,9 +936,12 @@ class Resource(Aggregation):
 
     _parsed_s3_bucket_path: Optional[str] = None
 
-    def __init__(self, map_path, hs_session, checksums=None, s3_client=None):
+    def __init__(self, map_path, hs_session, checksums=None, s3_client=None, s3_client_provider=None):
         super().__init__(map_path, hs_session, checksums)
         self._s3_client = s3_client
+        # Optional zero-arg callable that returns the s3fs client. When provided, the client is
+        # resolved lazily on first access (see the s3_client property).
+        self._s3_client_provider = s3_client_provider
 
     @property
     def _hsapi_path(self):
@@ -984,7 +987,14 @@ class Resource(Aggregation):
 
     @property
     def s3_client(self) -> Optional[s3fs.S3FileSystem]:
-        """The s3fs.S3FileSystem client used for direct S3 access to this resource's files, or None if unavailable"""
+        """
+        The s3fs.S3FileSystem client used for direct S3 access to this resource's files, or None if unavailable.
+
+        Resolved lazily on first access (e.g. from an s3_* method via _build_s3_path) so that opening
+        a resource for metadata only never triggers S3 credential retrieval.
+        """
+        if self._s3_client_provider is not None:
+            return self._s3_client_provider()
         return self._s3_client
 
     @property
@@ -1105,7 +1115,10 @@ class Resource(Aggregation):
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
         return Resource(
-            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+            "/resource/{}/data/resourcemap.xml".format(resource_id),
+            self._hs_session,
+            s3_client=self._s3_client,
+            s3_client_provider=self._s3_client_provider,
         )
 
     def copy(self):
@@ -1117,7 +1130,10 @@ class Resource(Aggregation):
         response = self._hs_session.post(path, status_code=202)
         resource_id = response.text
         return Resource(
-            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+            "/resource/{}/data/resourcemap.xml".format(resource_id),
+            self._hs_session,
+            s3_client=self._s3_client,
+            s3_client_provider=self._s3_client_provider,
         )
 
     def download(self, save_path: str = "") -> str:
@@ -1606,6 +1622,11 @@ class HydroShare:
     default_protocol = "https"
     default_port = 443
     default_s3_endpoint_url = "https://s3.hydroshare.org"
+    # (connect, read) timeout in seconds for the S3 credentials request, so a stalled endpoint fails
+    # fast instead of blocking the first-use path forever. The connect timeout is set just above a
+    # multiple of 3 (9.05 = 3 x 3 + margin), per the `requests` guidance tied to TCP's SYN retransmission
+    # window, so the third connection attempt isn't cut short. The read timeout bounds the response wait.
+    default_s3_credentials_timeout = (9.05, 30)
 
     def __init__(
         self,
@@ -1620,8 +1641,12 @@ class HydroShare:
     ):
         self._s3_access_key: str = None
         self._s3_secret_key: str = None
-        self._s3_client: s3fs.S3FileSystem = None
+        self._s3_client: Optional[s3fs.S3FileSystem] = None
         self._s3_endpoint_url: str = s3_endpoint_url
+        # S3 client creation is deferred until first use (see the s3_client property) to avoid unnecessary
+        # network calls.
+        self._s3_auth_available: bool = False
+        self._s3_bootstrapped: bool = False
 
         if client_id or token:
             if not client_id or not token:
@@ -1637,7 +1662,7 @@ class HydroShare:
             )
             if username or password:
                 self.my_user_info()  # validate credentials
-                self._init_s3_client()
+                self._s3_auth_available = True  # defer S3 client creation to first use
 
         self._resource_object_cache: Dict[str, Resource] = dict()
 
@@ -1647,21 +1672,43 @@ class HydroShare:
         password = getpass.getpass("Password for {}: ".format(username))
         self._hs_session.set_auth((username, password))
         self.my_user_info()  # validate credentials
-        self._init_s3_client()
+        self._s3_client = None
+        self._s3_auth_available = True  # defer S3 client creation to first use
+        self._s3_bootstrapped = False  # allow (re)bootstrap with the newly provided credentials
 
     @property
     def s3_client(self) -> Optional[s3fs.S3FileSystem]:
         """
         The s3fs.S3FileSystem client for direct S3 access to HydroShare-backed storage.
-        Available after authenticating with a username/password. None if S3 credentials could not
-        be obtained, or no username/password was supplied.
+        Created lazily on first access (one network call to fetch S3 credentials). Available after
+        authenticating with a username/password. None if S3 credentials could not be obtained, or the
+        client is anonymous or authenticated with OAuth2.
         """
+        if self._s3_client is None and self._s3_auth_available and not self._s3_bootstrapped:
+            self._init_s3_client()
         return self._s3_client
 
     def _init_s3_client(self) -> None:
-        """Retrieves the user's S3 credentials from HydroShare and creates an s3fs S3FileSystem client"""
+        """
+        Retrieves the user's S3 credentials from HydroShare and creates an s3fs S3FileSystem client.
+        Called lazily from the s3_client property on first use.
+        """
         try:
             self._set_user_s3_credentials()
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            # transient: do not mark bootstrapped, so a later s3_client access can retry
+            print(f"WARNING: Could not reach HydroShare to obtain S3 credentials - {str(e)}")
+            self._s3_client = None
+            return
+        except Exception as e:
+            # permanent: mark bootstrapped so the failing credential fetch is not retried
+            self._s3_bootstrapped = True
+            print(f"WARNING: Failed to obtain S3 credentials from HydroShare - {str(e)}")
+            self._s3_client = None
+            return
+
+        self._s3_bootstrapped = True
+        try:
             if self._s3_access_key and self._s3_secret_key:
                 self._s3_client = s3fs.S3FileSystem(
                     key=self._s3_access_key,
@@ -1683,7 +1730,9 @@ class HydroShare:
 
     def _set_user_s3_credentials(self) -> None:
         """Retrieves and stores the user's S3 credentials from HydroShare"""
-        response = self._hs_session.post('/hsapi/user/service/accounts/s3/', status_code=201)
+        response = self._hs_session.post(
+            '/hsapi/user/service/accounts/s3/', status_code=201, timeout=self.default_s3_credentials_timeout
+        )
         response_json = response.json()
         self._s3_access_key = response_json['access_key']
         self._s3_secret_key = response_json['secret_key']
@@ -1805,7 +1854,9 @@ class HydroShare:
             return self._resource_object_cache[resource_id]
 
         res = Resource(
-            "/resource/{}/data/resourcemap.xml".format(resource_id), self._hs_session, s3_client=self._s3_client
+            "/resource/{}/data/resourcemap.xml".format(resource_id),
+            self._hs_session,
+            s3_client_provider=lambda: self.s3_client,
         )
         if validate:
             res.metadata
