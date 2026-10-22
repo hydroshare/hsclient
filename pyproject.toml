@@ -24,6 +24,7 @@ dependencies = [
     "hsmodels>=1.1.2",
     "requests",
     "requests_oauthlib",
+    "s3fs",
 ]
 
 [project.urls]
@@ -39,6 +40,7 @@ dev = [
     "pandas", "netCDF4", "xarray", "rasterio", "fiona",
     "pytest", "pytest-xdist", "pytest-cov",
     "mkdocs", "mknotebooks", "mkdocstrings", "mkdocstrings-python",
+    "pymdown-extensions<12",
 ]
 
 [tool.setuptools]
