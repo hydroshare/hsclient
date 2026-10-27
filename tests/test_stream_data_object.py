@@ -129,7 +129,7 @@ def test_stream_missing_dependency_raises(hs_with_s3):
 
 
 @pytest.mark.integration
-def test_stream_zarr_to_xarray_integration(hydroshare, new_resource):
+def test_stream_zarr_to_xarray_integration(hydroshare, new_resource, tmp_path):
     """
     End-to-end: write a small zarr store to a resource's S3 location, then stream it back into
     an xarray.Dataset without downloading. Requires a HydroShare/S3 backend and xarray+zarr.
@@ -145,7 +145,13 @@ def test_stream_zarr_to_xarray_integration(hydroshare, new_resource):
         coords={"time": np.arange(5)},
     )
     zarr_s3_path = f"{new_resource.s3_path}/sample.zarr"
-    ds.to_zarr(hydroshare.s3_client.get_mapper(zarr_s3_path), mode="w")
+    # Write locally and upload file-by-file.
+    local_zarr = tmp_path / "sample.zarr"
+    ds.to_zarr(str(local_zarr), mode="w")
+    for local_file in local_zarr.rglob("*"):
+        if local_file.is_file():
+            relative_path = local_file.relative_to(local_zarr).as_posix()
+            hydroshare.s3_client.put_file(str(local_file), f"{zarr_s3_path}/{relative_path}")
 
     streamed = hydroshare.stream_data_object(zarr_s3_path)
     assert streamed.__class__.__name__ == "Dataset"
