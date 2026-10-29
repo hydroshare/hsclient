@@ -32,13 +32,16 @@ Homepage = "https://github.com/hydroshare/hsclient"
 
 [project.optional-dependencies]
 pandas = ["pandas"]
-xarray = ["netCDF4", "xarray"]
+xarray = ["netCDF4", "xarray", "zarr", "h5netcdf"]
 rasterio = ["rasterio"]
 fiona = ["fiona"]
-all = ["pandas", "netCDF4", "xarray", "rasterio", "fiona"]
+pyarrow = ["pyarrow"]
+fastparquet = ["fastparquet"]
+all = ["pandas", "netCDF4", "xarray", "zarr", "h5netcdf", "rasterio", "fiona", "pyarrow", "fastparquet"]
 dev = [
-    "pandas", "netCDF4", "xarray", "rasterio", "fiona",
+    "pandas", "netCDF4", "xarray", "zarr", "h5netcdf", "rasterio", "fiona", "pyarrow", "fastparquet",
     "pytest", "pytest-xdist", "pytest-cov",
+    "isort", "black", "Pygments",
     "mkdocs", "mknotebooks", "mkdocstrings", "mkdocstrings-python",
     "pymdown-extensions<12",
 ]
@@ -51,6 +54,9 @@ version = {attr = "hsclient.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: tests that require a live HydroShare/S3 backend",
+]
 
 [tool.flake8]
 max-line-length = 120
@@ -95,4 +101,16 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "dotenv"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "s3fs.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "fastparquet.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pyarrow.*"
 ignore_missing_imports = true
