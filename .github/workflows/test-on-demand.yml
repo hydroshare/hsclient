@@ -30,7 +30,7 @@ jobs:
         pip install .
     - name: Run Tests against target = ${{ github.event.inputs.target }}
       env:
-        HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
+        HYDRO_USERNAME: ${{ vars.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
         HYDRO_HOST: ${{ github.event.inputs.target }}
       run: |

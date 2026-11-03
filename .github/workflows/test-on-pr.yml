@@ -39,7 +39,7 @@ jobs:
         make format
     - name: Test with pytest
       env:
-        HYDRO_USERNAME: ${{ secrets.HYDRO_USERNAME }}
+        HYDRO_USERNAME: ${{ vars.HYDRO_USERNAME }}
         HYDRO_PASSWORD: ${{ secrets.HYDRO_PASSWORD }}
       run: |
         make test-cov
