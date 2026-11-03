@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 from os.path import splitext
 from urllib.request import pathname2url
@@ -64,6 +65,18 @@ def encode_resource_url(url):
     url_encoded_path = pathname2url(parsed_url.path)
     encoded_url = parsed_url._replace(path=url_encoded_path).geturl()
     return encoded_url
+
+
+def release_version(version: str) -> str:
+    """
+    Returns the numeric release part of a version string, dropping any pre-release, post-release,
+    dev, or local suffix (e.g. "1.2.0b1" -> "1.2.0"). HydroShare returns HTTP 500 when the hsclient
+    version in the User-Agent header has such a suffix.
+    :param version: a version string
+    :return: the numeric release part, or the input unchanged if it does not start with a number
+    """
+    match = re.match(r"\d+(\.\d+)*", version)
+    return match.group(0) if match else version
 
 
 def is_folder(path):
