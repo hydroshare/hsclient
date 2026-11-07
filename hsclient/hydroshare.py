@@ -62,7 +62,7 @@ from requests_oauthlib import OAuth2Session
 
 from hsclient.json_models import ResourcePreview, User
 from hsclient.oauth2_model import Token
-from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type
+from hsclient.utils import attribute_filter, encode_resource_url, is_aggregation, main_file_type, release_version
 
 from hsclient import __version__ as VERSION
 
@@ -1457,7 +1457,7 @@ class HydroShareSession:
         else:
             self._session = requests.Session()
             default_agent = self._session.headers['User-Agent']
-            self._session.headers['User-Agent'] = f'{default_agent} (hsclient {VERSION})'
+            self._session.headers['User-Agent'] = f'{default_agent} (hsclient {release_version(VERSION)})'
 
             if username is None or password is None:
                 return
