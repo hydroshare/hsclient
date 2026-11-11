@@ -2116,7 +2116,8 @@ class HydroShare:
         :raises NotImplementedError: for a format that is registered but not yet streamable in this
             POC iteration (.shp, .sqlite).
         """
-        if self._s3_client is None:
+        s3_client = self.s3_client  # lazily creates the client on first use
+        if s3_client is None:
             raise Exception("S3 client is not available - sign in with username/password")
 
         ext = splitext(s3_path.rstrip("/"))[1].lower()
@@ -2127,4 +2128,4 @@ class HydroShare:
 
         reader = reader_cls()
         selected = reader.validate_object_type(ext, object_type)
-        return reader.read(self._s3_client, s3_path, selected, reader_kwargs)
+        return reader.read(s3_client, s3_path, selected, reader_kwargs)
