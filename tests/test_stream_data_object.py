@@ -24,6 +24,32 @@ def test_stream_raises_without_s3_client():
         hs.stream_data_object(f"{S3_BASE}/my_data.zarr")
 
 
+def test_stream_lazily_creates_s3_client_for_signed_in_user():
+    """stream_data_object must go through the lazy s3_client property, so a signed-in user whose S3 client
+    has not been created yet still gets one."""
+    mock_s3_client = MagicMock()
+    with (
+        patch("hsclient.hydroshare.HydroShareSession.get") as mock_get,
+        patch("hsclient.hydroshare.HydroShareSession.post") as mock_post,
+        patch("hsclient.hydroshare.s3fs") as mock_s3fs,
+        patch("hsclient.hydroshare.xarray") as mock_xarray,
+    ):
+        mock_get.return_value = MagicMock(status_code=200, json=lambda: {"username": "test_user"})
+        mock_post.return_value = MagicMock(
+            status_code=201, json=lambda: {"access_key": "AKIATEST", "secret_key": "SECRETTEST"}
+        )
+        mock_s3fs.S3FileSystem.return_value = mock_s3_client
+
+        hs = HydroShare(username="test_user", password="test_pass")
+        assert hs._s3_client is None  # not created at sign-in
+
+        result = hs.stream_data_object(f"{S3_BASE}/my_data.zarr")
+
+    mock_s3fs.S3FileSystem.assert_called_once()
+    mock_s3_client.get_mapper.assert_called_once_with(f"{S3_BASE}/my_data.zarr")
+    assert result is mock_xarray.open_zarr.return_value
+
+
 def test_stream_unsupported_extension_raises(hs_with_s3):
     hs, _ = hs_with_s3
     with pytest.raises(ValueError, match="Unsupported file format '.txt'"):
